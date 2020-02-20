@@ -1,0 +1,6 @@
+#Basic requirements
+numpy
+matplotlib
+
+#Requirements for analyzing MD trajectories
+MDAnalysis
