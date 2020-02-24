@@ -3,4 +3,5 @@ numpy
 matplotlib
 
 #Requirements for analyzing MD trajectories
-MDAnalysis
+MDAnalysis>=0.20
+pymbar>=3.0

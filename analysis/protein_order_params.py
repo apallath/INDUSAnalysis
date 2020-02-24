@@ -17,7 +17,8 @@ class OrderParams(timeseries.TimeSeries):
         super().__init__()
         self.parser.add_argument("structf", help="Structure file (.gro)")
         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
-        self.parser.add_argument("-selection", help="atoms/groups to track order parameters for")
+        self.parser.add_argument("-select", help="atoms/groups to track order parameters for (MDA selection string)")
+        self.parser.add_argument("-align", help="atoms/groups to align to reference frame (MDA selection string)")
 
     def calc_Rg(self):
         Rg = []
@@ -33,7 +34,7 @@ class OrderParams(timeseries.TimeSeries):
         #initial positions
         initpos = sel.positions.copy()
         for ts in self.u.trajectory:
-            RMSD.append((self.u.trajectory.time, mda_rms.rmsd(initpos,sel.positions)))
+            RMSD.append((self.u.trajectory.time, mda_rms.rmsd(initpos,sel.positions.copy(),superposition=True)))
         RMSD = np.array(RMSD)
         return RMSD
 
@@ -62,6 +63,8 @@ class OrderParams(timeseries.TimeSeries):
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel("RMSD (nm)")
         self.save_figure(fig,suffix="RMSD")
+        if self.args.show:
+            plt.show()
 
 if __name__=="__main__":
     prot = OrderParams()
