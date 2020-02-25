@@ -8,6 +8,8 @@ import argparse
 
 #For time series analysis
 import pymbar
+from scipy import stats
+from numpy import convolve
 
 class TimeSeries:
     def __init__(self):
@@ -30,10 +32,35 @@ class TimeSeries:
         ts = np.stack((t,x))
         np.save(self.args.opref+"_"+label,ts)
 
-    def average(self,t,x,label=""):
+    def moving_average(self,t,x,window):
+        w = np.repeat(1.0, window)/window
+        ma = np.convolve(x, w, 'same')
+        return t, ma
+
+    def average(self,t,x):
         tstep = t[1] - t[0]
-        [t0, g, Neff_max] = pymbar.timeseries.detectEquilibration(x)
-        print("Equilibrated at {}".format(tstep * t0))
+        start = 0
+        end = len(x) - 1
+        if self.avgstart is not None:
+            start = int(floor(self.avgstart/tstep))
+        if self.avgend is not None:
+            end = int(floor(self.avgend/tstep))
+        te = t[start:end]
+        xe = x[start:end]
+        tau_step = pymbar.timeseries.integratedAutocorrelationTime(xe)
+        Neff = len(xe)/tau_step
+
+        #Calculate std and sem
+        std = 0
+        sem = 0
+        for i in range(1000):
+            sidx = np.random.choice(np.array(range(len(xe))), size = int(N_uncorr), replace=False)
+            std += np.std(xe[sidx])
+            sem += stats.sem(xe[sidx])
+        std/= 1000
+        sem/= 1000
+        return std, sem
+
 
     def save_figure(self,fig,suffix=""):
         oformat = self.args.oformat
