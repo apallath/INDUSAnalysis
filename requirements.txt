@@ -5,3 +5,4 @@ matplotlib
 #Requirements for analyzing MD trajectories
 MDAnalysis>=0.20
 pymbar>=3.0
+pytest

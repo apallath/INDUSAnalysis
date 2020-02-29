@@ -1,0 +1,10 @@
+README.md
+setup.py
+AnalysisScripts.egg-info/PKG-INFO
+AnalysisScripts.egg-info/SOURCES.txt
+AnalysisScripts.egg-info/dependency_links.txt
+AnalysisScripts.egg-info/top_level.txt
+analysis/__init__.py
+analysis/indus_waters.py
+analysis/protein_order_params.py
+analysis/timeseries.py

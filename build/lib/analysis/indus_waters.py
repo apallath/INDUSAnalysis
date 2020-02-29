@@ -2,7 +2,7 @@
 
 @Author: Akash Pallath
 """
-from . import timeseries
+import timeseries
 
 import numpy as np
 import matplotlib.pyplot as plt
