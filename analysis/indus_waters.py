@@ -11,6 +11,7 @@ class IndusWaters(TimeSeries):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
+        self.parser.add_argument("-apref", help="Append current trajectory to <apref_N/Ntw>.npy files and plot")
 
     #read data
     def get_data(self):
@@ -61,8 +62,8 @@ class IndusWaters(TimeSeries):
         maN = self.moving_average(self.N,self.args.window)
         maNtw = self.moving_average(self.Ntw,self.args.window)
         fig, ax = plt.subplots()
-        ax.plot(self.t, maN, label="$N$, moving average")
-        ax.plot(self.t, maNtw, label="$N_{tw}$, moving average")
+        ax.plot(self.t[len(self.t) - len(maN):], maN, label="$N$, moving average")
+        ax.plot(self.t[len(self.t) - len(maN):], maNtw, label="$N_{tw}$, moving average")
         ax.set_xlabel("Time, in ps")
         ax.set_ylabel("Number of waters, moving average")
         ax.legend()
@@ -73,10 +74,52 @@ class IndusWaters(TimeSeries):
         #getaverages
         N_eff_samp, N_mean, N_std, N_sem, N_tau = self.average(self.t, self.N, self.args.avgstart, self.args.avgend)
         Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, Ntw_tau = self.average(self.t, self.Ntw, self.args.avgstart, self.args.avgend)
+
         #append averages
         if self.args.avgto is not None:
             with open(self.args.avgto, "a+") as f:
-                f.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(self.mu, N_eff_samp, N_mean, N_std, N_sem, Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, N_tau, Ntw_tau))
+                f.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(\
+                self.mu, N_eff_samp, N_mean, N_std, N_sem, Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, N_tau, Ntw_tau))
+
+        #append to previous data (if available), and plot
+        if self.args.apref is not None:
+            tNp = np.load(self.args.apref + "_N.npy")
+            tp = tNp[0,:]
+            Np = tNp[1,:]
+            tNtwp = np.load(self.args.apref + "_Ntw.npy")
+            Ntwp = tNtwp[1,:]
+
+            tn = tp[-1]+self.t
+
+            #plot time series data
+            fig, ax = plt.subplots()
+            ax.plot(tp,Np,label="$N$ (prev)")
+            ax.plot(tn,self.N,label="$N$")
+            ax.plot(tp,Ntwp,label="$N_{tw}$ (prev)")
+            ax.plot(tn,self.Ntw,label="$N_{tw}$")
+            ax.set_xlabel("Time, in ps")
+            ax.set_ylabel("$N_v$ and coarse-grained $N_v$")
+            ax.legend()
+            self.save_figure(fig,suffix="app_waters")
+            if self.args.show:
+                plt.show()
+
+            #plot time series data moving average
+            ttot = np.hstack([tp,tn])
+            Ntot = np.hstack([Np,self.N])
+            Ntwtot = np.hstack([Ntwp,self.Ntw])
+
+            maN = self.moving_average(Ntot,self.args.window)
+            maNtw = self.moving_average(Ntwtot,self.args.window)
+            fig, ax = plt.subplots()
+            ax.plot(ttot[len(ttot) - len(maN):], maN, label="$N$, moving average")
+            ax.plot(ttot[len(ttot) - len(maN):], maNtw, label="$N_{tw}$, moving average")
+            ax.set_xlabel("Time, in ps")
+            ax.set_ylabel("Number of waters, moving average")
+            ax.legend()
+            self.save_figure(fig,suffix="app_ma_waters")
+            if self.args.show:
+                plt.show()
 
 if __name__=="__main__":
     waters = IndusWaters()

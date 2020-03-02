@@ -13,7 +13,7 @@ import MDAnalysis as mda
 from MDAnalysis.analysis import align
 import MDAnalysis.analysis.rms as mda_rms
 
-class OrderParams(timeseries.TimeSeries):
+class OrderParams(TimeSeries):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("structf", help="Structure file (.gro)")
@@ -21,13 +21,7 @@ class OrderParams(timeseries.TimeSeries):
         self.parser.add_argument("-select", help="atoms/groups to track order parameters for (MDA selection string)")
         self.parser.add_argument("-align", help="atoms/groups to align to reference frame (MDA selection string)")
 
-    #testable
-    def align_traj(self, u):
-        #fit to initial frame
-        prealigner = align.AlignTraj(u, select=self.align)
-        prealigner.run()
-
-    #testable
+    """tests in tests/test_orderparams.py"""
     def calc_Rg(self,u,selection):
         Rg = []
         sel = u.select_atoms(selection)
@@ -36,19 +30,10 @@ class OrderParams(timeseries.TimeSeries):
         Rg = np.array(Rg)
         return Rg
 
-    #testable
+    """tests in tests/test_orderparams.py"""
     def calc_RMSD(self,u,align,selection):
-        """REQUIRES REVIEW"""
-
-        """
-        RMSD = []
-        #select atoms
-        sel = self.u.select_atoms(self.selection)
-        #initial positions
-        initpos = sel.positions.copy()
-        for ts in self.u.trajectory:
-            RMSD.append((self.u.trajectory.time, mda_rms.rmsd(initpos,sel.positions.copy(),superposition=True)))
-        RMSD = np.array(RMSD)
+        """REQUIRES REVIEW
+        - Issue: RMSD drifts significantly
         """
         R = mda_rms.RMSD(u, select=align, groupselections=[selection])
         R.run()

@@ -36,17 +36,17 @@ class TimeSeries:
             pref = "data"
         np.save(pref+"_"+label,ts)
 
-    #testable
+    """tests in tests/test_timeseries.py"""
     def moving_average(self,x,window):
         if window is None:
             window = np.float(10.0)
         else:
             window = np.float(window)
         w = np.repeat(1.0, window)/window
-        ma = np.convolve(x, w, 'same')
+        ma = np.convolve(x, w, 'valid')
         return ma
 
-    #testable
+    """tests in tests/test_timeseries.py"""
     def average(self,t,x,avgstart,avgend):
         tstep = t[1] - t[0]
         start = 0
