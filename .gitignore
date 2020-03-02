@@ -125,4 +125,4 @@ venv.bak/
 dmypy.json
 
 # xyz files for testing
-.xyz
+*.xyz

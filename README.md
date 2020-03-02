@@ -1,4 +1,4 @@
-Analysis scripts for MD simulation post processing.
+# Analysis scripts for MD simulation post processing.
 
 Install in editable state using pip:
 `pip install -e .`
@@ -9,5 +9,5 @@ Core analysis package:
 Tests (pytest):
 `test/`
 
-Test Jupyter notebooks:
-`test_notebooks/`
+Scratch Jupyter notebooks:
+`scratch/`
