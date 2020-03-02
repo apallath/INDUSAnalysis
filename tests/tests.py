@@ -11,7 +11,7 @@ def generate_xyz(natoms,boxlen):
         tf.write('testsystem')
         for i in range(natoms):
             [x,y,z] = [boxlen * np.random.rand(), boxlen * np.random.rand(), boxlen * np.random.rand()]
-            tf.write('{:.4f} {:.4f} {:.4f}'.format(x,y,z))
+            tf.write('{:.4f} {:.4f} {:.4f}\n'.format(x,y,z))
 
 def test_Rg():
     generate_xyz(30,10)

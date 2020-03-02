@@ -36,8 +36,8 @@ class TimeSeries:
             pref = "data"
         np.save(pref+"_"+label,ts)
 
-    def moving_average(self,x):
-        window = self.args.window
+    #testable
+    def moving_average(self,x,window):
         if window is None:
             window = np.float(10.0)
         else:
@@ -46,14 +46,15 @@ class TimeSeries:
         ma = np.convolve(x, w, 'same')
         return ma
 
-    def average(self,t,x):
+    #testable
+    def average(self,t,x,avgstart,avgend):
         tstep = t[1] - t[0]
         start = 0
         end = len(x) - 1
-        if self.args.avgstart is not None:
-            start = int(np.floor(np.float(self.args.avgstart)/tstep))
-        if self.args.avgend is not None:
-            end = int(np.floor(np.float(self.args.avgend)/tstep))
+        if avgstart is not None:
+            start = int(np.floor(np.float(avgstart)/tstep))
+        if avgend is not None:
+            end = int(np.floor(np.float(avgend)/tstep))
         te = t[start:end]
         xe = x[start:end]
         tau_step = pymbar.timeseries.integratedAutocorrelationTime(xe)

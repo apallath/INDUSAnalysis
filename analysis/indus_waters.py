@@ -2,16 +2,17 @@
 
 @Author: Akash Pallath
 """
-import timeseries
+from analysis.timeseries import TimeSeries
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-class IndusWaters(timeseries.TimeSeries):
+class IndusWaters(TimeSeries):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
 
+    #read data
     def get_data(self):
         self.read_args()
         t = []
@@ -57,8 +58,8 @@ class IndusWaters(timeseries.TimeSeries):
             plt.show()
 
         #plot moving average data
-        maN = self.moving_average(self.N)
-        maNtw = self.moving_average(self.Ntw)
+        maN = self.moving_average(self.N,self.args.window)
+        maNtw = self.moving_average(self.Ntw,self.args.window)
         fig, ax = plt.subplots()
         ax.plot(self.t, maN, label="$N$, moving average")
         ax.plot(self.t, maNtw, label="$N_{tw}$, moving average")
@@ -70,8 +71,8 @@ class IndusWaters(timeseries.TimeSeries):
             plt.show()
 
         #getaverages
-        N_eff_samp, N_mean, N_std, N_sem, N_tau = self.average(self.t, self.N)
-        Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, Ntw_tau = self.average(self.t, self.Ntw)
+        N_eff_samp, N_mean, N_std, N_sem, N_tau = self.average(self.t, self.N, self.args.avgstart, self.args.avgend)
+        Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, Ntw_tau = self.average(self.t, self.Ntw, self.args.avgstart, self.args.avgend)
         #append averages
         if self.args.avgto is not None:
             with open(self.args.avgto, "a+") as f:
