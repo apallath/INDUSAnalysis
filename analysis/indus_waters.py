@@ -131,4 +131,5 @@ warnings = ""
 if __name__=="__main__":
     waters = IndusWaters()
     startup_string = "#### INDUS Waters ####\n" + warnings
+    print(startup_string)
     waters()

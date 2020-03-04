@@ -1,6 +1,7 @@
 #Basic requirements
 numpy
 matplotlib
+Spicy
 
 #Requirements for analyzing MD trajectories
 MDAnalysis>=0.20
