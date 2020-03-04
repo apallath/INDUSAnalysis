@@ -25,9 +25,21 @@ class TimeSeries:
         self.parser.add_argument("-oformat", help="output image format")
         self.parser.add_argument("-dpi", type=int, help="dpi of output image(s)")
         self.parser.add_argument("--show", action='store_true', help="show interactive plot(s)")
+        #for classes that choose to append to saved data from another run before plotting
+        self.parser.add_argument("-apref", help="Append current quantities to previous quantities (from saved .npy files) and plot")
+        self.parser.add_argument("-aprevlegend", help="String describing what the previous run currently being appended to is (for plot legend)")
+        self.parser.add_argument("-acurlegend", help="String describing what the current run being appended is (for plot legend)")
 
     def read_args(self):
         self.args = self.parser.parse_args()
+
+        #Common corner case handling
+        self.aprevlegend = self.args.aprevlegend
+        self.acurlegend = self.args.acurlegend
+        if self.aprevlegend is None:
+            aprevlegend = "Previous"
+        if self.acurlegend is None:
+            acurlegend = "Current"
 
     def save_timeseries(self,t,x,label=""):
         ts = np.stack((t,x))
@@ -35,6 +47,7 @@ class TimeSeries:
         if pref == None:
             pref = "data"
         np.save(pref+"_"+label,ts)
+        print("Saving data > "+pref+"_"+label+".npy")
 
     """tests in tests/test_timeseries.py"""
     def moving_average(self,x,window):
@@ -90,3 +103,5 @@ class TimeSeries:
             fig.savefig(filename, dpi=imgdpi)
         else:
             fig.savefig(filename)
+
+        print("Saving figure > "+filename)

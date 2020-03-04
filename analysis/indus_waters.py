@@ -1,5 +1,8 @@
 """Plot number of waters in probe volume output by GROMACS-INDUS simulation
 
+Units:
+- time: ps
+
 @Author: Akash Pallath
 """
 from analysis.timeseries import TimeSeries
@@ -11,7 +14,6 @@ class IndusWaters(TimeSeries):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
-        self.parser.add_argument("-apref", help="Append current trajectory to <apref_N/Ntw>.npy files and plot")
 
     #read data
     def get_data(self):
@@ -51,8 +53,8 @@ class IndusWaters(TimeSeries):
         fig, ax = plt.subplots()
         ax.plot(self.t,self.N,label="$N$")
         ax.plot(self.t,self.Ntw,label="$N_{tw}$")
-        ax.set_xlabel("Time, in ps")
-        ax.set_ylabel("$N_v$ and coarse-grained $N_v$")
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel("Number of waters")
         ax.legend()
         self.save_figure(fig,suffix="waters")
         if self.args.show:
@@ -64,7 +66,7 @@ class IndusWaters(TimeSeries):
         fig, ax = plt.subplots()
         ax.plot(self.t[len(self.t) - len(maN):], maN, label="$N$, moving average")
         ax.plot(self.t[len(self.t) - len(maN):], maNtw, label="$N_{tw}$, moving average")
-        ax.set_xlabel("Time, in ps")
+        ax.set_xlabel("Time (ps)")
         ax.set_ylabel("Number of waters, moving average")
         ax.legend()
         self.save_figure(fig,suffix="ma_waters")
@@ -93,12 +95,12 @@ class IndusWaters(TimeSeries):
 
             #plot time series data
             fig, ax = plt.subplots()
-            ax.plot(tp,Np,label="$N$ (prev)")
-            ax.plot(tn,self.N,label="$N$")
-            ax.plot(tp,Ntwp,label="$N_{tw}$ (prev)")
-            ax.plot(tn,self.Ntw,label="$N_{tw}$")
-            ax.set_xlabel("Time, in ps")
-            ax.set_ylabel("$N_v$ and coarse-grained $N_v$")
+            ax.plot(tp,Np,label="$N$, " + self.aprevlegend)
+            ax.plot(tn,self.N,label="$N$, " + self.acurlegend)
+            ax.plot(tp,Ntwp,label="$N_{tw}$, " + self.aprevlegend)
+            ax.plot(tn,self.Ntw,label="$N_{tw}$, " + self.acurlegend)
+            ax.set_xlabel("Time (ps)")
+            ax.set_ylabel("Number of waters")
             ax.legend()
             self.save_figure(fig,suffix="app_waters")
             if self.args.show:
@@ -114,13 +116,19 @@ class IndusWaters(TimeSeries):
             fig, ax = plt.subplots()
             ax.plot(ttot[len(ttot) - len(maN):], maN, label="$N$, moving average")
             ax.plot(ttot[len(ttot) - len(maN):], maNtw, label="$N_{tw}$, moving average")
-            ax.set_xlabel("Time, in ps")
+            #separator line
+            ax.axvline(x=tp[-1])
+
+            ax.set_xlabel("Time (ps)")
             ax.set_ylabel("Number of waters, moving average")
             ax.legend()
             self.save_figure(fig,suffix="app_ma_waters")
             if self.args.show:
                 plt.show()
 
+warnings = ""
+
 if __name__=="__main__":
     waters = IndusWaters()
+    startup_string = "#### INDUS Waters ####\n" + warnings
     waters()

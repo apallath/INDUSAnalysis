@@ -17,10 +17,11 @@ def coords_generator(boxlen, natoms):
 """RMSD tests"""
 
 def test_RMSD_basic():
+    """no translations"""
     op = OrderParams()
     """random system with itself"""
     coords = coords_generator(10, 10)
-    assert(np.isclose(op.calc_RMSD_worker(coords,coords),0))
+    assert(np.isclose(op.calc_RMSD_worker(coords,coords,coords,coords),0))
 
     """known sample system"""
     coords1 = np.array([[1.0, 0.0, 0.0],
@@ -30,14 +31,14 @@ def test_RMSD_basic():
                         [0.0, -1.0, 0.0],
                         [0.0, 0.0, -1.0]])
     coords2 = 2.0 * coords1
-    assert(np.isclose(op.calc_RMSD_worker(coords1,coords2),1))
+    assert(np.isclose(op.calc_RMSD_worker(coords1,coords2,coords1,coords2),1))
 
 def test_RMSD_translate():
     """test RMSD translational invariance"""
     coords = coords_generator(10, 10)
     newcoords = coords + 100.0 * np.random.random_sample(3)
     op = OrderParams()
-    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords,coords,newcoords),0))
 
 def test_RMSD_known_rotate():
     """test RMSD rotational invariance"""
@@ -47,7 +48,7 @@ def test_RMSD_known_rotate():
                      [0, 0, 1.0]])
     newcoords = np.dot(coords, Rmat.T)
     op = OrderParams()
-    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords,coords,newcoords),0))
 
 def test_RMSD_rand_rotate():
     """test RMSD rotational invariance"""
@@ -56,7 +57,7 @@ def test_RMSD_rand_rotate():
     rot = scipy_R.from_rotvec(np.random.random_sample(3))
     newcoords = rot.apply(coords)
     op = OrderParams()
-    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords,coords,newcoords),0))
 
 def test_RMSD_translate_rotate():
     """test RMSD translation and rotational invariance"""
@@ -65,6 +66,7 @@ def test_RMSD_translate_rotate():
     rot = scipy_R.from_rotvec(np.random.random_sample(3))
     newcoords = rot.apply(newcoords)
     op = OrderParams()
-    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords,coords,newcoords),0))
 
 """Rg tests"""
+"""TODO"""
