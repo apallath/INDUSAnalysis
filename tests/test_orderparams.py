@@ -1,39 +1,70 @@
-"""test using PyTest"""
 import MDAnalysis as mda
 import numpy as np
-import matplotlib.pyplot as plt
+from scipy.spatial.transform import Rotation as scipy_R
 
 from analysis.protein_order_params import OrderParams
 
-#Test radius of gyration
-
-def Rg_compare_snapshot(natoms,boxlen):
-    #generate coordinates
+def coords_generator(boxlen, natoms):
+    """generates random coordinates for test cases"""
     coords = []
     for i in range(natoms):
         c = [boxlen * np.random.rand(), boxlen * np.random.rand(), boxlen * np.random.rand()]
         coords.append(c)
     coords = np.array(coords)
+    print(coords.shape)
+    return coords
 
-    #simple Rg calculation
-    com = np.mean(coords, axis=0)
-    sq_distances = np.sum((coords - com)**2, axis = 1)
-    true_Rg = np.sqrt(np.mean(sq_distances))
-    print(true_Rg)
+"""RMSD tests"""
 
-    #create Universe with H-atoms at same coordinates
-    u = mda.Universe.empty(natoms, trajectory=True)
-    u.add_TopologyAttr('mass', [1.0]*natoms)
-    u.atoms.positions = coords
-    sel = u.select_atoms("all")
+def test_RMSD_basic():
+    op = OrderParams()
+    """random system with itself"""
+    coords = coords_generator(10, 10)
+    assert(np.isclose(op.calc_RMSD_worker(coords,coords),0))
 
-    op_test = OrderParams()
-    test_Rg = op_test.calc_Rg(u, "all")[0,1]
+    """known sample system"""
+    coords1 = np.array([[1.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0],
+                        [0.0, 0.0, 1.0],
+                        [-1.0, 0.0, 0.0],
+                        [0.0, -1.0, 0.0],
+                        [0.0, 0.0, -1.0]])
+    coords2 = 2.0 * coords1
+    assert(np.isclose(op.calc_RMSD_worker(coords1,coords2),1))
 
-    assert(np.isclose(true_Rg, test_Rg))
+def test_RMSD_translate():
+    """test RMSD translational invariance"""
+    coords = coords_generator(10, 10)
+    newcoords = coords + 100.0 * np.random.random_sample(3)
+    op = OrderParams()
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
 
-def test_Rg():
-    for i in range(100):
-        boxlen = np.random.randint(100)
-        natoms = np.random.randint(1000)
-        Rg_compare_snapshot(natoms,boxlen)
+def test_RMSD_known_rotate():
+    """test RMSD rotational invariance"""
+    coords = coords_generator(10, 10)
+    Rmat = np.array([[0, -1.0, 0],
+                     [1.0, 0, 0],
+                     [0, 0, 1.0]])
+    newcoords = np.dot(coords, Rmat.T)
+    op = OrderParams()
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
+
+def test_RMSD_rand_rotate():
+    """test RMSD rotational invariance"""
+    coords = coords_generator(10, 10)
+    #generate random rotation matrix
+    rot = scipy_R.from_rotvec(np.random.random_sample(3))
+    newcoords = rot.apply(coords)
+    op = OrderParams()
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
+
+def test_RMSD_translate_rotate():
+    """test RMSD translation and rotational invariance"""
+    coords = coords_generator(10, 10)
+    newcoords = coords + 100.0 * np.random.random_sample(3)
+    rot = scipy_R.from_rotvec(np.random.random_sample(3))
+    newcoords = rot.apply(newcoords)
+    op = OrderParams()
+    assert(np.isclose(op.calc_RMSD_worker(coords,newcoords),0))
+
+"""Rg tests"""
