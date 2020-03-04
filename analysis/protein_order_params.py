@@ -92,6 +92,7 @@ class OrderParams(TimeSeries):
         RMSD = np.array(RMSD)
         return RMSD
 
+    """call"""
     def __call__(self):
         #definition in TimeSeries base class
         self.read_args()
@@ -114,7 +115,7 @@ class OrderParams(TimeSeries):
         if self.align is None:
             self.align= 'backbone'
 
-        """Radius of gyration"""
+        """Radius of gyration plots"""
         #radius of gyration
         sel_rg = self.calc_Rg(self.u, self.selection)
         #plot
@@ -172,7 +173,7 @@ class OrderParams(TimeSeries):
             if self.args.show:
                 plt.show()
 
-        """RMSD"""
+        """RMSD plots"""
         #RMSD from initial structure
         sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.selection, self.align)
         #plot
