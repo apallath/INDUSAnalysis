@@ -18,21 +18,29 @@ class OrderParams(TimeSeries):
         super().__init__()
         self.parser.add_argument("structf", help="Structure file (.gro)")
         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
-        self.parser.add_argument("-select", help="atoms/groups to track order parameters for (MDA selection string)")
-        self.parser.add_argument("-align", help="atoms/groups to align to reference frame (MDA selection string)")
+        self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
+        self.parser.add_argument("-align", help="Atoms/groups to align to reference frame (MDA selection string)")
 
     """tests in tests/test_orderparams.py"""
+    def calc_Rg_worker(self,pos,masses):
+        pass
+
     def calc_Rg(self,u,selection):
         Rg = []
         sel = u.select_atoms(selection)
         for ts in u.trajectory:
-            Rg.append((u.trajectory.time, sel.radius_of_gyration()))
+            Rgval = self.calc_Rg_worker(sel.atoms.positions, sel.atoms.masses)
+            Rg.append((u.trajectory.time, Rgval))
         Rg = np.array(Rg)
         return Rg
 
     """tests in tests/test_orderparams.py"""
+    def calc_RMSD_worker(self,initpos,pos,masses):
+        pass
+
     def calc_RMSD(self,u,align,selection):
-        """REQUIRES REVIEW
+        """
+        REQUIRES REVIEW
         - Issue: RMSD drifts significantly
         """
         R = mda_rms.RMSD(u, select=align, groupselections=[selection])
@@ -41,6 +49,10 @@ class OrderParams(TimeSeries):
         RMSD = np.transpose(np.vstack([R.rmsd[:,1], R.rmsd[:,3]]))
         #print(RMSD)
         return RMSD
+
+    def calc_boxsize(self,u):
+        for ts in u.trajectory:
+            Rg.append()
 
     def __call__(self):
         #definition in TimeSeries base class
