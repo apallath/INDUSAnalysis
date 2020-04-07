@@ -1,0 +1,30 @@
+import MDAnalysis as mda
+import numpy as np
+import matplotlib.pyplot as plt
+
+from analysis.timeseries import TimeSeries
+
+"""Averages (bootstrapping) tests"""
+
+def average_test():
+    return True
+
+"""CMA tests"""
+
+def test_cma_basic():
+    ts = TimeSeries()
+    x = np.array(range(5))
+    xcma = np.array([0, 0.5, 1, 1.5, 2])
+    assert(np.isclose(np.linalg.norm(ts.cumulative_moving_average(x) - xcma),0))
+
+def test_cma_visualization():
+    ts = TimeSeries()
+    x = np.linspace(0, 8, 1000)
+    y = np.sin(np.pi * x)
+    plt.figure()
+    plt.plot(x, y, label="Data")
+    plt.plot(x, ts.cumulative_moving_average(y), label="CMA")
+    plt.legend()
+    plt.savefig("cma_vis.png")
+    plt.show()
+    assert(np.isclose(ts.cumulative_moving_average(y)[-1], 0))

@@ -73,6 +73,19 @@ class IndusWaters(TimeSeries):
         if self.args.show:
             plt.show()
 
+        #plot cumulative moving average data
+        cmaN = self.cumulative_moving_average(self.N)
+        cmaNtw = self.cumulative_moving_average(self.Ntw)
+        fig, ax = plt.subplots()
+        ax.plot(self.t, cmaN, label="$N$, cum. moving average")
+        ax.plot(self.t, cmaNtw, label="$N_{tw}$, cum. moving average")
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel("Number of waters, cumulative moving average")
+        ax.legend()
+        self.save_figure(fig,suffix="cma_waters")
+        if self.args.show:
+            plt.show()
+
         #getaverages
         N_eff_samp, N_mean, N_std, N_sem, N_tau = self.average(self.t, self.N, self.args.avgstart, self.args.avgend)
         Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, Ntw_tau = self.average(self.t, self.Ntw, self.args.avgstart, self.args.avgend)
@@ -123,6 +136,26 @@ class IndusWaters(TimeSeries):
             ax.set_ylabel("Number of waters, moving average")
             ax.legend()
             self.save_figure(fig,suffix="app_ma_waters")
+            if self.args.show:
+                plt.show()
+
+            #plot time series data cumulative moving average
+            ttot = np.hstack([tp,tn])
+            Ntot = np.hstack([Np,self.N])
+            Ntwtot = np.hstack([Ntwp,self.Ntw])
+
+            cmaN = self.cumulative_moving_average(Ntot)
+            cmaNtw = self.cumulative_moving_average(Ntwtot)
+            fig, ax = plt.subplots()
+            ax.plot(ttot, cmaN, label="$N$, cum. moving average")
+            ax.plot(ttot, cmaNtw, label="$N_{tw}$, cum. moving average")
+            #separator line
+            ax.axvline(x=tp[-1])
+
+            ax.set_xlabel("Time (ps)")
+            ax.set_ylabel("Number of waters, cumulative moving average")
+            ax.legend()
+            self.save_figure(fig,suffix="app_cma_waters")
             if self.args.show:
                 plt.show()
 

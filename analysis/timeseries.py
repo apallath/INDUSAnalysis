@@ -60,6 +60,13 @@ class TimeSeries:
         return ma
 
     """tests in tests/test_timeseries.py"""
+    def cumulative_moving_average(self,x):
+        csum = np.cumsum(x)
+        nvals = range(1,len(x)+1)
+        cma = csum/nvals
+        return cma
+
+    """tests in tests/test_timeseries.py"""
     def average(self,t,x,avgstart,avgend):
         tstep = t[1] - t[0]
         start = 0

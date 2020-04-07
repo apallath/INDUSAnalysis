@@ -92,6 +92,9 @@ class OrderParams(TimeSeries):
         RMSD = np.array(RMSD)
         return RMSD
 
+    """Number of contacts
+    Tests in tests/test_orderparams.py"""
+
     """call"""
     def __call__(self):
         #definition in TimeSeries base class
