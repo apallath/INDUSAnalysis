@@ -26,9 +26,12 @@ class TimeSeries:
         self.parser.add_argument("-dpi", type=int, help="dpi of output image(s)")
         self.parser.add_argument("--show", action='store_true', help="show interactive plot(s)")
         #for classes that choose to append to saved data from another run before plotting
-        self.parser.add_argument("-apref", help="Append current quantities to previous quantities (from saved .npy files) and plot")
-        self.parser.add_argument("-aprevlegend", help="String describing what the previous run currently being appended to is (for plot legend)")
-        self.parser.add_argument("-acurlegend", help="String describing what the current run being appended is (for plot legend)")
+        self.parser.add_argument("-apref", \
+            help="Append current quantities to previous quantities (from saved .npy files) and plot")
+        self.parser.add_argument("-aprevlegend", \
+            help="String describing what the previous run currently being appended to is (for plot legend)")
+        self.parser.add_argument("-acurlegend", \
+            help="String describing what the current run being appended is (for plot legend)")
 
     def read_args(self):
         self.args = self.parser.parse_args()
@@ -68,6 +71,8 @@ class TimeSeries:
 
     """tests in tests/test_timeseries.py"""
     def average(self,t,x,avgstart,avgend):
+        """Compute averages for correlated time series data"""
+
         tstep = t[1] - t[0]
         start = 0
         end = len(x) - 1
@@ -77,7 +82,33 @@ class TimeSeries:
             end = int(np.floor(np.float(avgend)/tstep))
         te = t[start:end]
         xe = x[start:end]
+
+        """
+        References (include in any publications using this code):
+        [1] Shirts MR and Chodera JD. Statistically optimal analysis of samples from multiple equilibrium states.
+        J. Chem. Phys. 129:124105, 2008.
+        http://dx.doi.org/10.1063/1.2978177
+
+        [2] J. D. Chodera, W. C. Swope, J. W. Pitera, C. Seok, and K. A. Dill.
+        Use of the weighted histogram analysis method for the analysis of simulated and parallel tempering simulations.
+        JCTC 3(1):26-41, 2007.
+        """
+
+        """
+        Time series data: x_0, x_1, ..., x_{n-1}
+
+        sigma^2(x) = <x^2> - <x>^2
+
+        Normalized fluctuation autocorrelation function
+        C_XX(t) = (<X_i X_(i+t)> - <X_i>^2)/(<X_i^2> - <X_i>^2)
+                = (<X_0 X_t> - <X>^2)/(<X^2> - <X>^2)
+
+        """
+
+
         tau_step = pymbar.timeseries.integratedAutocorrelationTime(xe)
+
+        #number of effective samples
         Neff = len(xe)/tau_step
 
         #Calculate std and sem
