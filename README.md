@@ -17,7 +17,7 @@ The analysis scripts are executable with command line arguments.
 will list out the required and optional arguments for each script.
 
 ## Tests:
-`test/`
+`tests/`
 
 Run tests in this folder by running
 `pytest`
