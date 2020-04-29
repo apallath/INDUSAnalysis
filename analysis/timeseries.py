@@ -6,6 +6,7 @@ TODO: Block bootstrapping for averaging
 
 """
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import argparse
 
@@ -34,6 +35,8 @@ class TimeSeries:
             help="String describing what the previous run currently being appended to is (for plot legend)")
         self.parser.add_argument("-acurlegend", \
             help="String describing what the current run being appended is (for plot legend)")
+        #for running on remote server
+        self.parser.add_argument("--remote", action='store_true')
 
     def read_args(self):
         self.args = self.parser.parse_args()
@@ -53,6 +56,10 @@ class TimeSeries:
         self.acurlegend = self.args.acurlegend
         if self.acurlegend is None:
             acurlegend = "Current"
+        # Force matplotlib to not use any Xwindows backend if run on remote server
+        self.remote = self.args.remote
+        if self.remote:
+            matplotlib.use('Agg')
 
     """tests in tests/test_timeseries.py"""
     def moving_average(self,x,window):
