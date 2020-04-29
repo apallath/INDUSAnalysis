@@ -60,7 +60,7 @@ class Contacts(TimeSeries):
             da = mda.lib.distances.distance_array(heavy_side_i.positions, heavy_side_j.positions, box)
             refcontacts += np.count_nonzero(da < self.distcutoff)
 
-        self.refcontants = refcontacts
+        self.refcontacts = refcontacts
 
     # Contacts analysis along trajectory
     def calc_trajcontacts(self):
