@@ -18,21 +18,27 @@ will list out the required and optional arguments for each script.
 
 ### Usage examples
 
-`python /path/to/analysis_scripts/analysis/indus_waters.py phiout.dat \
+```
+    python /path/to/analysis_scripts/analysis/indus_waters.py phiout.dat \
     -opref current -apref previous -oformat png -dpi 150 -window 1000 \
     -aprevlegend "Previous run" -acurlegend "Current run" \
-    --remote`
+    --remote
+```
 
-`python /path/to/analysis_scripts/analysis/protein_order_params.py conf.gro traj.xtc \
+```
+    python /path/to/analysis_scripts/analysis/protein_order_params.py conf.gro traj.xtc \
     -reftrajf traj.xtc -reftstep 0 -opref current -apref previous -oformat png -dpi 150 \
     -align backbone -select backbone -window 50 \
     -aprevlegend "Previous run" -acurlegend "Current run" \
-    --remote`
+    --remote
+```
 
-`python /path/to/analysis_scripts/analysis/contacts.py conf.gro traj.xtc \
+```
+    python /path/to/analysis_scripts/analysis/contacts.py conf.gro traj.xtc \
     -opref current -apref previous -oformat png -dpi 150 \
     -aprevlegend "Previous run" -acurlegend "Current run" \
-    --verbose --remote`
+    --verbose --remote
+```
 
 ## Tests:
 `tests/`
