@@ -28,8 +28,15 @@ class Contacts(TimeSeries):
         super().read_args()
         self.structf = self.args.structf
         self.trajf = self.args.trajf
+
         self.refcontacts = self.args.refcontacts
+        if self.refcontacts is not None:
+            self.refcontacts = float(self.refcontacts)
+
         self.skip = self.args.skip
+        if self.skip is not None:
+            self.skip = int(self.skip)
+            
         self.verbose = self.args.verbose
         self.distcutoff = self.args.distcutoff
         if self.distcutoff is not None:
