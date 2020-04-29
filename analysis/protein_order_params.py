@@ -7,8 +7,6 @@ Units:
 - length: A
 - time: ps
 
-TODO: Clean up plotting sphagetti code?
-
 @Author: Akash Pallath
 """
 from analysis.timeseries import TimeSeries
@@ -27,6 +25,32 @@ class OrderParams(TimeSeries):
         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+
+    def read_args(self):
+        super().read_args()
+        self.structf = self.args.structf
+        self.trajf = self.args.trajf
+        self.reftrajf = self.args.reftrajf
+        self.reftstep = self.args.reftstep
+        self.select = self.args.select
+        if self.select is None:
+            self.select = 'protein'
+        self.align = self.args.align
+        if self.align is None:
+            self.align= 'backbone'
+
+        # Prepare system from args
+        self.u = mda.Universe(self.structf,self.trajf)
+
+        if self.reftrajf is not None:
+            self.refu = mda.Universe(self.structf,self.reftrajf)
+        else:
+            self.refu = mda.Universe(self.structf,self.trajf)
+
+        if self.reftstep is not None:
+            self.reftstep = int(self.reftstep)
+        else:
+            self.reftstep = 0
 
     """Radius of gyration
     Tests in tests/test_orderparams.py"""
@@ -92,35 +116,12 @@ class OrderParams(TimeSeries):
         RMSD = np.array(RMSD)
         return RMSD
 
-    """Number of contacts
-    Tests in tests/test_orderparams.py"""
-
     """call"""
     def __call__(self):
-        #definition in TimeSeries base class
-        self.read_args()
-
-        self.u = mda.Universe(self.args.structf,self.args.trajf)
-        self.refu = mda.Universe(self.args.structf,self.args.trajf)
-        self.reftstep = 0
-        #check if separate reference trajectory file was passed
-        if self.args.reftrajf is not None:
-            self.refu = mda.Universe(self.args.structf,self.args.reftrajf)
-        #check if reference timestep was passed
-        if self.args.reftstep is not None:
-            self.reftstep = int(self.args.reftstep)
-
-        self.selection = self.args.select
-        self.align = self.args.align
-        #defaults: align backbones, calculate RMSDs
-        if self.selection is None:
-            self.selection = 'protein'
-        if self.align is None:
-            self.align= 'backbone'
 
         """Radius of gyration plots"""
         #radius of gyration
-        sel_rg = self.calc_Rg(self.u, self.selection)
+        sel_rg = self.calc_Rg(self.u, self.select)
         #plot
         fig, ax = plt.subplots()
         rg = sel_rg[:,1]
@@ -130,21 +131,21 @@ class OrderParams(TimeSeries):
         ax.set_ylabel(r"Radius of gyration ($\AA$)")
         self.save_figure(fig,suffix="Rg")
         self.save_timeseries(sel_rg[:,0],sel_rg[:,1],label="Rg")
-        if self.args.show:
+        if self.show:
             plt.show()
 
         #radius of gyration moving average
-        rg_ma = self.moving_average(rg, self.args.window)
+        rg_ma = self.moving_average(rg, self.window)
         fig, ax = plt.subplots()
         ax.plot(t[len(t) - len(rg_ma):], rg_ma);
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Radius of gyration ($\AA$)")
         self.save_figure(fig,suffix="ma_Rg")
-        if self.args.show:
+        if self.show:
             plt.show()
 
-        if self.args.apref is not None:
-            trgp = np.load(self.args.apref + "_Rg.npy")
+        if self.apref is not None:
+            trgp = np.load(self.apref + "_Rg.npy")
             tp = trgp[0,:]
             rgp = trgp[1,:]
             tn = tp[-1]+t
@@ -157,14 +158,14 @@ class OrderParams(TimeSeries):
             ax.set_ylabel(r"Radius of gyration ($\AA$)")
             ax.legend()
             self.save_figure(fig,suffix="app_Rg")
-            if self.args.show:
+            if self.show:
                 plt.show()
 
             #plot time series data moving average
             ttot = np.hstack([tp,tn])
             rgtot = np.hstack([rgp,rg])
 
-            rgtot_ma = self.moving_average(rgtot,self.args.window)
+            rgtot_ma = self.moving_average(rgtot,self.window)
             fig, ax = plt.subplots()
             ax.plot(ttot[len(ttot) - len(rgtot_ma):], rgtot_ma)
             #separator line
@@ -173,12 +174,12 @@ class OrderParams(TimeSeries):
             ax.set_xlabel("Time (ps)")
             ax.set_ylabel(r"Radius of gyration ($\AA$)")
             self.save_figure(fig,suffix="app_ma_Rg")
-            if self.args.show:
+            if self.show:
                 plt.show()
 
         """RMSD plots"""
         #RMSD from initial structure
-        sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.selection, self.align)
+        sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.select, self.align)
         #plot
         fig, ax = plt.subplots()
         rmsd = sel_RMSD[:,1]
@@ -186,23 +187,23 @@ class OrderParams(TimeSeries):
         ax.plot(t,rmsd)
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
-        self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.selection)
-        self.save_timeseries(sel_RMSD[:,0],sel_RMSD[:,1],label="RMSD_"+self.align+"_"+self.selection)
-        if self.args.show:
+        self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
+        self.save_timeseries(sel_RMSD[:,0],sel_RMSD[:,1],label="RMSD_"+self.align+"_"+self.select)
+        if self.show:
             plt.show()
 
         #RMSD moving average
-        rmsd_ma = self.moving_average(rmsd, self.args.window)
+        rmsd_ma = self.moving_average(rmsd, self.window)
         fig, ax = plt.subplots()
         ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma);
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
-        self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.selection)
-        if self.args.show:
+        self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
+        if self.show:
             plt.show()
 
-        if self.args.apref is not None:
-            trmsdp = np.load(self.args.apref+"_RMSD_"+self.align+"_"+self.selection+".npy")
+        if self.apref is not None:
+            trmsdp = np.load(self.apref+"_RMSD_"+self.align+"_"+self.select+".npy")
             tp = trmsdp[0,:]
             rmsdp = trmsdp[1,:]
             tn = tp[-1]+t
@@ -214,15 +215,15 @@ class OrderParams(TimeSeries):
             ax.set_xlabel("Time (ps)")
             ax.set_ylabel(r"RMSD ($\AA$)")
             ax.legend()
-            self.save_figure(fig,suffix="app_RMSD_"+self.align+"_"+self.selection)
-            if self.args.show:
+            self.save_figure(fig,suffix="app_RMSD_"+self.align+"_"+self.select)
+            if self.show:
                 plt.show()
 
             #plot time series data moving average
             ttot = np.hstack([tp,tn])
             rmsdtot = np.hstack([rmsdp,rmsd])
 
-            rmsdtot_ma = self.moving_average(rmsdtot,self.args.window)
+            rmsdtot_ma = self.moving_average(rmsdtot,self.window)
             fig, ax = plt.subplots()
             ax.plot(ttot[len(ttot) - len(rmsdtot_ma):], rmsdtot_ma)
             #separator line
@@ -230,14 +231,15 @@ class OrderParams(TimeSeries):
 
             ax.set_xlabel("Time (ps)")
             ax.set_ylabel(r"RMSD, moving average ($\AA$)")
-            self.save_figure(fig,suffix="app_ma_RMSD_"+self.align+"_"+self.selection)
-            if self.args.show:
+            self.save_figure(fig,suffix="app_ma_RMSD_"+self.align+"_"+self.select)
+            if self.show:
                 plt.show()
 
 warnings = "Proceed with caution: this script requires PBC-corrected protein structures!\n"
 
 if __name__=="__main__":
     prot = OrderParams()
+    prot.read_args()
     startup_string = "#### Order Parameter Analysis ####\n" + warnings
     print(startup_string)
     prot()

@@ -15,14 +15,20 @@ class IndusWaters(TimeSeries):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
 
-    #read data
-    def get_data(self):
-        self.read_args()
+    def read_args(self):
+        super().read_args()
+        self.file = self.args.file
+
+        # Prepare system from args
+        self.t, self.N, self.Ntw, self.mu = self.get_data(self.file)
+
+    # Read data from file to prepare system
+    def get_data(self, file):
         t = []
         N = []
         Ntw = []
         mu = 0
-        with open(self.args.file) as f:
+        with open(file) as f:
             #read data file
             for l in f:
                 lstrip = l.strip()
@@ -38,18 +44,19 @@ class IndusWaters(TimeSeries):
                     N.append(Ncur)
                     Ntw.append(Ntwcur)
 
-            self.t = np.array(t)
-            self.N = np.array(N)
-            self.Ntw = np.array(Ntw)
-            self.mu = np.float(mu)
+        t = np.array(t)
+        N = np.array(N)
+        Ntw = np.array(Ntw)
+        mu = np.float(mu)
+
+        return t, N, Ntw, mu
 
     def __call__(self):
-        self.get_data()
-        #log data
+        # Log data
         self.save_timeseries(self.t,self.N,label="N")
         self.save_timeseries(self.t,self.N,label="Ntw")
 
-        #plot time series data
+        # Plot time series data
         fig, ax = plt.subplots()
         ax.plot(self.t,self.N,label="$N$")
         ax.plot(self.t,self.Ntw,label="$N_{tw}$")
@@ -57,12 +64,12 @@ class IndusWaters(TimeSeries):
         ax.set_ylabel("Number of waters")
         ax.legend()
         self.save_figure(fig,suffix="waters")
-        if self.args.show:
+        if self.show:
             plt.show()
 
-        #plot moving average data
-        maN = self.moving_average(self.N,self.args.window)
-        maNtw = self.moving_average(self.Ntw,self.args.window)
+        # Plot moving average data
+        maN = self.moving_average(self.N,self.window)
+        maNtw = self.moving_average(self.Ntw,self.window)
         fig, ax = plt.subplots()
         ax.plot(self.t[len(self.t) - len(maN):], maN, label="$N$, moving average")
         ax.plot(self.t[len(self.t) - len(maN):], maNtw, label="$N_{tw}$, moving average")
@@ -70,10 +77,10 @@ class IndusWaters(TimeSeries):
         ax.set_ylabel("Number of waters, moving average")
         ax.legend()
         self.save_figure(fig,suffix="ma_waters")
-        if self.args.show:
+        if self.show:
             plt.show()
 
-        #plot cumulative moving average data
+        # Plot cumulative moving average data
         cmaN = self.cumulative_moving_average(self.N)
         cmaNtw = self.cumulative_moving_average(self.Ntw)
         fig, ax = plt.subplots()
@@ -83,30 +90,20 @@ class IndusWaters(TimeSeries):
         ax.set_ylabel("Number of waters, cumulative moving average")
         ax.legend()
         self.save_figure(fig,suffix="cma_waters")
-        if self.args.show:
+        if self.show:
             plt.show()
 
-        #getaverages
-        N_eff_samp, N_mean, N_std, N_sem, N_tau = self.average(self.t, self.N, self.args.avgstart, self.args.avgend)
-        Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, Ntw_tau = self.average(self.t, self.Ntw, self.args.avgstart, self.args.avgend)
-
-        #append averages
-        if self.args.avgto is not None:
-            with open(self.args.avgto, "a+") as f:
-                f.write("{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\n".format(\
-                self.mu, N_eff_samp, N_mean, N_std, N_sem, Ntw_eff_samp, Ntw_mean, Ntw_std, Ntw_sem, N_tau, Ntw_tau))
-
-        #append to previous data (if available), and plot
-        if self.args.apref is not None:
-            tNp = np.load(self.args.apref + "_N.npy")
+        # Append to previous data (if available), and plot
+        if self.apref is not None:
+            tNp = np.load(self.apref + "_N.npy")
             tp = tNp[0,:]
             Np = tNp[1,:]
-            tNtwp = np.load(self.args.apref + "_Ntw.npy")
+            tNtwp = np.load(self.apref + "_Ntw.npy")
             Ntwp = tNtwp[1,:]
 
             tn = tp[-1]+self.t
 
-            #plot time series data
+            # Plot time series data
             fig, ax = plt.subplots()
             ax.plot(tp,Np,label="$N$, " + self.aprevlegend)
             ax.plot(tn,self.N,label="$N$, " + self.acurlegend)
@@ -116,30 +113,30 @@ class IndusWaters(TimeSeries):
             ax.set_ylabel("Number of waters")
             ax.legend()
             self.save_figure(fig,suffix="app_waters")
-            if self.args.show:
+            if self.show:
                 plt.show()
 
-            #plot time series data moving average
+            # Plot time series data moving average
             ttot = np.hstack([tp,tn])
             Ntot = np.hstack([Np,self.N])
             Ntwtot = np.hstack([Ntwp,self.Ntw])
 
-            maN = self.moving_average(Ntot,self.args.window)
-            maNtw = self.moving_average(Ntwtot,self.args.window)
+            maN = self.moving_average(Ntot,self.window)
+            maNtw = self.moving_average(Ntwtot,self.window)
             fig, ax = plt.subplots()
             ax.plot(ttot[len(ttot) - len(maN):], maN, label="$N$, moving average")
             ax.plot(ttot[len(ttot) - len(maN):], maNtw, label="$N_{tw}$, moving average")
             #separator line
             ax.axvline(x=tp[-1])
-
+            #labels
             ax.set_xlabel("Time (ps)")
             ax.set_ylabel("Number of waters, moving average")
             ax.legend()
             self.save_figure(fig,suffix="app_ma_waters")
-            if self.args.show:
+            if self.show:
                 plt.show()
 
-            #plot time series data cumulative moving average
+            # Plot time series data cumulative moving average
             ttot = np.hstack([tp,tn])
             Ntot = np.hstack([Np,self.N])
             Ntwtot = np.hstack([Ntwp,self.Ntw])
@@ -156,13 +153,14 @@ class IndusWaters(TimeSeries):
             ax.set_ylabel("Number of waters, cumulative moving average")
             ax.legend()
             self.save_figure(fig,suffix="app_cma_waters")
-            if self.args.show:
+            if self.show:
                 plt.show()
 
 warnings = ""
 
 if __name__=="__main__":
     waters = IndusWaters()
+    waters.read_args()
     startup_string = "#### INDUS Waters ####\n" + warnings
     print(startup_string)
     waters()

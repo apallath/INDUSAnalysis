@@ -1,6 +1,9 @@
 """Template for handling timeseries data produced by molecular simulations
 
 @Author: Akash Pallath
+
+TODO: Block bootstrapping for averaging
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,8 +19,8 @@ class TimeSeries:
         self.parser = argparse.ArgumentParser()
         #parser arguments common to all timeseries classes
         #averaging
-        self.parser.add_argument("-avgstart", help="time to start averaging at")
-        self.parser.add_argument("-avgend", help="time to stop averaging at")
+        self.parser.add_argument("-avgstart", help="time to start analysis at")
+        self.parser.add_argument("-avgend", help="time to stop analysis at")
         self.parser.add_argument("-avgto", help="file to append averages to")
         self.parser.add_argument("-window", help="window for moving average (default = 10)")
         #plotting
@@ -35,22 +38,22 @@ class TimeSeries:
 
     def read_args(self):
         self.args = self.parser.parse_args()
-
-        #Common corner case handling
+        #parse into class variables
+        self.avgstart = self.args.avgstart
+        self.avgend = self.args.avgend
+        self.avgto = self.args.avgto
+        self.window = self.args.window
+        self.opref = self.args.opref
+        self.oformat = self.args.oformat
+        self.dpi = self.args.dpi
+        self.show = self.args.show
+        self.apref = self.args.apref
         self.aprevlegend = self.args.aprevlegend
-        self.acurlegend = self.args.acurlegend
         if self.aprevlegend is None:
             aprevlegend = "Previous"
+        self.acurlegend = self.args.acurlegend
         if self.acurlegend is None:
             acurlegend = "Current"
-
-    def save_timeseries(self,t,x,label=""):
-        ts = np.stack((t,x))
-        pref = self.args.opref
-        if pref == None:
-            pref = "data"
-        np.save(pref+"_"+label,ts)
-        print("Saving data > "+pref+"_"+label+".npy")
 
     """tests in tests/test_timeseries.py"""
     def moving_average(self,x,window):
@@ -69,67 +72,24 @@ class TimeSeries:
         cma = csum/nvals
         return cma
 
-    """tests in tests/test_timeseries.py"""
+    """TODO
+       tests in tests/test_timeseries.py"""
     def average(self,t,x,avgstart,avgend):
         """Compute averages for correlated time series data"""
+        pass
 
-        tstep = t[1] - t[0]
-        start = 0
-        end = len(x) - 1
-        if avgstart is not None:
-            start = int(np.floor(np.float(avgstart)/tstep))
-        if avgend is not None:
-            end = int(np.floor(np.float(avgend)/tstep))
-        te = t[start:end]
-        xe = x[start:end]
-
-        """
-        References (include in any publications using this code):
-        [1] Shirts MR and Chodera JD. Statistically optimal analysis of samples from multiple equilibrium states.
-        J. Chem. Phys. 129:124105, 2008.
-        http://dx.doi.org/10.1063/1.2978177
-
-        [2] J. D. Chodera, W. C. Swope, J. W. Pitera, C. Seok, and K. A. Dill.
-        Use of the weighted histogram analysis method for the analysis of simulated and parallel tempering simulations.
-        JCTC 3(1):26-41, 2007.
-        """
-
-        """
-        Time series data: x_0, x_1, ..., x_{n-1}
-
-        sigma^2(x) = <x^2> - <x>^2
-
-        Normalized fluctuation autocorrelation function
-        C_XX(t) = (<X_i X_(i+t)> - <X_i>^2)/(<X_i^2> - <X_i>^2)
-                = (<X_0 X_t> - <X>^2)/(<X^2> - <X>^2)
-
-        """
-
-
-        tau_step = pymbar.timeseries.integratedAutocorrelationTime(xe)
-
-        #number of effective samples
-        Neff = len(xe)/tau_step
-
-        #Calculate std and sem
-        mean = 0
-        std = 0
-        sem = 0
-        for i in range(1000):
-            #sample without replacement
-            sidx = np.random.choice(np.array(range(len(xe))), size = int(Neff), replace=False)
-            mean += np.mean(xe[sidx])
-            std += np.std(xe[sidx])
-            sem += stats.sem(xe[sidx])
-        mean/= 1000
-        std/= 1000
-        sem/= 1000
-        return Neff, mean, std, sem, tau_step
+    def save_timeseries(self,t,x,label=""):
+        ts = np.stack((t,x))
+        pref = self.opref
+        if pref == None:
+            pref = "data"
+        np.save(pref+"_"+label,ts)
+        print("Saving data > "+pref+"_"+label+".npy")
 
     def save_figure(self,fig,suffix=""):
-        oformat = self.args.oformat
-        pref = self.args.opref
-        imgdpi= self.args.dpi
+        oformat = self.oformat
+        pref = self.opref
+        imgdpi= self.dpi
         if oformat == None:
             oformat = "ps"
         if pref == None:
