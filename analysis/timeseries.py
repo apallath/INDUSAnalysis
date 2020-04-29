@@ -19,15 +19,18 @@ class TimeSeries:
         self.parser = argparse.ArgumentParser()
         #parser arguments common to all timeseries classes
         #averaging
-        self.parser.add_argument("-avgstart", help="time to start analysis at")
-        self.parser.add_argument("-avgend", help="time to stop analysis at")
-        self.parser.add_argument("-avgto", help="file to append averages to")
-        self.parser.add_argument("-window", help="window for moving average (default = 10)")
+        self.parser.add_argument("-avgstart", help="Time to start analysis at")
+        self.parser.add_argument("-avgend", help="Time to stop analysis at")
+        self.parser.add_argument("-avgto", help="File to append averages to")
+        self.parser.add_argument("-window", help="Window for moving average (default = 10)")
         #plotting
-        self.parser.add_argument("-opref", help="output image and data prefix")
-        self.parser.add_argument("-oformat", help="output image format")
-        self.parser.add_argument("-dpi", type=int, help="dpi of output image(s)")
-        self.parser.add_argument("--show", action='store_true', help="show interactive plot(s)")
+        self.parser.add_argument("-opref", help="Output image and data prefix")
+        self.parser.add_argument("-oformat", help="Output image format")
+        self.parser.add_argument("-dpi", type=int, help="DPI of output image(s)")
+        self.parser.add_argument("--show", action='store_true', help="Show interactive plot(s)")
+        #replot arguments, for classes that choose to implement them
+        self.parser.add_argument("--replot", action="store_true", help="Replot from saved data")
+        self.parser.add_argument("-replotpref", help="Prefix (pref.npy) of data file to replot from")
         #for classes that choose to append to saved data from another run before plotting
         self.parser.add_argument("-apref", \
             help="Append current quantities to previous quantities (from saved .npy files) and plot")
@@ -45,10 +48,17 @@ class TimeSeries:
         self.avgend = self.args.avgend
         self.avgto = self.args.avgto
         self.window = self.args.window
+
         self.opref = self.args.opref
         self.oformat = self.args.oformat
         self.dpi = self.args.dpi
         self.show = self.args.show
+
+        self.replot = self.args.replot
+        self.replotpref = self.args.replotpref
+        if self.replotpref is None:
+            self.replotpref = "data"
+
         self.apref = self.args.apref
         self.aprevlegend = self.args.aprevlegend
         if self.aprevlegend is None:
@@ -56,6 +66,7 @@ class TimeSeries:
         self.acurlegend = self.args.acurlegend
         if self.acurlegend is None:
             acurlegend = "Current"
+
         # Force matplotlib to not use any Xwindows backend if run on remote server
         self.remote = self.args.remote
         if self.remote:
