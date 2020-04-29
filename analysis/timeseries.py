@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import argparse
 
 #For time series analysis
-import pymbar
 from scipy import stats
 from numpy import convolve
 

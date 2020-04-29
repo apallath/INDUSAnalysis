@@ -1,4 +1,8 @@
 """Plot number of waters in probe volume output by GROMACS-INDUS simulation
+Outputs
+- Number of waters
+- Number of waters (sliding window) moving average
+- Number of waters cumulative moving average
 
 Units:
 - time: ps

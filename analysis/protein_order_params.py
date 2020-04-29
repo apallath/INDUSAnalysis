@@ -3,6 +3,10 @@
 - RMSD
 given GROMACS trajectory of a protein
 
+Outputs
+- Order parameter
+- Order parameter (sliding window) moving average
+
 Units:
 - length: A
 - time: ps
