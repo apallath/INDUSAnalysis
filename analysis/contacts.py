@@ -99,7 +99,7 @@ class Contacts(TimeSeries):
             self.calc_refcontacts()
 
         if self.replot:
-            replotdata = np.load(self.apref + "_contacts.npy")
+            replotdata = np.load(self.replotpref + "_contacts.npy")
             self.contacts = np.transpose(replotdata)
         else:
             # Calculate contacts along trajectory
