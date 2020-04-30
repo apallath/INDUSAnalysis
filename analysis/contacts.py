@@ -5,6 +5,8 @@ Units:
 - time: ps
 
 @Author: Akash Pallath
+
+TODO:   Mean and CI plot for appended plots
 """
 from analysis.timeseries import TimeSeries
 
@@ -19,7 +21,7 @@ class Contacts(TimeSeries):
         self.parser.add_argument("structf", help="Structure file (.gro)")
         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
         self.parser.add_argument("-distcutoff", help="Distance cutoff for contacts, in A (default = 4.5 A)")
-        self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = contacts for structf)")
+        self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
         self.parser.add_argument("-skip", help="Number of frames to skip between analyses")
         self.parser.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
 
@@ -36,7 +38,7 @@ class Contacts(TimeSeries):
         self.skip = self.args.skip
         if self.skip is not None:
             self.skip = int(self.skip)
-            
+
         self.verbose = self.args.verbose
         self.distcutoff = self.args.distcutoff
         if self.distcutoff is not None:
@@ -50,6 +52,7 @@ class Contacts(TimeSeries):
         if self.skip is None:
             self.skip = 1
 
+    """ (deprecated)
     # Reference contacts calculation
     def calc_refcontacts(self):
         side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or type H)"
@@ -68,6 +71,7 @@ class Contacts(TimeSeries):
             refcontacts += np.count_nonzero(da < self.distcutoff)
 
         self.refcontacts = refcontacts
+    """
 
     # Contacts analysis along trajectory
     def calc_trajcontacts(self):
@@ -101,10 +105,6 @@ class Contacts(TimeSeries):
     """call"""
     def __call__(self):
         """Contacts along trajectory plot"""
-        # Calculate reference number of contacts if unavailable
-        if self.refcontacts is None:
-            self.calc_refcontacts()
-
         if self.replot:
             replotdata = np.load(self.replotpref + "_contacts.npy")
             self.contacts = np.transpose(replotdata)
@@ -112,11 +112,24 @@ class Contacts(TimeSeries):
             # Calculate contacts along trajectory
             self.calc_trajcontacts()
 
-        # Plot number of contacts
-        fig, ax = plt.subplots()
         contacts = self.contacts[:,1]
         t = self.contacts[:,0]
-        ax.plot(t,contacts);
+        mean, serr, ci_95_low, ci_95_high = self.average(t, contacts, self.avgstart, self.avgend)
+
+        if self.refcontacts is None:
+            self.refcontacts = mean
+
+        # Plot number of contacts
+        fig, ax = plt.subplots()
+        ax.plot(t,contacts)
+        # Plot mean and errors
+        meanline = mean*np.ones(len(t))
+        ci_low_line = ci_95_low*np.ones(len(t))
+        ci_high_line = ci_95_high*np.ones(len(t))
+        ax.plot(t,meanline,color='green')
+        ax.fill_between(t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
+        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
+        # Plot properties
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel("Number of contacts")
         self.save_figure(fig,suffix="contacts")
@@ -126,9 +139,15 @@ class Contacts(TimeSeries):
 
         # Plot fraction of contacts
         fig, ax = plt.subplots()
-        contacts = self.contacts[:,1]
-        t = self.contacts[:,0]
-        ax.plot(t, contacts/self.refcontacts);
+        ax.plot(t, contacts/self.refcontacts)
+        # Plot mean and errors
+        meanline = mean/self.refcontacts*np.ones(len(t))
+        ci_low_line = ci_95_low/self.refcontacts*np.ones(len(t))
+        ci_high_line = ci_95_high/self.refcontacts*np.ones(len(t))
+        ax.plot(t,meanline,color='green')
+        ax.fill_between(t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
+        plt.title('95% CI = [{:.2f}, {:.2f}]'.format(ci_95_low/self.refcontacts, ci_95_high/self.refcontacts))
+        # Plot properties
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel("Fraction of contacts")
         self.save_figure(fig,suffix="frac_contacts")

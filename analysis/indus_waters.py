@@ -8,6 +8,8 @@ Units:
 - time: ps
 
 @Author: Akash Pallath
+
+TODO:   Mean and CI plot for appended plots
 """
 from analysis.timeseries import TimeSeries
 
@@ -58,40 +60,53 @@ class IndusWaters(TimeSeries):
     def __call__(self):
         # Log data
         self.save_timeseries(self.t,self.N,label="N")
-        self.save_timeseries(self.t,self.N,label="Ntw")
+        self.save_timeseries(self.t,self.Ntw,label="Ntw")
 
         # Plot time series data
         fig, ax = plt.subplots()
-        ax.plot(self.t,self.N,label="$N$")
-        ax.plot(self.t,self.Ntw,label="$N_{tw}$")
+        ax.plot(self.t,self.Ntw,label=r"$\tilde{N}$")
+        # Plot mean and errors
+        mean, serr, ci_95_low, ci_95_high = self.average(self.t, self.Ntw, self.avgstart, self.avgend)
+        meanline = mean*np.ones(len(self.t))
+        ci_low_line = ci_95_low*np.ones(len(self.t))
+        ci_high_line = ci_95_high*np.ones(len(self.t))
+        ax.plot(self.t,meanline,color='green')
+        ax.fill_between(self.t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
+        # Plot properties
+        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Number of waters")
+        ax.set_ylabel("CG number of waters")
         ax.legend()
         self.save_figure(fig,suffix="waters")
         if self.show:
             plt.show()
 
         # Plot moving average data
-        maN = self.moving_average(self.N,self.window)
-        maNtw = self.moving_average(self.Ntw,self.window)
+        maNtw = self.moving_average(self.t, self.Ntw, self.window)
         fig, ax = plt.subplots()
-        ax.plot(self.t[len(self.t) - len(maN):], maN, label="$N$, moving average")
-        ax.plot(self.t[len(self.t) - len(maN):], maNtw, label="$N_{tw}$, moving average")
+        ax.plot(self.t[len(self.t) - len(maNtw):], maNtw, label=r"$\tilde{N}$, moving average")
+        # Plot mean and errors
+        meanline = mean*np.ones(len(maNtw))
+        ci_low_line = ci_95_low*np.ones(len(maNtw))
+        ci_high_line = ci_95_high*np.ones(len(maNtw))
+        ax.plot(self.t[len(self.t) - len(maNtw):], meanline, color='green')
+        ax.fill_between(self.t[len(self.t) - len(maNtw):], ci_low_line, ci_high_line,\
+            alpha=0.2,facecolor='green',edgecolor='green')
+        # Plot properties
+        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Number of waters, moving average")
+        ax.set_ylabel("CG number of waters, moving average")
         ax.legend()
         self.save_figure(fig,suffix="ma_waters")
         if self.show:
             plt.show()
 
         # Plot cumulative moving average data
-        cmaN = self.cumulative_moving_average(self.N)
         cmaNtw = self.cumulative_moving_average(self.Ntw)
         fig, ax = plt.subplots()
-        ax.plot(self.t, cmaN, label="$N$, cum. moving average")
-        ax.plot(self.t, cmaNtw, label="$N_{tw}$, cum. moving average")
+        ax.plot(self.t, cmaNtw, label=r"$\tilde{N}$, cum. moving average")
         ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Number of waters, cumulative moving average")
+        ax.set_ylabel("CG number of waters, cumulative moving average")
         ax.legend()
         self.save_figure(fig,suffix="cma_waters")
         if self.show:
@@ -99,22 +114,18 @@ class IndusWaters(TimeSeries):
 
         # Append to previous data (if available), and plot
         if self.apref is not None:
-            tNp = np.load(self.apref + "_N.npy")
-            tp = tNp[0,:]
-            Np = tNp[1,:]
             tNtwp = np.load(self.apref + "_Ntw.npy")
+            tp = tNtwp[0,:]
             Ntwp = tNtwp[1,:]
 
             tn = tp[-1]+self.t
 
             # Plot time series data
             fig, ax = plt.subplots()
-            ax.plot(tp,Np,label="$N$, " + self.aprevlegend)
-            ax.plot(tn,self.N,label="$N$, " + self.acurlegend)
-            ax.plot(tp,Ntwp,label="$N_{tw}$, " + self.aprevlegend)
-            ax.plot(tn,self.Ntw,label="$N_{tw}$, " + self.acurlegend)
+            ax.plot(tp,Ntwp,label=r"$\tilde{N}$, " + self.aprevlegend)
+            ax.plot(tn,self.Ntw,label=r"$\tilde{N}$, " + self.acurlegend)
             ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("Number of waters")
+            ax.set_ylabel("CG number of waters")
             ax.legend()
             self.save_figure(fig,suffix="app_waters")
             if self.show:
@@ -122,19 +133,15 @@ class IndusWaters(TimeSeries):
 
             # Plot time series data moving average
             ttot = np.hstack([tp,tn])
-            Ntot = np.hstack([Np,self.N])
             Ntwtot = np.hstack([Ntwp,self.Ntw])
-
-            maN = self.moving_average(Ntot,self.window)
-            maNtw = self.moving_average(Ntwtot,self.window)
+            maNtw = self.moving_average(ttot, Ntwtot, self.window)
             fig, ax = plt.subplots()
-            ax.plot(ttot[len(ttot) - len(maN):], maN, label="$N$, moving average")
-            ax.plot(ttot[len(ttot) - len(maN):], maNtw, label="$N_{tw}$, moving average")
+            ax.plot(ttot[len(ttot) - len(maN):], maNtw, label=r"$\tilde{N}$, moving average")
             #separator line
             ax.axvline(x=tp[-1])
             #labels
             ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("Number of waters, moving average")
+            ax.set_ylabel("CG number of waters, moving average")
             ax.legend()
             self.save_figure(fig,suffix="app_ma_waters")
             if self.show:
@@ -142,19 +149,15 @@ class IndusWaters(TimeSeries):
 
             # Plot time series data cumulative moving average
             ttot = np.hstack([tp,tn])
-            Ntot = np.hstack([Np,self.N])
             Ntwtot = np.hstack([Ntwp,self.Ntw])
-
-            cmaN = self.cumulative_moving_average(Ntot)
             cmaNtw = self.cumulative_moving_average(Ntwtot)
             fig, ax = plt.subplots()
-            ax.plot(ttot, cmaN, label="$N$, cum. moving average")
-            ax.plot(ttot, cmaNtw, label="$N_{tw}$, cum. moving average")
+            ax.plot(ttot, cmaNtw, label=r"$\tilde{N}$, cum. moving average")
             #separator line
             ax.axvline(x=tp[-1])
-
+            #labels
             ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("Number of waters, cumulative moving average")
+            ax.set_ylabel("CG number of waters, cumulative moving average")
             ax.legend()
             self.save_figure(fig,suffix="app_cma_waters")
             if self.show:

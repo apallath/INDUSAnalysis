@@ -12,6 +12,9 @@ Units:
 - time: ps
 
 @Author: Akash Pallath
+
+TODO:   Mean and CI plot for appended plots
+        Cumulative moving average for Rg and RMSD
 """
 from analysis.timeseries import TimeSeries
 
@@ -122,7 +125,6 @@ class OrderParams(TimeSeries):
 
     """call"""
     def __call__(self):
-
         """Radius of gyration plots"""
         #radius of gyration
         sel_rg = self.calc_Rg(self.u, self.select)
@@ -130,18 +132,38 @@ class OrderParams(TimeSeries):
         fig, ax = plt.subplots()
         rg = sel_rg[:,1]
         t = sel_rg[:,0]
-        ax.plot(t,rg);
+        ax.plot(t,rg)
+        # Plot mean and errors
+        mean, serr, ci_95_low, ci_95_high = self.average(t, rg, self.avgstart, self.avgend)
+        meanline = mean*np.ones(len(t))
+        ci_low_line = ci_95_low*np.ones(len(t))
+        ci_high_line = ci_95_high*np.ones(len(t))
+        ax.plot(t,meanline,color='green')
+        ax.fill_between(t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
+        # Plot properties
+        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+        ax.set_ylim([10, 14])
+        ax.set_xlim([0, 4000])
         self.save_figure(fig,suffix="Rg")
         self.save_timeseries(sel_rg[:,0],sel_rg[:,1],label="Rg")
         if self.show:
             plt.show()
 
         #radius of gyration moving average
-        rg_ma = self.moving_average(rg, self.window)
+        rg_ma = self.moving_average(t, rg, self.window)
         fig, ax = plt.subplots()
-        ax.plot(t[len(t) - len(rg_ma):], rg_ma);
+        ax.plot(t[len(t) - len(rg_ma):], rg_ma)
+        # Plot mean and errors
+        meanline = mean*np.ones(len(rg_ma))
+        ci_low_line = ci_95_low*np.ones(len(rg_ma))
+        ci_high_line = ci_95_high*np.ones(len(rg_ma))
+        ax.plot(t[len(t) - len(rg_ma):],meanline,color='green')
+        ax.fill_between(t[len(t) - len(rg_ma):],ci_low_line,ci_high_line,\
+            alpha=0.2,facecolor='green',edgecolor='green')
+        # Plot properties
+        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Radius of gyration ($\AA$)")
         self.save_figure(fig,suffix="ma_Rg")
@@ -169,7 +191,7 @@ class OrderParams(TimeSeries):
             ttot = np.hstack([tp,tn])
             rgtot = np.hstack([rgp,rg])
 
-            rgtot_ma = self.moving_average(rgtot,self.window)
+            rgtot_ma = self.moving_average(ttot, rgtot,self.window)
             fig, ax = plt.subplots()
             ax.plot(ttot[len(ttot) - len(rgtot_ma):], rgtot_ma)
             #separator line
@@ -189,6 +211,15 @@ class OrderParams(TimeSeries):
         rmsd = sel_RMSD[:,1]
         t = sel_RMSD[:,0]
         ax.plot(t,rmsd)
+        # Plot mean and errors
+        mean, serr, ci_95_low, ci_95_high = self.average(t, rmsd, self.avgstart, self.avgend)
+        meanline = mean*np.ones(len(t))
+        ci_low_line = ci_95_low*np.ones(len(t))
+        ci_high_line = ci_95_high*np.ones(len(t))
+        ax.plot(t,meanline,color='green')
+        ax.fill_between(t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
+        # Plot properties
+        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
@@ -197,9 +228,18 @@ class OrderParams(TimeSeries):
             plt.show()
 
         #RMSD moving average
-        rmsd_ma = self.moving_average(rmsd, self.window)
+        rmsd_ma = self.moving_average(t, rmsd, self.window)
         fig, ax = plt.subplots()
-        ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma);
+        ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
+        # Plot mean and errors
+        meanline = mean*np.ones(len(rmsd_ma))
+        ci_low_line = ci_95_low*np.ones(len(rmsd_ma))
+        ci_high_line = ci_95_high*np.ones(len(rmsd_ma))
+        ax.plot(t[len(t) - len(rmsd_ma):],meanline,color='green')
+        ax.fill_between(t[len(t) - len(rmsd_ma):],ci_low_line,ci_high_line,\
+            alpha=0.2,facecolor='green',edgecolor='green')
+        # Plot properties
+        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
@@ -227,7 +267,7 @@ class OrderParams(TimeSeries):
             ttot = np.hstack([tp,tn])
             rmsdtot = np.hstack([rmsdp,rmsd])
 
-            rmsdtot_ma = self.moving_average(rmsdtot,self.window)
+            rmsdtot_ma = self.moving_average(ttot, rmsdtot,self.window)
             fig, ax = plt.subplots()
             ax.plot(ttot[len(ttot) - len(rmsdtot_ma):], rmsdtot_ma)
             #separator line
