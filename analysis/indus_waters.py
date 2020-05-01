@@ -136,7 +136,7 @@ class IndusWaters(TimeSeries):
             Ntwtot = np.hstack([Ntwp,self.Ntw])
             maNtw = self.moving_average(ttot, Ntwtot, self.window)
             fig, ax = plt.subplots()
-            ax.plot(ttot[len(ttot) - len(maN):], maNtw, label=r"$\tilde{N}$, moving average")
+            ax.plot(ttot[len(ttot) - len(maNtw):], maNtw, label=r"$\tilde{N}$, moving average")
             #separator line
             ax.axvline(x=tp[-1])
             #labels

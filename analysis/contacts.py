@@ -177,7 +177,7 @@ class Contacts(TimeSeries):
             ax.plot(tp,contactsp/self.refcontacts,label=self.aprevlegend)
             ax.plot(tn,contacts/self.refcontacts,label=self.acurlegend)
             ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("Fractionc of contacts")
+            ax.set_ylabel("Fraction of contacts")
             ax.legend()
             self.save_figure(fig,suffix="app_frac_contacts")
             if self.show:
