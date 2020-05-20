@@ -40,7 +40,15 @@ python /path/to/analysis_scripts/analysis/contacts.py conf.gro traj.xtc \
     --verbose --remote
 ```
 
-## Integration tests:
+## Testing
+
+### Continuous integration
+On pushing to the repository, a Github workflow will 
+- Do a code review
+- Run unit tests
+- Run integration tests
+
+### Integration tests:
 `tests_integration/`
 
 Run integration tests in this folder by running
@@ -49,7 +57,7 @@ inside the folder. Ideally, all tests should pass.
 Running integration tests is not sufficient to test that the package works.
 Must also run unit tests.
 
-## Unit tests:
+### Unit tests:
 `tests_unit/`
 
 Run unit tests in this folder by running
