@@ -5,11 +5,6 @@ import matplotlib.pyplot as plt
 
 from analysis.timeseries import TimeSeries
 
-"""Averages (bootstrapping) tests"""
-
-def average_test():
-    return True
-
 """CMA tests"""
 
 def test_cma_basic():
