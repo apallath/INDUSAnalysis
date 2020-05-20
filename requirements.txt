@@ -1,8 +1,13 @@
 #Basic requirements
 numpy
+scipy
 matplotlib
-Spicy
 
 #Requirements for analyzing MD trajectories
 MDAnalysis>=0.20
+
+#Other requirements
+pymbar
+
+#Testing
 pytest

@@ -1,5 +1,6 @@
 import MDAnalysis as mda
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 
 from analysis.timeseries import TimeSeries
@@ -21,10 +22,10 @@ def test_cma_visualization():
     ts = TimeSeries()
     x = np.linspace(0, 8, 1000)
     y = np.sin(np.pi * x)
+    matplotlib.use('Agg')
     plt.figure()
     plt.plot(x, y, label="Data")
     plt.plot(x, ts.cumulative_moving_average(y), label="CMA")
     plt.legend()
     plt.savefig("cma_vis.png")
-    plt.show()
     assert(np.isclose(ts.cumulative_moving_average(y)[-1], 0))

@@ -13,8 +13,8 @@ Units:
 
 @Author: Akash Pallath
 
-TODO:   Mean and CI plot for appended plots
-        Cumulative moving average for Rg and RMSD
+FEATURE:    Cythonize code
+FEATURE:    Cumulative moving average for Rg and RMSD
 """
 from analysis.timeseries import TimeSeries
 
@@ -133,19 +133,8 @@ class OrderParams(TimeSeries):
         rg = sel_rg[:,1]
         t = sel_rg[:,0]
         ax.plot(t,rg)
-        # Plot mean and errors
-        mean, serr, ci_95_low, ci_95_high = self.average(t, rg, self.avgstart, self.avgend)
-        meanline = mean*np.ones(len(t))
-        ci_low_line = ci_95_low*np.ones(len(t))
-        ci_high_line = ci_95_high*np.ones(len(t))
-        ax.plot(t,meanline,color='green')
-        ax.fill_between(t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
-        # Plot properties
-        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Radius of gyration ($\AA$)")
-        ax.set_ylim([10, 14])
-        ax.set_xlim([0, 4000])
         self.save_figure(fig,suffix="Rg")
         self.save_timeseries(sel_rg[:,0],sel_rg[:,1],label="Rg")
         if self.show:
@@ -155,15 +144,6 @@ class OrderParams(TimeSeries):
         rg_ma = self.moving_average(t, rg, self.window)
         fig, ax = plt.subplots()
         ax.plot(t[len(t) - len(rg_ma):], rg_ma)
-        # Plot mean and errors
-        meanline = mean*np.ones(len(rg_ma))
-        ci_low_line = ci_95_low*np.ones(len(rg_ma))
-        ci_high_line = ci_95_high*np.ones(len(rg_ma))
-        ax.plot(t[len(t) - len(rg_ma):],meanline,color='green')
-        ax.fill_between(t[len(t) - len(rg_ma):],ci_low_line,ci_high_line,\
-            alpha=0.2,facecolor='green',edgecolor='green')
-        # Plot properties
-        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Radius of gyration ($\AA$)")
         self.save_figure(fig,suffix="ma_Rg")
@@ -211,15 +191,6 @@ class OrderParams(TimeSeries):
         rmsd = sel_RMSD[:,1]
         t = sel_RMSD[:,0]
         ax.plot(t,rmsd)
-        # Plot mean and errors
-        mean, serr, ci_95_low, ci_95_high = self.average(t, rmsd, self.avgstart, self.avgend)
-        meanline = mean*np.ones(len(t))
-        ci_low_line = ci_95_low*np.ones(len(t))
-        ci_high_line = ci_95_high*np.ones(len(t))
-        ax.plot(t,meanline,color='green')
-        ax.fill_between(t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
-        # Plot properties
-        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
@@ -231,15 +202,6 @@ class OrderParams(TimeSeries):
         rmsd_ma = self.moving_average(t, rmsd, self.window)
         fig, ax = plt.subplots()
         ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
-        # Plot mean and errors
-        meanline = mean*np.ones(len(rmsd_ma))
-        ci_low_line = ci_95_low*np.ones(len(rmsd_ma))
-        ci_high_line = ci_95_high*np.ones(len(rmsd_ma))
-        ax.plot(t[len(t) - len(rmsd_ma):],meanline,color='green')
-        ax.fill_between(t[len(t) - len(rmsd_ma):],ci_low_line,ci_high_line,\
-            alpha=0.2,facecolor='green',edgecolor='green')
-        # Plot properties
-        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
@@ -279,11 +241,11 @@ class OrderParams(TimeSeries):
             if self.show:
                 plt.show()
 
-warnings = "Proceed with caution: this script requires PBC-corrected protein structures!\n"
+warnings = "Proceed with caution: this script requires PBC-corrected protein structures!"
 
 if __name__=="__main__":
     prot = OrderParams()
     prot.read_args()
-    startup_string = "#### Order Parameter Analysis ####\n" + warnings
+    startup_string = "#### Order Parameter Analysis ####\n" + warnings + "\n"
     print(startup_string)
     prot()

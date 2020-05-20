@@ -2,8 +2,8 @@
 
 @Author: Akash Pallath
 
-TODO:   Replace statistical inefficiency analysis for standard errors with block
-        bootstrapping
+FEATURE:    Replace autocorrelation analysis for errors with block averaging/block bootstrapping analysis
+FEATURE:    Cythonize code
 """
 import numpy as np
 import matplotlib
@@ -14,26 +14,31 @@ import argparse
 from scipy import stats
 from numpy import convolve
 
-#Temporary use of pymbar
+#Pymbar for autocorrelation time
 import pymbar.timeseries
 
 class TimeSeries:
     def __init__(self):
         self.parser = argparse.ArgumentParser()
-        #parser arguments common to all timeseries classes
-        #averaging
-        self.parser.add_argument("-avgstart", help="Time to start analysis at")
-        self.parser.add_argument("-avgend", help="Time to stop analysis at")
-        self.parser.add_argument("-avgto", help="File to append averages to")
+
+        #discard portion of data for analysis
+        self.parser.add_argument("-obsstart", help="Timestep to begin computation of observables at")
+        self.parser.add_argument("-obsend", help="Timestep to end computation of observables at")
+        self.parser.add_argument("-obspref", help="Prefix of text file to append computed observables to")
+
+        #window for sliding window averaging
         self.parser.add_argument("-window", help="Time window for moving average (default = 1 time unit)")
+
         #plotting
         self.parser.add_argument("-opref", help="Output image and data prefix")
         self.parser.add_argument("-oformat", help="Output image format")
         self.parser.add_argument("-dpi", type=int, help="DPI of output image(s)")
         self.parser.add_argument("--show", action='store_true', help="Show interactive plot(s)")
+
         #replot arguments, for classes that choose to implement them
         self.parser.add_argument("--replot", action="store_true", help="Replot from saved data")
         self.parser.add_argument("-replotpref", help="Prefix (pref.npy) of data file to replot from")
+
         #for classes that choose to append to saved data from another run before plotting
         self.parser.add_argument("-apref", \
             help="Append current quantities to previous quantities (from saved .npy files) and plot")
@@ -44,18 +49,24 @@ class TimeSeries:
         #for running on remote server
         self.parser.add_argument("--remote", action='store_true')
 
+    def parse_args(self, args=None):
+        if args is None:
+            self.args = self.parser.parse_args()
+        else:
+            self.args = self.parser.parse_args(args)
+
     def read_args(self):
-        self.args = self.parser.parse_args()
         #parse into class variables
-        self.avgstart = self.args.avgstart
-        if self.avgstart is not None:
-            self.avgstart = np.float(self.avgstart)
+        self.obsstart = self.args.obsstart
+        if self.obsstart is not None:
+            self.obsstart = np.float(self.obsstart)
 
-        self.avgend = self.args.avgend
-        if self.avgend is not None:
-            self.avgend = np.float(self.avgend)
+        self.obsend = self.args.obsend
+        if self.obsend is not None:
+            self.obsend = np.float(self.obsend)
 
-        self.avgto = self.args.avgto
+        self.obspref = self.args.obspref
+
         self.window = self.args.window
         if self.window is not None:
             self.window = np.float(self.window)
@@ -68,7 +79,7 @@ class TimeSeries:
         self.replot = self.args.replot
         self.replotpref = self.args.replotpref
         if self.replotpref is None:
-            self.replotpref = "data"
+            self.replotpref = "fig"
 
         self.apref = self.args.apref
         self.aprevlegend = self.args.aprevlegend
@@ -83,7 +94,11 @@ class TimeSeries:
         if self.remote:
             matplotlib.use('Agg')
 
-    """tests in tests/test_timeseries.py"""
+    """
+    Compute moving average of time series data using a sliding window defined
+    in units of time
+
+    tests in tests/test_timeseries.py"""
     def moving_average(self,t,x,window):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]
@@ -96,28 +111,76 @@ class TimeSeries:
         ma = np.convolve(x, w, 'valid')
         return ma
 
-    """tests in tests/test_timeseries.py"""
+    """
+    Compute cumulative moving average (running average) of time series data
+
+    tests in tests/test_timeseries.py"""
     def cumulative_moving_average(self,x):
         csum = np.cumsum(x)
         nvals = range(1,len(x)+1)
         cma = csum/nvals
         return cma
 
-    """TODO
-       tests in tests/test_timeseries.py"""
-    def average(self,t,x,avgstart,avgend):
+
+    """
+    Compute mean of timeseries over range [obsstart, obsend]
+    """
+    def ts_mean(self,t,x,obsstart,obsend):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]
 
-        if avgstart is None:
+        if obsstart is None:
             startidx = 0
         else:
-            startidx = int(np.floor(avgstart/tstep))
+            startidx = int(np.floor(obsstart/tstep))
 
-        if avgend is None:
+        if obsend is None:
             endidx = len(x)
         else:
-            endidx = int(np.floor(avgend/tstep))
+            endidx = int(np.floor(obsend/tstep))
+
+        xsub = x[startidx:endidx]
+        return np.mean(xsub)
+
+    """
+    Compute std of timeseries over range [obsstart, obsend]
+    """
+    def ts_std(self,t,x,obsstart,obsend):
+        t = np.reshape(t, (len(t),))
+        tstep = t[1] - t[0]
+
+        if obsstart is None:
+            startidx = 0
+        else:
+            startidx = int(np.floor(obsstart/tstep))
+
+        if obsend is None:
+            endidx = len(x)
+        else:
+            endidx = int(np.floor(obsend/tstep))
+
+        xsub = x[startidx:endidx]
+        return np.std(xsub)
+
+    """
+    Compute standard error of mean (estimate of the standard deviation of the
+    distribution of the mean) for the time series data using autocorrelation
+    analysis for estimating number of independent samples
+
+    tests in tests/test_timeseries.py"""
+    def serr_mean(self,t,x,obsstart,obsend):
+        t = np.reshape(t, (len(t),))
+        tstep = t[1] - t[0]
+
+        if obsstart is None:
+            startidx = 0
+        else:
+            startidx = int(np.floor(obsstart/tstep))
+
+        if obsend is None:
+            endidx = len(x)
+        else:
+            endidx = int(np.floor(obsend/tstep))
 
         xsub = x[startidx:endidx]
 
@@ -134,12 +197,11 @@ class TimeSeries:
         actual_samples = len(xsub)/stat_ineff
         serr = np.std(xsub)/np.sqrt(actual_samples)
 
-        #95% CI
-        ci_95_low = mean - 1.96*serr
-        ci_95_high = mean + 1.96*serr
+        return serr
 
-        return mean, serr, ci_95_low, ci_95_high
-
+    """
+    Helper function to save timeseries data to file
+    """
     def save_timeseries(self,t,x,label=""):
         ts = np.stack((t,x))
         pref = self.opref
@@ -148,6 +210,10 @@ class TimeSeries:
         np.save(pref+"_"+label,ts)
         print("Saving data > "+pref+"_"+label+".npy")
 
+
+    """
+    Helper function to save figures to file
+    """
     def save_figure(self,fig,suffix=""):
         oformat = self.oformat
         pref = self.opref

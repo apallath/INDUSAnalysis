@@ -6,7 +6,9 @@ Units:
 
 @Author: Akash Pallath
 
-TODO:   Mean and CI plot for appended plots
+FEATURE:    Mean and CI plot for appended plots
+FEATURE:    Parallelize code
+FEATURE:    Cythonize code
 """
 from analysis.timeseries import TimeSeries
 
@@ -52,27 +54,6 @@ class Contacts(TimeSeries):
         if self.skip is None:
             self.skip = 1
 
-    """ (deprecated)
-    # Reference contacts calculation
-    def calc_refcontacts(self):
-        side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or type H)"
-
-        refprotein = self.refu.select_atoms("protein")
-
-        nres = len(refprotein.residues)
-        box = self.refu.dimensions
-
-        refcontacts = 0
-
-        for i in range(nres):
-            heavy_side_i = refprotein.residues[i].atoms.select_atoms(side_heavy_sel)
-            heavy_side_j = refprotein.residues[i+4:].atoms.select_atoms(side_heavy_sel)
-            da = mda.lib.distances.distance_array(heavy_side_i.positions, heavy_side_j.positions, box)
-            refcontacts += np.count_nonzero(da < self.distcutoff)
-
-        self.refcontacts = refcontacts
-    """
-
     # Contacts analysis along trajectory
     def calc_trajcontacts(self):
         side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or type H)"
@@ -116,6 +97,8 @@ class Contacts(TimeSeries):
         t = self.contacts[:,0]
         mean, serr, ci_95_low, ci_95_high = self.average(t, contacts, self.avgstart, self.avgend)
 
+        """Use mean number of contacts along trajectory as reference
+           (sensible choice for native state run)"""s
         if self.refcontacts is None:
             self.refcontacts = mean
 
@@ -140,6 +123,8 @@ class Contacts(TimeSeries):
         # Plot fraction of contacts
         fig, ax = plt.subplots()
         ax.plot(t, contacts/self.refcontacts)
+        ax.set_ylim([0, 1.25])
+        ax.axhline(y=0.5)
         # Plot mean and errors
         meanline = mean/self.refcontacts*np.ones(len(t))
         ci_low_line = ci_95_low/self.refcontacts*np.ones(len(t))
@@ -178,6 +163,8 @@ class Contacts(TimeSeries):
             ax.plot(tn,contacts/self.refcontacts,label=self.acurlegend)
             ax.set_xlabel("Time (ps)")
             ax.set_ylabel("Fraction of contacts")
+            ax.set_ylim([0, 1.25])
+            ax.axhline(y=0.5)
             ax.legend()
             self.save_figure(fig,suffix="app_frac_contacts")
             if self.show:

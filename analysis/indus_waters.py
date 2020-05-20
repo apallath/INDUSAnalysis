@@ -1,15 +1,15 @@
 """Plot number of waters in probe volume output by GROMACS-INDUS simulation
 Outputs
-- Number of waters
-- Number of waters (sliding window) moving average
-- Number of waters cumulative moving average
+- Number of waters in probe volume
+- Number of waters in probe volume - moving (sliding window) average
+- Number of waters in probe volume - cumulative moving (running) average
 
 Units:
 - time: ps
 
 @Author: Akash Pallath
 
-TODO:   Mean and CI plot for appended plots
+FEATURE:    Cythonize code
 """
 from analysis.timeseries import TimeSeries
 
@@ -28,7 +28,9 @@ class IndusWaters(TimeSeries):
         # Prepare system from args
         self.t, self.N, self.Ntw, self.mu = self.get_data(self.file)
 
-    # Read data from file to prepare system
+    """
+    Read data from file to prepare system
+    """
     def get_data(self, file):
         t = []
         N = []
@@ -57,23 +59,12 @@ class IndusWaters(TimeSeries):
 
         return t, N, Ntw, mu
 
-    def __call__(self):
-        # Log data
-        self.save_timeseries(self.t,self.N,label="N")
-        self.save_timeseries(self.t,self.Ntw,label="Ntw")
-
-        # Plot time series data
+    """
+    Plot waters in probe volume
+    """
+    def plot_waters(self):
         fig, ax = plt.subplots()
         ax.plot(self.t,self.Ntw,label=r"$\tilde{N}$")
-        # Plot mean and errors
-        mean, serr, ci_95_low, ci_95_high = self.average(self.t, self.Ntw, self.avgstart, self.avgend)
-        meanline = mean*np.ones(len(self.t))
-        ci_low_line = ci_95_low*np.ones(len(self.t))
-        ci_high_line = ci_95_high*np.ones(len(self.t))
-        ax.plot(self.t,meanline,color='green')
-        ax.fill_between(self.t,ci_low_line,ci_high_line,alpha=0.2,facecolor='green',edgecolor='green')
-        # Plot properties
-        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel("CG number of waters")
         ax.legend()
@@ -81,38 +72,7 @@ class IndusWaters(TimeSeries):
         if self.show:
             plt.show()
 
-        # Plot moving average data
-        maNtw = self.moving_average(self.t, self.Ntw, self.window)
-        fig, ax = plt.subplots()
-        ax.plot(self.t[len(self.t) - len(maNtw):], maNtw, label=r"$\tilde{N}$, moving average")
-        # Plot mean and errors
-        meanline = mean*np.ones(len(maNtw))
-        ci_low_line = ci_95_low*np.ones(len(maNtw))
-        ci_high_line = ci_95_high*np.ones(len(maNtw))
-        ax.plot(self.t[len(self.t) - len(maNtw):], meanline, color='green')
-        ax.fill_between(self.t[len(self.t) - len(maNtw):], ci_low_line, ci_high_line,\
-            alpha=0.2,facecolor='green',edgecolor='green')
-        # Plot properties
-        plt.title('Mean = {:.2f}\n95% CI = [{:.2f}, {:.2f}]'.format(mean, ci_95_low, ci_95_high))
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("CG number of waters, moving average")
-        ax.legend()
-        self.save_figure(fig,suffix="ma_waters")
-        if self.show:
-            plt.show()
-
-        # Plot cumulative moving average data
-        cmaNtw = self.cumulative_moving_average(self.Ntw)
-        fig, ax = plt.subplots()
-        ax.plot(self.t, cmaNtw, label=r"$\tilde{N}$, cum. moving average")
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("CG number of waters, cumulative moving average")
-        ax.legend()
-        self.save_figure(fig,suffix="cma_waters")
-        if self.show:
-            plt.show()
-
-        # Append to previous data (if available), and plot
+        #Append
         if self.apref is not None:
             tNtwp = np.load(self.apref + "_Ntw.npy")
             tp = tNtwp[0,:]
@@ -120,7 +80,6 @@ class IndusWaters(TimeSeries):
 
             tn = tp[-1]+self.t
 
-            # Plot time series data
             fig, ax = plt.subplots()
             ax.plot(tp,Ntwp,label=r"$\tilde{N}$, " + self.aprevlegend)
             ax.plot(tn,self.Ntw,label=r"$\tilde{N}$, " + self.acurlegend)
@@ -130,6 +89,29 @@ class IndusWaters(TimeSeries):
             self.save_figure(fig,suffix="app_waters")
             if self.show:
                 plt.show()
+
+    """
+    Plot moving (sliding window) average of waters in probe volume
+    """
+    def plot_ma_waters(self):
+        maNtw = self.moving_average(self.t, self.Ntw, self.window)
+
+        fig, ax = plt.subplots()
+        ax.plot(self.t[len(self.t) - len(maNtw):], maNtw, label=r"$\tilde{N}$, moving average")
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel("CG number of waters, moving (window) average")
+        ax.legend()
+        self.save_figure(fig,suffix="ma_waters")
+        if self.show:
+            plt.show()
+
+        #Append
+        if self.apref is not None:
+            tNtwp = np.load(self.apref + "_Ntw.npy")
+            tp = tNtwp[0,:]
+            Ntwp = tNtwp[1,:]
+
+            tn = tp[-1]+self.t
 
             # Plot time series data moving average
             ttot = np.hstack([tp,tn])
@@ -141,11 +123,33 @@ class IndusWaters(TimeSeries):
             ax.axvline(x=tp[-1])
             #labels
             ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("CG number of waters, moving average")
+            ax.set_ylabel("CG number of waters, moving (window) average")
             ax.legend()
             self.save_figure(fig,suffix="app_ma_waters")
             if self.show:
                 plt.show()
+
+    """
+    Plot cumulative moving (running) average of waters in probe volume
+    """
+    def plot_cma_waters(self):
+        cmaNtw = self.cumulative_moving_average(self.Ntw)
+        fig, ax = plt.subplots()
+        ax.plot(self.t, cmaNtw, label=r"$\tilde{N}$, cum. moving average")
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel("CG number of waters, cumulative moving (running) average")
+        ax.legend()
+        self.save_figure(fig,suffix="cma_waters")
+        if self.show:
+            plt.show()
+
+        #Append
+        if self.apref is not None:
+            tNtwp = np.load(self.apref + "_Ntw.npy")
+            tp = tNtwp[0,:]
+            Ntwp = tNtwp[1,:]
+
+            tn = tp[-1]+self.t
 
             # Plot time series data cumulative moving average
             ttot = np.hstack([tp,tn])
@@ -157,17 +161,48 @@ class IndusWaters(TimeSeries):
             ax.axvline(x=tp[-1])
             #labels
             ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("CG number of waters, cumulative moving average")
+            ax.set_ylabel("CG number of waters, cumulative moving (running) average")
             ax.legend()
             self.save_figure(fig,suffix="app_cma_waters")
             if self.show:
                 plt.show()
 
+    """
+    Append mean waters to text file
+    """
+    def report_mean(self):
+        meanstr = "{:.2f} {:.2f}\n".format(self.mu, self.ts_mean(self.t, self.Ntw, self.obsstart, self.obsend))
+        with open(self.obspref+"_mean.txt", 'a+') as meanf:
+            meanf.write(meanstr)
+
+    """
+    Append standard deviation of waters to text file
+    """
+    def report_std(self):
+        stdstr = "{:.2f} {:.2f}\n".format(self.mu, self.ts_std(self.t, self.Ntw, self.obsstart, self.obsend))
+        with open(self.obspref+"_std.txt", 'a+') as stdf:
+            stdf.write(stdstr)
+
+    def __call__(self):
+        """Log data"""
+        self.save_timeseries(self.t,self.N,label="N")
+        self.save_timeseries(self.t,self.Ntw,label="Ntw")
+
+        """Plots"""
+        self.plot_waters()
+        self.plot_ma_waters()
+        self.plot_cma_waters()
+
+        """Report observables to text files"""
+        self.report_mean()
+        self.report_std()
+
 warnings = ""
 
 if __name__=="__main__":
     waters = IndusWaters()
+    waters.parse_args()
     waters.read_args()
-    startup_string = "#### INDUS Waters ####\n" + warnings
+    startup_string = "#### INDUS Waters ####\n" + warnings + "\n"
     print(startup_string)
     waters()
