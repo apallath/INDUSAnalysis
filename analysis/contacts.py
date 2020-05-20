@@ -98,7 +98,7 @@ class Contacts(TimeSeries):
         mean, serr, ci_95_low, ci_95_high = self.average(t, contacts, self.avgstart, self.avgend)
 
         """Use mean number of contacts along trajectory as reference
-           (sensible choice for native state run)"""s
+           (sensible choice for native state run)"""
         if self.refcontacts is None:
             self.refcontacts = mean
 
