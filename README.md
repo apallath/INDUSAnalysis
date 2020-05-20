@@ -1,4 +1,4 @@
-# Analysis scripts for MD simulation post processing.
+# Analysis scripts for Dynamic INDUS MD simulation post processing.
 
 Install in editable state using pip:
 
