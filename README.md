@@ -1,4 +1,4 @@
-# Scripts for Dynamic INDUS MD simulation post processing.
+# Dynamic INDUS MD simulation post processing.
 
 Install in editable state using pip:
 
@@ -16,7 +16,12 @@ The analysis scripts are executable with command line arguments.
 `python /path/to/script/ --help`
 will list out the required and optional arguments for each script.
 
-### Usage examples
+## Tools for analysis package to use:
+`meta_analysis/`
+
+Similar instructions. Currently implements function profiling through a decorator.
+
+## Usage examples for analysis:
 
 ```
 python /path/to/analysis_scripts/analysis/indus_waters.py phiout.dat \
