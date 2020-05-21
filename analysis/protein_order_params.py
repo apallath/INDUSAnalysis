@@ -1,4 +1,5 @@
-"""Calculate time series
+"""
+Calculate time series
 - Radius of gyration
 - RMSD
 given GROMACS trajectory of a protein
@@ -59,8 +60,11 @@ class OrderParams(TimeSeries):
         else:
             self.reftstep = 0
 
-    """Radius of gyration
-    Tests in tests/test_orderparams.py"""
+    """
+    Radius of gyration worker and helper function
+
+    Tests in tests/test_orderparams.py
+    """
     def calc_Rg_worker(self,coords,masses):
         assert(coords.shape[1] == 3)
 
@@ -78,8 +82,102 @@ class OrderParams(TimeSeries):
         Rg = np.array(Rg)
         return Rg
 
-    """RMSD
-    Tests in tests/test_orderparams.py"""
+    """
+    Plot radius of gyration
+    """
+    def plot_Rg(self, Rg_data):
+        t = Rg_data[:,0]
+        rg = Rg_data[:,1]
+
+        fig, ax = plt.subplots()
+        ax.plot(t,rg)
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel(r"Radius of gyration ($\AA$)")
+        self.save_figure(fig,suffix="Rg")
+        self.save_timeseries(t,rg,label="Rg")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+        if self.apref is not None:
+            trgp = np.load(self.apref + "_Rg.npy")
+            tp = trgp[0,:]
+            rgp = trgp[1,:]
+            tn = tp[-1]+t
+
+            fig, ax = plt.subplots()
+            ax.plot(tp,rgp,label=self.aprevlegend)
+            ax.plot(tn,rg,label=self.acurlegend)
+            ax.set_xlabel("Time (ps)")
+            ax.set_ylabel(r"Radius of gyration ($\AA$)")
+            ax.legend()
+            self.save_figure(fig,suffix="app_Rg")
+            if self.show:
+                plt.show()
+            else:
+                plt.close()
+
+    """
+    Plot moving (sliding window) average of radius of gyration
+    """
+    def plot_ma_Rg(self, Rg_data):
+        t = Rg_data[:,0]
+        rg = Rg_data[:,1]
+
+        rg_ma = self.moving_average(t, rg, self.window)
+        fig, ax = plt.subplots()
+        ax.plot(t[len(t) - len(rg_ma):], rg_ma)
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel(r"Radius of gyration ($\AA$)")
+        self.save_figure(fig,suffix="ma_Rg")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+        if self.apref is not None:
+            trgp = np.load(self.apref + "_Rg.npy")
+            tp = trgp[0,:]
+            rgp = trgp[1,:]
+            tn = tp[-1]+t
+
+            ttot = np.hstack([tp,tn])
+            rgtot = np.hstack([rgp,rg])
+
+            rgtot_ma = self.moving_average(ttot, rgtot,self.window)
+            fig, ax = plt.subplots()
+            ax.plot(ttot[len(ttot) - len(rgtot_ma):], rgtot_ma)
+            #separator line
+            ax.axvline(x=tp[-1])
+
+            ax.set_xlabel("Time (ps)")
+            ax.set_ylabel(r"Radius of gyration ($\AA$)")
+            self.save_figure(fig,suffix="app_ma_Rg")
+            if self.show:
+                plt.show()
+            else:
+                plt.close()
+
+    """
+    Plot cumulative moving (running) average of radius of gyration
+    TODO: Implement
+    """
+    def plot_cma_Rg(self, Rg_data):
+        t = Rg_data[:,0]
+        rg = Rg_data[:,1]
+
+        if self.apref is not None:
+            trgp = np.load(self.apref + "_Rg.npy")
+            tp = trgp[0,:]
+            rgp = trgp[1,:]
+            tn = tp[-1]+t
+
+    """
+    RMSD worker and helper function
+
+    Tests in tests/test_orderparams.py
+    """
     def calc_RMSD_worker(self,initcoords,coords,aligninitcoords,aligncoords):
         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
@@ -123,90 +221,23 @@ class OrderParams(TimeSeries):
         RMSD = np.array(RMSD)
         return RMSD
 
-    """call"""
-    def __call__(self):
-        """Radius of gyration plots"""
-        #radius of gyration
-        sel_rg = self.calc_Rg(self.u, self.select)
-        #plot
+    """
+    Plot RMSD
+    """
+    def plot_RMSD(self, RMSD_data):
+        rmsd = RMSD_data[:,1]
+        t = RMSD_data[:,0]
+
         fig, ax = plt.subplots()
-        rg = sel_rg[:,1]
-        t = sel_rg[:,0]
-        ax.plot(t,rg)
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel(r"Radius of gyration ($\AA$)")
-        self.save_figure(fig,suffix="Rg")
-        self.save_timeseries(sel_rg[:,0],sel_rg[:,1],label="Rg")
-        if self.show:
-            plt.show()
-
-        #radius of gyration moving average
-        rg_ma = self.moving_average(t, rg, self.window)
-        fig, ax = plt.subplots()
-        ax.plot(t[len(t) - len(rg_ma):], rg_ma)
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel(r"Radius of gyration ($\AA$)")
-        self.save_figure(fig,suffix="ma_Rg")
-        if self.show:
-            plt.show()
-
-        if self.apref is not None:
-            trgp = np.load(self.apref + "_Rg.npy")
-            tp = trgp[0,:]
-            rgp = trgp[1,:]
-            tn = tp[-1]+t
-
-            #plot time series data
-            fig, ax = plt.subplots()
-            ax.plot(tp,rgp,label=self.aprevlegend)
-            ax.plot(tn,rg,label=self.acurlegend)
-            ax.set_xlabel("Time (ps)")
-            ax.set_ylabel(r"Radius of gyration ($\AA$)")
-            ax.legend()
-            self.save_figure(fig,suffix="app_Rg")
-            if self.show:
-                plt.show()
-
-            #plot time series data moving average
-            ttot = np.hstack([tp,tn])
-            rgtot = np.hstack([rgp,rg])
-
-            rgtot_ma = self.moving_average(ttot, rgtot,self.window)
-            fig, ax = plt.subplots()
-            ax.plot(ttot[len(ttot) - len(rgtot_ma):], rgtot_ma)
-            #separator line
-            ax.axvline(x=tp[-1])
-
-            ax.set_xlabel("Time (ps)")
-            ax.set_ylabel(r"Radius of gyration ($\AA$)")
-            self.save_figure(fig,suffix="app_ma_Rg")
-            if self.show:
-                plt.show()
-
-        """RMSD plots"""
-        #RMSD from initial structure
-        sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.select, self.align)
-        #plot
-        fig, ax = plt.subplots()
-        rmsd = sel_RMSD[:,1]
-        t = sel_RMSD[:,0]
         ax.plot(t,rmsd)
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
-        self.save_timeseries(sel_RMSD[:,0],sel_RMSD[:,1],label="RMSD_"+self.align+"_"+self.select)
+        self.save_timeseries(t,rmsd,label="RMSD_"+self.align+"_"+self.select)
         if self.show:
             plt.show()
-
-        #RMSD moving average
-        rmsd_ma = self.moving_average(t, rmsd, self.window)
-        fig, ax = plt.subplots()
-        ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel(r"RMSD ($\AA$)")
-        self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
-        if self.show:
-            plt.show()
+        else:
+            plt.close()
 
         if self.apref is not None:
             trmsdp = np.load(self.apref+"_RMSD_"+self.align+"_"+self.select+".npy")
@@ -214,7 +245,6 @@ class OrderParams(TimeSeries):
             rmsdp = trmsdp[1,:]
             tn = tp[-1]+t
 
-            #plot time series data
             fig, ax = plt.subplots()
             ax.plot(tp,rmsdp,label=self.aprevlegend)
             ax.plot(tn,rmsd,label=self.acurlegend)
@@ -224,8 +254,33 @@ class OrderParams(TimeSeries):
             self.save_figure(fig,suffix="app_RMSD_"+self.align+"_"+self.select)
             if self.show:
                 plt.show()
+            else:
+                plt.close()
 
-            #plot time series data moving average
+    """
+    Plot moving (sliding window) average of RMSD
+    """
+    def plot_ma_RMSD(self, RMSD_data):
+        rmsd = RMSD_data[:,1]
+        t = RMSD_data[:,0]
+
+        rmsd_ma = self.moving_average(t, rmsd, self.window)
+        fig, ax = plt.subplots()
+        ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel(r"RMSD ($\AA$)")
+        self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+        if self.apref is not None:
+            trmsdp = np.load(self.apref+"_RMSD_"+self.align+"_"+self.select+".npy")
+            tp = trmsdp[0,:]
+            rmsdp = trmsdp[1,:]
+            tn = tp[-1]+t
+
             ttot = np.hstack([tp,tn])
             rmsdtot = np.hstack([rmsdp,rmsd])
 
@@ -240,12 +295,46 @@ class OrderParams(TimeSeries):
             self.save_figure(fig,suffix="app_ma_RMSD_"+self.align+"_"+self.select)
             if self.show:
                 plt.show()
+            else:
+                plt.close()
 
-warnings = "Proceed with caution: this script requires PBC-corrected protein structures!"
+    """
+    Plot cumulative moving (running) average of RMSD
+    TODO: Implement
+    """
+    def plot_cma_RMSD(self, RMSD_data):
+        rmsd = RMSD_data[:,1]
+        t = RMSD_data[:,0]
 
-if __name__=="__main__":
+        if self.apref is not None:
+            trmsdp = np.load(self.apref+"_RMSD_"+self.align+"_"+self.select+".npy")
+            tp = trmsdp[0,:]
+            rmsdp = trmsdp[1,:]
+            tn = tp[-1]+t
+
+    """call"""
+    def __call__(self):
+        """Radius of gyration plots"""
+        sel_Rg = self.calc_Rg(self.u, self.select)
+        self.plot_Rg(sel_Rg)
+        self.plot_ma_Rg(sel_Rg)
+        self.plot_cma_Rg(sel_Rg)
+
+        """RMSD plots"""
+        sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.select, self.align)
+        self.plot_RMSD(sel_RMSD)
+        self.plot_ma_RMSD(sel_RMSD)
+        self.plot_cma_RMSD(sel_RMSD)
+
+def main():
+    warnings = "Proceed with caution: this script requires PBC-corrected protein structures!"
     prot = OrderParams()
+    prot.parse_args()
     prot.read_args()
     startup_string = "#### Order Parameter Analysis ####\n" + warnings + "\n"
     print(startup_string)
     prot()
+    plt.close('all')
+
+if __name__=="__main__":
+    main()

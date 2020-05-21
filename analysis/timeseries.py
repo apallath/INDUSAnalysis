@@ -1,4 +1,5 @@
-"""Template for handling timeseries data produced by molecular simulations
+"""
+Template for handling timeseries data produced by molecular simulations
 
 @Author: Akash Pallath
 
@@ -167,7 +168,8 @@ class TimeSeries:
     distribution of the mean) for the time series data using autocorrelation
     analysis for estimating number of independent samples
 
-    tests in tests/test_timeseries.py"""
+    tests in tests/test_timeseries.py
+    """
     def serr_mean(self,t,x,obsstart,obsend):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]

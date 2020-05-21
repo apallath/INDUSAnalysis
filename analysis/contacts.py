@@ -1,4 +1,6 @@
-"""Plot number of contacts and fraction of native contacts with time
+"""
+Plot number of contacts, fraction of native contacts, and contact histograms
+with time
 
 Units:
 - length: A
@@ -6,7 +8,6 @@ Units:
 
 @Author: Akash Pallath
 
-FEATURE:    Mean and CI plot for appended plots
 FEATURE:    Parallelize code
 FEATURE:    Cythonize code
 """
@@ -16,6 +17,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import MDAnalysis.lib.distances #for fast distance matrix calculation
+
+from meta_analysis.profiling import timefunc #for function run-time profiling
 
 class Contacts(TimeSeries):
     def __init__(self):
@@ -55,6 +58,7 @@ class Contacts(TimeSeries):
             self.skip = 1
 
     # Contacts analysis along trajectory
+    @timefunc
     def calc_trajcontacts(self):
         side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or type H)"
 
@@ -119,6 +123,8 @@ class Contacts(TimeSeries):
         self.save_timeseries(self.contacts[:,0], self.contacts[:,1], label="contacts")
         if self.show:
             plt.show()
+        else:
+            plt.close()
 
         # Plot fraction of contacts
         fig, ax = plt.subplots()
@@ -139,6 +145,8 @@ class Contacts(TimeSeries):
         self.save_timeseries(self.contacts[:,0], self.contacts[:,1], label="contacts")
         if self.show:
             plt.show()
+        else:
+            plt.close()
 
         if self.apref is not None:
             tcp = np.load(self.apref + "_contacts.npy")
@@ -156,6 +164,8 @@ class Contacts(TimeSeries):
             self.save_figure(fig,suffix="app_contacts")
             if self.show:
                 plt.show()
+            else:
+                plt.close()
 
             #plot fraction of contacts time series
             fig, ax = plt.subplots()
@@ -169,12 +179,18 @@ class Contacts(TimeSeries):
             self.save_figure(fig,suffix="app_frac_contacts")
             if self.show:
                 plt.show()
+            else:
+                plt.close()
 
-warnings = "Proceed with caution: this script requires PBC-corrected protein structures!\n"
-
-if __name__=="__main__":
+def main():
+    warnings = "Proceed with caution: this script requires PBC-corrected protein structures!\n"
     contacts = Contacts()
+    contacts.parse_args()
     contacts.read_args()
     startup_string = "#### Contacts ####\n" + warnings
     print(startup_string)
     contacts()
+    plt.close('all')
+
+if __name__=="__main__":
+    main()

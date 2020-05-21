@@ -1,4 +1,6 @@
-"""Plot number of waters in probe volume output by GROMACS-INDUS simulation
+"""
+Plot number of waters in probe volume output by GROMACS-INDUS simulation
+
 Outputs
 - Number of waters in probe volume
 - Number of waters in probe volume - moving (sliding window) average
@@ -71,6 +73,8 @@ class IndusWaters(TimeSeries):
         self.save_figure(fig,suffix="waters")
         if self.show:
             plt.show()
+        else:
+            plt.close()
 
         #Append
         if self.apref is not None:
@@ -89,6 +93,8 @@ class IndusWaters(TimeSeries):
             self.save_figure(fig,suffix="app_waters")
             if self.show:
                 plt.show()
+            else:
+                plt.close()
 
     """
     Plot moving (sliding window) average of waters in probe volume
@@ -104,6 +110,8 @@ class IndusWaters(TimeSeries):
         self.save_figure(fig,suffix="ma_waters")
         if self.show:
             plt.show()
+        else:
+            plt.close()
 
         #Append
         if self.apref is not None:
@@ -128,6 +136,8 @@ class IndusWaters(TimeSeries):
             self.save_figure(fig,suffix="app_ma_waters")
             if self.show:
                 plt.show()
+            else:
+                plt.close()
 
     """
     Plot cumulative moving (running) average of waters in probe volume
@@ -142,6 +152,8 @@ class IndusWaters(TimeSeries):
         self.save_figure(fig,suffix="cma_waters")
         if self.show:
             plt.show()
+        else:
+            plt.close()
 
         #Append
         if self.apref is not None:
@@ -166,6 +178,8 @@ class IndusWaters(TimeSeries):
             self.save_figure(fig,suffix="app_cma_waters")
             if self.show:
                 plt.show()
+            else:
+                plt.close()
 
     """
     Append mean waters to text file
@@ -197,12 +211,15 @@ class IndusWaters(TimeSeries):
         self.report_mean()
         self.report_std()
 
-warnings = ""
-
-if __name__=="__main__":
+def main():
+    warnings = ""
     waters = IndusWaters()
     waters.parse_args()
     waters.read_args()
     startup_string = "#### INDUS Waters ####\n" + warnings + "\n"
     print(startup_string)
     waters()
+    plt.close('all')
+
+if __name__=="__main__":
+    main()
