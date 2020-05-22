@@ -18,6 +18,8 @@ from analysis.timeseries import TimeSeries
 import numpy as np
 import matplotlib.pyplot as plt
 
+from meta_analysis.profiling import timefunc #for function run-time profiling
+
 class IndusWaters(TimeSeries):
     def __init__(self):
         super().__init__()
@@ -211,6 +213,7 @@ class IndusWaters(TimeSeries):
         self.report_mean()
         self.report_std()
 
+@timefunc
 def main():
     warnings = ""
     waters = IndusWaters()

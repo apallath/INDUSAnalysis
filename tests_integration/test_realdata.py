@@ -1,9 +1,8 @@
 """
 Integration tests
 
+Execution times for test cases will be reported to `test_exec_times.txt`
 For detailed profiling, run `python -m cProfile test_realdata.py`.
-For profiling only each test, run `python test_realdata.py` instead of pytest,
-and the timefunc decorators will handle run time analysis
 """
 
 import numpy as np
@@ -13,10 +12,10 @@ import os
 from analysis.indus_waters import IndusWaters
 from analysis.protein_order_params import OrderParams
 from analysis.contacts import Contacts
-from meta_analysis.profiling import timefunc
+from meta_analysis.profiling import timefuncfile, skipfunc
 
 """Ensure that INDUS waters analysis does not break on running with actual data"""
-@timefunc
+@timefuncfile("test_exec_times.txt")
 def test_waters():
     if not os.path.exists('waters_test_data'):
         os.makedirs('waters_test_data')
@@ -40,7 +39,7 @@ def test_waters():
 
 """Ensure that protein order parameters analysis does not break on running
 with actual data"""
-@timefunc
+@timefuncfile("test_exec_times.txt")
 def test_order_params():
     if not os.path.exists('order_params_test_data'):
         os.makedirs('order_params_test_data')
@@ -64,8 +63,23 @@ def test_order_params():
 
 """Ensure that contacts analysis does not break on running
 with actual data"""
-@timefunc
+@timefuncfile("test_exec_times.txt")
 def test_contacts():
+    if not os.path.exists('contacts_test_data'):
+        os.makedirs('contacts_test_data')
+
+    forward = Contacts()
+    forward.parse_args(['prod.gro', 'indus_fwd_mol.xtc', '-opref', 'contacts_test_data/fwd', '-oformat', 'png',
+                        '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
+    forward.read_args()
+    forward()
+
+    back = Contacts()
+    back.parse_args(['prod.gro', 'indus_back_mol.xtc', '-opref', 'contacts_test_data/back', '-oformat', 'png',
+                     '-apref', 'contacts_test_data/fwd', '-aprevlegend', "Biased", '-acurlegend', "Biasing off",
+                     '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
+    back.read_args()
+    back()
     return True
 
 if __name__=="__main__":

@@ -24,6 +24,8 @@ import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import MDAnalysis.analysis.align
 
+from meta_analysis.profiling import timefunc #for function run-time profiling
+
 class OrderParams(TimeSeries):
     def __init__(self):
         super().__init__()
@@ -94,7 +96,6 @@ class OrderParams(TimeSeries):
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"Radius of gyration ($\AA$)")
         self.save_figure(fig,suffix="Rg")
-        self.save_timeseries(t,rg,label="Rg")
         if self.show:
             plt.show()
         else:
@@ -233,7 +234,6 @@ class OrderParams(TimeSeries):
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel(r"RMSD ($\AA$)")
         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
-        self.save_timeseries(t,rmsd,label="RMSD_"+self.align+"_"+self.select)
         if self.show:
             plt.show()
         else:
@@ -314,18 +314,24 @@ class OrderParams(TimeSeries):
 
     """call"""
     def __call__(self):
-        """Radius of gyration plots"""
         sel_Rg = self.calc_Rg(self.u, self.select)
+        sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.select, self.align)
+
+        """Log data"""
+        self.save_timeseries(sel_Rg[:,0],sel_Rg[:,1],label="Rg")
+        self.save_timeseries(sel_RMSD[:,0],sel_RMSD[:,1],label="RMSD_"+self.align+"_"+self.select)
+
+        """Radius of gyration plots"""
         self.plot_Rg(sel_Rg)
         self.plot_ma_Rg(sel_Rg)
         self.plot_cma_Rg(sel_Rg)
 
         """RMSD plots"""
-        sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.select, self.align)
         self.plot_RMSD(sel_RMSD)
         self.plot_ma_RMSD(sel_RMSD)
         self.plot_cma_RMSD(sel_RMSD)
 
+@timefunc
 def main():
     warnings = "Proceed with caution: this script requires PBC-corrected protein structures!"
     prot = OrderParams()

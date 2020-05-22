@@ -18,6 +18,9 @@ from numpy import convolve
 #Pymbar for autocorrelation time
 import pymbar.timeseries
 
+#Profiling
+from meta_analysis.profiling import timefunc
+
 class TimeSeries:
     def __init__(self):
         self.parser = argparse.ArgumentParser()
@@ -122,7 +125,6 @@ class TimeSeries:
         cma = csum/nvals
         return cma
 
-
     """
     Compute mean of timeseries over range [obsstart, obsend]
     """
@@ -170,6 +172,7 @@ class TimeSeries:
 
     tests in tests/test_timeseries.py
     """
+    @timefunc
     def serr_mean(self,t,x,obsstart,obsend):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]
