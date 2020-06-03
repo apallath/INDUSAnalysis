@@ -25,30 +25,28 @@ Similar instructions. Currently implements function profiling through a decorato
 
 ```
 python /path/to/analysis_scripts/analysis/indus_waters.py phiout.dat \
-    -opref current -apref previous -oformat png -dpi 150 -window 1000 \
-    -aprevlegend "Previous run" -acurlegend "Current run" \
+    -opref outputprefix -oformat png -dpi 150 -window 1000 \
     --remote
 ```
 
 ```
 python /path/to/analysis_scripts/analysis/protein_order_params.py conf.gro traj.xtc \
-    -reftrajf traj.xtc -reftstep 0 -opref current -apref previous -oformat png -dpi 150 \
+    -reftrajf traj.xtc -reftstep 0 -opref outputpref -oformat png -dpi 150 \
     -align backbone -select backbone -window 50 \
-    -aprevlegend "Previous run" -acurlegend "Current run" \
     --remote
 ```
 
 ```
 python /path/to/analysis_scripts/analysis/contacts.py conf.gro traj.xtc \
-    -opref current -apref previous -oformat png -dpi 150 \
-    -aprevlegend "Previous run" -acurlegend "Current run" \
+    -method 3res-sh \
+    -opref outputprefix -oformat png -dpi 150 \
     --verbose --remote
 ```
 
 ## Testing
 
 ### Continuous integration
-On pushing to the repository, a Github workflow will 
+On pushing to the repository, a Github workflow will
 - Do a code review
 - Run unit tests
 - Run integration tests
