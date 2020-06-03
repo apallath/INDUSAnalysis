@@ -70,33 +70,13 @@ class IndusWaters(TimeSeries):
         fig, ax = plt.subplots()
         ax.plot(self.t,self.Ntw,label=r"$\tilde{N}$")
         ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("CG number of waters")
+        ax.set_ylabel("Continuous number of waters")
         ax.legend()
         self.save_figure(fig,suffix="waters")
         if self.show:
             plt.show()
         else:
             plt.close()
-
-        #Append
-        if self.apref is not None:
-            tNtwp = np.load(self.apref + "_Ntw.npy")
-            tp = tNtwp[0,:]
-            Ntwp = tNtwp[1,:]
-
-            tn = tp[-1]+self.t
-
-            fig, ax = plt.subplots()
-            ax.plot(tp,Ntwp,label=r"$\tilde{N}$, " + self.aprevlegend)
-            ax.plot(tn,self.Ntw,label=r"$\tilde{N}$, " + self.acurlegend)
-            ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("CG number of waters")
-            ax.legend()
-            self.save_figure(fig,suffix="app_waters")
-            if self.show:
-                plt.show()
-            else:
-                plt.close()
 
     """
     Plot moving (sliding window) average of waters in probe volume
@@ -107,39 +87,13 @@ class IndusWaters(TimeSeries):
         fig, ax = plt.subplots()
         ax.plot(self.t[len(self.t) - len(maNtw):], maNtw, label=r"$\tilde{N}$, moving average")
         ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("CG number of waters, moving (window) average")
+        ax.set_ylabel("Continuous number of waters, moving (window) average")
         ax.legend()
         self.save_figure(fig,suffix="ma_waters")
         if self.show:
             plt.show()
         else:
             plt.close()
-
-        #Append
-        if self.apref is not None:
-            tNtwp = np.load(self.apref + "_Ntw.npy")
-            tp = tNtwp[0,:]
-            Ntwp = tNtwp[1,:]
-
-            tn = tp[-1]+self.t
-
-            # Plot time series data moving average
-            ttot = np.hstack([tp,tn])
-            Ntwtot = np.hstack([Ntwp,self.Ntw])
-            maNtw = self.moving_average(ttot, Ntwtot, self.window)
-            fig, ax = plt.subplots()
-            ax.plot(ttot[len(ttot) - len(maNtw):], maNtw, label=r"$\tilde{N}$, moving average")
-            #separator line
-            ax.axvline(x=tp[-1])
-            #labels
-            ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("CG number of waters, moving (window) average")
-            ax.legend()
-            self.save_figure(fig,suffix="app_ma_waters")
-            if self.show:
-                plt.show()
-            else:
-                plt.close()
 
     """
     Plot cumulative moving (running) average of waters in probe volume
@@ -149,39 +103,13 @@ class IndusWaters(TimeSeries):
         fig, ax = plt.subplots()
         ax.plot(self.t, cmaNtw, label=r"$\tilde{N}$, cum. moving average")
         ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("CG number of waters, cumulative moving (running) average")
+        ax.set_ylabel("Continuous number of waters, cumulative moving (running) average")
         ax.legend()
         self.save_figure(fig,suffix="cma_waters")
         if self.show:
             plt.show()
         else:
             plt.close()
-
-        #Append
-        if self.apref is not None:
-            tNtwp = np.load(self.apref + "_Ntw.npy")
-            tp = tNtwp[0,:]
-            Ntwp = tNtwp[1,:]
-
-            tn = tp[-1]+self.t
-
-            # Plot time series data cumulative moving average
-            ttot = np.hstack([tp,tn])
-            Ntwtot = np.hstack([Ntwp,self.Ntw])
-            cmaNtw = self.cumulative_moving_average(Ntwtot)
-            fig, ax = plt.subplots()
-            ax.plot(ttot, cmaNtw, label=r"$\tilde{N}$, cum. moving average")
-            #separator line
-            ax.axvline(x=tp[-1])
-            #labels
-            ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("CG number of waters, cumulative moving (running) average")
-            ax.legend()
-            self.save_figure(fig,suffix="app_cma_waters")
-            if self.show:
-                plt.show()
-            else:
-                plt.close()
 
     """
     Append mean waters to text file
@@ -201,8 +129,8 @@ class IndusWaters(TimeSeries):
 
     def __call__(self):
         """Log data"""
-        self.save_timeseries(self.t,self.N,label="N")
-        self.save_timeseries(self.t,self.Ntw,label="Ntw")
+        self.save_timeseries(self.t, self.N, label="N")
+        self.save_timeseries(self.t, self.Ntw, label="Ntw")
 
         """Plots"""
         self.plot_waters()

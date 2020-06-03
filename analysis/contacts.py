@@ -8,7 +8,7 @@ Units:
 
 @Author: Akash Pallath
 
-FEATURE:    Parallelize code
+FEATURE:    Parallelize code using Python multiprocessing
 FEATURE:    Cythonize code
 """
 from analysis.timeseries import TimeSeries
@@ -25,16 +25,24 @@ class Contacts(TimeSeries):
         super().__init__()
         self.parser.add_argument("structf", help="Structure file (.gro)")
         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
-        self.parser.add_argument("-distcutoff", help="Distance cutoff for contacts, in A (default = 4.5 A)")
+        self.parser.add_argument("-method", help="Method for calculating contacts (3res-sh, atomic-sh; default=3res-sh)")
+        self.parser.add_argument("-distcutoff", help="Distance cutoff for contacts, in A")
         self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
-        self.parser.add_argument("-skip", help="Number of frames to skip between analyses")
-        self.parser.add_argument("-bins", help="Number of bins for histogram")
+        self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
+        self.parser.add_argument("-bins", help="Number of bins for histogram (default = 20)")
         self.parser.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
 
     def read_args(self):
         super().read_args()
         self.structf = self.args.structf
         self.trajf = self.args.trajf
+
+        self.method = self.args.method
+        if self.method is None:
+            self.method = "3res-sh"
+
+        self.opref = self.opref + "_" + self.method
+        self.replotpref = self.replotpref + "_" + self.method
 
         self.refcontacts = self.args.refcontacts
         if self.refcontacts is not None:
@@ -43,6 +51,8 @@ class Contacts(TimeSeries):
         self.skip = self.args.skip
         if self.skip is not None:
             self.skip = int(self.skip)
+        else:
+            self.skip = 1
 
         self.bins = self.args.bins
         if self.bins is not None:
@@ -60,14 +70,28 @@ class Contacts(TimeSeries):
         # Prepare system from args
         self.u = mda.Universe(self.structf, self.trajf)
         self.refu = mda.Universe(self.structf)
-        if self.skip is None:
-            self.skip = 1
 
     """
-    Main analysis worker/helper to analyse contacts along trajectory
+    BEGIN
+    Main analysis worker/helpers to analyse contacts along trajectory
+    """
+
+    def calc_trajcontacts(self, cutoff):
+        if self.method == "3res-sh":
+            return self.calc_trajcontacts_3res_sh(cutoff)
+        elif self.method == "atomic-sh":
+            raise Exception("Not implemented yet")
+            return None
+        else:
+            raise Exception("Method not recognized")
+            return None
+
+    """
+    Method: 3res-sh
+    Contacts between side-chain heavy atoms belonging to residues that are at least 3 residues apart
     """
     @timefunc
-    def calc_trajcontacts(self, cutoff):
+    def calc_trajcontacts_3res_sh(self, cutoff):
         side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or type H)"
 
         protein = self.u.select_atoms("protein")
@@ -112,6 +136,11 @@ class Contacts(TimeSeries):
         self.contactmatrix = contactmatrix
 
     """
+    END
+    Main analysis worker/helpers to analyse contacts along trajectory
+    """
+
+    """
     Plot number of contacts
     """
     def plot_contacts(self, t, contacts):
@@ -125,25 +154,6 @@ class Contacts(TimeSeries):
         else:
             plt.close()
 
-        if self.apref is not None:
-            tcp = np.load(self.apref + "_contacts.npy")
-            tp = tcp[0,:]
-            contactsp = tcp[1,:]
-            tn = tp[-1]+t
-
-            #plot contacts time series
-            fig, ax = plt.subplots()
-            ax.plot(tp,contactsp,label=self.aprevlegend)
-            ax.plot(tn,contacts,label=self.acurlegend)
-            ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("Number of contacts")
-            ax.legend()
-            self.save_figure(fig,suffix="app_contacts")
-            if self.show:
-                plt.show()
-            else:
-                plt.close()
-
     """
     Plot fraction of contacts
     """
@@ -154,32 +164,11 @@ class Contacts(TimeSeries):
         ax.axhline(y=1.0, color='r', linestyle='--')
         ax.set_xlabel("Time (ps)")
         ax.set_ylabel("Fraction of contacts")
-        self.save_figure(fig,suffix="frac_contacts")
+        self.save_figure(fig, suffix="frac_contacts")
         if self.show:
             plt.show()
         else:
             plt.close()
-
-        if self.apref is not None:
-            tcp = np.load(self.apref + "_contacts.npy")
-            tp = tcp[0,:]
-            contactsp = tcp[1,:]
-            tn = tp[-1]+t
-
-            #plot fraction of contacts time series
-            fig, ax = plt.subplots()
-            ax.plot(tp,contactsp/self.refcontacts,label=self.aprevlegend)
-            ax.plot(tn,contacts/self.refcontacts,label=self.acurlegend)
-            ax.set_xlabel("Time (ps)")
-            ax.set_ylabel("Fraction of contacts")
-            ax.set_ylim(bottom = 0)
-            ax.axhline(y=1, color='r', linestyle='--')
-            ax.legend()
-            self.save_figure(fig,suffix="app_frac_contacts")
-            if self.show:
-                plt.show()
-            else:
-                plt.close()
 
     """
     Plot histogram of contacts (as density)
@@ -196,7 +185,7 @@ class Contacts(TimeSeries):
         ax.plot(bin_centers, hist)
         ax.set_xlabel('Number of contacts')
         ax.set_ylabel('Frequency')
-        self.save_figure(fig,suffix="hist_contacts")
+        self.save_figure(fig, suffix="hist_contacts")
         if self.show:
             plt.show()
         else:
@@ -204,20 +193,18 @@ class Contacts(TimeSeries):
 
     """
     Plot contact matrix
+    - Note: Also saves contact matrix
     """
     def plot_matrix_contacts(self, contactmatrix):
         #save contact matrix
-        pref = self.opref
-        if pref == None:
-            pref = "data"
-        np.save(pref+"_contactmatrix", contactmatrix)
+        np.save(self.opref+"_contactmatrix", contactmatrix)
 
         fig, ax = plt.subplots()
         im = ax.imshow(contactmatrix)
         fig.colorbar(im)
         ax.set_xlabel('Atom $i$')
         ax.set_ylabel('Atom $j$')
-        self.save_figure(fig,suffix="hist_contacts")
+        self.save_figure(fig, suffix="hist_contacts")
         if self.show:
             plt.show()
         else:
@@ -227,8 +214,10 @@ class Contacts(TimeSeries):
     def __call__(self):
         """Get contacts along trajectory"""
         if self.replot:
-            replotdata = np.load(self.replotpref + "_contacts.npy")
-            self.contacts = np.transpose(replotdata)
+            replotcontacts = np.load(self.replotpref + "_contacts.npy")
+            self.contacts = np.transpose(replotcontacts)
+            replotcontactmatrix = np.load(self.replotpref + "_contactmatrix.npy")
+            self.contactmatrix = np.transpose(replotcontactmatrix)
         else:
             # Calculate contacts along trajectory
             self.calc_trajcontacts(self.distcutoff)

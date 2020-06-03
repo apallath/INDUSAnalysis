@@ -1,3 +1,12 @@
-'test_waters' 1.65 s
-'test_order_params' 4.40 s
-'test_contacts' 12.98 s
+'test_waters' 0.85 s
+'test_contacts' 10.52 s
+'test_waters' 0.77 s
+'test_order_params' 2.67 s
+'test_contacts' 10.92 s
+'test_waters' 0.94 s
+'test_order_params' 3.39 s
+'test_contacts' 12.97 s
+'test_waters' 0.81 s
+'test_order_params' 2.58 s
+'test_contacts' 10.25 s
+'test_contacts_3res_sh' 12.11 s

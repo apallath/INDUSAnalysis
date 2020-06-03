@@ -43,13 +43,6 @@ class TimeSeries:
         self.parser.add_argument("--replot", action="store_true", help="Replot from saved data")
         self.parser.add_argument("-replotpref", help="Prefix (pref.npy) of data file to replot from")
 
-        #for classes that choose to append to saved data from another run before plotting
-        self.parser.add_argument("-apref", \
-            help="Append current quantities to previous quantities (from saved .npy files) and plot")
-        self.parser.add_argument("-aprevlegend", \
-            help="String describing what the previous run currently being appended to is (for plot legend)")
-        self.parser.add_argument("-acurlegend", \
-            help="String describing what the current run being appended is (for plot legend)")
         #for running on remote server
         self.parser.add_argument("--remote", action='store_true')
 
@@ -76,22 +69,25 @@ class TimeSeries:
             self.window = np.float(self.window)
 
         self.opref = self.args.opref
+        if self.opref is None:
+            self.opref = "analysis"
+
         self.oformat = self.args.oformat
+        if self.oformat is None:
+            self.oformat = "png"
+
         self.dpi = self.args.dpi
+        if self.dpi is not None:
+            self.dpi = int(self.dpi)
+        else:
+            self.dpi = 150
+
         self.show = self.args.show
 
         self.replot = self.args.replot
         self.replotpref = self.args.replotpref
         if self.replotpref is None:
-            self.replotpref = "fig"
-
-        self.apref = self.args.apref
-        self.aprevlegend = self.args.aprevlegend
-        if self.aprevlegend is None:
-            aprevlegend = "Previous"
-        self.acurlegend = self.args.acurlegend
-        if self.acurlegend is None:
-            acurlegend = "Current"
+            self.replotpref = "analysis"
 
         # Force matplotlib to not use any Xwindows backend if run on remote server
         self.remote = self.args.remote
@@ -103,7 +99,7 @@ class TimeSeries:
     in units of time
 
     tests in tests/test_timeseries.py"""
-    def moving_average(self,t,x,window):
+    def moving_average(self, t, x, window):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]
 
@@ -119,7 +115,7 @@ class TimeSeries:
     Compute cumulative moving average (running average) of time series data
 
     tests in tests/test_timeseries.py"""
-    def cumulative_moving_average(self,x):
+    def cumulative_moving_average(self, x):
         csum = np.cumsum(x)
         nvals = range(1,len(x)+1)
         cma = csum/nvals
@@ -128,7 +124,7 @@ class TimeSeries:
     """
     Compute mean of timeseries over range [obsstart, obsend]
     """
-    def ts_mean(self,t,x,obsstart,obsend):
+    def ts_mean(self, t, x, obsstart, obsend):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]
 
@@ -148,7 +144,7 @@ class TimeSeries:
     """
     Compute std of timeseries over range [obsstart, obsend]
     """
-    def ts_std(self,t,x,obsstart,obsend):
+    def ts_std(self, t, x, obsstart, obsend):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]
 
@@ -173,7 +169,7 @@ class TimeSeries:
     tests in tests/test_timeseries.py
     """
     @timefunc
-    def serr_mean(self,t,x,obsstart,obsend):
+    def serr_mean(self, t, x, obsstart, obsend):
         t = np.reshape(t, (len(t),))
         tstep = t[1] - t[0]
 
@@ -207,32 +203,18 @@ class TimeSeries:
     """
     Helper function to save timeseries data to file
     """
-    def save_timeseries(self,t,x,label=""):
+    def save_timeseries(self, t, x, label=""):
         ts = np.stack((t,x))
-        pref = self.opref
-        if pref == None:
-            pref = "data"
-        np.save(pref+"_"+label,ts)
-        print("Saving data > "+pref+"_"+label+".npy")
-
+        np.save(self.opref+"_"+label,ts)
+        print("Saving data > "+self.opref+"_"+label+".npy")
 
     """
     Helper function to save figures to file
     """
-    def save_figure(self,fig,suffix=""):
-        oformat = self.oformat
-        pref = self.opref
-        imgdpi= self.dpi
-        if oformat == None:
-            oformat = "ps"
-        if pref == None:
-            pref = "fig"
-
-        filename = pref+"_"+suffix+"."+oformat
-
-        if imgdpi is not None:
-            fig.savefig(filename, dpi=imgdpi)
+    def save_figure(self, fig, suffix=""):
+        filename = self.opref+"_"+suffix+"."+self.oformat
+        if self.dpi is not None:
+            fig.savefig(filename, dpi=self.dpi)
         else:
             fig.savefig(filename)
-
         print("Saving figure > "+filename)
