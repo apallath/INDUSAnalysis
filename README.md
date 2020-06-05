@@ -66,7 +66,3 @@ Must also run unit tests.
 Run unit tests in this folder by running
 `pytest`
 inside the folder. Ideally, all tests should pass.
-
-## Other components:
-Scratch Jupyter notebooks:
-`scratch/`
