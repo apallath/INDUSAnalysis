@@ -1,68 +1,44 @@
-# Dynamic INDUS MD simulation post processing.
+# Analysis package for simulation data obtained using GROMACS implementation of Dynamic INDUS
 
-Install in editable state using pip:
+Uses Python 3.x.
 
-`pip install -e .`
+## Installation
 
-## Core analysis package:
-`analysis/`
+1. Install requirements
+`pip install -r requirements.txt`
+
+2. Install package [in editable state]
+`pip install [--editable] .`
+
+## Usage
 
 The analysis package can be imported in any Python script using
 
 `import analysis`
 
-The analysis scripts are executable with command line arguments.
-
+Individual module scripts can be called directly from the command line with
+arguments to process data files.
 `python /path/to/script/ --help`
 will list out the required and optional arguments for each script.
 
-## Tools for analysis package to use:
-`meta_analysis/`
+The meta_analysis package, which implements functions for profling/performance
+analysis of the analysis package, can be imported using
 
-Similar instructions. Currently implements function profiling through a decorator.
-
-## Usage examples for analysis:
-
-```
-python /path/to/analysis_scripts/analysis/indus_waters.py phiout.dat \
-    -opref outputprefix -oformat png -dpi 150 -window 1000 \
-    --remote
-```
-
-```
-python /path/to/analysis_scripts/analysis/protein_order_params.py conf.gro traj.xtc \
-    -reftrajf traj.xtc -reftstep 0 -opref outputpref -oformat png -dpi 150 \
-    -align backbone -select backbone -window 50 \
-    --remote
-```
-
-```
-python /path/to/analysis_scripts/analysis/contacts.py conf.gro traj.xtc \
-    -method 3res-sh \
-    -opref outputprefix -oformat png -dpi 150 \
-    --verbose --remote
-```
+`import meta_analysis`
 
 ## Testing
 
-### Continuous integration
-On pushing to the repository, a Github workflow will
-- Do a code review
-- Run unit tests
-- Run integration tests
+Run both unit tests and integration tests to make sure the package is installed
+and working correctly. Ideally, all tests should pass.
 
 ### Integration tests:
-`tests_integration/`
 
 Run integration tests in this folder by running
 `pytest`
-inside the folder. Ideally, all tests should pass.
-Running integration tests is not sufficient to test that the package works.
-Must also run unit tests.
+inside the folder `tests_integration/`.
 
 ### Unit tests:
-`tests_unit/`
 
 Run unit tests in this folder by running
 `pytest`
-inside the folder. Ideally, all tests should pass.
+inside the folder `tests_unit/`.
