@@ -1,15 +1,11 @@
 """
-Plot number of contacts, fraction of native contacts, and contact histograms
-with time
+Time series contacts analysis (# of contacts and fraction of native contacts)
 
 Units:
 - length: A
 - time: ps
 
 @Author: Akash Pallath
-
-FEATURE:    Parallelize code using Python multiprocessing
-FEATURE:    Cythonize code
 """
 from analysis.timeseries import TimeSeries
 
@@ -17,19 +13,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import MDAnalysis.lib.distances #for fast distance matrix calculation
+from tqdm import tqdm #for progress bars
+from itertools import combinations
 
 from meta_analysis.profiling import timefunc #for function run-time profiling
 
 class Contacts(TimeSeries):
     def __init__(self):
         super().__init__()
-        self.parser.add_argument("structf", help="Structure file (.gro)")
+        self.parser.add_argument("structf", help="Topology or structure file (.tpr, .gro; .gro required for atomic-sh)")
         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
-        self.parser.add_argument("-method", help="Method for calculating contacts (3res-sh, atomic-sh; default=3res-sh)")
+
+        #Calculation options
+        self.parser.add_argument("-method", help="Method for calculating contacts (atomic-sh, 3res-sh; default=atomic-sh)")
         self.parser.add_argument("-distcutoff", help="Distance cutoff for contacts, in A")
         self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
         self.parser.add_argument("-bins", help="Number of bins for histogram (default = 20)")
+
+        #Output control
+        self.parser.add_argument("--genpdb", action="store_true", help="Write contacts density per atom to pdb file")
         self.parser.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
 
     def read_args(self):
@@ -37,12 +40,24 @@ class Contacts(TimeSeries):
         self.structf = self.args.structf
         self.trajf = self.args.trajf
 
+        # Calculation options
         self.method = self.args.method
         if self.method is None:
-            self.method = "3res-sh"
+            self.method = "atomic-sh"
 
         self.opref = self.opref + "_" + self.method
         self.replotpref = self.replotpref + "_" + self.method
+
+        self.distcutoff = self.args.distcutoff
+        if self.distcutoff is not None:
+            self.distcutoff = float(self.distcutoff)
+        else:
+            if self.method == "atomic-sh":
+                self.distcutoff = 6.0
+            elif self.method == "3res-sh":
+                self.distcutoff = 4.5
+            else:
+                pass
 
         self.refcontacts = self.args.refcontacts
         if self.refcontacts is not None:
@@ -60,12 +75,9 @@ class Contacts(TimeSeries):
         else:
             self.bins = 20
 
+        # Output control
+        self.genpdb = self.args.genpdb
         self.verbose = self.args.verbose
-        self.distcutoff = self.args.distcutoff
-        if self.distcutoff is not None:
-            self.distcutoff = float(self.distcutoff)
-        else:
-            self.distcutoff = 4.5
 
         # Prepare system from args
         self.u = mda.Universe(self.structf, self.trajf)
@@ -76,12 +88,11 @@ class Contacts(TimeSeries):
     Main analysis worker/helpers to analyse contacts along trajectory
     """
 
-    def calc_trajcontacts(self, cutoff):
+    def calc_trajcontacts(self):
         if self.method == "3res-sh":
-            return self.calc_trajcontacts_3res_sh(cutoff)
+            return self.calc_trajcontacts_3res_sh()
         elif self.method == "atomic-sh":
-            raise Exception("Not implemented yet")
-            return None
+            return self.calc_trajcontacts_atomic_sh()
         else:
             raise Exception("Method not recognized")
             return None
@@ -91,54 +102,193 @@ class Contacts(TimeSeries):
     Contacts between side-chain heavy atoms belonging to residues that are at least 3 residues apart
     """
     @timefunc
-    def calc_trajcontacts_3res_sh(self, cutoff):
-        side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or type H)"
+    def calc_trajcontacts_3res_sh(self):
+        side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
 
         protein = self.u.select_atoms("protein")
+        natoms = len(protein.atoms)
 
-        nres = len(protein.residues)
+        contactmatrices = []
 
-        step = 0
-        contacts = []
-        l = len(protein.residues.atoms)
-        contactmatrix = np.zeros((l,l))
+        utraj = self.u.trajectory[::self.skip]
 
-        for ts in self.u.trajectory[0::self.skip]:
+        if self.verbose:
+            pbar = tqdm(desc = "Calculating contacts", total = len(utraj))
+
+        for ts in utraj:
             box = ts.dimensions
-            ncontacts = 0
+            local_contactmatrix = np.zeros((natoms, natoms))
 
             for i in range(nres):
                 heavy_side_i = protein.residues[i].atoms.select_atoms(side_heavy_sel)
                 heavy_side_j = protein.residues[i+4:].atoms.select_atoms(side_heavy_sel)
                 dmatrix = mda.lib.distances.distance_array(heavy_side_i.positions, heavy_side_j.positions, box)
-                local_contact_matrix = np.array(dmatrix < cutoff)
-                ijc = np.count_nonzero(local_contact_matrix)
-                ncontacts += ijc
+                res_contactmatrix = np.array(dmatrix < self.distcutoff)
                 iidx = heavy_side_i.indices
                 jidx = heavy_side_j.indices
 
                 for i in range(dmatrix.shape[0]):
                     for j in range(dmatrix.shape[1]):
-                        contactmatrix[iidx[i], jidx[j]] += local_contact_matrix[i,j]
+                        local_contactmatrix[iidx[i], jidx[j]] += res_contactmatrix[i,j]
+
+            #make matrix symmetric
+            local_contactmatrix = np.maximum(local_contactmatrix[:,:], local_contactmatrix[:,:].transpose())
+            contactmatrices.append(local_contactmatrix)
 
             # Print progress
             if self.verbose:
-                print("Step = {}, time = {} ps, contacts = {}".format(step*self.skip + 1,ts.time,ncontacts))
+                pbar.update(1)
 
-            contacts.append([ts.time, ncontacts])
-            step += 1
+        # Contact matrices along trajectory
+        self.contactmatrices = np.array(contactmatrices)
 
-        for i in range(contactmatrix.shape[0]):
-            for j in range(contactmatrix.shape[1]):
-                contactmatrix[i,j] = max(contactmatrix[i,j], contactmatrix[j,i])
+        # Contacts per atom along trajectory
+        self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
 
-        self.contacts = np.array(contacts)
-        self.contactmatrix = contactmatrix
+        # Total number of contacts along trajectory
+        contacts = np.sum(self.contacts_per_atom, axis=1)
+        times = []
+        for ts in utraj:
+            times.append(ts.time)
+        times = np.array(times)
+        self.contacts = np.zeros((len(utraj), 2))
+        self.contacts[:,0] = times
+        self.contacts[:,1] = contacts
+
+        # Normalized mean contactmatrix
+        self.contactmatrix = np.mean(self.contactmatrices, axis=0)
+
+    """
+    Method: atomic-sh
+    Contacts between side-chain heavy atoms which are not part of the same bond, angle, or dihedral
+    """
+    @timefunc
+    def calc_trajcontacts_atomic_sh(self):
+        side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
+        not_side_heavy_sel = "protein and (name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
+
+        # Preprocessing
+        # Select atoms
+        side_heavy = self.u.select_atoms(side_heavy_sel)
+        # Maps of bonds, angles, dihedrals
+        d_bonds = {}
+        d_angles = {}
+        d_dihedrals = {}
+
+        sh_bonds = side_heavy.bonds
+        sh_angles = side_heavy.angles
+        sh_dihedrals = side_heavy.dihedrals
+
+        for bond in sh_bonds:
+            [i,j] = bond.atoms.indices
+            d_bonds[i] = d_bonds.get(i, []) + [j]
+            d_bonds[j] = d_bonds.get(j, []) + [i]
+
+        for angle in sh_angles:
+            lst = angle.atoms.indices
+            for (i,j) in list(combinations(lst, 2)):
+                d_angles[i] = d_angles.get(i, []) + [j]
+                d_angles[j] = d_angles.get(j, []) + [i]
+
+        for dihedral in sh_dihedrals:
+            lst = dihedral.atoms.indices
+            for (i,j) in list(combinations(lst, 2)):
+                d_dihedrals[i] = d_dihedrals.get(i, []) + [j]
+                d_dihedrals[j] = d_dihedrals.get(j, []) + [i]
+
+        # Calculate distances between all atoms using fast MDA function
+        protein = self.u.select_atoms("protein")
+        natoms = len(protein.atoms)
+
+        utraj = self.u.trajectory[::self.skip]
+
+        dmatrices = np.zeros((len(utraj), natoms, natoms))
+
+        if self.verbose:
+            pbar = tqdm(desc = "Calculating distances", total = len(utraj))
+
+        for tidx, ts in enumerate(utraj):
+            dmatrix = mda.lib.distances.distance_array(protein.positions, protein.positions)
+            dmatrices[tidx,:,:] = dmatrix
+            if self.verbose:
+                pbar.update(1)
+
+        # Process distance matrices
+        for i in range(dmatrices.shape[1]):
+            dmatrices[:,i,i] = np.Inf
+
+        # Remove atoms that are not side chain heavy atoms
+        for i in self.u.select_atoms(not_side_heavy_sel).indices:
+            dmatrices[:,i,:] = np.Inf
+            dmatrices[:,:,i] = np.Inf
+
+        # Remove atoms that are part of the same bond
+        for k in d_bonds.keys():
+            for v in d_bonds[k]:
+                dmatrices[:,k,v] = np.Inf
+
+        # Remove atoms that are part of the same angle
+        for k in d_angles.keys():
+            for v in d_angles[k]:
+                dmatrices[:,k,v] = np.Inf
+
+        # Remove atoms that are part of the same dihedral
+        for k in d_dihedrals.keys():
+            for v in d_dihedrals[k]:
+                dmatrices[:,k,v] = np.Inf
+
+        self.contactmatrices = np.array(dmatrices < self.distcutoff)
+
+        # Contacts per atom along trajectory
+        self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
+
+        # Total number of contacts along trajectory
+        contacts = np.sum(self.contacts_per_atom, axis=1)
+        times = []
+        for ts in utraj:
+            times.append(ts.time)
+        times = np.array(times)
+        self.contacts = np.zeros((len(utraj), 2))
+        self.contacts[:,0] = times
+        self.contacts[:,1] = contacts
+
+        # Normalized mean contactmatrix
+        self.contactmatrix = np.mean(self.contactmatrices, axis=0)
 
     """
     END
     Main analysis worker/helpers to analyse contacts along trajectory
     """
+
+    """
+    Save
+    - Contact matrix along trajectory
+    - Contacts per atom along trajectory
+    - Averaged contact matrix
+    """
+    def save_rawcontactsdata(self):
+        np.save(self.opref + "_contactmatrices", self.contactmatrices)
+        np.save(self.opref + "_contacts_per_atom", self.contacts_per_atom)
+        np.save(self.opref + "_contactmatrix", self.contactmatrix)
+
+    """
+    Save contacts density data to pdb
+    """
+    def save_pdb(self):
+        protein = self.u.select_atoms("protein")
+        self.u.add_TopologyAttr('tempfactors')
+        utraj = self.u.trajectory[0::self.skip]
+        pdbtrj = self.opref + "_contacts.pdb"
+
+        if self.verbose:
+            pbar = tqdm(desc = "Writing PDB", total = len(utraj))
+
+        with MDAnalysis.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
+            for tidx, ts in enumerate(utraj):
+                protein.atoms.tempfactors = self.contacts_per_atom[:,tidx]
+                PDB.write(self.u.atoms)
+                if self.verbose:
+                    pbar.update(1)
 
     """
     Plot number of contacts
@@ -193,18 +343,30 @@ class Contacts(TimeSeries):
 
     """
     Plot contact matrix
-    - Note: Also saves contact matrix
     """
     def plot_matrix_contacts(self, contactmatrix):
-        #save contact matrix
-        np.save(self.opref+"_contactmatrix", contactmatrix)
-
         fig, ax = plt.subplots()
-        im = ax.imshow(contactmatrix)
+        im = ax.imshow(contactmatrix.T, origin="lower", cmap="hot")
         fig.colorbar(im)
         ax.set_xlabel('Atom $i$')
         ax.set_ylabel('Atom $j$')
-        self.save_figure(fig, suffix="hist_contacts")
+        self.save_figure(fig, suffix="contactmatrix")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+    """
+    Plot contacts per atom
+    """
+    def plot_contacts_per_atom(self, times, contacts_per_atom):
+        fig, ax = plt.subplots(dpi=300)
+        im = ax.imshow(contacts_per_atom.T, origin="lower", cmap="hot", aspect="auto")
+        fig.colorbar(im, ax=ax)
+        ax.set_xlabel('Atom')
+        ax.set_ylabel('Time (ps)')
+        ax.set_yticklabels([str(t) for t in times])
+        self.save_figure(fig, suffix="contacts_per_atom")
         if self.show:
             plt.show()
         else:
@@ -214,13 +376,20 @@ class Contacts(TimeSeries):
     def __call__(self):
         """Get contacts along trajectory"""
         if self.replot:
+            replotcontactmatrices = np.load(self.replotpref + "_contactmatrices.npy")
+            self.contactmatrices = np.transpose(replotcontactmatrices)
+
+            replotcontacts_per_atom = np.load(self.replotpref + "_contacts_per_atom.npy")
+            self.contacts_per_atom = np.transpose(replotcontacts_per_atom)
+
             replotcontacts = np.load(self.replotpref + "_contacts.npy")
             self.contacts = np.transpose(replotcontacts)
+
             replotcontactmatrix = np.load(self.replotpref + "_contactmatrix.npy")
             self.contactmatrix = np.transpose(replotcontactmatrix)
         else:
             # Calculate contacts along trajectory
-            self.calc_trajcontacts(self.distcutoff)
+            self.calc_trajcontacts()
 
         t = self.contacts[:,0]
         contacts = self.contacts[:,1]
@@ -233,14 +402,23 @@ class Contacts(TimeSeries):
             self.refcontacts = mean
 
         """Log data"""
+        # Matrices
+        self.save_rawcontactsdata()
+
+        # Timeseries
         self.save_timeseries(t, contacts, label="contacts")
         self.save_timeseries(t, contacts/self.refcontacts, label="frac_contacts")
+
+        # PDB
+        if self.genpdb:
+            self.save_pdb()
 
         """Plots"""
         self.plot_contacts(t, contacts)
         self.plot_fraction_contacts(t, contacts, self.refcontacts)
         self.plot_histogram_contacts(contacts, bins=self.bins)
         self.plot_matrix_contacts(self.contactmatrix)
+        self.plot_contacts_per_atom(t, self.contacts_per_atom)
 
 @timefunc
 def main():

@@ -2,9 +2,6 @@
 Template for handling timeseries data produced by molecular simulations
 
 @Author: Akash Pallath
-
-FEATURE:    Replace autocorrelation analysis for errors with block averaging/block bootstrapping analysis
-FEATURE:    Cythonize code
 """
 import numpy as np
 import matplotlib
@@ -25,25 +22,24 @@ class TimeSeries:
     def __init__(self):
         self.parser = argparse.ArgumentParser()
 
-        #discard portion of data for analysis
+        # Averaging options
+        # Analysis region
         self.parser.add_argument("-obsstart", help="Timestep to begin computation of observables at")
         self.parser.add_argument("-obsend", help="Timestep to end computation of observables at")
         self.parser.add_argument("-obspref", help="Prefix of text file to append computed observables to")
-
-        #window for sliding window averaging
+        # Sliding window
         self.parser.add_argument("-window", help="Time window for moving average (default = 1 time unit)")
 
-        #plotting
+        # Plotting options
         self.parser.add_argument("-opref", help="Output image and data prefix")
         self.parser.add_argument("-oformat", help="Output image format")
         self.parser.add_argument("-dpi", type=int, help="DPI of output image(s)")
         self.parser.add_argument("--show", action='store_true', help="Show interactive plot(s)")
 
-        #replot arguments, for classes that choose to implement them
         self.parser.add_argument("--replot", action="store_true", help="Replot from saved data")
-        self.parser.add_argument("-replotpref", help="Prefix (pref.npy) of data file to replot from")
+        self.parser.add_argument("-replotpref", help="[replot] Prefix (<prefix>[.npy]) of data file to replot from")
 
-        #for running on remote server
+        # Remote cluster run modifications
         self.parser.add_argument("--remote", action='store_true')
 
     def parse_args(self, args=None):

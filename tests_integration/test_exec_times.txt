@@ -10,3 +10,16 @@
 'test_order_params' 2.58 s
 'test_contacts' 10.25 s
 'test_contacts_3res_sh' 12.11 s
+'test_waters' 0.88 s
+'test_order_params' 2.68 s
+'test_waters' 0.81 s
+'test_order_params' 2.50 s
+'test_contacts_3res_sh' 14.24 s
+'test_contacts_3res_sh' 13.07 s
+'test_contacts_3res_sh' 13.98 s
+'test_contacts_3res_sh' 13.98 s
+'test_contacts_3res_sh' 14.22 s
+'test_contacts_atomic_sh' 4.64 s
+'test_contacts_atomic_sh' 4.63 s
+'test_contacts_atomic_sh' 4.22 s
+'test_contacts_atomic_sh' 20.36 s

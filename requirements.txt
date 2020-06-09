@@ -8,6 +8,7 @@ MDAnalysis>=0.20
 
 #Other requirements
 pymbar
+tqdm
 
 #Testing
 pytest

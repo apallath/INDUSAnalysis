@@ -13,8 +13,6 @@ Units:
 - time: ps
 
 @Author: Akash Pallath
-
-FEATURE:    Cythonize code
 """
 from analysis.timeseries import TimeSeries
 

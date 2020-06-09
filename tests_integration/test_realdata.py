@@ -36,7 +36,7 @@ def test_order_params():
         os.makedirs('order_params_test_data')
 
     op = OrderParams()
-    op.parse_args(['prod.gro', 'indus_mol_skip.xtc', '-opref', 'order_params_test_data/indus', '-oformat', 'png',
+    op.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'order_params_test_data/indus', '-oformat', 'png',
                    '-dpi', '150', '-align', 'backbone', '-select', 'backbone', '-window', '50',
                    '--remote'])
     op.read_args()
@@ -45,19 +45,6 @@ def test_order_params():
 
 """Ensure that default contacts analysis does not break on running
 with actual data"""
-@timefuncfile("test_exec_times.txt")
-def test_contacts():
-    if not os.path.exists('contacts_test_data'):
-        os.makedirs('contacts_test_data')
-
-    #test default mode
-    cts = Contacts()
-    cts.parse_args(['prod.gro', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
-                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
-    cts.read_args()
-    cts()
-
-    return True
 
 @timefuncfile("test_exec_times.txt")
 def test_contacts_3res_sh():
@@ -66,17 +53,18 @@ def test_contacts_3res_sh():
 
     #test 3res-sh mode
     cts = Contacts()
-    cts.parse_args(['prod.gro', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', '3res-sh',
                     '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
     cts.read_args()
     cts()
 
-    #test replot 3res-sh mode
+    #test replot 3res-sh mode, generating PDB on replot
     cts = Contacts()
-    cts.parse_args(['prod.gro', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', '3res-sh', '--replot', '-replotpref', 'contacts_test_data/indus',
-                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
+                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose',
+                    '--genpdb'])
     cts.read_args()
     cts()
 
@@ -89,23 +77,25 @@ def test_contacts_atomic_sh():
 
     #test atomic-sh mode
     cts = Contacts()
-    cts.parse_args(['prod.gro', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh',
                     '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
     cts.read_args()
     cts()
 
-    #test replot atomic-sh mode
+    #test replot atomic-sh mode, generating PDB on replot
     cts = Contacts()
-    cts.parse_args(['prod.gro', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh', '--replot', '-replotpref', 'contacts_test_data/indus',
-                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
+                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote', '--verbose',
+                    '--genpdb'])
     cts.read_args()
     cts()
 
     return True
 
 if __name__=="__main__":
-    test_waters()
-    test_order_params()
-    test_contacts()
+    #test_waters()
+    #test_order_params()
+    #test_contacts_3res_sh()
+    test_contacts_atomic_sh()

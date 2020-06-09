@@ -10,8 +10,6 @@ Units:
 - time: ps
 
 @Author: Akash Pallath
-
-FEATURE:    Cythonize code
 """
 from analysis.timeseries import TimeSeries
 
@@ -24,6 +22,9 @@ class IndusWaters(TimeSeries):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
+        self.parser.add_argument("--genpdb", help="Count atoms in each spherical probe volume, and generate PDB with data")
+        self.parser.add_argument("-structf", help="[genpdb] Topology or structure file (.tpr, .gro)")
+        self.parser.add_argument("-trajf", help="[genpdb] Compressed trajectory file (.xtc)")
 
     def read_args(self):
         super().read_args()
