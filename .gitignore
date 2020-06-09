@@ -124,5 +124,7 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# xyz files for testing
-*.xyz
+# Files generated during testing
+*.pdb
+*.png
+*.npy
