@@ -55,7 +55,7 @@ def test_contacts_3res_sh():
     cts = Contacts()
     cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', '3res-sh',
-                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
+                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote'])
     cts.read_args()
     cts()
 
@@ -63,7 +63,7 @@ def test_contacts_3res_sh():
     cts = Contacts()
     cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', '3res-sh', '--replot', '-replotpref', 'contacts_test_data/indus',
-                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote', '--verbose',
+                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote',
                     '--genpdb'])
     cts.read_args()
     cts()
@@ -79,7 +79,7 @@ def test_contacts_atomic_sh():
     cts = Contacts()
     cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh',
-                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote', '--verbose'])
+                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote'])
     cts.read_args()
     cts()
 
@@ -87,7 +87,7 @@ def test_contacts_atomic_sh():
     cts = Contacts()
     cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh', '--replot', '-replotpref', 'contacts_test_data/indus',
-                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote', '--verbose',
+                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote',
                     '--genpdb'])
     cts.read_args()
     cts()
@@ -95,7 +95,7 @@ def test_contacts_atomic_sh():
     return True
 
 if __name__=="__main__":
-    #test_waters()
-    #test_order_params()
-    #test_contacts_3res_sh()
+    test_waters()
+    test_order_params()
+    test_contacts_3res_sh()
     test_contacts_atomic_sh()

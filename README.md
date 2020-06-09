@@ -1,7 +1,11 @@
 # Analysis package for simulation data obtained using GROMACS implementation of Dynamic INDUS
 
-[![Python 3.7](https://img.shields.io/badge/python-v3.7-blue)](https://www.python.org/downloads/release/python-370/)
-[![Actions Status](https://github.com/apallath/analysis_scripts/workflows/review_unit_integration/badge.svg)](https://github.com/apallath/analysis_scripts/actions)
+[![Python](https://img.shields.io/github/languages/top/apallath/analysis_scripts)](https://www.python.org/downloads/release/python-370/)
+[![Actions Status](https://img.shields.io/github/workflow/status/apallath/analysis_scripts/Analysis)](https://github.com/apallath/analysis_scripts/actions)
+
+[![Open Issues](https://img.shields.io/github/issues-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
+[![Closed Issues](https://img.shields.io/github/issues-closed-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
+
 
 ## Installation
 
