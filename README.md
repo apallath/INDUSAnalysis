@@ -1,6 +1,6 @@
 # Analysis package for simulation data obtained using GROMACS implementation of Dynamic INDUS
 
-Uses Python 3.x.
+[![Python 3.7](https://img.shields.io/badge/python-v3.7-blue)](https://www.python.org/downloads/release/python-370/)
 
 ## Installation
 
