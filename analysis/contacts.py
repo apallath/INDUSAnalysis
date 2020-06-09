@@ -106,6 +106,7 @@ class Contacts(TimeSeries):
         side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
 
         protein = self.u.select_atoms("protein")
+        nres = len(protein.residues)
         natoms = len(protein.atoms)
 
         contactmatrices = []
