@@ -1,5 +1,6 @@
 from analysis.indus_waters import IndusWaters
 from meta_analysis.profiling import timefunc
+import matplotlib.pyplot as plt
 
 @timefunc
 def main():
