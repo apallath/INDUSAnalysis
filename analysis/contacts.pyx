@@ -7,9 +7,11 @@ Units:
 
 @Author: Akash Pallath
 """
+
 from analysis.timeseries import TimeSeries
 
 import numpy as np
+
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import MDAnalysis.lib.distances #for fast distance matrix calculation
@@ -17,6 +19,9 @@ from tqdm import tqdm #for progress bars
 from itertools import combinations
 
 from meta_analysis.profiling import timefunc #for function run-time profiling
+
+"""Cython"""
+cimport numpy as np
 
 class Contacts(TimeSeries):
     def __init__(self):
@@ -97,6 +102,7 @@ class Contacts(TimeSeries):
             return None
 
     """
+    *** EXPENSIVE ***
     Method: 3res-sh
     Contacts between side-chain heavy atoms belonging to residues that are at least 3 residues apart
     """
@@ -159,6 +165,7 @@ class Contacts(TimeSeries):
         self.contactmatrix = np.mean(self.contactmatrices, axis=0)
 
     """
+    *** EXPENSIVE ***
     Method: atomic-sh
     Contacts between side-chain heavy atoms which are not part of the same bond, angle, or dihedral
     """
@@ -427,17 +434,3 @@ class Contacts(TimeSeries):
         self.plot_histogram_contacts(contacts, bins=self.bins)
         self.plot_matrix_contacts(self.contactmatrix)
         self.plot_contacts_per_atom(t, self.contacts_per_atom)
-
-@timefunc
-def main():
-    warnings = "Proceed with caution: this script requires PBC-corrected protein structures!\n"
-    contacts = Contacts()
-    contacts.parse_args()
-    contacts.read_args()
-    startup_string = "#### Contacts ####\n" + warnings
-    print(startup_string)
-    contacts()
-    plt.close('all')
-
-if __name__=="__main__":
-    main()

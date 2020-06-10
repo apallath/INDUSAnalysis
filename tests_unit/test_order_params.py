@@ -1,3 +1,6 @@
+"""On the fly Cython compilation for development versions"""
+import pyximport; pyximport.install()
+
 import MDAnalysis as mda
 import numpy as np
 from scipy.spatial.transform import Rotation as scipy_R

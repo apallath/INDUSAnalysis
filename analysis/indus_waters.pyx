@@ -11,14 +11,19 @@ Units:
 
 @Author: Akash Pallath
 """
+
 from analysis.timeseries import TimeSeries
 
 import numpy as np
+
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 from tqdm import tqdm
 
 from meta_analysis.profiling import timefunc #for function run-time profiling
+
+"""Cython"""
+cimport numpy as np
 
 class IndusWaters(TimeSeries):
     def __init__(self):
@@ -154,6 +159,7 @@ class IndusWaters(TimeSeries):
             stdf.write(stdstr)
 
     """
+    *** EXPENSIVE ***
     Calculate probe waters
     - Note: also saves calculated probe waters data to file
     """
@@ -161,21 +167,23 @@ class IndusWaters(TimeSeries):
         protein = self.u.select_atoms("protein")
         protein_heavy = self.u.select_atoms("protein and not name H*")
         utraj = self.u.trajectory[0::self.skip]
+
         self.atom_waters = np.zeros((len(utraj), len(protein)))
 
         if self.verbose:
             bar = tqdm(desc = "Calculating waters", total = len(utraj))
 
-        self.times = []
-
         for tidx, ts in enumerate(utraj):
-            self.times.append(ts.time)
             for atom in protein_heavy.atoms:
                 waters = self.u.select_atoms("name OW and (around {} (atom {} {} {}))".format(\
                                         self.radius, atom.segid, atom.resid, atom.name))
                 self.atom_waters[tidx, atom.index] = len(waters)
             if self.verbose:
                 bar.update(1)
+
+        self.times = []
+        for tidx, ts in enumerate(utraj):
+            self.times.append(ts.time)
 
         np.save(self.opref + "_waters", self.atom_waters)
 
@@ -233,17 +241,3 @@ class IndusWaters(TimeSeries):
             self.calc_probe_waters()
             self.save_pdb()
             self.plot_heavy_waters(self.times, self.atom_waters)
-
-@timefunc
-def main():
-    warnings = ""
-    waters = IndusWaters()
-    waters.parse_args()
-    waters.read_args()
-    startup_string = "#### INDUS Waters ####\n" + warnings + "\n"
-    print(startup_string)
-    waters()
-    plt.close('all')
-
-if __name__=="__main__":
-    main()

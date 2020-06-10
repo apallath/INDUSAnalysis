@@ -3,7 +3,9 @@ Template for handling timeseries data produced by molecular simulations
 
 @Author: Akash Pallath
 """
+
 import numpy as np
+
 import matplotlib
 import matplotlib.pyplot as plt
 import argparse
@@ -17,6 +19,9 @@ import pymbar.timeseries
 
 #Profiling
 from meta_analysis.profiling import timefunc
+
+"""Cython"""
+cimport numpy as np
 
 class TimeSeries:
     def __init__(self):

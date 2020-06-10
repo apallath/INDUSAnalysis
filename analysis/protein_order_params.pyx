@@ -14,14 +14,19 @@ Units:
 
 @Author: Akash Pallath
 """
+
 from analysis.timeseries import TimeSeries
 
 import numpy as np
+
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import MDAnalysis.analysis.align
 
 from meta_analysis.profiling import timefunc #for function run-time profiling
+
+"""Cython"""
+cimport numpy as np
 
 class OrderParams(TimeSeries):
     def __init__(self):
@@ -269,17 +274,3 @@ class OrderParams(TimeSeries):
         self.plot_RMSD(sel_RMSD)
         self.plot_ma_RMSD(sel_RMSD)
         self.plot_cma_RMSD(sel_RMSD)
-
-@timefunc
-def main():
-    warnings = "Proceed with caution: this script requires PBC-corrected protein structures!"
-    prot = OrderParams()
-    prot.parse_args()
-    prot.read_args()
-    startup_string = "#### Order Parameter Analysis ####\n" + warnings + "\n"
-    print(startup_string)
-    prot()
-    plt.close('all')
-
-if __name__=="__main__":
-    main()

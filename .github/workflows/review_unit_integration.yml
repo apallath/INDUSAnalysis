@@ -25,8 +25,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # compile C extensions
+        python setup.py build_ext --inplace
         # install analysis package
-        pip install -e .
+        pip install .
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -41,4 +44,3 @@ jobs:
         cd tests_integration
         pytest
         cd ..
-        

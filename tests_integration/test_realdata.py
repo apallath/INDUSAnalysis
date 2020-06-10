@@ -132,7 +132,7 @@ def test_contacts_atomic_sh_pdb():
     cts = Contacts()
     cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh',
-                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote',
+                    '-dpi', '150', '-distcutoff', '7', '-skip', '5', '-bins', '50', '--remote',
                     '--genpdb'])
     cts.read_args()
     cts()
@@ -154,4 +154,12 @@ def test_contacts_atomic_sh_replot_pdb():
     return True
 
 if __name__=="__main__":
-    pass
+    test_waters_noprobe()
+    test_waters_pdb()
+    test_order_params()
+    test_contacts_3res_sh_nopdb()
+    test_contacts_3res_sh_pdb()
+    test_contacts_3res_sh_replot_pdb()
+    test_contacts_atomic_sh_nopdb()
+    test_contacts_atomic_sh_pdb()
+    test_contacts_atomic_sh_replot_pdb()

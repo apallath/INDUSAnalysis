@@ -6,14 +6,20 @@
 [![Open Issues](https://img.shields.io/github/issues-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
 [![Closed Issues](https://img.shields.io/github/issues-closed-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
 
+## Features (v0.2)
+- Uses Cython for improved performance (still under development)
+- New program call structure
 
 ## Installation
 
 1. Install requirements
 `pip install -r requirements.txt`
 
+2. Build C extensions
+`python setup.py build_ext --inplace`
+
 2. Install package [in editable state]
-`pip install [--editable] .`
+`pip install .`
 
 ## Usage
 
@@ -21,15 +27,14 @@ The analysis package can be imported in any Python script using
 
 `import analysis`
 
-Individual module scripts can be called directly from the command line with
-arguments to process data files.
-`python /path/to/script/ --help`
-will list out the required and optional arguments for each script.
-
 The meta_analysis package, which implements functions for profling/performance
 analysis of the analysis package, can be imported using
 
 `import meta_analysis`
+
+To run an analysis from the command line, call
+`python /path/to/analysis_scripts/run_<analysis_name>.py`
+with the required arguments
 
 ## Testing
 
