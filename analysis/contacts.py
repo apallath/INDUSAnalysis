@@ -213,6 +213,9 @@ class Contacts(TimeSeries):
             if self.verbose:
                 pbar.update(1)
 
+        if self.verbose:
+            print("Processing distance matrices")
+
         # Process distance matrices
         for i in range(dmatrices.shape[1]):
             dmatrices[:,i,i] = np.Inf
@@ -237,9 +240,14 @@ class Contacts(TimeSeries):
             for v in d_dihedrals[k]:
                 dmatrices[:,k,v] = np.Inf
 
+        if self.verbose:
+            print("Calculating contacts from distance matrices")
+
         self.contactmatrices = np.array(dmatrices < self.distcutoff)
 
         # Contacts per atom along trajectory
+        if self.verbose:
+            print("Calculating contacts per atom")
         self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
 
         # Total number of contacts along trajectory
