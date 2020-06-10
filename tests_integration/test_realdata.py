@@ -16,7 +16,7 @@ from meta_analysis.profiling import timefuncfile, skipfunc
 
 """Ensure that INDUS waters analysis does not break on running with actual data"""
 @timefuncfile("test_exec_times.txt")
-def test_waters():
+def test_waters_noprobe():
     if not os.path.exists('waters_test_data'):
         os.makedirs('waters_test_data')
 
@@ -24,6 +24,20 @@ def test_waters():
     waters.parse_args(['phiout.dat', '-obsstart', '500', '-obspref',
                        'waters_test_data/obsdata', '-window', '50', '-opref', 'waters_test_data/indus', '-oformat',
                        'png', '-dpi', '150', '--remote'])
+    waters.read_args()
+    waters()
+    return True
+
+@timefuncfile("test_exec_times.txt")
+def test_waters_probe():
+    if not os.path.exists('waters_test_data'):
+        os.makedirs('waters_test_data')
+
+    waters = IndusWaters()
+    waters.parse_args(['phiout.dat', '-obsstart', '500', '-obspref',
+                       'waters_test_data/obsdata', '-window', '50', '-opref', 'waters_test_data/indus', '-oformat',
+                       'png', '-dpi', '150', '--remote',
+                       '--genpdb', '-structf', 'indus.tpr', '-trajf', 'indus_mol_skip.xtc', '-radius', '6.0', '-skip', '50'])
     waters.read_args()
     waters()
     return True
@@ -43,9 +57,8 @@ def test_order_params():
     op()
     return True
 
-"""Ensure that default contacts analysis does not break on running
+"""Ensure that contacts analysis does not break on running
 with actual data"""
-
 @timefuncfile("test_exec_times.txt")
 def test_contacts_3res_sh():
     if not os.path.exists('contacts_test_data'):
@@ -95,7 +108,8 @@ def test_contacts_atomic_sh():
     return True
 
 if __name__=="__main__":
-    test_waters()
-    test_order_params()
-    test_contacts_3res_sh()
-    test_contacts_atomic_sh()
+    test_waters_noprobe()
+    test_waters_probe()
+    #test_order_params()
+    #test_contacts_3res_sh()
+    #test_contacts_atomic_sh()

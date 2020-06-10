@@ -37,7 +37,7 @@ class TimeSeries:
         self.parser.add_argument("--show", action='store_true', help="Show interactive plot(s)")
 
         self.parser.add_argument("--replot", action="store_true", help="Replot from saved data")
-        self.parser.add_argument("-replotpref", help="[replot] Prefix (<prefix>[.npy]) of data file to replot from")
+        self.parser.add_argument("-replotpref", help="[replot] Prefix (REPLOTPREF[.npy]) of .npy file to replot from")
 
         # Remote cluster run modifications
         self.parser.add_argument("--remote", action='store_true')

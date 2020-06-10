@@ -81,7 +81,6 @@ class Contacts(TimeSeries):
 
         # Prepare system from args
         self.u = mda.Universe(self.structf, self.trajf)
-        self.refu = mda.Universe(self.structf)
 
     """
     BEGIN
@@ -284,7 +283,7 @@ class Contacts(TimeSeries):
         if self.verbose:
             pbar = tqdm(desc = "Writing PDB", total = len(utraj))
 
-        with MDAnalysis.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
+        with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
             for tidx, ts in enumerate(utraj):
                 protein.atoms.tempfactors = self.contacts_per_atom[:,tidx]
                 PDB.write(self.u.atoms)

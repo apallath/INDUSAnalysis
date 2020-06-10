@@ -15,6 +15,8 @@ from analysis.timeseries import TimeSeries
 
 import numpy as np
 import matplotlib.pyplot as plt
+import MDAnalysis as mda
+from tqdm import tqdm
 
 from meta_analysis.profiling import timefunc #for function run-time profiling
 
@@ -22,16 +24,39 @@ class IndusWaters(TimeSeries):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
-        self.parser.add_argument("--genpdb", help="Count atoms in each spherical probe volume, and generate PDB with data")
+        self.parser.add_argument("--genpdb", help="Count atoms in each spherical probe volume, and generate PDB with data", action="store_true")
         self.parser.add_argument("-structf", help="[genpdb] Topology or structure file (.tpr, .gro)")
         self.parser.add_argument("-trajf", help="[genpdb] Compressed trajectory file (.xtc)")
+        self.parser.add_argument("-radius", help="[genpdb] Probe volume radiu (in A)")
+        self.parser.add_argument("-skip", help="[genpdb] Frame-selection interval (default = 1)")
+        self.parser.add_argument("--verbose", help="[genpdb] Display progress", action="store_true")
 
     def read_args(self):
         super().read_args()
         self.file = self.args.file
 
-        # Prepare system from args
+        self.genpdb = self.args.genpdb
+        self.structf = self.args.structf
+        self.trajf = self.args.trajf
+
+        self.radius = self.args.radius
+        if self.radius is not None:
+            self.radius = float(self.radius)
+
+        self.skip = self.args.skip
+        if self.skip is not None:
+            self.skip = int(self.skip)
+        else:
+            self.skip = 1
+
+        self.verbose = self.args.verbose
+
+        # INDUS waters data file
         self.t, self.N, self.Ntw, self.mu = self.get_data(self.file)
+
+        # Prepare system from args
+        if self.genpdb:
+            self.u = mda.Universe(self.structf, self.trajf)
 
     """
     Read data from file to prepare system
@@ -128,6 +153,67 @@ class IndusWaters(TimeSeries):
         with open(self.obspref+"_std.txt", 'a+') as stdf:
             stdf.write(stdstr)
 
+    """
+    Calculate probe waters
+    - Note: also saves calculated probe waters data to file
+    """
+    def calc_probe_waters(self):
+        protein = self.u.select_atoms("protein")
+        protein_heavy = self.u.select_atoms("protein and not name H*")
+        utraj = self.u.trajectory[0::self.skip]
+        self.atom_waters = np.zeros((len(utraj), len(protein)))
+
+        if self.verbose:
+            bar = tqdm(desc = "Calculating waters", total = len(utraj))
+
+        self.times = []
+
+        for tidx, ts in enumerate(utraj):
+            self.times.append(ts.time)
+            for atom in protein_heavy.atoms:
+                waters = self.u.select_atoms("name OW and (around {} (atom {} {} {}))".format(\
+                                        self.radius, atom.segid, atom.resid, atom.name))
+                self.atom_waters[tidx, atom.index] = len(waters)
+            if self.verbose:
+                bar.update(1)
+
+        np.save(self.opref + "_waters", self.atom_waters)
+
+    """
+    Save probe waters to PDB
+    """
+    def save_pdb(self):
+        protein = self.u.select_atoms("protein")
+        self.u.add_TopologyAttr('tempfactors')
+        utraj = self.u.trajectory[0::self.skip]
+        pdbtrj = self.opref + "_waters.pdb"
+
+        if self.verbose:
+            pbar = tqdm(desc = "Writing PDB", total = len(utraj))
+
+        with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
+            for tidx, ts in enumerate(utraj):
+                protein.atoms.tempfactors = self.atom_waters[tidx,:]
+                PDB.write(self.u.atoms)
+                if self.verbose:
+                    pbar.update(1)
+
+    """
+    Plot waters around each heavy atom
+    """
+    def plot_heavy_waters(self, times, atom_waters):
+        fig, ax = plt.subplots(dpi=300)
+        im = ax.imshow(atom_waters, origin="lower", cmap="hot", aspect='auto')
+        fig.colorbar(im, ax=ax)
+        ax.set_xlabel('Atom')
+        ax.set_ylabel('Time (ps)')
+        ax.set_yticklabels([str(t) for t in times])
+        self.save_figure(fig, suffix="waters_per_heavy_atom")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
     def __call__(self):
         """Log data"""
         self.save_timeseries(self.t, self.N, label="N")
@@ -141,6 +227,12 @@ class IndusWaters(TimeSeries):
         """Report observables to text files"""
         self.report_mean()
         self.report_std()
+
+        """Generate PDB and save"""
+        if self.genpdb:
+            self.calc_probe_waters()
+            self.save_pdb()
+            self.plot_heavy_waters(self.times, self.atom_waters)
 
 @timefunc
 def main():
