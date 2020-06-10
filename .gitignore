@@ -123,3 +123,7 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Test data
+tests_integration/*_test_data/*
+tests_integration/test_exec_times.txt
