@@ -285,7 +285,7 @@ class Contacts(TimeSeries):
 
         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
             for tidx, ts in enumerate(utraj):
-                protein.atoms.tempfactors = self.contacts_per_atom[:,tidx]
+                protein.atoms.tempfactors = self.contacts_per_atom[tidx,:]
                 PDB.write(self.u.atoms)
                 if self.verbose:
                     pbar.update(1)
@@ -377,16 +377,16 @@ class Contacts(TimeSeries):
         """Get contacts along trajectory"""
         if self.replot:
             replotcontactmatrices = np.load(self.replotpref + "_contactmatrices.npy")
-            self.contactmatrices = np.transpose(replotcontactmatrices)
+            self.contactmatrices = replotcontactmatrices
 
             replotcontacts_per_atom = np.load(self.replotpref + "_contacts_per_atom.npy")
-            self.contacts_per_atom = np.transpose(replotcontacts_per_atom)
+            self.contacts_per_atom = replotcontacts_per_atom
+
+            replotcontactmatrix = np.load(self.replotpref + "_contactmatrix.npy")
+            self.contactmatrix = replotcontactmatrix
 
             replotcontacts = np.load(self.replotpref + "_contacts.npy")
             self.contacts = np.transpose(replotcontacts)
-
-            replotcontactmatrix = np.load(self.replotpref + "_contactmatrix.npy")
-            self.contactmatrix = np.transpose(replotcontactmatrix)
         else:
             # Calculate contacts along trajectory
             self.calc_trajcontacts()
