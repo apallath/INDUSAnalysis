@@ -5,7 +5,7 @@ scipy
 matplotlib
 
 #Requirements for analyzing MD trajectories
-MDAnalysis>=0.20
+MDAnalysis==0.20.1
 
 #Other requirements
 pymbar

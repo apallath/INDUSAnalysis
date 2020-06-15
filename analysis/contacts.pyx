@@ -1,6 +1,8 @@
 """
 Time series contacts analysis (# of contacts and fraction of native contacts)
 
+SUPPORTS REPLOT FOR GENPDB
+
 Units:
 - length: A
 - time: ps
@@ -35,6 +37,9 @@ class Contacts(TimeSeries):
         self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
         self.parser.add_argument("-bins", help="Number of bins for histogram (default = 20)")
+
+        #Development options
+        self.parser.add_argument("--devel_rem", help="[atomic-sh, devel] Remove contacts between atoms [DEVEL_REM] units apart")
 
         #Output control
         self.parser.add_argument("--genpdb", action="store_true", help="Write contacts density per atom to pdb file")
@@ -376,10 +381,11 @@ class Contacts(TimeSeries):
     """
     def plot_contacts_per_atom(self, times, contacts_per_atom):
         fig, ax = plt.subplots(dpi=300)
-        im = ax.imshow(contacts_per_atom.T, origin="lower", cmap="hot", aspect="auto")
+        im = ax.imshow(contacts_per_atom, origin="lower", cmap="hot", aspect="auto")
         fig.colorbar(im, ax=ax)
         ax.set_xlabel('Atom')
         ax.set_ylabel('Time (ps)')
+        ax.set_yticks(range(len(times)))
         ax.set_yticklabels([str(t) for t in times])
         self.save_figure(fig, suffix="contacts_per_atom")
         if self.show:

@@ -20,29 +20,55 @@ INDUS waters analysis with sample data
 
 # Waters analysis
 @timefuncfile("test_exec_times.txt")
-def test_waters_noprobe():
+def test_waters_nopdb():
     if not os.path.exists('waters_test_data'):
         os.makedirs('waters_test_data')
 
     waters = IndusWaters()
-    waters.parse_args(['phiout.dat', '-obsstart', '500', '-obspref',
-                       'waters_test_data/obsdata', '-window', '50', '-opref', 'waters_test_data/indus', '-oformat',
-                       'png', '-dpi', '150', '--remote'])
+    args = ['phiout.dat', 'indus.tpr', 'indus_mol_skip.xtc', '-radius', '6.0', '-skip', '100',
+                       '-obsstart', '500', '-obspref', 'waters_test_data/obsdata',
+                       '-window', '50', '-opref', 'waters_test_data/indus', '-oformat',
+                       'png', '-dpi', '150', '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
+    waters.parse_args(args)
     waters.read_args()
     waters()
     return True
 
-# Waters analysis with generation of PDB
+# Waters analysis
 @timefuncfile("test_exec_times.txt")
 def test_waters_pdb():
     if not os.path.exists('waters_test_data'):
         os.makedirs('waters_test_data')
 
     waters = IndusWaters()
-    waters.parse_args(['phiout.dat', '-obsstart', '500', '-obspref',
-                       'waters_test_data/obsdata', '-window', '50', '-opref', 'waters_test_data/indus', '-oformat',
-                       'png', '-dpi', '150', '--remote',
-                       '--genpdb', '-structf', 'indus.tpr', '-trajf', 'indus_mol_skip.xtc', '-radius', '6.0', '-skip', '50'])
+    args = ['phiout.dat', 'indus.tpr', 'indus_mol_skip.xtc', '-radius', '6.0', '-skip', '100',
+                       '-obsstart', '500', '-obspref', 'waters_test_data/obsdata',
+                       '-window', '50', '-opref', 'waters_test_data/indus', '-oformat',
+                       'png', '-dpi', '150', '--genpdb', '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
+    waters.parse_args(args)
+    waters.read_args()
+    waters()
+    return True
+
+# Waters analysis, replotting from saved data, with PDB generation
+@timefuncfile("test_exec_times.txt")
+def test_waters_replot_pdb():
+    if not os.path.exists('waters_test_data'):
+        os.makedirs('waters_test_data')
+
+    waters = IndusWaters()
+    args = ['phiout.dat', 'indus.tpr', 'indus_mol_skip.xtc', '-radius', '6.0', '-skip', '100',
+                       '--replot', '-replotpref', 'waters_test_data/indus',
+                       '-obsstart', '500', '-obspref', 'waters_test_data/obsdata',
+                       '-window', '50', '-opref', 'waters_test_data/indus', '-oformat',
+                       'png', '-dpi', '150', '--genpdb', '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
+    waters.parse_args(args)
     waters.read_args()
     waters()
     return True
@@ -56,9 +82,10 @@ def test_order_params():
         os.makedirs('order_params_test_data')
 
     op = OrderParams()
-    op.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'order_params_test_data/indus', '-oformat', 'png',
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'order_params_test_data/indus', '-oformat', 'png',
                    '-dpi', '150', '-align', 'backbone', '-select', 'backbone', '-window', '50',
-                   '--remote'])
+                   '--remote']
+    op.parse_args(args)
     op.read_args()
     op()
     return True
@@ -74,9 +101,12 @@ def test_contacts_3res_sh_nopdb():
         os.makedirs('contacts_test_data')
 
     cts = Contacts()
-    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', '3res-sh',
-                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote'])
+                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '100', '-bins', '50', '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
+    cts.parse_args(args)
     cts.read_args()
     cts()
 
@@ -87,10 +117,13 @@ def test_contacts_3res_sh_pdb():
         os.makedirs('contacts_test_data')
 
     cts = Contacts()
-    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', '3res-sh',
-                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote',
-                    '--genpdb'])
+                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '100', '-bins', '50', '--remote',
+                    '--genpdb']
+    if __name__=="__main__":
+        args.append("--verbose")
+    cts.parse_args(args)
     cts.read_args()
     cts()
 
@@ -101,10 +134,13 @@ def test_contacts_3res_sh_replot_pdb():
         os.makedirs('contacts_test_data')
 
     cts = Contacts()
-    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', '3res-sh', '--replot', '-replotpref', 'contacts_test_data/indus',
-                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '20', '-bins', '50', '--remote',
-                    '--genpdb'])
+                    '-dpi', '150', '-distcutoff', '4.5', '-skip', '100', '-bins', '50', '--remote',
+                    '--genpdb']
+    if __name__=="__main__":
+        args.append("--verbose")
+    cts.parse_args(args)
     cts.read_args()
     cts()
 
@@ -117,9 +153,12 @@ def test_contacts_atomic_sh_nopdb():
         os.makedirs('contacts_test_data')
 
     cts = Contacts()
-    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh',
-                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote'])
+                    '-dpi', '150', '-distcutoff', '5', '-skip', '100', '-bins', '50', '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
+    cts.parse_args(args)
     cts.read_args()
     cts()
 
@@ -130,10 +169,13 @@ def test_contacts_atomic_sh_pdb():
         os.makedirs('contacts_test_data')
 
     cts = Contacts()
-    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh',
-                    '-dpi', '150', '-distcutoff', '7', '-skip', '5', '-bins', '50', '--remote',
-                    '--genpdb'])
+                    '-dpi', '150', '-distcutoff', '5', '-skip', '100', '-bins', '50', '--remote',
+                    '--genpdb']
+    if __name__=="__main__":
+        args.append("--verbose")
+    cts.parse_args(args)
     cts.read_args()
     cts()
 
@@ -144,19 +186,31 @@ def test_contacts_atomic_sh_replot_pdb():
         os.makedirs('contacts_test_data')
 
     cts = Contacts()
-    cts.parse_args(['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus', '-oformat', 'png',
                     '-method', 'atomic-sh', '--replot', '-replotpref', 'contacts_test_data/indus',
-                    '-dpi', '150', '-distcutoff', '7', '-skip', '20', '-bins', '50', '--remote',
-                    '--genpdb'])
+                    '-dpi', '150', '-distcutoff', '5', '-skip', '100', '-bins', '50', '--remote',
+                    '--genpdb']
+    if __name__=="__main__":
+        args.append("--verbose")
+    cts.parse_args(args)
     cts.read_args()
     cts()
 
     return True
 
 if __name__=="__main__":
-    test_waters_noprobe()
+    if os.path.exists("waters_test_data"):
+        os.system("rm -rf waters_test_data")
+    test_waters_nopdb()
     test_waters_pdb()
+    test_waters_replot_pdb()
+
+    if os.path.exists("order_params_test_data"):
+        os.system("rm -rf order_params_test_data")
     test_order_params()
+
+    if os.path.exists("contacts_test_data"):
+        os.system("rm -rf contacts_test_data")
     test_contacts_3res_sh_nopdb()
     test_contacts_3res_sh_pdb()
     test_contacts_3res_sh_replot_pdb()

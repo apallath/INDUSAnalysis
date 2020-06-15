@@ -1,10 +1,7 @@
 """
-Plot number of waters in probe volume output by GROMACS-INDUS simulation
+Number of waters in probe volumes [union and individual] analysis
 
-Outputs
-- Number of waters in probe volume
-- Number of waters in probe volume - moving (sliding window) average
-- Number of waters in probe volume - cumulative moving (running) average
+SUPPORTS REPLOT FOR GENPDB
 
 Units:
 - time: ps
@@ -29,24 +26,26 @@ class IndusWaters(TimeSeries):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
-        self.parser.add_argument("--genpdb", help="Count atoms in each spherical probe volume, and generate PDB with data", action="store_true")
-        self.parser.add_argument("-structf", help="[genpdb] Topology or structure file (.tpr, .gro)")
-        self.parser.add_argument("-trajf", help="[genpdb] Compressed trajectory file (.xtc)")
-        self.parser.add_argument("-radius", help="[genpdb] Probe volume radiu (in A)")
-        self.parser.add_argument("-skip", help="[genpdb] Frame-selection interval (default = 1)")
-        self.parser.add_argument("--verbose", help="[genpdb] Display progress", action="store_true")
+        self.parser.add_argument("structf", help="Topology or structure file (.tpr, .gro)")
+        self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+        self.parser.add_argument("-radius", help="Probe volume radius (in A) (default = 6 A)")
+        self.parser.add_argument("-skip", help="Frame-selection interval (default = 1)")
+
+        #Output control
+        self.parser.add_argument("--genpdb", action="store_true", help="Write atoms per probe volume data to pdb file")
+        self.parser.add_argument("--verbose", help="Display progress", action="store_true")
 
     def read_args(self):
         super().read_args()
         self.file = self.args.file
-
-        self.genpdb = self.args.genpdb
         self.structf = self.args.structf
         self.trajf = self.args.trajf
 
         self.radius = self.args.radius
         if self.radius is not None:
             self.radius = float(self.radius)
+        else:
+            self.radius = 6.0
 
         self.skip = self.args.skip
         if self.skip is not None:
@@ -54,14 +53,11 @@ class IndusWaters(TimeSeries):
         else:
             self.skip = 1
 
+        self.genpdb = self.args.genpdb
         self.verbose = self.args.verbose
 
-        # INDUS waters data file
-        self.t, self.N, self.Ntw, self.mu = self.get_data(self.file)
-
         # Prepare system from args
-        if self.genpdb:
-            self.u = mda.Universe(self.structf, self.trajf)
+        self.u = mda.Universe(self.structf, self.trajf)
 
     """
     Read data from file to prepare system
@@ -181,11 +177,9 @@ class IndusWaters(TimeSeries):
             if self.verbose:
                 bar.update(1)
 
-        self.times = []
+        self.atom_times = []
         for tidx, ts in enumerate(utraj):
-            self.times.append(ts.time)
-
-        np.save(self.opref + "_waters", self.atom_waters)
+            self.atom_times.append(ts.time)
 
     """
     Save probe waters to PDB
@@ -215,22 +209,37 @@ class IndusWaters(TimeSeries):
         fig.colorbar(im, ax=ax)
         ax.set_xlabel('Atom')
         ax.set_ylabel('Time (ps)')
+        ax.set_yticks(range(len(times)))
         ax.set_yticklabels([str(t) for t in times])
-        self.save_figure(fig, suffix="waters_per_heavy_atom")
+        self.save_figure(fig, suffix="atom_waters")
         if self.show:
             plt.show()
         else:
             plt.close()
 
+
     def __call__(self):
+        # Read INDUS waters data file
+        self.t, self.N, self.Ntw, self.mu = self.get_data(self.file)
+
         """Log data"""
         self.save_timeseries(self.t, self.N, label="N")
         self.save_timeseries(self.t, self.Ntw, label="Ntw")
+
+        """Replot options"""
+        if self.replot:
+            self.atom_times = np.load(self.replotpref + "_atom_times.npy")
+            self.atom_waters = np.load(self.replotpref + "_atom_waters.npy")
+        else:
+            self.calc_probe_waters()
+            np.save(self.opref + "_atom_times", self.atom_times)
+            np.save(self.opref + "_atom_waters", self.atom_waters)
 
         """Plots"""
         self.plot_waters()
         self.plot_ma_waters()
         self.plot_cma_waters()
+        self.plot_heavy_waters(self.atom_times, self.atom_waters)
 
         """Report observables to text files"""
         self.report_mean()
@@ -238,6 +247,4 @@ class IndusWaters(TimeSeries):
 
         """Generate PDB and save"""
         if self.genpdb:
-            self.calc_probe_waters()
             self.save_pdb()
-            self.plot_heavy_waters(self.times, self.atom_waters)
