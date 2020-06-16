@@ -1,7 +1,7 @@
 """
 Number of waters in probe volumes [union and individual] analysis
 
-SUPPORTS REPLOT FOR GENPDB
+Supports PDB generation from saved data using the replot option with genpdb
 
 Units:
 - time: ps

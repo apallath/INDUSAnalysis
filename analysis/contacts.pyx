@@ -1,7 +1,7 @@
 """
 Time series contacts analysis (# of contacts and fraction of native contacts)
 
-SUPPORTS REPLOT FOR GENPDB
+Supports PDB generation from saved data using the replot option with genpdb
 
 Units:
 - length: A
@@ -38,8 +38,9 @@ class Contacts(TimeSeries):
         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
         self.parser.add_argument("-bins", help="Number of bins for histogram (default = 20)")
 
-        #Development options
-        self.parser.add_argument("--devel_rem", help="[atomic-sh, devel] Remove contacts between atoms [DEVEL_REM] units apart")
+        #Under development
+        self.parser.add_argument("-atomic_sh_chain_cutoff", \
+                    help="Remove contacts between atoms X units apart by numbering on chain")
 
         #Output control
         self.parser.add_argument("--genpdb", action="store_true", help="Write contacts density per atom to pdb file")
@@ -92,6 +93,11 @@ class Contacts(TimeSeries):
         # Prepare system from args
         self.u = mda.Universe(self.structf, self.trajf)
 
+        # Under development
+        self.atomic_sh_chain_cutoff = self.args.atomic_sh_chain_cutoff
+        if self.atomic_sh_chain_cutoff is not None:
+            self.atomic_sh_chain_cutoff = int(self.atomic_sh_chain_cutoff)
+
     """
     BEGIN
     Main analysis worker/helpers to analyse contacts along trajectory
@@ -107,7 +113,6 @@ class Contacts(TimeSeries):
             return None
 
     """
-    *** EXPENSIVE ***
     Method: 3res-sh
     Contacts between side-chain heavy atoms belonging to residues that are at least 3 residues apart
     """
@@ -170,7 +175,6 @@ class Contacts(TimeSeries):
         self.contactmatrix = np.mean(self.contactmatrices, axis=0)
 
     """
-    *** EXPENSIVE ***
     Method: atomic-sh
     Contacts between side-chain heavy atoms which are not part of the same bond, angle, or dihedral
     """
@@ -251,6 +255,13 @@ class Contacts(TimeSeries):
         for k in d_dihedrals.keys():
             for v in d_dihedrals[k]:
                 dmatrices[:,k,v] = np.Inf
+
+        ### DEVELOPMENT ###
+        if self.atomic_sh_chain_cutoff is not None:
+            for i in range(dmatrices.shape[1]):
+                for j in range(i+1, min(i+self.atomic_sh_chain_cutoff, dmatrices.shape[1])):
+                    dmatrices[:,i,j] = np.Inf
+                    dmatrices[:,j,i] = np.Inf
 
         if self.verbose:
             print("Calculating contacts from distance matrices")
