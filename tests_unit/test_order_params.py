@@ -70,3 +70,19 @@ def test_RMSD_translate_rotate():
     newcoords = rot.apply(newcoords)
     op = OrderParams()
     assert(np.isclose(op.calc_RMSD_worker(coords,newcoords,coords,newcoords),0))
+
+"""Per-atom-deviation test"""
+def test_deviation_translate_rotate_known():
+    coords = np.array([[1.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0],
+                        [0.0, 0.0, 1.0],
+                        [-1.0, 0.0, 0.0],
+                        [0.0, -1.0, 0.0],
+                        [0.0, 0.0, -1.0]])
+    newcoords = 2.0 * coords + 100.0 * np.random.random_sample(3)
+    rot = scipy_R.from_rotvec(np.random.random_sample(3))
+    newcoords = rot.apply(newcoords)
+    op = OrderParams()
+    calc_deviations = op.calc_deviation_worker(coords,newcoords,coords,newcoords)
+    known_deviations = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+    assert(np.allclose(calc_deviations,known_deviations))

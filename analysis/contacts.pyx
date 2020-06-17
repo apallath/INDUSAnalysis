@@ -303,7 +303,7 @@ class Contacts(TimeSeries):
         np.save(self.opref + "_contactmatrix", self.contactmatrix)
 
     """
-    Save contacts density data to pdb
+    Save instantaneous contacts density data to pdb
     """
     def save_pdb(self):
         protein = self.u.select_atoms("protein")
@@ -396,8 +396,11 @@ class Contacts(TimeSeries):
         fig.colorbar(im, ax=ax)
         ax.set_xlabel('Atom')
         ax.set_ylabel('Time (ps)')
-        ax.set_yticks(range(len(times)))
-        ax.set_yticklabels([str(t) for t in times])
+        #SET TICKS
+        ticks = ax.get_yticks().tolist()
+        factor = times[-1]/ticks[-2]
+        newlabels = [factor * item for item in ticks]
+        ax.set_yticklabels(newlabels)
         self.save_figure(fig, suffix="contacts_per_atom")
         if self.show:
             plt.show()

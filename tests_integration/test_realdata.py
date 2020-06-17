@@ -79,14 +79,52 @@ def test_waters_replot_pdb():
 Protein order parameters analysis with actual data
 """
 @timefuncfile("test_exec_times.txt")
-def test_order_params():
+def test_order_params_nopdb():
     if not os.path.exists('order_params_test_data'):
         os.makedirs('order_params_test_data')
 
     op = OrderParams()
     args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'order_params_test_data/indus', '-oformat', 'png',
-                   '-dpi', '150', '-align', 'backbone', '-select', 'backbone', '-window', '50',
+                   '-dpi', '150', '-align', 'backbone', '-select', 'backbone', '-window', '2000',
+                   '-skip', '100',
                    '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
+    op.parse_args(args)
+    op.read_args()
+    op()
+    return True
+
+@timefuncfile("test_exec_times.txt")
+def test_order_params_pdb():
+    if not os.path.exists('order_params_test_data'):
+        os.makedirs('order_params_test_data')
+
+    op = OrderParams()
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'order_params_test_data/indus', '-oformat', 'png',
+                   '-dpi', '150', '-align', 'backbone', '-select', 'backbone', '-window', '2000',
+                   '-skip', '100',
+                   '--genpdb', '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
+    op.parse_args(args)
+    op.read_args()
+    op()
+    return True
+
+@timefuncfile("test_exec_times.txt")
+def test_order_params_replot_pdb():
+    if not os.path.exists('order_params_test_data'):
+        os.makedirs('order_params_test_data')
+
+    op = OrderParams()
+    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'order_params_test_data/indus', '-oformat', 'png',
+                   '--replot', '-replotpref', 'order_params_test_data/indus',
+                   '-dpi', '150', '-align', 'backbone', '-select', 'backbone', '-window', '2000',
+                   '-skip', '100',
+                   '--genpdb', '--remote']
+    if __name__=="__main__":
+        args.append("--verbose")
     op.parse_args(args)
     op.read_args()
     op()
@@ -228,7 +266,9 @@ if __name__=="__main__":
 
     if os.path.exists("order_params_test_data"):
         os.system("rm -rf order_params_test_data")
-    test_order_params()
+    test_order_params_nopdb()
+    test_order_params_pdb()
+    test_order_params_replot_pdb()
 
     if os.path.exists("contacts_test_data"):
         os.system("rm -rf contacts_test_data")
@@ -238,5 +278,6 @@ if __name__=="__main__":
     test_contacts_atomic_sh_nopdb()
     test_contacts_atomic_sh_pdb()
     test_contacts_atomic_sh_replot_pdb()
+
     #devel
     test_contacts_atomic_sh_devel()
