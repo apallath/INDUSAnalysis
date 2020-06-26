@@ -5,7 +5,7 @@ import MDAnalysis as mda
 import numpy as np
 from scipy.spatial.transform import Rotation as scipy_R
 
-from analysis.protein_order_params import OrderParams
+from INDUSAnalysis.protein_order_params import OrderParams
 
 def coords_generator(boxlen, natoms):
     """generates random coordinates for test cases"""

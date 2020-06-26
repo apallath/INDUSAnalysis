@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-from analysis.timeseries import TimeSeries
+from INDUSAnalysis.timeseries import TimeSeries
 
 """CMA tests"""
 

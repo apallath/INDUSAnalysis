@@ -10,7 +10,8 @@ Units:
 @Author: Akash Pallath
 """
 
-from analysis.timeseries import TimeSeries
+from INDUSAnalysis.timeseries import TimeSeries
+from INDUSAnalysis.lib.profiling import timefunc
 
 import numpy as np
 
@@ -19,8 +20,6 @@ import MDAnalysis as mda
 import MDAnalysis.lib.distances #for fast distance matrix calculation
 from tqdm import tqdm #for progress bars
 from itertools import combinations
-
-from meta_analysis.profiling import timefunc #for function run-time profiling
 
 """Cython"""
 cimport numpy as np
@@ -37,10 +36,6 @@ class Contacts(TimeSeries):
         self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
         self.parser.add_argument("-bins", help="Number of bins for histogram (default = 20)")
-
-        #Under development
-        self.parser.add_argument("-atomic_sh_chain_cutoff", \
-                    help="Remove contacts between atoms X units apart by numbering on chain")
 
         #Output control
         self.parser.add_argument("--genpdb", action="store_true", help="Write contacts density per atom to pdb file")
@@ -92,11 +87,6 @@ class Contacts(TimeSeries):
 
         # Prepare system from args
         self.u = mda.Universe(self.structf, self.trajf)
-
-        # Under development
-        self.atomic_sh_chain_cutoff = self.args.atomic_sh_chain_cutoff
-        if self.atomic_sh_chain_cutoff is not None:
-            self.atomic_sh_chain_cutoff = int(self.atomic_sh_chain_cutoff)
 
     """
     BEGIN
@@ -255,13 +245,6 @@ class Contacts(TimeSeries):
         for k in d_dihedrals.keys():
             for v in d_dihedrals[k]:
                 dmatrices[:,k,v] = np.Inf
-
-        ### DEVELOPMENT ###
-        if self.atomic_sh_chain_cutoff is not None:
-            for i in range(dmatrices.shape[1]):
-                for j in range(i+1, min(i+self.atomic_sh_chain_cutoff, dmatrices.shape[1])):
-                    dmatrices[:,i,j] = np.Inf
-                    dmatrices[:,j,i] = np.Inf
 
         if self.verbose:
             print("Calculating contacts from distance matrices")

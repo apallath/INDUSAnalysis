@@ -1,5 +1,5 @@
-from analysis.contacts import Contacts
-from meta_analysis.profiling import timefunc
+from INDUSAnalysis.contacts import Contacts
+from INDUSAnalysis.lib.profiling import timefunc
 import matplotlib.pyplot as plt
 
 @timefunc

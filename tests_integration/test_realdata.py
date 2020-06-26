@@ -11,10 +11,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-from analysis.indus_waters import IndusWaters
-from analysis.protein_order_params import OrderParams
-from analysis.contacts import Contacts
-from meta_analysis.profiling import timefuncfile, skipfunc
+from INDUSAnalysis.indus_waters import IndusWaters
+from INDUSAnalysis.protein_order_params import OrderParams
+from INDUSAnalysis.contacts import Contacts
+from INDUSAnalysis.lib.profiling import timefuncfile, skipfunc
 
 """
 INDUS waters analysis with sample data

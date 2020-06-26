@@ -1,5 +1,5 @@
-from analysis.protein_order_params import OrderParams
-from meta_analysis.profiling import timefunc
+from INDUSAnalysis.protein_order_params import OrderParams
+from INDUSAnalysis.lib.profiling import timefunc
 import matplotlib.pyplot as plt
 
 @timefunc

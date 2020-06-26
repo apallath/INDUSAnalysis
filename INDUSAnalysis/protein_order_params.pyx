@@ -12,7 +12,8 @@ Units:
 @Author: Akash Pallath
 """
 
-from analysis.timeseries import TimeSeries
+from INDUSAnalysis.timeseries import TimeSeries
+from INDUSAnalysis.lib.profiling import timefunc
 
 import numpy as np
 
@@ -20,8 +21,6 @@ import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import MDAnalysis.analysis.align
 from tqdm import tqdm
-
-from meta_analysis.profiling import timefunc #for function run-time profiling
 
 """Cython"""
 cimport numpy as np

@@ -1,4 +1,6 @@
-# Analysis package for simulation data obtained using GROMACS implementation of Dynamic INDUS
+# INDUSAnalysis
+
+#### Analysis package for simulation data obtained using GROMACS implementation of Dynamic INDUS
 
 [![Python](https://img.shields.io/github/languages/top/apallath/analysis_scripts)](https://www.python.org/downloads/release/python-370/)
 [![Actions Status](https://img.shields.io/github/workflow/status/apallath/analysis_scripts/Analysis)](https://github.com/apallath/analysis_scripts/actions)
@@ -6,9 +8,8 @@
 [![Open Issues](https://img.shields.io/github/issues-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
 [![Closed Issues](https://img.shields.io/github/issues-closed-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
 
-## Features (v0.2)
-- Uses Cython for improved performance (still under development)
-- New program call structure
+# What's new in v1.0?
+- Refactored code
 
 ## Installation
 
@@ -23,16 +24,15 @@
 
 ## Usage
 
-The analysis package can be imported in any Python script using
+The package can be imported in any Python script using
 
-`import analysis`
+`import INDUSAnalysis`
 
-The meta_analysis package, which implements functions for profling/performance
-analysis of the analysis package, can be imported using
+INDUSAnalysis library functions can be impored using
 
-`import meta_analysis`
+`import INDUSAnalysis.lib`
 
-To run an analysis from the command line, call
+To run a particular type of analysis from the command line, call
 `python /path/to/analysis_scripts/run_<analysis_name>.py`
 with the required arguments
 

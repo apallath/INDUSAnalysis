@@ -3,6 +3,7 @@ Template for handling timeseries data produced by molecular simulations
 
 @Author: Akash Pallath
 """
+from INDUSAnalysis.lib.profiling import timefunc
 
 import numpy as np
 
@@ -16,9 +17,6 @@ from numpy import convolve
 
 #Pymbar for autocorrelation time
 import pymbar.timeseries
-
-#Profiling
-from meta_analysis.profiling import timefunc
 
 """Cython"""
 cimport numpy as np

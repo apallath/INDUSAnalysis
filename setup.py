@@ -8,22 +8,22 @@ except AttributeError:
     numpy_include = numpy.get_numpy_include()
 from Cython.Distutils import build_ext
 
-ext_modules = [ Extension("analysis.timeseries", ["analysis/timeseries.pyx"],
+ext_modules = [ Extension("INDUSAnalysis.timeseries", ["INDUSAnalysis/timeseries.pyx"],
                             include_dirs=[numpy_include]),
-                Extension("analysis.indus_waters", ["analysis/indus_waters.pyx"],
+                Extension("INDUSAnalysis.indus_waters", ["INDUSAnalysis/indus_waters.pyx"],
                             include_dirs=[numpy_include]),
-                Extension("analysis.protein_order_params", ["analysis/protein_order_params.pyx"],
+                Extension("INDUSAnalysis.protein_order_params", ["INDUSAnalysis/protein_order_params.pyx"],
                             include_dirs=[numpy_include]),
-                Extension("analysis.contacts", ["analysis/contacts.pyx"],
+                Extension("INDUSAnalysis.contacts", ["INDUSAnalysis/contacts.pyx"],
                             include_dirs=[numpy_include]),
-                Extension("meta_analysis.profiling", ["meta_analysis/profiling.pyx"],
+                Extension("INDUSAnalysis.lib.profiling", ["INDUSAnalysis/lib/profiling.pyx"],
                             include_dirs=[numpy_include])
               ]
 
 setup(
-    name='AnalysisScripts',
-    version='0.2dev',
-    packages=['analysis', 'meta_analysis'],
+    name='INDUSAnalysis',
+    version='0.3-alpha',
+    packages=['INDUSAnalysis'],
     cmdclass = {'build_ext': build_ext},
     ext_modules = ext_modules
 )
