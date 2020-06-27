@@ -9,7 +9,8 @@ For detailed profiling, run `python -m cProfile test_realdata.py`.
 
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import os, sys, inspect
+import re
 
 from INDUSAnalysis.indus_waters import IndusWaters
 from INDUSAnalysis.protein_order_params import OrderParams
@@ -238,46 +239,9 @@ def test_contacts_atomic_sh_replot_pdb():
 
     return True
 
-# DEVELOPMENT OPTION atomic-sh method, with PDB generation
-@timefuncfile("test_exec_times.txt")
-def test_contacts_atomic_sh_devel():
-    if not os.path.exists('contacts_test_data'):
-        os.makedirs('contacts_test_data')
-
-    cts = Contacts()
-    args = ['indus.tpr', 'indus_mol_skip.xtc', '-opref', 'contacts_test_data/indus_devel', '-oformat', 'png',
-                    '-method', 'atomic-sh',
-                    '-dpi', '150', '-distcutoff', '5', '-skip', '100', '-bins', '50', '--remote',
-                    '-atomic_sh_chain_cutoff', '20',
-                    '--genpdb']
-    if __name__=="__main__":
-        args.append("--verbose")
-    cts.parse_args(args)
-    cts.read_args()
-    cts()
-
-
 if __name__=="__main__":
-    if os.path.exists("waters_test_data"):
-        os.system("rm -rf waters_test_data")
-    test_waters_nopdb()
-    test_waters_pdb()
-    test_waters_replot_pdb()
-
-    if os.path.exists("order_params_test_data"):
-        os.system("rm -rf order_params_test_data")
-    test_order_params_nopdb()
-    test_order_params_pdb()
-    test_order_params_replot_pdb()
-
-    if os.path.exists("contacts_test_data"):
-        os.system("rm -rf contacts_test_data")
-    test_contacts_3res_sh_nopdb()
-    test_contacts_3res_sh_pdb()
-    test_contacts_3res_sh_replot_pdb()
-    test_contacts_atomic_sh_nopdb()
-    test_contacts_atomic_sh_pdb()
-    test_contacts_atomic_sh_replot_pdb()
-
-    #devel
-    test_contacts_atomic_sh_devel()
+    all_objects = inspect.getmembers(sys.modules[__name__])
+    for obj in all_objects:
+        if re.match("^test_+", obj[0]):
+            print(obj[0])
+            obj[1]()

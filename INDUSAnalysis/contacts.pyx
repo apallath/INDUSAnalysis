@@ -94,13 +94,73 @@ class Contacts(TimeSeries):
     """
 
     def calc_trajcontacts(self):
-        if self.method == "3res-sh":
-            return self.calc_trajcontacts_3res_sh()
-        elif self.method == "atomic-sh":
+        if self.method == "atomic-sh":
             return self.calc_trajcontacts_atomic_sh()
+        elif self.method == "3res-sh":
+            return self.calc_trajcontacts_3res_sh()
         else:
             raise Exception("Method not recognized")
             return None
+
+    """
+    Method: atomic-sh
+    Contacts between side-chain heavy atoms
+    """
+    @timefunc
+    def calc_trajcontacts_atomic_sh(self):
+        not_side_heavy_sel = "protein and (name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
+
+        # Calculate distances between all atoms using fast MDA function
+        protein = self.u.select_atoms("protein")
+        natoms = len(protein.atoms)
+
+        utraj = self.u.trajectory[::self.skip]
+
+        dmatrices = np.zeros((len(utraj), natoms, natoms))
+
+        if self.verbose:
+            pbar = tqdm(desc = "Calculating distances", total = len(utraj))
+
+        for tidx, ts in enumerate(utraj):
+            dmatrix = mda.lib.distances.distance_array(protein.positions, protein.positions)
+            dmatrices[tidx,:,:] = dmatrix
+            if self.verbose:
+                pbar.update(1)
+
+        if self.verbose:
+            print("Processing distance matrices")
+
+        # Process distance matrices
+        for i in range(dmatrices.shape[1]):
+            dmatrices[:,i,i] = np.Inf
+
+        # Remove atoms that are not side chain heavy atoms
+        for i in self.u.select_atoms(not_side_heavy_sel).indices:
+            dmatrices[:,i,:] = np.Inf
+            dmatrices[:,:,i] = np.Inf
+
+        if self.verbose:
+            print("Calculating contacts from distance matrices")
+
+        self.contactmatrices = np.array(dmatrices < self.distcutoff)
+
+        # Contacts per atom along trajectory
+        if self.verbose:
+            print("Calculating contacts per atom")
+        self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
+
+        # Total number of contacts along trajectory
+        contacts = np.sum(self.contacts_per_atom, axis=1)
+        times = []
+        for ts in utraj:
+            times.append(ts.time)
+        times = np.array(times)
+        self.contacts = np.zeros((len(utraj), 2))
+        self.contacts[:,0] = times
+        self.contacts[:,1] = contacts
+
+        # Normalized mean contactmatrix
+        self.contactmatrix = np.mean(self.contactmatrices, axis=0)
 
     """
     Method: 3res-sh
@@ -149,111 +209,6 @@ class Contacts(TimeSeries):
         self.contactmatrices = np.array(contactmatrices)
 
         # Contacts per atom along trajectory
-        self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
-
-        # Total number of contacts along trajectory
-        contacts = np.sum(self.contacts_per_atom, axis=1)
-        times = []
-        for ts in utraj:
-            times.append(ts.time)
-        times = np.array(times)
-        self.contacts = np.zeros((len(utraj), 2))
-        self.contacts[:,0] = times
-        self.contacts[:,1] = contacts
-
-        # Normalized mean contactmatrix
-        self.contactmatrix = np.mean(self.contactmatrices, axis=0)
-
-    """
-    Method: atomic-sh
-    Contacts between side-chain heavy atoms which are not part of the same bond, angle, or dihedral
-    """
-    @timefunc
-    def calc_trajcontacts_atomic_sh(self):
-        side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
-        not_side_heavy_sel = "protein and (name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
-
-        # Preprocessing
-        # Select atoms
-        side_heavy = self.u.select_atoms(side_heavy_sel)
-        # Maps of bonds, angles, dihedrals
-        d_bonds = {}
-        d_angles = {}
-        d_dihedrals = {}
-
-        sh_bonds = side_heavy.bonds
-        sh_angles = side_heavy.angles
-        sh_dihedrals = side_heavy.dihedrals
-
-        for bond in sh_bonds:
-            [i,j] = bond.atoms.indices
-            d_bonds[i] = d_bonds.get(i, []) + [j]
-            d_bonds[j] = d_bonds.get(j, []) + [i]
-
-        for angle in sh_angles:
-            lst = angle.atoms.indices
-            for (i,j) in list(combinations(lst, 2)):
-                d_angles[i] = d_angles.get(i, []) + [j]
-                d_angles[j] = d_angles.get(j, []) + [i]
-
-        for dihedral in sh_dihedrals:
-            lst = dihedral.atoms.indices
-            for (i,j) in list(combinations(lst, 2)):
-                d_dihedrals[i] = d_dihedrals.get(i, []) + [j]
-                d_dihedrals[j] = d_dihedrals.get(j, []) + [i]
-
-        # Calculate distances between all atoms using fast MDA function
-        protein = self.u.select_atoms("protein")
-        natoms = len(protein.atoms)
-
-        utraj = self.u.trajectory[::self.skip]
-
-        dmatrices = np.zeros((len(utraj), natoms, natoms))
-
-        if self.verbose:
-            pbar = tqdm(desc = "Calculating distances", total = len(utraj))
-
-        for tidx, ts in enumerate(utraj):
-            dmatrix = mda.lib.distances.distance_array(protein.positions, protein.positions)
-            dmatrices[tidx,:,:] = dmatrix
-            if self.verbose:
-                pbar.update(1)
-
-        if self.verbose:
-            print("Processing distance matrices")
-
-        # Process distance matrices
-        for i in range(dmatrices.shape[1]):
-            dmatrices[:,i,i] = np.Inf
-
-        # Remove atoms that are not side chain heavy atoms
-        for i in self.u.select_atoms(not_side_heavy_sel).indices:
-            dmatrices[:,i,:] = np.Inf
-            dmatrices[:,:,i] = np.Inf
-
-        # Remove atoms that are part of the same bond
-        for k in d_bonds.keys():
-            for v in d_bonds[k]:
-                dmatrices[:,k,v] = np.Inf
-
-        # Remove atoms that are part of the same angle
-        for k in d_angles.keys():
-            for v in d_angles[k]:
-                dmatrices[:,k,v] = np.Inf
-
-        # Remove atoms that are part of the same dihedral
-        for k in d_dihedrals.keys():
-            for v in d_dihedrals[k]:
-                dmatrices[:,k,v] = np.Inf
-
-        if self.verbose:
-            print("Calculating contacts from distance matrices")
-
-        self.contactmatrices = np.array(dmatrices < self.distcutoff)
-
-        # Contacts per atom along trajectory
-        if self.verbose:
-            print("Calculating contacts per atom")
         self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
 
         # Total number of contacts along trajectory
