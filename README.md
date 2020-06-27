@@ -8,9 +8,6 @@
 [![Open Issues](https://img.shields.io/github/issues-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
 [![Closed Issues](https://img.shields.io/github/issues-closed-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
 
-# What's new in v1.0?
-- Refactored code
-
 ## Installation
 
 1. Install requirements
