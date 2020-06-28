@@ -17,7 +17,7 @@
 `python setup.py build_ext --inplace`
 
 2. Install package [in editable state]
-`pip install .`
+`pip install [-e] .`
 
 ## Usage
 
