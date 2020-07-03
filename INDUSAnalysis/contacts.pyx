@@ -17,12 +17,13 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
-import MDAnalysis.lib.distances #for fast distance matrix calculation
-from tqdm import tqdm #for progress bars
+import MDAnalysis.lib.distances  # for fast distance matrix calculation
+from tqdm import tqdm  # for progress bars
 from itertools import combinations
 
 """Cython"""
 cimport numpy as np
+
 
 class Contacts(TimeSeries):
     def __init__(self):
@@ -30,14 +31,14 @@ class Contacts(TimeSeries):
         self.parser.add_argument("structf", help="Topology or structure file (.tpr, .gro; .gro required for atomic-sh)")
         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
 
-        #Calculation options
+        # Calculation options
         self.parser.add_argument("-method", help="Method for calculating contacts (atomic-sh, 3res-sh; default=atomic-sh)")
         self.parser.add_argument("-distcutoff", help="Distance cutoff for contacts, in A")
         self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
         self.parser.add_argument("-bins", help="Number of bins for histogram (default = 20)")
 
-        #Output control
+        # Output control
         self.parser.add_argument("--genpdb", action="store_true", help="Write contacts density per atom to pdb file")
         self.parser.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
 

@@ -1,12 +1,19 @@
 # INDUSAnalysis
 
-#### Analysis package for simulation data obtained using GROMACS implementation of Dynamic INDUS
+Package to analyze simulation data generated using
+[INDUS](https://link.springer.com/article/10.1007/s10955-011-0269-9).
+Presently, the focus of the package is on analysis of solvated protein systems.
 
-[![Python](https://img.shields.io/github/languages/top/apallath/analysis_scripts)](https://www.python.org/downloads/release/python-370/)
+## Status
+
 [![Actions Status](https://img.shields.io/github/workflow/status/apallath/analysis_scripts/Analysis)](https://github.com/apallath/analysis_scripts/actions)
-
 [![Open Issues](https://img.shields.io/github/issues-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
 [![Closed Issues](https://img.shields.io/github/issues-closed-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
+
+## Code
+
+[![Python](https://img.shields.io/github/languages/top/apallath/analysis_scripts)](https://www.python.org/downloads/release/python-370/)
+[![Google Python Style](https://img.shields.io/badge/Code%20Style-Google%20Python%20Style-brightgreen)](https://google.github.io/styleguide/pyguide.html)
 
 ## Installation
 
@@ -52,3 +59,7 @@ inside the folder `tests_integration/`.
 Run unit tests in this folder by running
 `pytest`
 inside the folder `tests_unit/`.
+
+## Contributing
+
+[Contributing Guidelines](CONTRIBUTING.md) contain details.
