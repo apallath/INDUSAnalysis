@@ -11,13 +11,16 @@
 ## Installation
 
 1. Install requirements
+
 `pip install -r requirements.txt`
 
 2. Build C extensions
+
 `python setup.py build_ext --inplace`
 
 2. Install package [in editable state]
-`pip install .`
+
+`pip install [-e] .`
 
 ## Usage
 
@@ -25,13 +28,13 @@ The package can be imported in any Python script using
 
 `import INDUSAnalysis`
 
-INDUSAnalysis library functions can be impored using
+INDUSAnalysis library functions can be imported using
 
 `import INDUSAnalysis.lib`
 
 To run a particular type of analysis from the command line, call
 `python /path/to/analysis_scripts/run_<analysis_name>.py`
-with the required arguments
+with the required and optional arguments [use -h or --help for help with arguments]
 
 ## Testing
 
