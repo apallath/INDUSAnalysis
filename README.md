@@ -39,9 +39,14 @@ INDUSAnalysis library functions can be imported using
 
 `import INDUSAnalysis.lib`
 
-To run a particular type of analysis from the command line, call
-`python /path/to/analysis_scripts/run_<analysis_name>.py`
-with the required and optional arguments [use -h or --help for help with arguments]
+## Scripts
+
+`scripts/` contains executable Python and VMD scripts
+
+Call `python /path/to/INDUSAnalysis/scripts/run_<analysis_name>.py`
+with the required and optional arguments to run analysis on data generated from a single run [use -h or --help for help with arguments].
+
+Call `python /path/to/INDUSAnalysis/scripts/run_agg_<analysis_name>.py` with the required and optional arguments to run aggregate analyses on data [use -h or --help for help with arguments].
 
 ## Testing
 

@@ -9,8 +9,8 @@ Units:
 @Author: Akash Pallath
 """
 
-from INDUSAnalysis.timeseries import TimeSeries
-from INDUSAnalysis.lib.profiling import timefunc
+from INDUSAnalysis import timeseries
+from INDUSAnalysis.lib import profiling
 
 import numpy as np
 
@@ -21,7 +21,8 @@ from tqdm import tqdm
 """Cython"""
 cimport numpy as np
 
-class IndusWaters(TimeSeries):
+
+class IndusWaters(timeseries.TimeSeriesAnalysis):
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")

@@ -2,6 +2,7 @@ from INDUSAnalysis.indus_waters import IndusWaters
 from INDUSAnalysis.lib.profiling import timefunc
 import matplotlib.pyplot as plt
 
+
 @timefunc
 def main():
     warnings = ""
@@ -13,5 +14,6 @@ def main():
     waters()
     plt.close('all')
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()
