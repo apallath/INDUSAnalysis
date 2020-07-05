@@ -1,24 +1,25 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 
 from INDUSAnalysis import timeseries
 
 
 def test_TimeSeries_1d_basic():
-    t = [10, 20, 30, 40, 50, 60, 70, 80]
-    t = np.array(t)
-    x = [2, 4, 6, 8, 10, 10, 10, 30]
-    x = np.array(x)
+    """Tests getters, slicing, mean and std for 1-d data"""
+    t = np.array([10, 20, 30, 40, 50, 60, 70, 80])
+    x = np.array([2, 4, 6, 8, 10, 10, 10, 30])
     ts = timeseries.TimeSeries(t, x, ['RMSD'])
 
     # Test getter methods
     assert(np.allclose(ts.time_array, t))
     assert(np.allclose(ts.data_array, x))
 
-    # Test indexing
+    # Test slicing
     assert(np.allclose(ts[:50].data_array, np.array([2, 4, 6, 8, 10])))
     assert(np.allclose(ts[10:30].data_array, np.array([2, 4, 6])))
+    assert(np.allclose(ts[60:].data_array, np.array([10, 10, 30])))
+    assert(np.allclose(ts[::2].data_array, np.array([2, 6, 10, 10])))
+    assert(np.allclose(ts[20::3].data_array, np.array([4, 10, 30])))
 
     # Test mean
     assert(np.isclose(ts.mean(), 10.0))
@@ -30,27 +31,161 @@ def test_TimeSeries_1d_basic():
     assert(np.isclose(ts[50:70].std(), 0.0))
 
 
+def test_TimeSeries_1d_ma_cma():
+    """Tests moving average and cumulative moving average for 1-d data"""
+    t = np.array([10, 20, 30, 40, 50, 60, 70, 80])
+    x = np.array([2, 1, 2, 1, 2, 1, 2, 1])
+    ts = timeseries.TimeSeries(t, x, ['RMSD'])
+
+    # Test moving average
+    assert(np.allclose(ts.moving_average(window=2).data_array,
+                       np.array([1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5])))
+    # Test cumulative moving average
+    assert(np.allclose(ts.cumulative_moving_average().data_array,
+                       np.array([2, 3 / 2, 5 / 3, 6 / 4, 8 / 5, 9 / 6, 11 / 7, 12 / 8])))
+
+
 def test_TimeSeries_1d_vis():
-    pass
+    """Tests plotting for 1-d data"""
+    t = np.array([10, 20, 30, 40, 50, 60, 70, 80])
+    x = np.array([2, 4, 6, 8, 10, 10, 10, 30])
+    ts = timeseries.TimeSeries(t, x, ['RMSD'])
+
+    fig = ts.plot('s--', lw=1.2, label='Backbone-Backbone RMSD')
+    fig.set_dpi(300)
+    ax = fig.gca()
+    ax.legend()
+    fig.savefig("timeseries_test_data/1d.png")
 
 
 def test_TimeSeries_2d_basic():
-    pass
+    """Tests getters, slicing, mean and std for 2-d data"""
+    t = np.array([10, 20, 30, 40, 50])
+    x = np.array([[2, 10, 0], [4, 10, 0], [6, 10, 5], [8, 10, 5], [10, 10, 10]])
+    ts = timeseries.TimeSeries(t, x, ['Atomic deviations', 'Atom index'])
+
+    # Test getter methods
+    assert(np.allclose(ts.time_array, t))
+    assert(np.allclose(ts.data_array, x))
+
+    # Test slicing
+    assert(np.allclose(ts[40:].data_array, np.array([[8, 10, 5], [10, 10, 10]])))
+    assert(np.allclose(ts[20:30].data_array, np.array([[4, 10, 0], [6, 10, 5]])))
+    assert(np.allclose(ts[:20].data_array, np.array([[2, 10, 0], [4, 10, 0]])))
+    assert(np.allclose(ts[::2].data_array,
+                       np.array([[2, 10, 0], [6, 10, 5], [10, 10, 10]])))
+
+    # Test mean
+    assert(np.isclose(ts.mean(), x.mean()))
+    assert(np.allclose(ts.mean(axis=0), x.mean(axis=0)))
+    assert(np.allclose(ts.mean(axis=1).data_array, x.mean(axis=1)))
+
+    # Test std
+    assert(np.isclose(ts.std(), x.std()))
+    assert(np.allclose(ts.std(axis=0), x.std(axis=0)))
+    assert(np.allclose(ts.std(axis=1).data_array, x.std(axis=1)))
 
 
 def test_TimeSeries_2d_vis():
-    pass
+    """Tests heatmap visualization for 2-d data"""
+    # Test with time starting from 0
+    t = np.array([0, 10, 20, 30, 40, 50])
+    x = np.array([[0, 10, 0], [2, 10, 0], [4, 10, 0], [6, 10, 5], [8, 10, 5], [10, 10, 10]])
+    ts = timeseries.TimeSeries(t, x, ['Atomic deviations', 'Atom index'])
+
+    fig = ts.plot_2d_heatmap(cmap='cool')
+    fig.set_dpi(300)
+    fig.savefig("timeseries_test_data/2d_0_index.png")
+
+    # Test with time starting from 10
+    t = np.array([10, 20, 30, 40, 50])
+    x = np.array([[2, 10, 0], [4, 10, 0], [6, 10, 5], [8, 10, 5], [10, 10, 10]])
+    ts = timeseries.TimeSeries(t, x, ['Atomic deviations', 'Atom index'])
+
+    fig = ts.plot_2d_heatmap(cmap='cool')
+    fig.set_dpi(300)
+    fig.savefig("timeseries_test_data/2d_10_index.png")
+
+    # Test with larger data
+    t = np.linspace(0, 10000, 41)
+    x = np.random.random((41, 100))
+    ts = timeseries.TimeSeries(t, x, ['Atomic deviations', 'Atom index'])
+
+    fig = ts.plot_2d_heatmap(cmap='hot')
+    fig.set_dpi(300)
+    fig.savefig("timeseries_test_data/2d_large.png")
+
+    # Test with sliced larger data
+    t = np.linspace(0, 10000, 41)
+    x = np.random.random((41, 100))
+    ts = timeseries.TimeSeries(t, x, ['Atomic deviations', 'Atom index'])
+    ts_slice = ts[5000:]
+    fig = ts_slice.plot_2d_heatmap(cmap='hot')
+    fig.set_dpi(300)
+    fig.savefig("timeseries_test_data/2d_large_slice.png")
 
 
-def test_TimeSeries_3d_basic():
-    pass
+def test_TimeSeries_3d_dimred_vis():
+    t = np.linspace(0, 10000, 41)
+    x = np.random.random((41, 100, 100))
+    x_T = np.transpose(x, axes=(0, 2, 1))
+    x_sym = (x + x_T) / 2
+    ts = timeseries.TimeSeries(t, x_sym, ['Contact duration', 'Atom i', 'Atom j'])
+
+    # Test average matrix
+    mean_contacts_matrix = ts.mean(axis=0)
+    assert(mean_contacts_matrix.shape == (100, 100))
+
+    # Test if reductions along alternate axes work symmetrically
+    mean_per_atom = ts.mean(axis=1)
+    mean_per_atom_1 = ts.mean(axis=2)
+    assert(np.allclose(mean_per_atom.data_array, mean_per_atom_1.data_array))
+
+    # Plot 2d reduction
+    fig = mean_per_atom.plot_2d_heatmap(cmap='hot')
+    fig.set_dpi(300)
+    fig.savefig("timeseries_test_data/3d_dimred_2d.png")
+
+    # Plot 2d reduction
+    mean_per_frame = mean_per_atom.mean(axis=1)
+    assert(mean_per_frame.data_array.shape == (41,))
+    fig = mean_per_frame.plot('s--', lw=1.2, label='Mean contacts per timestep')
+    fig.set_dpi(300)
+    fig.savefig("timeseries_test_data/3d_dimred_1d.png")
+
 
 # TODO: Write tests for standard error of mean
 
 
-def test_TimeSeriesAnalysis_argparse():
-    pass
+def test_TimeSeriesAnalysis_save_load_TimeSeries():
+    t = np.linspace(0, 10000, 41)
+    x = np.random.random((41, 100, 100))
+    x_T = np.transpose(x, axes=(0, 2, 1))
+    x_sym = (x + x_T) / 2
+    ts = timeseries.TimeSeries(t, x_sym, ['Contact duration', 'Atom i', 'Atom j'])
+
+    tsa = timeseries.TimeSeriesAnalysis()
+    tsa.save_TimeSeries(ts, "timeseries_test_data/ts.pkl")
+
+    tsl = tsa.load_TimeSeries("timeseries_test_data/ts.pkl")
+    assert(np.allclose(ts.time_array, tsl.time_array))
+    assert(np.allclose(ts.data_array, tsl.data_array))
+    assert(ts.labels == tsl.labels)
 
 
-def test_TimeSeriesAnalysis_savefig():
-    pass
+def test_TimeSeriesAnalysis_save_load_fig():
+    """Tests plotting for 1-d data"""
+    t = np.array([10, 20, 30, 40, 50, 60, 70, 80])
+    x = np.array([2, 4, 6, 8, 10, 10, 10, 30])
+    ts = timeseries.TimeSeries(t, x, ['RMSD'])
+
+    fig = ts.plot('s--', lw=1.2, label='Backbone-Backbone RMSD')
+    fig.set_dpi(300)
+    ax = fig.gca()
+    ax.legend()
+
+    tsa = timeseries.TimeSeriesAnalysis()
+    tsa.opref = "timeseries_test_data/tsa"
+    tsa.oformat = "png"
+    tsa.dpi = 300
+    tsa.save_figure(fig, suffix="test_fig")

@@ -1,14 +1,3 @@
-"""
-Number of waters in probe volumes [union and individual] analysis
-
-Supports PDB generation from saved data using the replot option with genpdb
-
-Units:
-- time: ps
-
-@Author: Akash Pallath
-"""
-
 from INDUSAnalysis import timeseries
 from INDUSAnalysis.lib import profiling
 
@@ -23,6 +12,7 @@ cimport numpy as np
 
 
 class IndusWaters(timeseries.TimeSeriesAnalysis):
+    """
     def __init__(self):
         super().__init__()
         self.parser.add_argument("file", help="GROMACS-INDUS waters data file")

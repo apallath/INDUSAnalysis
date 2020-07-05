@@ -7,12 +7,11 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 
+import pickle
 import argparse
 
 from scipy import stats
 from numpy import convolve
-
-import pymbar.timeseries
 
 from INDUSAnalysis.lib import profiling
 
@@ -48,14 +47,6 @@ class TimeSeries:
         if len(self._labels) > self._x.ndim:
             raise ValueError("Too many labels for data dimensions")
 
-    @property
-    def time_array(self):
-        return self._t
-
-    @property
-    def data_array(self):
-        return self._x
-
     def __getitem__(self, key):
         """
         Performs indexing/slicing based on time values,
@@ -86,6 +77,18 @@ class TimeSeries:
     def __repr__(self):
         return "<{} object, {} with shape {}, {} time frames>".format(
             self.__class__.__name__, self._labels, self._x.shape, len(self._t))
+
+    @property
+    def time_array(self):
+        return self._t
+
+    @property
+    def data_array(self):
+        return self._x
+
+    @property
+    def labels(self):
+        return self._labels
 
     def moving_average(self, window):
         """
@@ -124,10 +127,15 @@ class TimeSeries:
         Computes mean of timeseries data.
 
         Args:
-            axis (int): Optional, ignored for 1-d data.
+            axis (int): Optional
+
+        Returns:
+            np.float if mean is computed for flattened data (axis = None)
+            np.array if mean is computed along axis 0
+            TimeSeries object if mean is computed along axis > 0
         """
-        if axis is None or self._x.ndim == 1:
-            return np.mean(self._x)
+        if axis is None or axis == 0:
+            return np.mean(self._x, axis=axis)
         else:
             mean = np.mean(self._x, axis=axis)
             labels = [x for i, x in enumerate(self._labels) if i != axis]
@@ -138,16 +146,22 @@ class TimeSeries:
         Computes std of timeseries data.
 
         Args:
-            axis (int): Optional, ignored for 1-d data.
+            axis (int): Optional
+
+        Returns:
+            np.float if mean is computed for flattened data (axis = None)
+            np.array if mean is computed along axis 0
+            TimeSeries object if mean is computed along axis > 0
         """
-        if axis is None or self._x.ndim == 1:
-            return np.std(self._x)
+        if axis is None or axis == 0:
+            return np.std(self._x, axis=axis)
         else:
             std = np.std(self._x, axis=axis)
             labels = [x for i, x in enumerate(self._labels) if i != axis]
             return TimeSeries(self._t, std, labels=labels)
 
     # TODO: Implement
+    @profiling.timefunc
     def sem(self, axis=0):
         """
         Computes standard error of mean (estimate of the standard deviation
@@ -158,9 +172,12 @@ class TimeSeries:
         """
         raise NotImplementedError
 
-    # TODO: Figure options
-    def plot(self):
+    def plot(self, *plotargs, **plotkwargs):
         """Plots 1-d timeseries data.
+
+        Args:
+            *plotargs: Arguments for Matplotlib's plot function
+            **plotkwargs: Keyword arguments for Matplotlib's plot function
 
         Returns:
             Matplotlib figure object containing plotted data.
@@ -169,14 +186,16 @@ class TimeSeries:
             ValueError if data is not 1-dimensional.
         """
         fig, ax = plt.subplots()
-        ax.plot(self._t, self._x)
+        ax.plot(self._t, self._x, *plotargs, **plotkwargs)
         ax.set_xlabel("Time")
-        ax.set_ylabel(self.labels[0])
+        ax.set_ylabel(self._labels[0])
         return fig
 
-    # TODO: Figure options
-    def plot_2d_heatmap(self):
+    def plot_2d_heatmap(self, **imshowkwargs):
         """Plots 2-d timeseries data as a heatmap.
+
+        Args:
+            *imshowkwargs: Keyword arguments for Matplotlib's imshow function
 
         Returns:
             Matplotlib figure object containing plotted data.
@@ -185,15 +204,17 @@ class TimeSeries:
             ValueError if data is not 2-dimensional.
         """
         fig, ax = plt.subplots()
-        im = ax.imshow(self._x, origin="lower", cmap="hot", aspect='auto')
-        fig.colorbar(im, ax=ax)
-        ax.set_xlabel('Time')
-        ax.set_ylabel(self.labels[1])
+        im = ax.imshow(self._x, origin='lower', aspect='auto', **imshowkwargs)
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label(self._labels[0])
+        ax.set_xlabel(self._labels[1])
+        ax.set_ylabel('Time')
 
         # Ticks
         ticks = ax.get_yticks().tolist()
-        factor = self._t[-1] / ticks[-2]
-        newlabels = [factor * item for item in ticks]
+        start = self._t[0]
+        sep = (self._t[-1] - self._t[0]) / (ticks[-2] - ticks[1])
+        newlabels = [(start + sep * axval) for axval in ticks]
         ax.set_yticklabels(newlabels)
 
         return fig
@@ -233,7 +254,7 @@ class TimeSeriesAnalysis:
         self.replot_args.add_argument("--replot", action="store_true", help="Replot from saved data")
         self.replot_args.add_argument("-replotpref", help="[replot] Prefix (REPLOTPREF[.npy]) of .npy file to replot from [Default = indus]")
 
-        # Miscellanious optinos
+        # Miscellanious options
         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")
 
     def parse_args(self, args=None):
@@ -296,14 +317,29 @@ class TimeSeriesAnalysis:
             matplotlib.use('Agg')
 
     # TODO: Implement
-    def save_TimeSeries(self, tso):
+    def save_TimeSeries(self, tso, filename):
         """
         Saves TimeSeries object to file using pickle dump.
 
         Args:
             tso (TimeSeries): TimeSeries object to pickle and dump.
         """
-        raise NotImplementedError
+        with open(filename, 'wb+') as f:
+            pickle.dump(tso, f)
+
+    def load_TimeSeries(self, filename):
+        """
+        Loads pickled TimeSeries object from file
+
+        Args:
+            filename: Name of file to load pickled TimeSeries object from
+
+        Returns:
+            TimeSeries object loaded from file
+        """
+        with open(filename, 'rb') as f:
+            tso = pickle.load(f)
+            return tso
 
     def save_figure(self, fig, suffix=""):
         """
