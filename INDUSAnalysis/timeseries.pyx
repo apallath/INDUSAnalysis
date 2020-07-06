@@ -1,5 +1,5 @@
 """
-Classes for storing and analysing timeseries data.
+Defines classes for storing and analysing timeseries data.
 """
 
 import numpy as np
@@ -233,10 +233,11 @@ class TimeSeriesAnalysis:
         # Argument groups
         self.req_file_args = self.parser.add_argument_group('required filename arguments')
         self.opt_file_args = self.parser.add_argument_group('optional filename arguments')
+        self.calc_args = self.parser.add_argument_group('calculation arguments')
         self.avg_args = self.parser.add_argument_group('averaging optional arguments')
-        self.plot_args = self.parser.add_argument_group('plotting optional arguments')
-        self.replot_args = self.parser.add_argument_group('replot optional arguments')
-        self.misc_args = self.parser.add_argument_group('miscellanious optional arguments')
+        self.out_args = self.parser.add_argument_group('output control arguments')
+        self.replot_args = self.parser.add_argument_group('replot control arguments')
+        self.misc_args = self.parser.add_argument_group('miscellanious arguments')
 
         # Averaging options
         self.avg_args.add_argument("-obsstart", help="Time to begin computation of observables at")
@@ -245,10 +246,10 @@ class TimeSeriesAnalysis:
         self.avg_args.add_argument("-window", help="Window size (number of points) for moving average")
 
         # Plotting options
-        self.plot_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")
-        self.plot_args.add_argument("-oformat", help="Output image format [Default = png]")
-        self.plot_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
-        self.plot_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")
+        self.out_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")
+        self.out_args.add_argument("-oformat", help="Output image format [Default = png]")
+        self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
+        self.out_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")
 
         # Replot options
         self.replot_args.add_argument("--replot", action="store_true", help="Replot from saved data")
@@ -272,9 +273,6 @@ class TimeSeriesAnalysis:
     def read_args(self):
         """
         Stores arguments from TimeSeries `args` parameter in class variables
-
-        Raises:
-            ValueError if arguments parsed are inconsistent
         """
         self.obsstart = self.args.obsstart
         if self.obsstart is not None:

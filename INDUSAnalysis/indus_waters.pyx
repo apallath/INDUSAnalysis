@@ -1,3 +1,7 @@
+"""
+Defines class for analysing waters in INDUS probe volumes
+"""
+
 from INDUSAnalysis import timeseries
 from INDUSAnalysis.lib import profiling
 
@@ -11,25 +15,43 @@ from tqdm import tqdm
 cimport numpy as np
 
 
-class IndusWaters(timeseries.TimeSeriesAnalysis):
+class WatersAnalysis(timeseries.TimeSeriesAnalysis):
+    """
+    Calculates number of waters in individual and union probe volumes. Generates
+    plots and PDB files.
     """
     def __init__(self):
         super().__init__()
-        self.parser.add_argument("file", help="GROMACS-INDUS waters data file")
-        self.parser.add_argument("structf", help="Topology or structure file (.tpr, .gro)")
-        self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
-        self.parser.add_argument("-radius", help="Probe volume radius (in A) (default = 6 A)")
-        self.parser.add_argument("-skip", help="Frame-selection interval (default = 1)")
+        self.req_file_args.add_argument("file",
+                                        help="GROMACS-INDUS waters data file")
+        self.req_file_args.add_argument("structf",
+                                        help="Topology or structure file (.tpr, .gro)")
+        self.req_file_args.add_argument("trajf",
+                                        help="Compressed trajectory file (.xtc)")
 
-        #Output control
-        self.parser.add_argument("--genpdb", action="store_true", help="Write atoms per probe volume data to pdb file")
-        self.parser.add_argument("--verbose", help="Display progress", action="store_true")
+        self.calc_args.add_argument("-radius",
+                                    help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
+        self.calc_args.add_argument("-skip",
+                                    help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
+
+        self.out_args.add_argument("--genpdb",
+                                   action="store_true",
+                                   help="[per-probe waters] Write atoms per probe volume data to pdb file")
+
+        self.misc_args.add_argument("--verbose",
+                                    action="store_true",
+                                    help="Display progress")
 
     def read_args(self):
+        """
+        Stores arguments from TimeSeries `args` parameter in class variables
+        """
         super().read_args()
         self.file = self.args.file
         self.structf = self.args.structf
         self.trajf = self.args.trajf
+
+        self.u = mda.Universe(self.structf, self.trajf)
 
         self.radius = self.args.radius
         if self.radius is not None:
@@ -46,29 +68,38 @@ class IndusWaters(timeseries.TimeSeriesAnalysis):
         self.genpdb = self.args.genpdb
         self.verbose = self.args.verbose
 
-        # Prepare system from args
-        self.u = mda.Universe(self.structf, self.trajf)
+    # Data calculation methods
 
-    """
-    Read data from file to prepare system
-    """
-    def get_data(self, file):
+    def read_waters(self, filename):
+        """
+        Reads data from GROMACS-INDUS phi/probe waters output file.
+
+        Args:
+            filename (str): Name of GROMACS-INDUS waters output file.
+
+        Returns:
+            {
+                ts_N (TimeSeries): N values.
+                ts_Ntw (TimeSeries): N~ values.
+                mu (np.float): Value of mu.
+            }.
+        """
         t = []
         N = []
         Ntw = []
         mu = 0
-        with open(file) as f:
-            #read data file
+        with open(filename) as f:
+            # Read data file
             for l in f:
                 lstrip = l.strip()
-                #parse comments
-                if lstrip[0]=='#':
+                # Parse comments
+                if lstrip[0] == '#':
                     comment = lstrip[1:].split()
                     if comment[0] == 'mu':
                         mu = comment[2]
-                #parse data
-                if lstrip[0]!='#':
-                    (tcur,Ncur,Ntwcur) = map(float,lstrip.split())
+                # Parse data
+                if lstrip[0] != '#':
+                    (tcur, Ncur, Ntwcur) = map(float, lstrip.split())
                     t.append(tcur)
                     N.append(Ncur)
                     Ntw.append(Ntwcur)
@@ -78,166 +109,163 @@ class IndusWaters(timeseries.TimeSeriesAnalysis):
         Ntw = np.array(Ntw)
         mu = np.float(mu)
 
-        return t, N, Ntw, mu
+        ts_N = timeseries.TimeSeries(t, N, labels=["N"])
+        ts_Ntw = timeseries.TimeSeries(t, Ntw, labels=[r"N~"])
 
-    """
-    Plot waters in probe volume
-    """
-    def plot_waters(self):
-        fig, ax = plt.subplots()
-        ax.plot(self.t,self.Ntw,label=r"$\tilde{N}$")
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Continuous number of waters")
-        ax.legend()
-        self.save_figure(fig,suffix="waters")
-        if self.show:
-            plt.show()
-        else:
-            plt.close()
+        return ts_N, ts_Ntw, mu
 
-    """
-    Plot moving (sliding window) average of waters in probe volume
-    """
-    def plot_ma_waters(self):
-        maNtw = self.moving_average(self.t, self.Ntw, self.window)
+    def calc_probe_waters(self, u, skip, radius):
+        """
+        Calculates waters in individual probe volumes
 
-        fig, ax = plt.subplots()
-        ax.plot(self.t[len(self.t) - len(maNtw):], maNtw, label=r"$\tilde{N}$, moving average")
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Continuous number of waters, moving (window) average")
-        ax.legend()
-        self.save_figure(fig,suffix="ma_waters")
-        if self.show:
-            plt.show()
-        else:
-            plt.close()
+        Args:
+            u (mda.Universe): Universe containing solvated protein
+            skip (int): Trajectory resampling interval
+            radius (float): Radius of probe waters
 
-    """
-    Plot cumulative moving (running) average of waters in probe volume
-    """
-    def plot_cma_waters(self):
-        cmaNtw = self.cumulative_moving_average(self.Ntw)
-        fig, ax = plt.subplots()
-        ax.plot(self.t, cmaNtw, label=r"$\tilde{N}$, cum. moving average")
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Continuous number of waters, cumulative moving (running) average")
-        ax.legend()
-        self.save_figure(fig,suffix="cma_waters")
-        if self.show:
-            plt.show()
-        else:
-            plt.close()
+        Returns:
+            TimeSeries object containing probe waters
+        """
+        # Probes placed on protein-heavy atoms
+        protein = u.select_atoms("protein")
+        protein_heavy = u.select_atoms("protein and not name H*")
 
-    """
-    Append mean waters to text file
-    """
-    def report_mean(self):
-        meanstr = "{:.2f} {:.2f}\n".format(self.mu, self.ts_mean(self.t, self.Ntw, self.obsstart, self.obsend))
-        with open(self.obspref+"_mean.txt", 'a+') as meanf:
-            meanf.write(meanstr)
-
-    """
-    Append standard deviation of waters to text file
-    """
-    def report_std(self):
-        stdstr = "{:.2f} {:.2f}\n".format(self.mu, self.ts_std(self.t, self.Ntw, self.obsstart, self.obsend))
-        with open(self.obspref+"_std.txt", 'a+') as stdf:
-            stdf.write(stdstr)
-
-    """
-    *** EXPENSIVE ***
-    Calculate probe waters
-    - Note: also saves calculated probe waters data to file
-    """
-    def calc_probe_waters(self):
-        protein = self.u.select_atoms("protein")
-        protein_heavy = self.u.select_atoms("protein and not name H*")
-        utraj = self.u.trajectory[0::self.skip]
-
-        self.atom_waters = np.zeros((len(utraj), len(protein)))
+        utraj = u.trajectory[::skip]
+        times = np.zeros(len(utraj))
+        probe_waters = np.zeros((len(utraj), len(protein)))
 
         if self.verbose:
-            bar = tqdm(desc = "Calculating waters", total = len(utraj))
+            bar = tqdm(desc="Calculating waters", total=len(utraj))
 
         for tidx, ts in enumerate(utraj):
+            times[tidx] = ts.time
             for atom in protein_heavy.atoms:
-                waters = self.u.select_atoms("name OW and (around {} (atom {} {} {}))".format(\
-                                        self.radius, atom.segid, atom.resid, atom.name))
-                self.atom_waters[tidx, atom.index] = len(waters)
+                waters = u.select_atoms("name OW and (around {} (atom {} {} {}))".format(
+                                        radius, atom.segid, atom.resid, atom.name))
+                probe_waters[tidx, atom.index] = len(waters)
             if self.verbose:
                 bar.update(1)
 
-        self.atom_times = []
-        for tidx, ts in enumerate(utraj):
-            self.atom_times.append(ts.time)
+        return timeseries.TimeSeries(times, probe_waters,
+                                     labels=['Number of waters', 'Heavy atom index'])
 
-    """
-    Save instantaneous probe waters to PDB
-    """
-    def save_pdb(self):
-        protein = self.u.select_atoms("protein")
-        self.u.add_TopologyAttr('tempfactors')
-        utraj = self.u.trajectory[0::self.skip]
-        pdbtrj = self.opref + "_waters.pdb"
-
-        if self.verbose:
-            pbar = tqdm(desc = "Writing PDB", total = len(utraj))
-
-        with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
-            for tidx, ts in enumerate(utraj):
-                protein.atoms.tempfactors = self.atom_waters[tidx,:]
-                PDB.write(self.u.atoms)
-                if self.verbose:
-                    pbar.update(1)
-
-    """
-    Plot waters around each heavy atom
-    """
-    def plot_heavy_waters(self, times, atom_waters):
-        fig, ax = plt.subplots(dpi=300)
-        im = ax.imshow(atom_waters, origin="lower", cmap="hot", aspect='auto')
-        fig.colorbar(im, ax=ax)
-        ax.set_xlabel('Atom')
-        ax.set_ylabel('Time (ps)')
-        #SET TICKS
-        ticks = ax.get_yticks().tolist()
-        factor = times[-1]/ticks[-2]
-        newlabels = [factor * item for item in ticks]
-        ax.set_yticklabels(newlabels)
-        self.save_figure(fig, suffix="atom_waters")
+    def plot_waters(self, ts_Ntw):
+        """Plots waters and saves figure to file"""
+        fig = ts_Ntw.plot()
+        fig.set_dpi(300)
+        self.save_figure(fig, suffix="waters")
         if self.show:
             plt.show()
         else:
             plt.close()
 
+    def plot_ma_waters(self, ts_Ntw):
+        """Plots moving average waters and saves figure to file"""
+        fig = ts_Ntw.moving_average(window=self.window).plot()
+        fig.set_dpi(300)
+        self.save_figure(fig, suffix="ma_waters")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+    def plot_cma_waters(self, ts_Ntw):
+        """Plots cumulative moving average waters and saves figure to file"""
+        fig = ts_Ntw.cumulative_moving_average().plot()
+        fig.set_dpi(300)
+        self.save_figure(fig, suffix="cma_waters")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+    def plot_probe_waters(self, ts_probe_waters):
+        """Plots waters in each individual probe as a 2D heatmap"""
+        fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
+        fig.set_dpi(300)
+        self.save_figure(fig, suffix="probe_waters")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+    def write_mean_std_waters(self, mu, ts_Ntw):
+        """Appends mean and std waters to text file"""
+        meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
+        with open(self.obspref + "_mean.txt", 'a+') as meanf:
+            meanf.write(meanstr)
+
+        stdstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.std())
+        with open(self.obspref + "_std.txt", 'a+') as stdf:
+            stdf.write(stdstr)
+
+    def write_probe_waters_pdb(self, u, skip, ts_probe_waters):
+        """
+        Writes instantaneous probe waters to PDB file.
+
+        Args:
+            u (mda.Universe): Universe containing solvated protein
+            skip (int): Trajectory resampling interval
+            ts_probe_waters (TimeSeries): Probe waters timeseries data.
+
+        Raises:
+            ValueError if the time for the same index in u.trajectory[::skip]
+            and ts_probe_waters does not match.
+        """
+        protein = u.select_atoms("protein")
+        u.add_TopologyAttr('tempfactors')
+        pdbtrj = self.opref + "_waters.pdb"
+
+        utraj = u.trajectory[::skip]
+
+        if self.verbose:
+            pbar = tqdm(desc="Writing PDB", total=len(utraj))
+
+        with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
+            for tidx, ts in enumerate(utraj):
+                if np.isclose(ts.time, ts_probe_waters.time_array[tidx]):
+                    protein.atoms.tempfactors = ts_probe_waters.data_array[tidx, :]
+                    PDB.write(u.atoms)
+                    if self.verbose:
+                        pbar.update(1)
+                else:
+                    raise ValueError("Trajectory and TimeSeries times do not match at same index.")
 
     def __call__(self):
-        # Read INDUS waters data file
-        self.t, self.N, self.Ntw, self.mu = self.get_data(self.file)
+        """Performs analysis"""
 
-        """Log data"""
-        self.save_timeseries(self.t, self.N, label="N")
-        self.save_timeseries(self.t, self.Ntw, label="Ntw")
+        """Raw data"""
+        # Overall probe waters
+        ts_N, ts_Ntw, mu = self.read_waters(self.file)
+        self.save_TimeSeries(ts_N, self.opref + "_N.pkl")
+        self.save_TimeSeries(ts_Ntw, self.opref + "_Ntw.pkl")
 
-        """Replot options"""
+        # Individual probe waters
+        u = mda.Universe(self.structf, self.trajf)
+        ts_probe_waters = None
         if self.replot:
-            self.atom_times = np.load(self.replotpref + "_atom_times.npy")
-            self.atom_waters = np.load(self.replotpref + "_atom_waters.npy")
+            ts_probe_waters = self.load_TimeSeries(self.replotpref + "_probe_waters.pkl")
         else:
-            self.calc_probe_waters()
-            np.save(self.opref + "_atom_times", self.atom_times)
-            np.save(self.opref + "_atom_waters", self.atom_waters)
+            ts_probe_waters = self.calc_probe_waters(u, self.skip, self.radius)
 
-        """Plots"""
-        self.plot_waters()
-        self.plot_ma_waters()
-        self.plot_cma_waters()
-        self.plot_heavy_waters(self.atom_times, self.atom_waters)
+        self.save_TimeSeries(ts_probe_waters, self.opref + "_probe_waters.pkl")
 
-        """Report observables to text files"""
-        self.report_mean()
-        self.report_std()
+        """Plots and averages"""
+        # Plot waters, moving average waters, cumulative moving average waters,
+        # and save figures
+        self.plot_waters(ts_Ntw)
+        self.plot_ma_waters(ts_Ntw)
+        self.plot_cma_waters(ts_Ntw)
 
-        """Generate PDB and save"""
+        # Plot heatmap of waters in individual probe volumes, and save figure
+        self.plot_probe_waters(ts_probe_waters)
+
+        """Trajectories"""
+        # Write waters in individual probe volumes to PDB
         if self.genpdb:
-            self.save_pdb()
+            u = mda.Universe(self.structf, self.trajf)
+            self.write_probe_waters_pdb(u, self.skip, ts_probe_waters)
+
+        """Observables"""
+        # Write mean and std of waters to text files
+        self.write_mean_std_waters(mu, ts_Ntw[self.obsstart:self.obsend])
