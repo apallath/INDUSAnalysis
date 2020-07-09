@@ -33,7 +33,7 @@ $ python setup.py build_ext --inplace
 2. Install package [in editable state]
 
 ```sh
-pip install [-e] .
+$ pip install [-e] .
 ```
 
 ## Tests
