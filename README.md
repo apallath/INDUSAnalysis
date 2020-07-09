@@ -21,19 +21,19 @@ At present, the focus of this package is on analysis of solvated protein systems
 1. Install requirements
 
 ```sh
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 2. Build C extensions
 
 ```sh
-$ python setup.py build_ext --inplace
+python setup.py build_ext --inplace
 ```
 
 2. Install package [in editable state]
 
 ```sh
-$ pip install [-e] .
+pip install [-e] .
 ```
 
 ## Tests
@@ -44,7 +44,7 @@ and working correctly. All tests should pass.
 ### Unit tests:
 
 Run
-```
+```sh
 pytest
 ```
 inside the folder `tests_unit/`.
@@ -52,7 +52,7 @@ inside the folder `tests_unit/`.
 ### Integration tests:
 
 Run
-```
+```sh
 pytest
 ```
 inside the folder `tests_integration/`.
@@ -76,15 +76,15 @@ import INDUSAnalysis.lib
 `scripts/` contains executable Python and VMD scripts
 
 Run
-```console
-python /path/to/INDUSAnalysis/scripts/run_<analysis_name>.py
+```sh
+python /path/to/INDUSAnalysis/scripts/run_$analysis_name.py
 ```
 with the required and optional arguments to run analysis on data generated
 from a single run [use the -h or --help flags for help with arguments].
 
 Run
-```console
-python /path/to/INDUSAnalysis/scripts/run_agg_<analysis_name>.py
+```sh
+python /path/to/INDUSAnalysis/scripts/run_agg_$analysis_name.py
 ```
 with the required and optional arguments to run aggregate analyses on data [
 use the -h or --help flags for help with arguments].

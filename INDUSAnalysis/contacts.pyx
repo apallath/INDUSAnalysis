@@ -187,6 +187,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
             {
                 D (np.array): Array of shape (nheavy, nheavy), where D[i,j] is the shortest
                     path distance between heavy atom i and heavy atom j.
+                    
                 index_map (dict): Dictionary mapping heavy atom i to its atom
                     index in the Universe.
             }
