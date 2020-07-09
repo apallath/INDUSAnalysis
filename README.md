@@ -20,19 +20,19 @@ At present, the focus of this package is on analysis of solvated protein systems
 
 1. Install requirements
 
-```console
+```sh
 $ pip install -r requirements.txt
 ```
 
 2. Build C extensions
 
-```console
+```sh
 $ python setup.py build_ext --inplace
 ```
 
 2. Install package [in editable state]
 
-```console
+```sh
 pip install [-e] .
 ```
 
