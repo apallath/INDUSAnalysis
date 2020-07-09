@@ -590,8 +590,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__meta_analysis__profiling
-#define __PYX_HAVE_API__meta_analysis__profiling
+#define __PYX_HAVE__INDUSAnalysis__lib__profiling
+#define __PYX_HAVE_API__INDUSAnalysis__lib__profiling
 /* Early includes */
 #ifdef _OPENMP
 #include <omp.h>
@@ -801,50 +801,50 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "meta_analysis/profiling.pyx",
+  "INDUSAnalysis/lib/profiling.pyx",
 };
 
 /*--- Type declarations ---*/
-struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc;
-struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile;
-struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc;
+struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc;
+struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile;
+struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc;
 
-/* "meta_analysis/profiling.pyx":21
- * Report function execution time to stdout
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":18
+ * 
+ * 
  * def timefunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def timedfunc(*args, **kwargs):
+ *     """
+ *     Reports function execution time to stdout [decorator]
  */
-struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc {
+struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc {
   PyObject_HEAD
   PyObject *__pyx_v_func;
 };
 
 
-/* "meta_analysis/profiling.pyx":36
- * Report function execution time to file
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":34
+ * 
+ * 
  * def timefuncfile(fname):             # <<<<<<<<<<<<<<
- *     def timefunc(func):
- *         @wraps(func)
+ *     """
+ *     Reports function execution time to file [decorator]
  */
-struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile {
+struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile {
   PyObject_HEAD
   PyObject *__pyx_v_fname;
 };
 
 
-/* "meta_analysis/profiling.pyx":37
- * """
- * def timefuncfile(fname):
+/* "INDUSAnalysis/lib/profiling.pyx":38
+ *     Reports function execution time to file [decorator]
+ *     """
  *     def timefunc(func):             # <<<<<<<<<<<<<<
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):
  */
-struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc {
+struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc {
   PyObject_HEAD
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *__pyx_outer_scope;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *__pyx_outer_scope;
   PyObject *__pyx_v_func;
 };
 
@@ -1255,15 +1255,15 @@ static int __Pyx_check_binary_version(void);
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 
-/* Module declarations from 'meta_analysis.profiling' */
-static PyTypeObject *__pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct__timefunc = 0;
-static PyTypeObject *__pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile = 0;
-static PyTypeObject *__pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc = 0;
-#define __Pyx_MODULE_NAME "meta_analysis.profiling"
-extern int __pyx_module_is_main_meta_analysis__profiling;
-int __pyx_module_is_main_meta_analysis__profiling = 0;
+/* Module declarations from 'INDUSAnalysis.lib.profiling' */
+static PyTypeObject *__pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc = 0;
+static PyTypeObject *__pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile = 0;
+static PyTypeObject *__pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc = 0;
+#define __Pyx_MODULE_NAME "INDUSAnalysis.lib.profiling"
+extern int __pyx_module_is_main_INDUSAnalysis__lib__profiling;
+int __pyx_module_is_main_INDUSAnalysis__lib__profiling = 0;
 
-/* Implementation of 'meta_analysis.profiling' */
+/* Implementation of 'INDUSAnalysis.lib.profiling' */
 static PyObject *__pyx_builtin_open;
 static const char __pyx_k_a[] = "a+";
 static const char __pyx_k_f[] = "f";
@@ -1296,13 +1296,15 @@ static const char __pyx_k_timedfunc[] = "timedfunc";
 static const char __pyx_k_skippedfunc[] = "skippedfunc";
 static const char __pyx_k_timefuncfile[] = "timefuncfile";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
-static const char __pyx_k_meta_analysis_profiling[] = "meta_analysis.profiling";
 static const char __pyx_k_timefunc_locals_timedfunc[] = "timefunc.<locals>.timedfunc";
-static const char __pyx_k_meta_analysis_profiling_pyx[] = "meta_analysis/profiling.pyx";
+static const char __pyx_k_INDUSAnalysis_lib_profiling[] = "INDUSAnalysis.lib.profiling";
 static const char __pyx_k_skipfunc_locals_skippedfunc[] = "skipfunc.<locals>.skippedfunc";
 static const char __pyx_k_timefuncfile_locals_timefunc[] = "timefuncfile.<locals>.timefunc";
-static const char __pyx_k_Helper_function_definitions_for[] = "\nHelper function definitions for code profiling\n\n@Author: Akash Pallath\n";
+static const char __pyx_k_Helper_function_definitions_for[] = "\nHelper function definitions for code profiling\n";
+static const char __pyx_k_INDUSAnalysis_lib_profiling_pyx[] = "INDUSAnalysis/lib/profiling.pyx";
 static const char __pyx_k_timefuncfile_locals_timefunc_loc[] = "timefuncfile.<locals>.timefunc.<locals>.timedfunc";
+static PyObject *__pyx_n_s_INDUSAnalysis_lib_profiling;
+static PyObject *__pyx_kp_s_INDUSAnalysis_lib_profiling_pyx;
 static PyObject *__pyx_kp_s_a;
 static PyObject *__pyx_n_s_args;
 static PyObject *__pyx_n_s_cline_in_traceback;
@@ -1317,8 +1319,6 @@ static PyObject *__pyx_n_s_functools;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_kwargs;
 static PyObject *__pyx_n_s_main;
-static PyObject *__pyx_n_s_meta_analysis_profiling;
-static PyObject *__pyx_kp_s_meta_analysis_profiling_pyx;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_open;
 static PyObject *__pyx_n_s_output;
@@ -1340,16 +1340,16 @@ static PyObject *__pyx_n_s_timefuncfile_locals_timefunc_loc;
 static PyObject *__pyx_n_s_tstart;
 static PyObject *__pyx_n_s_wraps;
 static PyObject *__pyx_n_s_write;
-static PyObject *__pyx_pf_13meta_analysis_9profiling_8skipfunc_skippedfunc(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
-static PyObject *__pyx_pf_13meta_analysis_9profiling_skipfunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func); /* proto */
-static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs); /* proto */
-static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func); /* proto */
-static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs); /* proto */
-static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /* proto */
-static PyObject *__pyx_pf_13meta_analysis_9profiling_4timefuncfile(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_fname); /* proto */
-static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct__timefunc(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
-static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
-static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_8skipfunc_skippedfunc(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_skipfunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_2timefunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_12timefuncfile_timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_4timefuncfile(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_fname); /* proto */
+static PyObject *__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__3;
 static PyObject *__pyx_tuple__5;
@@ -1367,30 +1367,31 @@ static PyObject *__pyx_codeobj__13;
 static PyObject *__pyx_codeobj__15;
 /* Late includes */
 
-/* "meta_analysis/profiling.pyx":12
- * Skip function exection
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":8
+ * 
+ * 
  * def skipfunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def skippedfunc(*args, **kwargs):
+ *     """
+ *     Bypasses function execution [decorator]
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13meta_analysis_9profiling_1skipfunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /*proto*/
-static PyMethodDef __pyx_mdef_13meta_analysis_9profiling_1skipfunc = {"skipfunc", (PyCFunction)__pyx_pw_13meta_analysis_9profiling_1skipfunc, METH_O, 0};
-static PyObject *__pyx_pw_13meta_analysis_9profiling_1skipfunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_1skipfunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_3lib_9profiling_skipfunc[] = "\n    Bypasses function execution [decorator]\n    ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_3lib_9profiling_1skipfunc = {"skipfunc", (PyCFunction)__pyx_pw_13INDUSAnalysis_3lib_9profiling_1skipfunc, METH_O, __pyx_doc_13INDUSAnalysis_3lib_9profiling_skipfunc};
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_1skipfunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("skipfunc (wrapper)", 0);
-  __pyx_r = __pyx_pf_13meta_analysis_9profiling_skipfunc(__pyx_self, ((PyObject *)__pyx_v_func));
+  __pyx_r = __pyx_pf_13INDUSAnalysis_3lib_9profiling_skipfunc(__pyx_self, ((PyObject *)__pyx_v_func));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":14
- * def skipfunc(func):
+/* "INDUSAnalysis/lib/profiling.pyx":13
+ *     """
  *     @wraps(func)
  *     def skippedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         return True
@@ -1398,9 +1399,9 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_1skipfunc(PyObject *__pyx_s
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13meta_analysis_9profiling_8skipfunc_1skippedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13meta_analysis_9profiling_8skipfunc_1skippedfunc = {"skippedfunc", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13meta_analysis_9profiling_8skipfunc_1skippedfunc, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13meta_analysis_9profiling_8skipfunc_1skippedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_8skipfunc_1skippedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_3lib_9profiling_8skipfunc_1skippedfunc = {"skippedfunc", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_3lib_9profiling_8skipfunc_1skippedfunc, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_8skipfunc_1skippedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_args = 0;
   CYTHON_UNUSED PyObject *__pyx_v_kwargs = 0;
   PyObject *__pyx_r = 0;
@@ -1409,7 +1410,7 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_8skipfunc_1skippedfunc(PyOb
   if (unlikely(__pyx_kwds) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "skippedfunc", 1))) return NULL;
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_13meta_analysis_9profiling_8skipfunc_skippedfunc(__pyx_self, __pyx_v_args, __pyx_v_kwargs);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_3lib_9profiling_8skipfunc_skippedfunc(__pyx_self, __pyx_v_args, __pyx_v_kwargs);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -1418,12 +1419,12 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_8skipfunc_1skippedfunc(PyOb
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13meta_analysis_9profiling_8skipfunc_skippedfunc(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_8skipfunc_skippedfunc(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("skippedfunc", 0);
 
-  /* "meta_analysis/profiling.pyx":15
+  /* "INDUSAnalysis/lib/profiling.pyx":14
  *     @wraps(func)
  *     def skippedfunc(*args, **kwargs):
  *         return True             # <<<<<<<<<<<<<<
@@ -1435,8 +1436,8 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8skipfunc_skippedfunc(CYTHO
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "meta_analysis/profiling.pyx":14
- * def skipfunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":13
+ *     """
  *     @wraps(func)
  *     def skippedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         return True
@@ -1450,15 +1451,15 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8skipfunc_skippedfunc(CYTHO
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":12
- * Skip function exection
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":8
+ * 
+ * 
  * def skipfunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def skippedfunc(*args, **kwargs):
+ *     """
+ *     Bypasses function execution [decorator]
  */
 
-static PyObject *__pyx_pf_13meta_analysis_9profiling_skipfunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func) {
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_skipfunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func) {
   PyObject *__pyx_v_skippedfunc = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1468,14 +1469,14 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_skipfunc(CYTHON_UNUSED PyOb
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("skipfunc", 0);
 
-  /* "meta_analysis/profiling.pyx":13
- * """
- * def skipfunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":12
+ *     Bypasses function execution [decorator]
+ *     """
  *     @wraps(func)             # <<<<<<<<<<<<<<
  *     def skippedfunc(*args, **kwargs):
  *         return True
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_wraps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_wraps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -1489,18 +1490,18 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_skipfunc(CYTHON_UNUSED PyOb
   }
   __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_func) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_func);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "meta_analysis/profiling.pyx":14
- * def skipfunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":13
+ *     """
  *     @wraps(func)
  *     def skippedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         return True
  *     return skippedfunc
  */
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13meta_analysis_9profiling_8skipfunc_1skippedfunc, 0, __pyx_n_s_skipfunc_locals_skippedfunc, NULL, __pyx_n_s_meta_analysis_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__2)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_3lib_9profiling_8skipfunc_1skippedfunc, 0, __pyx_n_s_skipfunc_locals_skippedfunc, NULL, __pyx_n_s_INDUSAnalysis_lib_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__2)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -1515,30 +1516,30 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_skipfunc(CYTHON_UNUSED PyOb
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_skippedfunc = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":16
+  /* "INDUSAnalysis/lib/profiling.pyx":15
  *     def skippedfunc(*args, **kwargs):
  *         return True
  *     return skippedfunc             # <<<<<<<<<<<<<<
  * 
- * """
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_skippedfunc);
   __pyx_r = __pyx_v_skippedfunc;
   goto __pyx_L0;
 
-  /* "meta_analysis/profiling.pyx":12
- * Skip function exection
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":8
+ * 
+ * 
  * def skipfunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def skippedfunc(*args, **kwargs):
+ *     """
+ *     Bypasses function execution [decorator]
  */
 
   /* function exit code */
@@ -1547,7 +1548,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_skipfunc(CYTHON_UNUSED PyOb
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("meta_analysis.profiling.skipfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.lib.profiling.skipfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_skippedfunc);
@@ -1556,30 +1557,31 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_skipfunc(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":21
- * Report function execution time to stdout
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":18
+ * 
+ * 
  * def timefunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def timedfunc(*args, **kwargs):
+ *     """
+ *     Reports function execution time to stdout [decorator]
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13meta_analysis_9profiling_3timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /*proto*/
-static PyMethodDef __pyx_mdef_13meta_analysis_9profiling_3timefunc = {"timefunc", (PyCFunction)__pyx_pw_13meta_analysis_9profiling_3timefunc, METH_O, 0};
-static PyObject *__pyx_pw_13meta_analysis_9profiling_3timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_3timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_3lib_9profiling_2timefunc[] = "\n    Reports function execution time to stdout [decorator]\n    ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_3lib_9profiling_3timefunc = {"timefunc", (PyCFunction)__pyx_pw_13INDUSAnalysis_3lib_9profiling_3timefunc, METH_O, __pyx_doc_13INDUSAnalysis_3lib_9profiling_2timefunc};
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_3timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("timefunc (wrapper)", 0);
-  __pyx_r = __pyx_pf_13meta_analysis_9profiling_2timefunc(__pyx_self, ((PyObject *)__pyx_v_func));
+  __pyx_r = __pyx_pf_13INDUSAnalysis_3lib_9profiling_2timefunc(__pyx_self, ((PyObject *)__pyx_v_func));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":23
- * def timefunc(func):
+/* "INDUSAnalysis/lib/profiling.pyx":23
+ *     """
  *     @wraps(func)
  *     def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         tstart = time.time()
@@ -1587,9 +1589,9 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_3timefunc(PyObject *__pyx_s
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13meta_analysis_9profiling_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13meta_analysis_9profiling_8timefunc_1timedfunc = {"timedfunc", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13meta_analysis_9profiling_8timefunc_1timedfunc, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13meta_analysis_9profiling_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_3lib_9profiling_8timefunc_1timedfunc = {"timedfunc", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_3lib_9profiling_8timefunc_1timedfunc, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_v_kwargs = 0;
   PyObject *__pyx_r = 0;
@@ -1604,7 +1606,7 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_8timefunc_1timedfunc(PyObje
   }
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(__pyx_self, __pyx_v_args, __pyx_v_kwargs);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_3lib_9profiling_8timefunc_timedfunc(__pyx_self, __pyx_v_args, __pyx_v_kwargs);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -1613,9 +1615,9 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_8timefunc_1timedfunc(PyObje
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *__pyx_cur_scope;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *__pyx_outer_scope;
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *__pyx_cur_scope;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *__pyx_outer_scope;
   PyObject *__pyx_v_tstart = NULL;
   PyObject *__pyx_v_output = NULL;
   PyObject *__pyx_v_tend = NULL;
@@ -1625,10 +1627,10 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("timedfunc", 0);
-  __pyx_outer_scope = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *) __Pyx_CyFunction_GetClosure(__pyx_self);
+  __pyx_outer_scope = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "meta_analysis/profiling.pyx":24
+  /* "INDUSAnalysis/lib/profiling.pyx":24
  *     @wraps(func)
  *     def timedfunc(*args, **kwargs):
  *         tstart = time.time()             # <<<<<<<<<<<<<<
@@ -1658,7 +1660,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   __pyx_v_tstart = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":25
+  /* "INDUSAnalysis/lib/profiling.pyx":25
  *     def timedfunc(*args, **kwargs):
  *         tstart = time.time()
  *         output = func(*args, **kwargs)             # <<<<<<<<<<<<<<
@@ -1671,7 +1673,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   __pyx_v_output = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":26
+  /* "INDUSAnalysis/lib/profiling.pyx":26
  *         tstart = time.time()
  *         output = func(*args, **kwargs)
  *         tend = time.time()             # <<<<<<<<<<<<<<
@@ -1701,7 +1703,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   __pyx_v_tend = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":28
+  /* "INDUSAnalysis/lib/profiling.pyx":28
  *         tend = time.time()
  * 
  *         print("%r %.2f s " % (func.__name__, tend - tstart))             # <<<<<<<<<<<<<<
@@ -1727,7 +1729,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "meta_analysis/profiling.pyx":30
+  /* "INDUSAnalysis/lib/profiling.pyx":30
  *         print("%r %.2f s " % (func.__name__, tend - tstart))
  * 
  *         return output             # <<<<<<<<<<<<<<
@@ -1739,8 +1741,8 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   __pyx_r = __pyx_v_output;
   goto __pyx_L0;
 
-  /* "meta_analysis/profiling.pyx":23
- * def timefunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":23
+ *     """
  *     @wraps(func)
  *     def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         tstart = time.time()
@@ -1752,7 +1754,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("meta_analysis.profiling.timefunc.timedfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.lib.profiling.timefunc.timedfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_tstart);
@@ -1763,16 +1765,16 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_8timefunc_timedfunc(PyObjec
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":21
- * Report function execution time to stdout
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":18
+ * 
+ * 
  * def timefunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def timedfunc(*args, **kwargs):
+ *     """
+ *     Reports function execution time to stdout [decorator]
  */
 
-static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *__pyx_cur_scope;
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_2timefunc(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_func) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *__pyx_cur_scope;
   PyObject *__pyx_v_timedfunc = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1781,11 +1783,11 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyO
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("timefunc", 0);
-  __pyx_cur_scope = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *)__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct__timefunc(__pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct__timefunc, __pyx_empty_tuple, NULL);
+  __pyx_cur_scope = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *)__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc(__pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc, __pyx_empty_tuple, NULL);
   if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *)Py_None);
+    __pyx_cur_scope = ((struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 21, __pyx_L1_error)
+    __PYX_ERR(0, 18, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -1793,9 +1795,9 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyO
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_func);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_func);
 
-  /* "meta_analysis/profiling.pyx":22
- * """
- * def timefunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":22
+ *     Reports function execution time to stdout [decorator]
+ *     """
  *     @wraps(func)             # <<<<<<<<<<<<<<
  *     def timedfunc(*args, **kwargs):
  *         tstart = time.time()
@@ -1818,14 +1820,14 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyO
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "meta_analysis/profiling.pyx":23
- * def timefunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":23
+ *     """
  *     @wraps(func)
  *     def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         tstart = time.time()
  *         output = func(*args, **kwargs)
  */
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13meta_analysis_9profiling_8timefunc_1timedfunc, 0, __pyx_n_s_timefunc_locals_timedfunc, ((PyObject*)__pyx_cur_scope), __pyx_n_s_meta_analysis_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_3lib_9profiling_8timefunc_1timedfunc, 0, __pyx_n_s_timefunc_locals_timedfunc, ((PyObject*)__pyx_cur_scope), __pyx_n_s_INDUSAnalysis_lib_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -1846,24 +1848,24 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyO
   __pyx_v_timedfunc = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":31
+  /* "INDUSAnalysis/lib/profiling.pyx":31
  * 
  *         return output
  *     return timedfunc             # <<<<<<<<<<<<<<
  * 
- * """
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_timedfunc);
   __pyx_r = __pyx_v_timedfunc;
   goto __pyx_L0;
 
-  /* "meta_analysis/profiling.pyx":21
- * Report function execution time to stdout
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":18
+ * 
+ * 
  * def timefunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def timedfunc(*args, **kwargs):
+ *     """
+ *     Reports function execution time to stdout [decorator]
  */
 
   /* function exit code */
@@ -1872,7 +1874,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyO
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("meta_analysis.profiling.timefunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.lib.profiling.timefunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_timedfunc);
@@ -1882,51 +1884,52 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_2timefunc(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":36
- * Report function execution time to file
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":34
+ * 
+ * 
  * def timefuncfile(fname):             # <<<<<<<<<<<<<<
- *     def timefunc(func):
- *         @wraps(func)
+ *     """
+ *     Reports function execution time to file [decorator]
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13meta_analysis_9profiling_5timefuncfile(PyObject *__pyx_self, PyObject *__pyx_v_fname); /*proto*/
-static PyMethodDef __pyx_mdef_13meta_analysis_9profiling_5timefuncfile = {"timefuncfile", (PyCFunction)__pyx_pw_13meta_analysis_9profiling_5timefuncfile, METH_O, 0};
-static PyObject *__pyx_pw_13meta_analysis_9profiling_5timefuncfile(PyObject *__pyx_self, PyObject *__pyx_v_fname) {
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_5timefuncfile(PyObject *__pyx_self, PyObject *__pyx_v_fname); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_3lib_9profiling_4timefuncfile[] = "\n    Reports function execution time to file [decorator]\n    ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_3lib_9profiling_5timefuncfile = {"timefuncfile", (PyCFunction)__pyx_pw_13INDUSAnalysis_3lib_9profiling_5timefuncfile, METH_O, __pyx_doc_13INDUSAnalysis_3lib_9profiling_4timefuncfile};
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_5timefuncfile(PyObject *__pyx_self, PyObject *__pyx_v_fname) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("timefuncfile (wrapper)", 0);
-  __pyx_r = __pyx_pf_13meta_analysis_9profiling_4timefuncfile(__pyx_self, ((PyObject *)__pyx_v_fname));
+  __pyx_r = __pyx_pf_13INDUSAnalysis_3lib_9profiling_4timefuncfile(__pyx_self, ((PyObject *)__pyx_v_fname));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":37
- * """
- * def timefuncfile(fname):
+/* "INDUSAnalysis/lib/profiling.pyx":38
+ *     Reports function execution time to file [decorator]
+ *     """
  *     def timefunc(func):             # <<<<<<<<<<<<<<
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13meta_analysis_9profiling_12timefuncfile_1timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /*proto*/
-static PyMethodDef __pyx_mdef_13meta_analysis_9profiling_12timefuncfile_1timefunc = {"timefunc", (PyCFunction)__pyx_pw_13meta_analysis_9profiling_12timefuncfile_1timefunc, METH_O, 0};
-static PyObject *__pyx_pw_13meta_analysis_9profiling_12timefuncfile_1timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_12timefuncfile_1timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func); /*proto*/
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_3lib_9profiling_12timefuncfile_1timefunc = {"timefunc", (PyCFunction)__pyx_pw_13INDUSAnalysis_3lib_9profiling_12timefuncfile_1timefunc, METH_O, 0};
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_12timefuncfile_1timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("timefunc (wrapper)", 0);
-  __pyx_r = __pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(__pyx_self, ((PyObject *)__pyx_v_func));
+  __pyx_r = __pyx_pf_13INDUSAnalysis_3lib_9profiling_12timefuncfile_timefunc(__pyx_self, ((PyObject *)__pyx_v_func));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":39
+/* "INDUSAnalysis/lib/profiling.pyx":40
  *     def timefunc(func):
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
@@ -1935,9 +1938,9 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_12timefuncfile_1timefunc(Py
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13meta_analysis_9profiling_12timefuncfile_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13meta_analysis_9profiling_12timefuncfile_8timefunc_1timedfunc = {"timedfunc", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13meta_analysis_9profiling_12timefuncfile_8timefunc_1timedfunc, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13meta_analysis_9profiling_12timefuncfile_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_1timedfunc = {"timedfunc", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_1timedfunc, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_1timedfunc(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_v_kwargs = 0;
   PyObject *__pyx_r = 0;
@@ -1952,7 +1955,7 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_12timefuncfile_8timefunc_1t
   }
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_timedfunc(__pyx_self, __pyx_v_args, __pyx_v_kwargs);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_timedfunc(__pyx_self, __pyx_v_args, __pyx_v_kwargs);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -1961,9 +1964,9 @@ static PyObject *__pyx_pw_13meta_analysis_9profiling_12timefuncfile_8timefunc_1t
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *__pyx_cur_scope;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *__pyx_outer_scope;
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_timedfunc(PyObject *__pyx_self, PyObject *__pyx_v_args, PyObject *__pyx_v_kwargs) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *__pyx_cur_scope;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *__pyx_outer_scope;
   PyObject *__pyx_v_tstart = NULL;
   PyObject *__pyx_v_output = NULL;
   PyObject *__pyx_v_tend = NULL;
@@ -1983,19 +1986,19 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
   int __pyx_t_11;
   int __pyx_t_12;
   __Pyx_RefNannySetupContext("timedfunc", 0);
-  __pyx_outer_scope = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *) __Pyx_CyFunction_GetClosure(__pyx_self);
+  __pyx_outer_scope = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "meta_analysis/profiling.pyx":40
+  /* "INDUSAnalysis/lib/profiling.pyx":41
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):
  *             tstart = time.time()             # <<<<<<<<<<<<<<
  *             output = func(*args, **kwargs)
  *             tend = time.time()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2010,35 +2013,35 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_tstart = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":41
+  /* "INDUSAnalysis/lib/profiling.pyx":42
  *         def timedfunc(*args, **kwargs):
  *             tstart = time.time()
  *             output = func(*args, **kwargs)             # <<<<<<<<<<<<<<
  *             tend = time.time()
  * 
  */
-  if (unlikely(!__pyx_cur_scope->__pyx_v_func)) { __Pyx_RaiseClosureNameError("func"); __PYX_ERR(0, 41, __pyx_L1_error) }
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_cur_scope->__pyx_v_func, __pyx_v_args, __pyx_v_kwargs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_func)) { __Pyx_RaiseClosureNameError("func"); __PYX_ERR(0, 42, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_cur_scope->__pyx_v_func, __pyx_v_args, __pyx_v_kwargs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_output = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":42
+  /* "INDUSAnalysis/lib/profiling.pyx":43
  *             tstart = time.time()
  *             output = func(*args, **kwargs)
  *             tend = time.time()             # <<<<<<<<<<<<<<
  * 
  *             with open(fname, "a+") as f:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -2053,13 +2056,13 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_tend = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":44
+  /* "INDUSAnalysis/lib/profiling.pyx":45
  *             tend = time.time()
  * 
  *             with open(fname, "a+") as f:             # <<<<<<<<<<<<<<
@@ -2067,8 +2070,8 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
  * 
  */
   /*with:*/ {
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_fname)) { __Pyx_RaiseClosureNameError("fname"); __PYX_ERR(0, 44, __pyx_L1_error) }
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_fname)) { __Pyx_RaiseClosureNameError("fname"); __PYX_ERR(0, 45, __pyx_L1_error) }
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_fname);
     __Pyx_GIVEREF(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_fname);
@@ -2076,12 +2079,12 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
     __Pyx_INCREF(__pyx_kp_s_a);
     __Pyx_GIVEREF(__pyx_kp_s_a);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_kp_s_a);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 44, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L3_error)
+    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -2095,7 +2098,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
     }
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L3_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = __pyx_t_1;
@@ -2113,21 +2116,21 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
           __pyx_v_f = __pyx_t_3;
           __pyx_t_3 = 0;
 
-          /* "meta_analysis/profiling.pyx":45
+          /* "INDUSAnalysis/lib/profiling.pyx":46
  * 
  *             with open(fname, "a+") as f:
  *                 f.write("%r %.2f s\n" % (func.__name__, tend - tstart))             # <<<<<<<<<<<<<<
  * 
  *             return output
  */
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_f, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L7_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_f, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
-          if (unlikely(!__pyx_cur_scope->__pyx_v_func)) { __Pyx_RaiseClosureNameError("func"); __PYX_ERR(0, 45, __pyx_L7_error) }
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_func, __pyx_n_s_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L7_error)
+          if (unlikely(!__pyx_cur_scope->__pyx_v_func)) { __Pyx_RaiseClosureNameError("func"); __PYX_ERR(0, 46, __pyx_L7_error) }
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_func, __pyx_n_s_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_5 = PyNumber_Subtract(__pyx_v_tend, __pyx_v_tstart); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 45, __pyx_L7_error)
+          __pyx_t_5 = PyNumber_Subtract(__pyx_v_tend, __pyx_v_tstart); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 46, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 45, __pyx_L7_error)
+          __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 46, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_GIVEREF(__pyx_t_1);
           PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_1);
@@ -2135,7 +2138,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
           PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_5);
           __pyx_t_1 = 0;
           __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_PyString_Format(__pyx_kp_s_r_2f_s_2, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 45, __pyx_L7_error)
+          __pyx_t_5 = __Pyx_PyString_Format(__pyx_kp_s_r_2f_s_2, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 46, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __pyx_t_9 = NULL;
@@ -2151,12 +2154,12 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
           __pyx_t_3 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_9, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5);
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L7_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 46, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "meta_analysis/profiling.pyx":44
+          /* "INDUSAnalysis/lib/profiling.pyx":45
  *             tend = time.time()
  * 
  *             with open(fname, "a+") as f:             # <<<<<<<<<<<<<<
@@ -2175,21 +2178,21 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
         /*except:*/ {
-          __Pyx_AddTraceback("meta_analysis.profiling.timefuncfile.timefunc.timedfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_2, &__pyx_t_5) < 0) __PYX_ERR(0, 44, __pyx_L9_except_error)
+          __Pyx_AddTraceback("INDUSAnalysis.lib.profiling.timefuncfile.timefunc.timedfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+          if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_2, &__pyx_t_5) < 0) __PYX_ERR(0, 45, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_9 = PyTuple_Pack(3, __pyx_t_3, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 44, __pyx_L9_except_error)
+          __pyx_t_9 = PyTuple_Pack(3, __pyx_t_3, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 45, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_9);
           __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 44, __pyx_L9_except_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 45, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_10);
           __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (__pyx_t_11 < 0) __PYX_ERR(0, 44, __pyx_L9_except_error)
+          if (__pyx_t_11 < 0) __PYX_ERR(0, 45, __pyx_L9_except_error)
           __pyx_t_12 = ((!(__pyx_t_11 != 0)) != 0);
           if (__pyx_t_12) {
             __Pyx_GIVEREF(__pyx_t_3);
@@ -2197,7 +2200,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
             __Pyx_XGIVEREF(__pyx_t_5);
             __Pyx_ErrRestoreWithState(__pyx_t_3, __pyx_t_2, __pyx_t_5);
             __pyx_t_3 = 0; __pyx_t_2 = 0; __pyx_t_5 = 0; 
-            __PYX_ERR(0, 44, __pyx_L9_except_error)
+            __PYX_ERR(0, 45, __pyx_L9_except_error)
           }
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -2223,7 +2226,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
         if (__pyx_t_4) {
           __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__5, NULL);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 44, __pyx_L1_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 45, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
@@ -2238,7 +2241,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
     __pyx_L16:;
   }
 
-  /* "meta_analysis/profiling.pyx":47
+  /* "INDUSAnalysis/lib/profiling.pyx":48
  *                 f.write("%r %.2f s\n" % (func.__name__, tend - tstart))
  * 
  *             return output             # <<<<<<<<<<<<<<
@@ -2250,7 +2253,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
   __pyx_r = __pyx_v_output;
   goto __pyx_L0;
 
-  /* "meta_analysis/profiling.pyx":39
+  /* "INDUSAnalysis/lib/profiling.pyx":40
  *     def timefunc(func):
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
@@ -2265,7 +2268,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_AddTraceback("meta_analysis.profiling.timefuncfile.timefunc.timedfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.lib.profiling.timefuncfile.timefunc.timedfunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_tstart);
@@ -2277,16 +2280,16 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_8timefunc_ti
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":37
- * """
- * def timefuncfile(fname):
+/* "INDUSAnalysis/lib/profiling.pyx":38
+ *     Reports function execution time to file [decorator]
+ *     """
  *     def timefunc(func):             # <<<<<<<<<<<<<<
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):
  */
 
-static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *__pyx_cur_scope;
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_12timefuncfile_timefunc(PyObject *__pyx_self, PyObject *__pyx_v_func) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *__pyx_cur_scope;
   PyObject *__pyx_v_timedfunc = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -2295,29 +2298,29 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyO
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("timefunc", 0);
-  __pyx_cur_scope = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *)__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc(__pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc, __pyx_empty_tuple, NULL);
+  __pyx_cur_scope = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *)__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc(__pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc, __pyx_empty_tuple, NULL);
   if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *)Py_None);
+    __pyx_cur_scope = ((struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 37, __pyx_L1_error)
+    __PYX_ERR(0, 38, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
-  __pyx_cur_scope->__pyx_outer_scope = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *) __Pyx_CyFunction_GetClosure(__pyx_self);
+  __pyx_cur_scope->__pyx_outer_scope = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __Pyx_INCREF(((PyObject *)__pyx_cur_scope->__pyx_outer_scope));
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_outer_scope);
   __pyx_cur_scope->__pyx_v_func = __pyx_v_func;
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_func);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_func);
 
-  /* "meta_analysis/profiling.pyx":38
- * def timefuncfile(fname):
+  /* "INDUSAnalysis/lib/profiling.pyx":39
+ *     """
  *     def timefunc(func):
  *         @wraps(func)             # <<<<<<<<<<<<<<
  *         def timedfunc(*args, **kwargs):
  *             tstart = time.time()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_wraps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_wraps); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -2331,18 +2334,18 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyO
   }
   __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_cur_scope->__pyx_v_func) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_cur_scope->__pyx_v_func);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "meta_analysis/profiling.pyx":39
+  /* "INDUSAnalysis/lib/profiling.pyx":40
  *     def timefunc(func):
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *             tstart = time.time()
  *             output = func(*args, **kwargs)
  */
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13meta_analysis_9profiling_12timefuncfile_8timefunc_1timedfunc, 0, __pyx_n_s_timefuncfile_locals_timefunc_loc, ((PyObject*)__pyx_cur_scope), __pyx_n_s_meta_analysis_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_3lib_9profiling_12timefuncfile_8timefunc_1timedfunc, 0, __pyx_n_s_timefuncfile_locals_timefunc_loc, ((PyObject*)__pyx_cur_scope), __pyx_n_s_INDUSAnalysis_lib_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -2357,13 +2360,13 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyO
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_timedfunc = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":48
+  /* "INDUSAnalysis/lib/profiling.pyx":49
  * 
  *             return output
  *         return timedfunc             # <<<<<<<<<<<<<<
@@ -2374,9 +2377,9 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyO
   __pyx_r = __pyx_v_timedfunc;
   goto __pyx_L0;
 
-  /* "meta_analysis/profiling.pyx":37
- * """
- * def timefuncfile(fname):
+  /* "INDUSAnalysis/lib/profiling.pyx":38
+ *     Reports function execution time to file [decorator]
+ *     """
  *     def timefunc(func):             # <<<<<<<<<<<<<<
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):
@@ -2388,7 +2391,7 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyO
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("meta_analysis.profiling.timefuncfile.timefunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.lib.profiling.timefuncfile.timefunc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_timedfunc);
@@ -2398,26 +2401,26 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_12timefuncfile_timefunc(PyO
   return __pyx_r;
 }
 
-/* "meta_analysis/profiling.pyx":36
- * Report function execution time to file
- * """
+/* "INDUSAnalysis/lib/profiling.pyx":34
+ * 
+ * 
  * def timefuncfile(fname):             # <<<<<<<<<<<<<<
- *     def timefunc(func):
- *         @wraps(func)
+ *     """
+ *     Reports function execution time to file [decorator]
  */
 
-static PyObject *__pyx_pf_13meta_analysis_9profiling_4timefuncfile(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_fname) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *__pyx_cur_scope;
+static PyObject *__pyx_pf_13INDUSAnalysis_3lib_9profiling_4timefuncfile(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_fname) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *__pyx_cur_scope;
   PyObject *__pyx_v_timefunc = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("timefuncfile", 0);
-  __pyx_cur_scope = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *)__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile(__pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile, __pyx_empty_tuple, NULL);
+  __pyx_cur_scope = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *)__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile(__pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile, __pyx_empty_tuple, NULL);
   if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *)Py_None);
+    __pyx_cur_scope = ((struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 36, __pyx_L1_error)
+    __PYX_ERR(0, 34, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -2425,19 +2428,19 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_4timefuncfile(CYTHON_UNUSED
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_fname);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_fname);
 
-  /* "meta_analysis/profiling.pyx":37
- * """
- * def timefuncfile(fname):
+  /* "INDUSAnalysis/lib/profiling.pyx":38
+ *     Reports function execution time to file [decorator]
+ *     """
  *     def timefunc(func):             # <<<<<<<<<<<<<<
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13meta_analysis_9profiling_12timefuncfile_1timefunc, 0, __pyx_n_s_timefuncfile_locals_timefunc, ((PyObject*)__pyx_cur_scope), __pyx_n_s_meta_analysis_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_3lib_9profiling_12timefuncfile_1timefunc, 0, __pyx_n_s_timefuncfile_locals_timefunc, ((PyObject*)__pyx_cur_scope), __pyx_n_s_INDUSAnalysis_lib_profiling, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_timefunc = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":49
+  /* "INDUSAnalysis/lib/profiling.pyx":50
  *             return output
  *         return timedfunc
  *     return timefunc             # <<<<<<<<<<<<<<
@@ -2447,18 +2450,18 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_4timefuncfile(CYTHON_UNUSED
   __pyx_r = __pyx_v_timefunc;
   goto __pyx_L0;
 
-  /* "meta_analysis/profiling.pyx":36
- * Report function execution time to file
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":34
+ * 
+ * 
  * def timefuncfile(fname):             # <<<<<<<<<<<<<<
- *     def timefunc(func):
- *         @wraps(func)
+ *     """
+ *     Reports function execution time to file [decorator]
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("meta_analysis.profiling.timefuncfile", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.lib.profiling.timefuncfile", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_timefunc);
@@ -2468,14 +2471,14 @@ static PyObject *__pyx_pf_13meta_analysis_9profiling_4timefuncfile(CYTHON_UNUSED
   return __pyx_r;
 }
 
-static struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *__pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct__timefunc[8];
-static int __pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct__timefunc = 0;
+static struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *__pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc[8];
+static int __pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc = 0;
 
-static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct__timefunc(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+static PyObject *__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   PyObject *o;
-  if (CYTHON_COMPILING_IN_CPYTHON && likely((__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct__timefunc > 0) & (t->tp_basicsize == sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc)))) {
-    o = (PyObject*)__pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct__timefunc[--__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct__timefunc];
-    memset(o, 0, sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc));
+  if (CYTHON_COMPILING_IN_CPYTHON && likely((__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc > 0) & (t->tp_basicsize == sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc)))) {
+    o = (PyObject*)__pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc[--__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc];
+    memset(o, 0, sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc));
     (void) PyObject_INIT(o, t);
     PyObject_GC_Track(o);
   } else {
@@ -2485,41 +2488,41 @@ static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct__tim
   return o;
 }
 
-static void __pyx_tp_dealloc_13meta_analysis_9profiling___pyx_scope_struct__timefunc(PyObject *o) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *)o;
+static void __pyx_tp_dealloc_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc(PyObject *o) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *)o;
   PyObject_GC_UnTrack(o);
   Py_CLEAR(p->__pyx_v_func);
-  if (CYTHON_COMPILING_IN_CPYTHON && ((__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct__timefunc < 8) & (Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc)))) {
-    __pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct__timefunc[__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct__timefunc++] = ((struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *)o);
+  if (CYTHON_COMPILING_IN_CPYTHON && ((__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc < 8) & (Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc)))) {
+    __pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc[__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc++] = ((struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *)o);
   } else {
     (*Py_TYPE(o)->tp_free)(o);
   }
 }
 
-static int __pyx_tp_traverse_13meta_analysis_9profiling___pyx_scope_struct__timefunc(PyObject *o, visitproc v, void *a) {
+static int __pyx_tp_traverse_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc(PyObject *o, visitproc v, void *a) {
   int e;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *)o;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *)o;
   if (p->__pyx_v_func) {
     e = (*v)(p->__pyx_v_func, a); if (e) return e;
   }
   return 0;
 }
 
-static int __pyx_tp_clear_13meta_analysis_9profiling___pyx_scope_struct__timefunc(PyObject *o) {
+static int __pyx_tp_clear_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc(PyObject *o) {
   PyObject* tmp;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc *)o;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc *)o;
   tmp = ((PyObject*)p->__pyx_v_func);
   p->__pyx_v_func = Py_None; Py_INCREF(Py_None);
   Py_XDECREF(tmp);
   return 0;
 }
 
-static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct__timefunc = {
+static PyTypeObject __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc = {
   PyVarObject_HEAD_INIT(0, 0)
-  "meta_analysis.profiling.__pyx_scope_struct__timefunc", /*tp_name*/
-  sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct__timefunc), /*tp_basicsize*/
+  "INDUSAnalysis.lib.profiling.__pyx_scope_struct__timefunc", /*tp_name*/
+  sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_13meta_analysis_9profiling___pyx_scope_struct__timefunc, /*tp_dealloc*/
+  __pyx_tp_dealloc_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -2546,8 +2549,8 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct__ti
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  __pyx_tp_traverse_13meta_analysis_9profiling___pyx_scope_struct__timefunc, /*tp_traverse*/
-  __pyx_tp_clear_13meta_analysis_9profiling___pyx_scope_struct__timefunc, /*tp_clear*/
+  __pyx_tp_traverse_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc, /*tp_traverse*/
+  __pyx_tp_clear_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
@@ -2562,7 +2565,7 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct__ti
   0, /*tp_dictoffset*/
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct__timefunc, /*tp_new*/
+  __pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -2583,14 +2586,14 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct__ti
   #endif
 };
 
-static struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *__pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile[8];
-static int __pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile = 0;
+static struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *__pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile[8];
+static int __pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile = 0;
 
-static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+static PyObject *__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   PyObject *o;
-  if (CYTHON_COMPILING_IN_CPYTHON && likely((__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile > 0) & (t->tp_basicsize == sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile)))) {
-    o = (PyObject*)__pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile[--__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile];
-    memset(o, 0, sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile));
+  if (CYTHON_COMPILING_IN_CPYTHON && likely((__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile > 0) & (t->tp_basicsize == sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile)))) {
+    o = (PyObject*)__pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile[--__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile];
+    memset(o, 0, sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile));
     (void) PyObject_INIT(o, t);
     PyObject_GC_Track(o);
   } else {
@@ -2600,41 +2603,41 @@ static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_1_ti
   return o;
 }
 
-static void __pyx_tp_dealloc_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile(PyObject *o) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *)o;
+static void __pyx_tp_dealloc_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile(PyObject *o) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *)o;
   PyObject_GC_UnTrack(o);
   Py_CLEAR(p->__pyx_v_fname);
-  if (CYTHON_COMPILING_IN_CPYTHON && ((__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile < 8) & (Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile)))) {
-    __pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile[__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile++] = ((struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *)o);
+  if (CYTHON_COMPILING_IN_CPYTHON && ((__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile < 8) & (Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile)))) {
+    __pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile[__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile++] = ((struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *)o);
   } else {
     (*Py_TYPE(o)->tp_free)(o);
   }
 }
 
-static int __pyx_tp_traverse_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile(PyObject *o, visitproc v, void *a) {
+static int __pyx_tp_traverse_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile(PyObject *o, visitproc v, void *a) {
   int e;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *)o;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *)o;
   if (p->__pyx_v_fname) {
     e = (*v)(p->__pyx_v_fname, a); if (e) return e;
   }
   return 0;
 }
 
-static int __pyx_tp_clear_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile(PyObject *o) {
+static int __pyx_tp_clear_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile(PyObject *o) {
   PyObject* tmp;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *)o;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *)o;
   tmp = ((PyObject*)p->__pyx_v_fname);
   p->__pyx_v_fname = Py_None; Py_INCREF(Py_None);
   Py_XDECREF(tmp);
   return 0;
 }
 
-static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile = {
+static PyTypeObject __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile = {
   PyVarObject_HEAD_INIT(0, 0)
-  "meta_analysis.profiling.__pyx_scope_struct_1_timefuncfile", /*tp_name*/
-  sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile), /*tp_basicsize*/
+  "INDUSAnalysis.lib.profiling.__pyx_scope_struct_1_timefuncfile", /*tp_name*/
+  sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_dealloc*/
+  __pyx_tp_dealloc_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -2661,8 +2664,8 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_t
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  __pyx_tp_traverse_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_traverse*/
-  __pyx_tp_clear_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_clear*/
+  __pyx_tp_traverse_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_traverse*/
+  __pyx_tp_clear_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
@@ -2677,7 +2680,7 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_t
   0, /*tp_dictoffset*/
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_new*/
+  __pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -2698,14 +2701,14 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_t
   #endif
 };
 
-static struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *__pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc[8];
-static int __pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc = 0;
+static struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *__pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc[8];
+static int __pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc = 0;
 
-static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+static PyObject *__pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   PyObject *o;
-  if (CYTHON_COMPILING_IN_CPYTHON && likely((__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc > 0) & (t->tp_basicsize == sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc)))) {
-    o = (PyObject*)__pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc[--__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc];
-    memset(o, 0, sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc));
+  if (CYTHON_COMPILING_IN_CPYTHON && likely((__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc > 0) & (t->tp_basicsize == sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc)))) {
+    o = (PyObject*)__pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc[--__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc];
+    memset(o, 0, sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc));
     (void) PyObject_INIT(o, t);
     PyObject_GC_Track(o);
   } else {
@@ -2715,21 +2718,21 @@ static PyObject *__pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_2_ti
   return o;
 }
 
-static void __pyx_tp_dealloc_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc(PyObject *o) {
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *)o;
+static void __pyx_tp_dealloc_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc(PyObject *o) {
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *)o;
   PyObject_GC_UnTrack(o);
   Py_CLEAR(p->__pyx_outer_scope);
   Py_CLEAR(p->__pyx_v_func);
-  if (CYTHON_COMPILING_IN_CPYTHON && ((__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc < 8) & (Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc)))) {
-    __pyx_freelist_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc[__pyx_freecount_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc++] = ((struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *)o);
+  if (CYTHON_COMPILING_IN_CPYTHON && ((__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc < 8) & (Py_TYPE(o)->tp_basicsize == sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc)))) {
+    __pyx_freelist_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc[__pyx_freecount_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc++] = ((struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *)o);
   } else {
     (*Py_TYPE(o)->tp_free)(o);
   }
 }
 
-static int __pyx_tp_traverse_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc(PyObject *o, visitproc v, void *a) {
+static int __pyx_tp_traverse_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc(PyObject *o, visitproc v, void *a) {
   int e;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *)o;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *)o;
   if (p->__pyx_outer_scope) {
     e = (*v)(((PyObject *)p->__pyx_outer_scope), a); if (e) return e;
   }
@@ -2739,11 +2742,11 @@ static int __pyx_tp_traverse_13meta_analysis_9profiling___pyx_scope_struct_2_tim
   return 0;
 }
 
-static int __pyx_tp_clear_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc(PyObject *o) {
+static int __pyx_tp_clear_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc(PyObject *o) {
   PyObject* tmp;
-  struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *p = (struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc *)o;
+  struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *p = (struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc *)o;
   tmp = ((PyObject*)p->__pyx_outer_scope);
-  p->__pyx_outer_scope = ((struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile *)Py_None); Py_INCREF(Py_None);
+  p->__pyx_outer_scope = ((struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile *)Py_None); Py_INCREF(Py_None);
   Py_XDECREF(tmp);
   tmp = ((PyObject*)p->__pyx_v_func);
   p->__pyx_v_func = Py_None; Py_INCREF(Py_None);
@@ -2751,12 +2754,12 @@ static int __pyx_tp_clear_13meta_analysis_9profiling___pyx_scope_struct_2_timefu
   return 0;
 }
 
-static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc = {
+static PyTypeObject __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc = {
   PyVarObject_HEAD_INIT(0, 0)
-  "meta_analysis.profiling.__pyx_scope_struct_2_timefunc", /*tp_name*/
-  sizeof(struct __pyx_obj_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc), /*tp_basicsize*/
+  "INDUSAnalysis.lib.profiling.__pyx_scope_struct_2_timefunc", /*tp_name*/
+  sizeof(struct __pyx_obj_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc, /*tp_dealloc*/
+  __pyx_tp_dealloc_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -2783,8 +2786,8 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_t
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  __pyx_tp_traverse_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc, /*tp_traverse*/
-  __pyx_tp_clear_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc, /*tp_clear*/
+  __pyx_tp_traverse_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc, /*tp_traverse*/
+  __pyx_tp_clear_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
@@ -2799,7 +2802,7 @@ static PyTypeObject __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_t
   0, /*tp_dictoffset*/
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc, /*tp_new*/
+  __pyx_tp_new_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -2866,6 +2869,8 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_n_s_INDUSAnalysis_lib_profiling, __pyx_k_INDUSAnalysis_lib_profiling, sizeof(__pyx_k_INDUSAnalysis_lib_profiling), 0, 0, 1, 1},
+  {&__pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_k_INDUSAnalysis_lib_profiling_pyx, sizeof(__pyx_k_INDUSAnalysis_lib_profiling_pyx), 0, 0, 1, 0},
   {&__pyx_kp_s_a, __pyx_k_a, sizeof(__pyx_k_a), 0, 0, 1, 0},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
@@ -2880,8 +2885,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_kwargs, __pyx_k_kwargs, sizeof(__pyx_k_kwargs), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
-  {&__pyx_n_s_meta_analysis_profiling, __pyx_k_meta_analysis_profiling, sizeof(__pyx_k_meta_analysis_profiling), 0, 0, 1, 1},
-  {&__pyx_kp_s_meta_analysis_profiling_pyx, __pyx_k_meta_analysis_profiling_pyx, sizeof(__pyx_k_meta_analysis_profiling_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_open, __pyx_k_open, sizeof(__pyx_k_open), 0, 0, 1, 1},
   {&__pyx_n_s_output, __pyx_k_output, sizeof(__pyx_k_output), 0, 0, 1, 1},
@@ -2906,7 +2909,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 45, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -2916,20 +2919,20 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "meta_analysis/profiling.pyx":14
- * def skipfunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":13
+ *     """
  *     @wraps(func)
  *     def skippedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         return True
  *     return skippedfunc
  */
-  __pyx_tuple_ = PyTuple_Pack(2, __pyx_n_s_args, __pyx_n_s_kwargs); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(2, __pyx_n_s_args, __pyx_n_s_kwargs); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
-  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_meta_analysis_profiling_pyx, __pyx_n_s_skippedfunc, 14, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_n_s_skippedfunc, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 13, __pyx_L1_error)
 
-  /* "meta_analysis/profiling.pyx":23
- * def timefunc(func):
+  /* "INDUSAnalysis/lib/profiling.pyx":23
+ *     """
  *     @wraps(func)
  *     def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *         tstart = time.time()
@@ -2938,78 +2941,78 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__3 = PyTuple_Pack(5, __pyx_n_s_args, __pyx_n_s_kwargs, __pyx_n_s_tstart, __pyx_n_s_output, __pyx_n_s_tend); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_meta_analysis_profiling_pyx, __pyx_n_s_timedfunc, 23, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_n_s_timedfunc, 23, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 23, __pyx_L1_error)
 
-  /* "meta_analysis/profiling.pyx":44
+  /* "INDUSAnalysis/lib/profiling.pyx":45
  *             tend = time.time()
  * 
  *             with open(fname, "a+") as f:             # <<<<<<<<<<<<<<
  *                 f.write("%r %.2f s\n" % (func.__name__, tend - tstart))
  * 
  */
-  __pyx_tuple__5 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "meta_analysis/profiling.pyx":39
+  /* "INDUSAnalysis/lib/profiling.pyx":40
  *     def timefunc(func):
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):             # <<<<<<<<<<<<<<
  *             tstart = time.time()
  *             output = func(*args, **kwargs)
  */
-  __pyx_tuple__6 = PyTuple_Pack(6, __pyx_n_s_args, __pyx_n_s_kwargs, __pyx_n_s_tstart, __pyx_n_s_output, __pyx_n_s_tend, __pyx_n_s_f); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(6, __pyx_n_s_args, __pyx_n_s_kwargs, __pyx_n_s_tstart, __pyx_n_s_output, __pyx_n_s_tend, __pyx_n_s_f); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_meta_analysis_profiling_pyx, __pyx_n_s_timedfunc, 39, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_n_s_timedfunc, 40, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 40, __pyx_L1_error)
 
-  /* "meta_analysis/profiling.pyx":37
- * """
- * def timefuncfile(fname):
+  /* "INDUSAnalysis/lib/profiling.pyx":38
+ *     Reports function execution time to file [decorator]
+ *     """
  *     def timefunc(func):             # <<<<<<<<<<<<<<
  *         @wraps(func)
  *         def timedfunc(*args, **kwargs):
  */
-  __pyx_tuple__8 = PyTuple_Pack(3, __pyx_n_s_func, __pyx_n_s_timedfunc, __pyx_n_s_timedfunc); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(3, __pyx_n_s_func, __pyx_n_s_timedfunc, __pyx_n_s_timedfunc); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_meta_analysis_profiling_pyx, __pyx_n_s_timefunc, 37, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_n_s_timefunc, 38, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 38, __pyx_L1_error)
 
-  /* "meta_analysis/profiling.pyx":12
- * Skip function exection
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":8
+ * 
+ * 
  * def skipfunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def skippedfunc(*args, **kwargs):
+ *     """
+ *     Bypasses function execution [decorator]
  */
-  __pyx_tuple__10 = PyTuple_Pack(3, __pyx_n_s_func, __pyx_n_s_skippedfunc, __pyx_n_s_skippedfunc); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(3, __pyx_n_s_func, __pyx_n_s_skippedfunc, __pyx_n_s_skippedfunc); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_meta_analysis_profiling_pyx, __pyx_n_s_skipfunc, 12, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_n_s_skipfunc, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 8, __pyx_L1_error)
 
-  /* "meta_analysis/profiling.pyx":21
- * Report function execution time to stdout
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":18
+ * 
+ * 
  * def timefunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def timedfunc(*args, **kwargs):
+ *     """
+ *     Reports function execution time to stdout [decorator]
  */
-  __pyx_tuple__12 = PyTuple_Pack(3, __pyx_n_s_func, __pyx_n_s_timedfunc, __pyx_n_s_timedfunc); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(3, __pyx_n_s_func, __pyx_n_s_timedfunc, __pyx_n_s_timedfunc); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_meta_analysis_profiling_pyx, __pyx_n_s_timefunc, 21, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_n_s_timefunc, 18, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 18, __pyx_L1_error)
 
-  /* "meta_analysis/profiling.pyx":36
- * Report function execution time to file
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":34
+ * 
+ * 
  * def timefuncfile(fname):             # <<<<<<<<<<<<<<
- *     def timefunc(func):
- *         @wraps(func)
+ *     """
+ *     Reports function execution time to file [decorator]
  */
-  __pyx_tuple__14 = PyTuple_Pack(3, __pyx_n_s_fname, __pyx_n_s_timefunc, __pyx_n_s_timefunc); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(3, __pyx_n_s_fname, __pyx_n_s_timefunc, __pyx_n_s_timefunc); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_meta_analysis_profiling_pyx, __pyx_n_s_timefuncfile, 36, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_lib_profiling_pyx, __pyx_n_s_timefuncfile, 34, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -3060,30 +3063,30 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_13meta_analysis_9profiling___pyx_scope_struct__timefunc) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_13meta_analysis_9profiling___pyx_scope_struct__timefunc.tp_print = 0;
+  __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_13meta_analysis_9profiling___pyx_scope_struct__timefunc.tp_dictoffset && __pyx_type_13meta_analysis_9profiling___pyx_scope_struct__timefunc.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_13meta_analysis_9profiling___pyx_scope_struct__timefunc.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc.tp_dictoffset && __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
   }
-  __pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct__timefunc = &__pyx_type_13meta_analysis_9profiling___pyx_scope_struct__timefunc;
-  if (PyType_Ready(&__pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc = &__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct__timefunc;
+  if (PyType_Ready(&__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile.tp_print = 0;
+  __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile.tp_dictoffset && __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile.tp_dictoffset && __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
   }
-  __pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile = &__pyx_type_13meta_analysis_9profiling___pyx_scope_struct_1_timefuncfile;
-  if (PyType_Ready(&__pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc) < 0) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile = &__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_1_timefuncfile;
+  if (PyType_Ready(&__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc.tp_print = 0;
+  __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc.tp_dictoffset && __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc.tp_dictoffset && __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
   }
-  __pyx_ptype_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc = &__pyx_type_13meta_analysis_9profiling___pyx_scope_struct_2_timefunc;
+  __pyx_ptype_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc = &__pyx_type_13INDUSAnalysis_3lib_9profiling___pyx_scope_struct_2_timefunc;
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -3285,14 +3288,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_meta_analysis__profiling) {
+  if (__pyx_module_is_main_INDUSAnalysis__lib__profiling) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "meta_analysis.profiling")) {
-      if (unlikely(PyDict_SetItemString(modules, "meta_analysis.profiling", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "INDUSAnalysis.lib.profiling")) {
+      if (unlikely(PyDict_SetItemString(modules, "INDUSAnalysis.lib.profiling", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -3313,79 +3316,79 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "meta_analysis/profiling.pyx":6
- * @Author: Akash Pallath
+  /* "INDUSAnalysis/lib/profiling.pyx":4
+ * Helper function definitions for code profiling
  * """
  * import time             # <<<<<<<<<<<<<<
  * from functools import wraps
  * 
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_time, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_time, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_time, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_time, __pyx_t_1) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "meta_analysis/profiling.pyx":7
+  /* "INDUSAnalysis/lib/profiling.pyx":5
  * """
  * import time
  * from functools import wraps             # <<<<<<<<<<<<<<
  * 
- * """
+ * 
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_wraps);
   __Pyx_GIVEREF(__pyx_n_s_wraps);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_wraps);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_functools, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_functools, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_wraps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_wraps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_wraps, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_wraps, __pyx_t_1) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "meta_analysis/profiling.pyx":12
- * Skip function exection
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":8
+ * 
+ * 
  * def skipfunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def skippedfunc(*args, **kwargs):
+ *     """
+ *     Bypasses function execution [decorator]
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_13meta_analysis_9profiling_1skipfunc, NULL, __pyx_n_s_meta_analysis_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_3lib_9profiling_1skipfunc, NULL, __pyx_n_s_INDUSAnalysis_lib_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_skipfunc, __pyx_t_2) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_skipfunc, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "meta_analysis/profiling.pyx":21
- * Report function execution time to stdout
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":18
+ * 
+ * 
  * def timefunc(func):             # <<<<<<<<<<<<<<
- *     @wraps(func)
- *     def timedfunc(*args, **kwargs):
+ *     """
+ *     Reports function execution time to stdout [decorator]
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_13meta_analysis_9profiling_3timefunc, NULL, __pyx_n_s_meta_analysis_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_3lib_9profiling_3timefunc, NULL, __pyx_n_s_INDUSAnalysis_lib_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timefunc, __pyx_t_2) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timefunc, __pyx_t_2) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "meta_analysis/profiling.pyx":36
- * Report function execution time to file
- * """
+  /* "INDUSAnalysis/lib/profiling.pyx":34
+ * 
+ * 
  * def timefuncfile(fname):             # <<<<<<<<<<<<<<
- *     def timefunc(func):
- *         @wraps(func)
+ *     """
+ *     Reports function execution time to file [decorator]
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_13meta_analysis_9profiling_5timefuncfile, NULL, __pyx_n_s_meta_analysis_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_3lib_9profiling_5timefuncfile, NULL, __pyx_n_s_INDUSAnalysis_lib_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timefuncfile, __pyx_t_2) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timefuncfile, __pyx_t_2) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "meta_analysis/profiling.pyx":1
+  /* "INDUSAnalysis/lib/profiling.pyx":1
  * """             # <<<<<<<<<<<<<<
  * Helper function definitions for code profiling
- * 
+ * """
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -3400,11 +3403,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init meta_analysis.profiling", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init INDUSAnalysis.lib.profiling", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init meta_analysis.profiling");
+    PyErr_SetString(PyExc_ImportError, "init INDUSAnalysis.lib.profiling");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

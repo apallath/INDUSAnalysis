@@ -1,7 +1,7 @@
 .. INDUSAnalysis documentation master file
 
 ###############################
-INDUSAnalysis documentation
+INDUSAnalysis
 ###############################
 
 :Release: |release|
@@ -68,5 +68,5 @@ Documentation
   :maxdepth: 2
   :caption: Contents:
 
-  source/INDUSAnalysis
-  source/INDUSAnalysis.lib
+  INDUSAnalysis/INDUSAnalysis
+  INDUSAnalysis/INDUSAnalysis.lib

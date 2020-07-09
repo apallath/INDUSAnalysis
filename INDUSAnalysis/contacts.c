@@ -4851,7 +4851,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_6calc_tra
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_9protein_heavy_APSP(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_heavy_APSP[] = "\n        Constructs graph of protein-heavy atoms and calculates all-pairs-shortest-path\n        distances using the Floyd-Warshall algorithm, assigning each bond an\n        equal weight (of 1).\n\n        Args:\n            u (mda.Universe): Universe object containing all atoms with bond definitions.\n\n        Returns:\n            {\n                D (np.array): Array of shape (nheavy, nheavy), where D[i,j] is the shortest\n                    path distance between heavy atom i and heavy atom j.\n                index_map (dict): Dictionary mapping heavy atom i to its atom\n                    index in the Universe.\n            }\n        ";
+static char __pyx_doc_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_heavy_APSP[] = "\n        Constructs graph of protein-heavy atoms and calculates all-pairs-shortest-path\n        distances using the Floyd-Warshall algorithm, assigning each bond an\n        equal weight (of 1).\n\n        Args:\n            u (mda.Universe): Universe object containing all atoms with bond definitions.\n\n        Returns:\n            {\n                D (np.array): Array of shape (nheavy, nheavy), where D[i,j] is the shortest\n                    path distance between heavy atom i and heavy atom j.\n                    \n                index_map (dict): Dictionary mapping heavy atom i to its atom\n                    index in the Universe.\n            }\n        ";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_9protein_heavy_APSP = {"protein_heavy_APSP", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_9protein_heavy_APSP, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_heavy_APSP};
 static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_9protein_heavy_APSP(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
@@ -4942,14 +4942,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
   int __pyx_t_10;
   __Pyx_RefNannySetupContext("protein_heavy_APSP", 0);
 
-  /* "INDUSAnalysis/contacts.pyx":195
+  /* "INDUSAnalysis/contacts.pyx":196
  *         """
  *         # Connectivity graph
  *         protein_heavy = u.select_atoms("protein and not name H*")             # <<<<<<<<<<<<<<
  *         nheavy = len(protein_heavy)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 196, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4963,62 +4963,62 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_protein_and_not_name_H) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_protein_and_not_name_H);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_protein_heavy = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":196
+  /* "INDUSAnalysis/contacts.pyx":197
  *         # Connectivity graph
  *         protein_heavy = u.select_atoms("protein and not name H*")
  *         nheavy = len(protein_heavy)             # <<<<<<<<<<<<<<
  * 
  *         heavy_indices = protein_heavy.atoms.indices
  */
-  __pyx_t_4 = PyObject_Length(__pyx_v_protein_heavy); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_4 = PyObject_Length(__pyx_v_protein_heavy); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 197, __pyx_L1_error)
   __pyx_v_nheavy = __pyx_t_4;
 
-  /* "INDUSAnalysis/contacts.pyx":198
+  /* "INDUSAnalysis/contacts.pyx":199
  *         nheavy = len(protein_heavy)
  * 
  *         heavy_indices = protein_heavy.atoms.indices             # <<<<<<<<<<<<<<
  *         heavy_idx_map = {}
  *         idx_heavy_map = {}
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_atoms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_atoms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_heavy_indices = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":199
+  /* "INDUSAnalysis/contacts.pyx":200
  * 
  *         heavy_indices = protein_heavy.atoms.indices
  *         heavy_idx_map = {}             # <<<<<<<<<<<<<<
  *         idx_heavy_map = {}
  *         for heavyidx, idx in enumerate(protein_heavy.atoms.indices):
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_heavy_idx_map = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":200
+  /* "INDUSAnalysis/contacts.pyx":201
  *         heavy_indices = protein_heavy.atoms.indices
  *         heavy_idx_map = {}
  *         idx_heavy_map = {}             # <<<<<<<<<<<<<<
  *         for heavyidx, idx in enumerate(protein_heavy.atoms.indices):
  *             heavy_idx_map[idx] = heavyidx
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_idx_heavy_map = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":201
+  /* "INDUSAnalysis/contacts.pyx":202
  *         heavy_idx_map = {}
  *         idx_heavy_map = {}
  *         for heavyidx, idx in enumerate(protein_heavy.atoms.indices):             # <<<<<<<<<<<<<<
@@ -5027,18 +5027,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
  */
   __Pyx_INCREF(__pyx_int_0);
   __pyx_t_2 = __pyx_int_0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_atoms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_atoms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_indices); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_indices); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
     __pyx_t_1 = __pyx_t_3; __Pyx_INCREF(__pyx_t_1); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 201, __pyx_L1_error)
+    __pyx_t_5 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 202, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   for (;;) {
@@ -5046,17 +5046,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 202, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 202, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -5066,7 +5066,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 201, __pyx_L1_error)
+          else __PYX_ERR(0, 202, __pyx_L1_error)
         }
         break;
       }
@@ -5076,31 +5076,31 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
     __pyx_t_3 = 0;
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_heavyidx, __pyx_t_2);
-    __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 202, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2);
     __pyx_t_2 = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":202
+    /* "INDUSAnalysis/contacts.pyx":203
  *         idx_heavy_map = {}
  *         for heavyidx, idx in enumerate(protein_heavy.atoms.indices):
  *             heavy_idx_map[idx] = heavyidx             # <<<<<<<<<<<<<<
  *             idx_heavy_map[heavyidx] = idx
  * 
  */
-    if (unlikely(PyDict_SetItem(__pyx_v_heavy_idx_map, __pyx_v_idx, __pyx_v_heavyidx) < 0)) __PYX_ERR(0, 202, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_heavy_idx_map, __pyx_v_idx, __pyx_v_heavyidx) < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
 
-    /* "INDUSAnalysis/contacts.pyx":203
+    /* "INDUSAnalysis/contacts.pyx":204
  *         for heavyidx, idx in enumerate(protein_heavy.atoms.indices):
  *             heavy_idx_map[idx] = heavyidx
  *             idx_heavy_map[heavyidx] = idx             # <<<<<<<<<<<<<<
  * 
  *         adj_matrix = np.zeros((nheavy, nheavy))
  */
-    if (unlikely(PyDict_SetItem(__pyx_v_idx_heavy_map, __pyx_v_heavyidx, __pyx_v_idx) < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_idx_heavy_map, __pyx_v_heavyidx, __pyx_v_idx) < 0)) __PYX_ERR(0, 204, __pyx_L1_error)
 
-    /* "INDUSAnalysis/contacts.pyx":201
+    /* "INDUSAnalysis/contacts.pyx":202
  *         heavy_idx_map = {}
  *         idx_heavy_map = {}
  *         for heavyidx, idx in enumerate(protein_heavy.atoms.indices):             # <<<<<<<<<<<<<<
@@ -5111,23 +5111,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":205
+  /* "INDUSAnalysis/contacts.pyx":206
  *             idx_heavy_map[heavyidx] = idx
  * 
  *         adj_matrix = np.zeros((nheavy, nheavy))             # <<<<<<<<<<<<<<
  * 
  *         for bond in protein_heavy.bonds:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_nheavy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_nheavy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = PyInt_FromSsize_t(__pyx_v_nheavy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_6 = PyInt_FromSsize_t(__pyx_v_nheavy); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
@@ -5148,28 +5148,28 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
   __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_6, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_7);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 205, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_adj_matrix = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":207
+  /* "INDUSAnalysis/contacts.pyx":208
  *         adj_matrix = np.zeros((nheavy, nheavy))
  * 
  *         for bond in protein_heavy.bonds:             # <<<<<<<<<<<<<<
  *             ati = bond.indices[0]
  *             atj = bond.indices[1]
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_bonds); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_bonds); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
     __pyx_t_3 = __pyx_t_2; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
+    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 208, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   for (;;) {
@@ -5177,17 +5177,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 208, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 208, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -5197,7 +5197,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 207, __pyx_L1_error)
+          else __PYX_ERR(0, 208, __pyx_L1_error)
         }
         break;
       }
@@ -5206,88 +5206,88 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
     __Pyx_XDECREF_SET(__pyx_v_bond, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":208
+    /* "INDUSAnalysis/contacts.pyx":209
  * 
  *         for bond in protein_heavy.bonds:
  *             ati = bond.indices[0]             # <<<<<<<<<<<<<<
  *             atj = bond.indices[1]
  *             if ati in heavy_indices and atj in heavy_indices:
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_bond, __pyx_n_s_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_bond, __pyx_n_s_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 209, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_ati, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":209
+    /* "INDUSAnalysis/contacts.pyx":210
  *         for bond in protein_heavy.bonds:
  *             ati = bond.indices[0]
  *             atj = bond.indices[1]             # <<<<<<<<<<<<<<
  *             if ati in heavy_indices and atj in heavy_indices:
  *                 heavyi = heavy_idx_map[ati]
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_bond, __pyx_n_s_indices); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_bond, __pyx_n_s_indices); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 210, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_7, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF_SET(__pyx_v_atj, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":210
+    /* "INDUSAnalysis/contacts.pyx":211
  *             ati = bond.indices[0]
  *             atj = bond.indices[1]
  *             if ati in heavy_indices and atj in heavy_indices:             # <<<<<<<<<<<<<<
  *                 heavyi = heavy_idx_map[ati]
  *                 heavyj = heavy_idx_map[atj]
  */
-    __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_v_ati, __pyx_v_heavy_indices, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 210, __pyx_L1_error)
+    __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_v_ati, __pyx_v_heavy_indices, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 211, __pyx_L1_error)
     __pyx_t_10 = (__pyx_t_9 != 0);
     if (__pyx_t_10) {
     } else {
       __pyx_t_8 = __pyx_t_10;
       goto __pyx_L8_bool_binop_done;
     }
-    __pyx_t_10 = (__Pyx_PySequence_ContainsTF(__pyx_v_atj, __pyx_v_heavy_indices, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 210, __pyx_L1_error)
+    __pyx_t_10 = (__Pyx_PySequence_ContainsTF(__pyx_v_atj, __pyx_v_heavy_indices, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 211, __pyx_L1_error)
     __pyx_t_9 = (__pyx_t_10 != 0);
     __pyx_t_8 = __pyx_t_9;
     __pyx_L8_bool_binop_done:;
     if (__pyx_t_8) {
 
-      /* "INDUSAnalysis/contacts.pyx":211
+      /* "INDUSAnalysis/contacts.pyx":212
  *             atj = bond.indices[1]
  *             if ati in heavy_indices and atj in heavy_indices:
  *                 heavyi = heavy_idx_map[ati]             # <<<<<<<<<<<<<<
  *                 heavyj = heavy_idx_map[atj]
  *                 adj_matrix[heavyi, heavyj] = 1
  */
-      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_heavy_idx_map, __pyx_v_ati); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_heavy_idx_map, __pyx_v_ati); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 212, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_XDECREF_SET(__pyx_v_heavyi, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "INDUSAnalysis/contacts.pyx":212
+      /* "INDUSAnalysis/contacts.pyx":213
  *             if ati in heavy_indices and atj in heavy_indices:
  *                 heavyi = heavy_idx_map[ati]
  *                 heavyj = heavy_idx_map[atj]             # <<<<<<<<<<<<<<
  *                 adj_matrix[heavyi, heavyj] = 1
  *                 adj_matrix[heavyj, heavyi] = 1
  */
-      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_heavy_idx_map, __pyx_v_atj); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 212, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_heavy_idx_map, __pyx_v_atj); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 213, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_XDECREF_SET(__pyx_v_heavyj, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "INDUSAnalysis/contacts.pyx":213
+      /* "INDUSAnalysis/contacts.pyx":214
  *                 heavyi = heavy_idx_map[ati]
  *                 heavyj = heavy_idx_map[atj]
  *                 adj_matrix[heavyi, heavyj] = 1             # <<<<<<<<<<<<<<
  *                 adj_matrix[heavyj, heavyi] = 1
  * 
  */
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 213, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_heavyi);
       __Pyx_GIVEREF(__pyx_v_heavyi);
@@ -5295,17 +5295,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
       __Pyx_INCREF(__pyx_v_heavyj);
       __Pyx_GIVEREF(__pyx_v_heavyj);
       PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_heavyj);
-      if (unlikely(PyObject_SetItem(__pyx_v_adj_matrix, __pyx_t_2, __pyx_int_1) < 0)) __PYX_ERR(0, 213, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_adj_matrix, __pyx_t_2, __pyx_int_1) < 0)) __PYX_ERR(0, 214, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "INDUSAnalysis/contacts.pyx":214
+      /* "INDUSAnalysis/contacts.pyx":215
  *                 heavyj = heavy_idx_map[atj]
  *                 adj_matrix[heavyi, heavyj] = 1
  *                 adj_matrix[heavyj, heavyi] = 1             # <<<<<<<<<<<<<<
  * 
  *         # All pairs shortest paths between protein-heavy atoms
  */
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_heavyj);
       __Pyx_GIVEREF(__pyx_v_heavyj);
@@ -5313,10 +5313,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
       __Pyx_INCREF(__pyx_v_heavyi);
       __Pyx_GIVEREF(__pyx_v_heavyi);
       PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_heavyi);
-      if (unlikely(PyObject_SetItem(__pyx_v_adj_matrix, __pyx_t_2, __pyx_int_1) < 0)) __PYX_ERR(0, 214, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_adj_matrix, __pyx_t_2, __pyx_int_1) < 0)) __PYX_ERR(0, 215, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "INDUSAnalysis/contacts.pyx":210
+      /* "INDUSAnalysis/contacts.pyx":211
  *             ati = bond.indices[0]
  *             atj = bond.indices[1]
  *             if ati in heavy_indices and atj in heavy_indices:             # <<<<<<<<<<<<<<
@@ -5325,7 +5325,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
  */
     }
 
-    /* "INDUSAnalysis/contacts.pyx":207
+    /* "INDUSAnalysis/contacts.pyx":208
  *         adj_matrix = np.zeros((nheavy, nheavy))
  * 
  *         for bond in protein_heavy.bonds:             # <<<<<<<<<<<<<<
@@ -5335,14 +5335,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":217
+  /* "INDUSAnalysis/contacts.pyx":218
  * 
  *         # All pairs shortest paths between protein-heavy atoms
  *         csr_graph = csr_matrix(adj_matrix)  # Store data in compressed sparse matrix form             # <<<<<<<<<<<<<<
  *         dist_matrix = floyd_warshall(csgraph=csr_graph, directed=False)  # Floyd-Warshall
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_csr_matrix); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_csr_matrix); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -5356,33 +5356,33 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
   }
   __pyx_t_3 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_7, __pyx_v_adj_matrix) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_adj_matrix);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 217, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_csr_graph = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":218
+  /* "INDUSAnalysis/contacts.pyx":219
  *         # All pairs shortest paths between protein-heavy atoms
  *         csr_graph = csr_matrix(adj_matrix)  # Store data in compressed sparse matrix form
  *         dist_matrix = floyd_warshall(csgraph=csr_graph, directed=False)  # Floyd-Warshall             # <<<<<<<<<<<<<<
  * 
  *         return dist_matrix, idx_heavy_map
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_floyd_warshall); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_floyd_warshall); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_csgraph, __pyx_v_csr_graph) < 0) __PYX_ERR(0, 218, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_directed, Py_False) < 0) __PYX_ERR(0, 218, __pyx_L1_error)
-  __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 218, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_csgraph, __pyx_v_csr_graph) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_directed, Py_False) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_dist_matrix = __pyx_t_7;
   __pyx_t_7 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":220
+  /* "INDUSAnalysis/contacts.pyx":221
  *         dist_matrix = floyd_warshall(csgraph=csr_graph, directed=False)  # Floyd-Warshall
  * 
  *         return dist_matrix, idx_heavy_map             # <<<<<<<<<<<<<<
@@ -5390,7 +5390,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
  *     def plot_mean_contactmatrix(self, mean_contactmatrix):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 221, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_INCREF(__pyx_v_dist_matrix);
   __Pyx_GIVEREF(__pyx_v_dist_matrix);
@@ -5439,7 +5439,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_8protein_
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/contacts.pyx":222
+/* "INDUSAnalysis/contacts.pyx":223
  *         return dist_matrix, idx_heavy_map
  * 
  *     def plot_mean_contactmatrix(self, mean_contactmatrix):             # <<<<<<<<<<<<<<
@@ -5480,11 +5480,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_11plot_me
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_mean_contactmatrix)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_mean_contactmatrix", 1, 2, 2, 1); __PYX_ERR(0, 222, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_mean_contactmatrix", 1, 2, 2, 1); __PYX_ERR(0, 223, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_mean_contactmatrix") < 0)) __PYX_ERR(0, 222, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_mean_contactmatrix") < 0)) __PYX_ERR(0, 223, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5497,7 +5497,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_11plot_me
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_mean_contactmatrix", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 222, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_mean_contactmatrix", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 223, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.contacts.ContactsAnalysis.plot_mean_contactmatrix", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5524,16 +5524,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("plot_mean_contactmatrix", 0);
 
-  /* "INDUSAnalysis/contacts.pyx":229
+  /* "INDUSAnalysis/contacts.pyx":230
  *             mean_contactmatrix (np.array): Mean contactmatrix.
  *         """
  *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
  *         im = ax.imshow(mean_contactmatrix.T, origin="lower", cmap="hot")
  *         fig.colorbar(im)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -5548,7 +5548,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
@@ -5557,7 +5557,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 229, __pyx_L1_error)
+      __PYX_ERR(0, 230, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -5570,15 +5570,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
     __Pyx_INCREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 229, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 229, __pyx_L1_error)
+    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
@@ -5586,7 +5586,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
     __Pyx_GOTREF(__pyx_t_3);
     index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 229, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 230, __pyx_L1_error)
     __pyx_t_5 = NULL;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     goto __pyx_L4_unpacking_done;
@@ -5594,7 +5594,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 229, __pyx_L1_error)
+    __PYX_ERR(0, 230, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_fig = __pyx_t_3;
@@ -5602,27 +5602,27 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   __pyx_v_ax = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":230
+  /* "INDUSAnalysis/contacts.pyx":231
  *         """
  *         fig, ax = plt.subplots()
  *         im = ax.imshow(mean_contactmatrix.T, origin="lower", cmap="hot")             # <<<<<<<<<<<<<<
  *         fig.colorbar(im)
  *         ax.set_xlabel('Atom $i$')
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_imshow); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_imshow); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_mean_contactmatrix, __pyx_n_s_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 230, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_mean_contactmatrix, __pyx_n_s_T); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 231, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 230, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 231, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 230, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 231, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_origin, __pyx_n_s_lower) < 0) __PYX_ERR(0, 230, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 230, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 230, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_origin, __pyx_n_s_lower) < 0) __PYX_ERR(0, 231, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 231, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 231, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -5630,14 +5630,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   __pyx_v_im = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":231
+  /* "INDUSAnalysis/contacts.pyx":232
  *         fig, ax = plt.subplots()
  *         im = ax.imshow(mean_contactmatrix.T, origin="lower", cmap="hot")
  *         fig.colorbar(im)             # <<<<<<<<<<<<<<
  *         ax.set_xlabel('Atom $i$')
  *         ax.set_ylabel('Atom $j$')
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_colorbar); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 231, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_colorbar); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5651,19 +5651,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   }
   __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_im) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_im);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 231, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":232
+  /* "INDUSAnalysis/contacts.pyx":233
  *         im = ax.imshow(mean_contactmatrix.T, origin="lower", cmap="hot")
  *         fig.colorbar(im)
  *         ax.set_xlabel('Atom $i$')             # <<<<<<<<<<<<<<
  *         ax.set_ylabel('Atom $j$')
  *         fig.set_dpi(300)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5677,19 +5677,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   }
   __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_Atom_i_2) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Atom_i_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 232, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":233
+  /* "INDUSAnalysis/contacts.pyx":234
  *         fig.colorbar(im)
  *         ax.set_xlabel('Atom $i$')
  *         ax.set_ylabel('Atom $j$')             # <<<<<<<<<<<<<<
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="mean_contactmatrix")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5703,19 +5703,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   }
   __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_Atom_j_2) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Atom_j_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 233, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":234
+  /* "INDUSAnalysis/contacts.pyx":235
  *         ax.set_xlabel('Atom $i$')
  *         ax.set_ylabel('Atom $j$')
  *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="mean_contactmatrix")
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5729,58 +5729,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   }
   __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":235
+  /* "INDUSAnalysis/contacts.pyx":236
  *         ax.set_ylabel('Atom $j$')
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="mean_contactmatrix")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_mean_contactmatrix) < 0) __PYX_ERR(0, 235, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_mean_contactmatrix) < 0) __PYX_ERR(0, 236, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":236
+  /* "INDUSAnalysis/contacts.pyx":237
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="mean_contactmatrix")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 236, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 237, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_6) {
 
-    /* "INDUSAnalysis/contacts.pyx":237
+    /* "INDUSAnalysis/contacts.pyx":238
  *         self.save_figure(fig, suffix="mean_contactmatrix")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -5795,12 +5795,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
     }
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":236
+    /* "INDUSAnalysis/contacts.pyx":237
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="mean_contactmatrix")
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -5810,7 +5810,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
     goto __pyx_L5;
   }
 
-  /* "INDUSAnalysis/contacts.pyx":239
+  /* "INDUSAnalysis/contacts.pyx":240
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -5818,9 +5818,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
  *     def plot_contacts_per_atom(self, ts_contacts_per_atom):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 240, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 240, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -5835,14 +5835,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
     }
     __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __pyx_L5:;
 
-  /* "INDUSAnalysis/contacts.pyx":222
+  /* "INDUSAnalysis/contacts.pyx":223
  *         return dist_matrix, idx_heavy_map
  * 
  *     def plot_mean_contactmatrix(self, mean_contactmatrix):             # <<<<<<<<<<<<<<
@@ -5869,7 +5869,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_10plot_me
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/contacts.pyx":241
+/* "INDUSAnalysis/contacts.pyx":242
  *             plt.close()
  * 
  *     def plot_contacts_per_atom(self, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
@@ -5910,11 +5910,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_13plot_co
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_contacts_per_atom)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_contacts_per_atom", 1, 2, 2, 1); __PYX_ERR(0, 241, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_contacts_per_atom", 1, 2, 2, 1); __PYX_ERR(0, 242, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_contacts_per_atom") < 0)) __PYX_ERR(0, 241, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_contacts_per_atom") < 0)) __PYX_ERR(0, 242, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5927,7 +5927,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_13plot_co
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_contacts_per_atom", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 241, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_contacts_per_atom", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 242, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.contacts.ContactsAnalysis.plot_contacts_per_atom", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5951,33 +5951,33 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_12plot_co
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("plot_contacts_per_atom", 0);
 
-  /* "INDUSAnalysis/contacts.pyx":245
+  /* "INDUSAnalysis/contacts.pyx":246
  *         Plots timeseries contacts per atom.
  *         """
  *         fig = ts_contacts_per_atom.plot_2d_heatmap(cmap='hot')             # <<<<<<<<<<<<<<
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="contacts_per_atom")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_plot_2d_heatmap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_plot_2d_heatmap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 245, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_fig = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":246
+  /* "INDUSAnalysis/contacts.pyx":247
  *         """
  *         fig = ts_contacts_per_atom.plot_2d_heatmap(cmap='hot')
  *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="contacts_per_atom")
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5991,58 +5991,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_12plot_co
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":247
+  /* "INDUSAnalysis/contacts.pyx":248
  *         fig = ts_contacts_per_atom.plot_2d_heatmap(cmap='hot')
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="contacts_per_atom")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 247, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_n_s_contacts_per_atom) < 0) __PYX_ERR(0, 247, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_n_s_contacts_per_atom) < 0) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":248
+  /* "INDUSAnalysis/contacts.pyx":249
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="contacts_per_atom")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/contacts.pyx":249
+    /* "INDUSAnalysis/contacts.pyx":250
  *         self.save_figure(fig, suffix="contacts_per_atom")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -6057,12 +6057,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_12plot_co
     }
     __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 249, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":248
+    /* "INDUSAnalysis/contacts.pyx":249
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="contacts_per_atom")
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -6072,7 +6072,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_12plot_co
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/contacts.pyx":251
+  /* "INDUSAnalysis/contacts.pyx":252
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -6080,9 +6080,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_12plot_co
  *     def plot_total_fraction_contacts(self, ts_contacts, refcontacts):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 251, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -6097,14 +6097,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_12plot_co
     }
     __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 251, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/contacts.pyx":241
+  /* "INDUSAnalysis/contacts.pyx":242
  *             plt.close()
  * 
  *     def plot_contacts_per_atom(self, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
@@ -6129,7 +6129,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_12plot_co
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/contacts.pyx":253
+/* "INDUSAnalysis/contacts.pyx":254
  *             plt.close()
  * 
  *     def plot_total_fraction_contacts(self, ts_contacts, refcontacts):             # <<<<<<<<<<<<<<
@@ -6173,17 +6173,17 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_15plot_to
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_contacts)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_total_fraction_contacts", 1, 3, 3, 1); __PYX_ERR(0, 253, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_total_fraction_contacts", 1, 3, 3, 1); __PYX_ERR(0, 254, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_refcontacts_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_total_fraction_contacts", 1, 3, 3, 2); __PYX_ERR(0, 253, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_total_fraction_contacts", 1, 3, 3, 2); __PYX_ERR(0, 254, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_total_fraction_contacts") < 0)) __PYX_ERR(0, 253, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_total_fraction_contacts") < 0)) __PYX_ERR(0, 254, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -6198,7 +6198,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_15plot_to
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_total_fraction_contacts", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 253, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_total_fraction_contacts", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 254, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.contacts.ContactsAnalysis.plot_total_fraction_contacts", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6223,14 +6223,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("plot_total_fraction_contacts", 0);
 
-  /* "INDUSAnalysis/contacts.pyx":257
+  /* "INDUSAnalysis/contacts.pyx":258
  *         Plots timeseries number of contacts and fraction of contacts.
  *         """
  *         fig1 = ts_contacts.plot()             # <<<<<<<<<<<<<<
  *         fig1.set_dpi(300)
  *         self.save_figure(fig1, suffix="contacts")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6244,20 +6244,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_fig1 = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":258
+  /* "INDUSAnalysis/contacts.pyx":259
  *         """
  *         fig1 = ts_contacts.plot()
  *         fig1.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig1, suffix="contacts")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig1, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig1, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6271,58 +6271,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":259
+  /* "INDUSAnalysis/contacts.pyx":260
  *         fig1 = ts_contacts.plot()
  *         fig1.set_dpi(300)
  *         self.save_figure(fig1, suffix="contacts")             # <<<<<<<<<<<<<<
  * 
  *         ts_contacts.data_array /= refcontacts
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig1);
   __Pyx_GIVEREF(__pyx_v_fig1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig1);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_contacts) < 0) __PYX_ERR(0, 259, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 259, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_contacts) < 0) __PYX_ERR(0, 260, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":261
+  /* "INDUSAnalysis/contacts.pyx":262
  *         self.save_figure(fig1, suffix="contacts")
  * 
  *         ts_contacts.data_array /= refcontacts             # <<<<<<<<<<<<<<
  *         fig2 = ts_contacts.plot()
  *         fig2.set_dpi(300)
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_data_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_data_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_4, __pyx_v_refcontacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_4, __pyx_v_refcontacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_data_array, __pyx_t_3) < 0) __PYX_ERR(0, 261, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_data_array, __pyx_t_3) < 0) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":262
+  /* "INDUSAnalysis/contacts.pyx":263
  * 
  *         ts_contacts.data_array /= refcontacts
  *         fig2 = ts_contacts.plot()             # <<<<<<<<<<<<<<
  *         fig2.set_dpi(300)
  *         self.save_figure(fig2, suffix="frac_contacts")
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_plot); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_plot); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6336,20 +6336,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_fig2 = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":263
+  /* "INDUSAnalysis/contacts.pyx":264
  *         ts_contacts.data_array /= refcontacts
  *         fig2 = ts_contacts.plot()
  *         fig2.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig2, suffix="frac_contacts")
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig2, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig2, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6363,58 +6363,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_2, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":264
+  /* "INDUSAnalysis/contacts.pyx":265
  *         fig2 = ts_contacts.plot()
  *         fig2.set_dpi(300)
  *         self.save_figure(fig2, suffix="frac_contacts")             # <<<<<<<<<<<<<<
  * 
  *         if self.show:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_fig2);
   __Pyx_GIVEREF(__pyx_v_fig2);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_fig2);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_suffix, __pyx_n_s_frac_contacts) < 0) __PYX_ERR(0, 264, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_suffix, __pyx_n_s_frac_contacts) < 0) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":266
+  /* "INDUSAnalysis/contacts.pyx":267
  *         self.save_figure(fig2, suffix="frac_contacts")
  * 
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/contacts.pyx":267
+    /* "INDUSAnalysis/contacts.pyx":268
  * 
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 268, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -6429,12 +6429,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
     }
     __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":266
+    /* "INDUSAnalysis/contacts.pyx":267
  *         self.save_figure(fig2, suffix="frac_contacts")
  * 
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -6444,7 +6444,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/contacts.pyx":269
+  /* "INDUSAnalysis/contacts.pyx":270
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -6452,9 +6452,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
  *     def calc_plot_histogram_contacts(self, ts_contacts, bins):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 270, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_close); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_close); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -6469,14 +6469,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
     }
     __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/contacts.pyx":253
+  /* "INDUSAnalysis/contacts.pyx":254
  *             plt.close()
  * 
  *     def plot_total_fraction_contacts(self, ts_contacts, refcontacts):             # <<<<<<<<<<<<<<
@@ -6502,7 +6502,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_14plot_to
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/contacts.pyx":271
+/* "INDUSAnalysis/contacts.pyx":272
  *             plt.close()
  * 
  *     def calc_plot_histogram_contacts(self, ts_contacts, bins):             # <<<<<<<<<<<<<<
@@ -6546,17 +6546,17 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_17calc_pl
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_contacts)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_plot_histogram_contacts", 1, 3, 3, 1); __PYX_ERR(0, 271, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_plot_histogram_contacts", 1, 3, 3, 1); __PYX_ERR(0, 272, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_bins_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_plot_histogram_contacts", 1, 3, 3, 2); __PYX_ERR(0, 271, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_plot_histogram_contacts", 1, 3, 3, 2); __PYX_ERR(0, 272, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_plot_histogram_contacts") < 0)) __PYX_ERR(0, 271, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_plot_histogram_contacts") < 0)) __PYX_ERR(0, 272, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -6571,7 +6571,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_17calc_pl
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_plot_histogram_contacts", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 271, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calc_plot_histogram_contacts", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 272, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.contacts.ContactsAnalysis.calc_plot_histogram_contacts", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6604,29 +6604,29 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   int __pyx_t_9;
   __Pyx_RefNannySetupContext("calc_plot_histogram_contacts", 0);
 
-  /* "INDUSAnalysis/contacts.pyx":276
+  /* "INDUSAnalysis/contacts.pyx":277
  *         contacts to file.
  *         """
  *         hist, bin_edges = np.histogram(ts_contacts.data_array, bins=bins)             # <<<<<<<<<<<<<<
  *         bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_histogram); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_histogram); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_data_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts, __pyx_n_s_data_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_bins_2, __pyx_v_bins) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_bins_2, __pyx_v_bins) < 0) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -6637,7 +6637,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 276, __pyx_L1_error)
+      __PYX_ERR(0, 277, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -6650,15 +6650,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_INCREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_t_3);
     #else
-    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 276, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_2 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
+    __pyx_t_2 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = Py_TYPE(__pyx_t_2)->tp_iternext;
@@ -6666,7 +6666,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_GOTREF(__pyx_t_1);
     index = 1; __pyx_t_3 = __pyx_t_5(__pyx_t_2); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_2), 2) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_2), 2) < 0) __PYX_ERR(0, 277, __pyx_L1_error)
     __pyx_t_5 = NULL;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     goto __pyx_L4_unpacking_done;
@@ -6674,7 +6674,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_5 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 276, __pyx_L1_error)
+    __PYX_ERR(0, 277, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_hist = __pyx_t_1;
@@ -6682,43 +6682,43 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   __pyx_v_bin_edges = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":277
+  /* "INDUSAnalysis/contacts.pyx":278
  *         """
  *         hist, bin_edges = np.histogram(ts_contacts.data_array, bins=bins)
  *         bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])             # <<<<<<<<<<<<<<
  * 
  *         histogram = np.zeros((2, len(hist)))
  */
-  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_v_bin_edges, 1, 0, NULL, NULL, &__pyx_slice__16, 1, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetSlice(__pyx_v_bin_edges, 1, 0, NULL, NULL, &__pyx_slice__16, 1, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_v_bin_edges, 0, -1L, NULL, NULL, &__pyx_slice__17, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_v_bin_edges, 0, -1L, NULL, NULL, &__pyx_slice__17, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyNumber_Add(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Add(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Multiply(__pyx_float_0_5, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_float_0_5, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_bin_centers = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":279
+  /* "INDUSAnalysis/contacts.pyx":280
  *         bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
  * 
  *         histogram = np.zeros((2, len(hist)))             # <<<<<<<<<<<<<<
  *         histogram[0, :] = bin_centers
  *         histogram[1, :] = hist
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = PyObject_Length(__pyx_v_hist); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 279, __pyx_L1_error)
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_6 = PyObject_Length(__pyx_v_hist); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 280, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_int_2);
   __Pyx_GIVEREF(__pyx_int_2);
@@ -6739,45 +6739,45 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 279, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_histogram = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":280
+  /* "INDUSAnalysis/contacts.pyx":281
  * 
  *         histogram = np.zeros((2, len(hist)))
  *         histogram[0, :] = bin_centers             # <<<<<<<<<<<<<<
  *         histogram[1, :] = hist
  * 
  */
-  if (unlikely(PyObject_SetItem(__pyx_v_histogram, __pyx_tuple__18, __pyx_v_bin_centers) < 0)) __PYX_ERR(0, 280, __pyx_L1_error)
+  if (unlikely(PyObject_SetItem(__pyx_v_histogram, __pyx_tuple__18, __pyx_v_bin_centers) < 0)) __PYX_ERR(0, 281, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":281
+  /* "INDUSAnalysis/contacts.pyx":282
  *         histogram = np.zeros((2, len(hist)))
  *         histogram[0, :] = bin_centers
  *         histogram[1, :] = hist             # <<<<<<<<<<<<<<
  * 
  *         np.save(self.opref + "_hist.npy", histogram)
  */
-  if (unlikely(PyObject_SetItem(__pyx_v_histogram, __pyx_tuple__19, __pyx_v_hist) < 0)) __PYX_ERR(0, 281, __pyx_L1_error)
+  if (unlikely(PyObject_SetItem(__pyx_v_histogram, __pyx_tuple__19, __pyx_v_hist) < 0)) __PYX_ERR(0, 282, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":283
+  /* "INDUSAnalysis/contacts.pyx":284
  *         histogram[1, :] = hist
  * 
  *         np.save(self.opref + "_hist.npy", histogram)             # <<<<<<<<<<<<<<
  * 
  *         fig, ax = plt.subplots()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 283, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_save); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 283, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_save); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 283, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = PyNumber_Add(__pyx_t_4, __pyx_kp_s_hist_npy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Add(__pyx_t_4, __pyx_kp_s_hist_npy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -6795,7 +6795,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_1, __pyx_v_histogram};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6804,14 +6804,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_1, __pyx_v_histogram};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else
   #endif
   {
-    __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 283, __pyx_L1_error)
+    __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (__pyx_t_4) {
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -6822,23 +6822,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_GIVEREF(__pyx_v_histogram);
     PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_v_histogram);
     __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":285
+  /* "INDUSAnalysis/contacts.pyx":286
  *         np.save(self.opref + "_hist.npy", histogram)
  * 
  *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
  *         ax.plot(bin_centers, hist)
  *         ax.set_xlabel('Number of contacts')
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -6853,7 +6853,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
@@ -6862,7 +6862,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 285, __pyx_L1_error)
+      __PYX_ERR(0, 286, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -6875,15 +6875,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_INCREF(__pyx_t_8);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_8 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_8 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 286, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 286, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_5 = Py_TYPE(__pyx_t_1)->tp_iternext;
@@ -6891,7 +6891,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_GOTREF(__pyx_t_8);
     index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_1); if (unlikely(!__pyx_t_2)) goto __pyx_L5_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_1), 2) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_1), 2) < 0) __PYX_ERR(0, 286, __pyx_L1_error)
     __pyx_t_5 = NULL;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     goto __pyx_L6_unpacking_done;
@@ -6899,7 +6899,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_5 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 285, __pyx_L1_error)
+    __PYX_ERR(0, 286, __pyx_L1_error)
     __pyx_L6_unpacking_done:;
   }
   __pyx_v_fig = __pyx_t_8;
@@ -6907,14 +6907,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   __pyx_v_ax = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":286
+  /* "INDUSAnalysis/contacts.pyx":287
  * 
  *         fig, ax = plt.subplots()
  *         ax.plot(bin_centers, hist)             # <<<<<<<<<<<<<<
  *         ax.set_xlabel('Number of contacts')
  *         ax.set_ylabel('Frequency')
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_8 = NULL;
   __pyx_t_7 = 0;
@@ -6931,7 +6931,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_bin_centers, __pyx_v_hist};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 286, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else
@@ -6939,13 +6939,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_bin_centers, __pyx_v_hist};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 286, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else
   #endif
   {
-    __pyx_t_1 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 286, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     if (__pyx_t_8) {
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -6956,21 +6956,21 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     __Pyx_INCREF(__pyx_v_hist);
     __Pyx_GIVEREF(__pyx_v_hist);
     PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_7, __pyx_v_hist);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 286, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":287
+  /* "INDUSAnalysis/contacts.pyx":288
  *         fig, ax = plt.subplots()
  *         ax.plot(bin_centers, hist)
  *         ax.set_xlabel('Number of contacts')             # <<<<<<<<<<<<<<
  *         ax.set_ylabel('Frequency')
  *         fig.set_dpi(300)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6984,19 +6984,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_kp_s_Number_of_contacts) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Number_of_contacts);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":288
+  /* "INDUSAnalysis/contacts.pyx":289
  *         ax.plot(bin_centers, hist)
  *         ax.set_xlabel('Number of contacts')
  *         ax.set_ylabel('Frequency')             # <<<<<<<<<<<<<<
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="hist_contacts")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 288, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7010,19 +7010,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_n_s_Frequency) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_Frequency);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 288, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":289
+  /* "INDUSAnalysis/contacts.pyx":290
  *         ax.set_xlabel('Number of contacts')
  *         ax.set_ylabel('Frequency')
  *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="hist_contacts")
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7036,58 +7036,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":290
+  /* "INDUSAnalysis/contacts.pyx":291
  *         ax.set_ylabel('Frequency')
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="hist_contacts")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_n_s_hist_contacts) < 0) __PYX_ERR(0, 290, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 290, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_n_s_hist_contacts) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":291
+  /* "INDUSAnalysis/contacts.pyx":292
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="hist_contacts")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 292, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   if (__pyx_t_9) {
 
-    /* "INDUSAnalysis/contacts.pyx":292
+    /* "INDUSAnalysis/contacts.pyx":293
  *         self.save_figure(fig, suffix="hist_contacts")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 293, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -7102,12 +7102,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     }
     __pyx_t_8 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 292, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 293, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":291
+    /* "INDUSAnalysis/contacts.pyx":292
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="hist_contacts")
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -7117,7 +7117,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     goto __pyx_L7;
   }
 
-  /* "INDUSAnalysis/contacts.pyx":294
+  /* "INDUSAnalysis/contacts.pyx":295
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -7125,9 +7125,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
  *     def write_contacts_per_atom_pdb(self, u, skip, ts_contacts_per_atom):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 294, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 294, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -7142,14 +7142,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
     }
     __pyx_t_8 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 294, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   }
   __pyx_L7:;
 
-  /* "INDUSAnalysis/contacts.pyx":271
+  /* "INDUSAnalysis/contacts.pyx":272
  *             plt.close()
  * 
  *     def calc_plot_histogram_contacts(self, ts_contacts, bins):             # <<<<<<<<<<<<<<
@@ -7180,7 +7180,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_16calc_pl
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/contacts.pyx":296
+/* "INDUSAnalysis/contacts.pyx":297
  *             plt.close()
  * 
  *     def write_contacts_per_atom_pdb(self, u, skip, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
@@ -7227,23 +7227,23 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_19write_c
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, 1); __PYX_ERR(0, 296, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, 1); __PYX_ERR(0, 297, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_skip_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, 2); __PYX_ERR(0, 296, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, 2); __PYX_ERR(0, 297, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_contacts_per_atom)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, 3); __PYX_ERR(0, 296, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, 3); __PYX_ERR(0, 297, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_contacts_per_atom_pdb") < 0)) __PYX_ERR(0, 296, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_contacts_per_atom_pdb") < 0)) __PYX_ERR(0, 297, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -7260,7 +7260,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_8contacts_16ContactsAnalysis_19write_c
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 296, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_contacts_per_atom_pdb", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 297, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.contacts.ContactsAnalysis.write_contacts_per_atom_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7303,14 +7303,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
   int __pyx_t_18;
   __Pyx_RefNannySetupContext("write_contacts_per_atom_pdb", 0);
 
-  /* "INDUSAnalysis/contacts.pyx":309
+  /* "INDUSAnalysis/contacts.pyx":310
  *             and ts_contacts_per_atom does not match.
  *         """
  *         protein = u.select_atoms("protein")             # <<<<<<<<<<<<<<
  *         u.add_TopologyAttr('tempfactors')
  *         pdbtrj = self.opref + "_contacts.pdb"
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7324,20 +7324,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_n_s_protein) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_protein);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 310, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_protein = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":310
+  /* "INDUSAnalysis/contacts.pyx":311
  *         """
  *         protein = u.select_atoms("protein")
  *         u.add_TopologyAttr('tempfactors')             # <<<<<<<<<<<<<<
  *         pdbtrj = self.opref + "_contacts.pdb"
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_add_TopologyAttr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_add_TopologyAttr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 311, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7351,82 +7351,82 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_n_s_tempfactors) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_tempfactors);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 310, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 311, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":311
+  /* "INDUSAnalysis/contacts.pyx":312
  *         protein = u.select_atoms("protein")
  *         u.add_TopologyAttr('tempfactors')
  *         pdbtrj = self.opref + "_contacts.pdb"             # <<<<<<<<<<<<<<
  * 
  *         utraj = u.trajectory[0::skip]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 312, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_contacts_pdb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_contacts_pdb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 312, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_pdbtrj = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":313
+  /* "INDUSAnalysis/contacts.pyx":314
  *         pdbtrj = self.opref + "_contacts.pdb"
  * 
  *         utraj = u.trajectory[0::skip]             # <<<<<<<<<<<<<<
  * 
  *         if self.verbose:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PySlice_New(__pyx_int_0, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_1 = PySlice_New(__pyx_int_0, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_utraj = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":315
+  /* "INDUSAnalysis/contacts.pyx":316
  *         utraj = u.trajectory[0::skip]
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 315, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 315, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/contacts.pyx":316
+    /* "INDUSAnalysis/contacts.pyx":317
  * 
  *         if self.verbose:
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))             # <<<<<<<<<<<<<<
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 316, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 317, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 316, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 317, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_desc, __pyx_kp_s_Writing_PDB) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
-    __pyx_t_5 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 316, __pyx_L1_error)
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 316, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_desc, __pyx_kp_s_Writing_PDB) < 0) __PYX_ERR(0, 317, __pyx_L1_error)
+    __pyx_t_5 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 317, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_total, __pyx_t_2) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_total, __pyx_t_2) < 0) __PYX_ERR(0, 317, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 316, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pbar = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":315
+    /* "INDUSAnalysis/contacts.pyx":316
  *         utraj = u.trajectory[0::skip]
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
@@ -7435,7 +7435,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
  */
   }
 
-  /* "INDUSAnalysis/contacts.pyx":318
+  /* "INDUSAnalysis/contacts.pyx":319
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
@@ -7443,35 +7443,35 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
  *                 if np.isclose(ts.time, ts_contacts_per_atom.time_array[tidx]):
  */
   /*with:*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Writer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Writer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_v_pdbtrj);
     __Pyx_GIVEREF(__pyx_v_pdbtrj);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_pdbtrj);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_multiframe, Py_True) < 0) __PYX_ERR(0, 318, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_bonds, Py_None) < 0) __PYX_ERR(0, 318, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 318, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_multiframe, Py_True) < 0) __PYX_ERR(0, 319, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_bonds, Py_None) < 0) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_n_atoms); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_n_atoms); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_n_atoms, __pyx_t_7) < 0) __PYX_ERR(0, 318, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_n_atoms, __pyx_t_7) < 0) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_8 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_exit); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_exit); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L4_error)
+    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7485,7 +7485,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
     }
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L4_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = __pyx_t_3;
@@ -7503,7 +7503,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
           __pyx_v_PDB = __pyx_t_2;
           __pyx_t_2 = 0;
 
-          /* "INDUSAnalysis/contacts.pyx":319
+          /* "INDUSAnalysis/contacts.pyx":320
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
@@ -7516,26 +7516,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
             __pyx_t_7 = __pyx_v_utraj; __Pyx_INCREF(__pyx_t_7); __pyx_t_5 = 0;
             __pyx_t_12 = NULL;
           } else {
-            __pyx_t_5 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 319, __pyx_L8_error)
+            __pyx_t_5 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 320, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_12 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 319, __pyx_L8_error)
+            __pyx_t_12 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 320, __pyx_L8_error)
           }
           for (;;) {
             if (likely(!__pyx_t_12)) {
               if (likely(PyList_CheckExact(__pyx_t_7))) {
                 if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_7)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 319, __pyx_L8_error)
+                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 320, __pyx_L8_error)
                 #else
-                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L8_error)
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 320, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_3);
                 #endif
               } else {
                 if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_7)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 319, __pyx_L8_error)
+                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 320, __pyx_L8_error)
                 #else
-                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L8_error)
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 320, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_3);
                 #endif
               }
@@ -7545,7 +7545,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
                   if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                  else __PYX_ERR(0, 319, __pyx_L8_error)
+                  else __PYX_ERR(0, 320, __pyx_L8_error)
                 }
                 break;
               }
@@ -7555,29 +7555,29 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
             __pyx_t_3 = 0;
             __Pyx_INCREF(__pyx_t_2);
             __Pyx_XDECREF_SET(__pyx_v_tidx, __pyx_t_2);
-            __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L8_error)
+            __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 320, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_2);
             __pyx_t_2 = __pyx_t_3;
             __pyx_t_3 = 0;
 
-            /* "INDUSAnalysis/contacts.pyx":320
+            /* "INDUSAnalysis/contacts.pyx":321
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_contacts_per_atom.time_array[tidx]):             # <<<<<<<<<<<<<<
  *                     protein.atoms.tempfactors = ts_contacts_per_atom.data_array[tidx, :]
  *                     PDB.write(self.u.atoms)
  */
-            __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 320, __pyx_L8_error)
+            __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_isclose); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 320, __pyx_L8_error)
+            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_isclose); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 321, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 320, __pyx_L8_error)
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_time_array); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 320, __pyx_L8_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_time_array); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 321, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_14 = __Pyx_PyObject_GetItem(__pyx_t_13, __pyx_v_tidx); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 320, __pyx_L8_error)
+            __pyx_t_14 = __Pyx_PyObject_GetItem(__pyx_t_13, __pyx_v_tidx); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 321, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_14);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __pyx_t_13 = NULL;
@@ -7595,7 +7595,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_6)) {
               PyObject *__pyx_temp[3] = {__pyx_t_13, __pyx_t_1, __pyx_t_14};
-              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 320, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L8_error)
               __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7605,7 +7605,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
               PyObject *__pyx_temp[3] = {__pyx_t_13, __pyx_t_1, __pyx_t_14};
-              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 320, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L8_error)
               __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7613,7 +7613,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
             } else
             #endif
             {
-              __pyx_t_16 = PyTuple_New(2+__pyx_t_15); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 320, __pyx_L8_error)
+              __pyx_t_16 = PyTuple_New(2+__pyx_t_15); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 321, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_16);
               if (__pyx_t_13) {
                 __Pyx_GIVEREF(__pyx_t_13); PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_t_13); __pyx_t_13 = NULL;
@@ -7624,25 +7624,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
               PyTuple_SET_ITEM(__pyx_t_16, 1+__pyx_t_15, __pyx_t_14);
               __pyx_t_1 = 0;
               __pyx_t_14 = 0;
-              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 320, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
             }
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 320, __pyx_L8_error)
+            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 321, __pyx_L8_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             if (likely(__pyx_t_4)) {
 
-              /* "INDUSAnalysis/contacts.pyx":321
+              /* "INDUSAnalysis/contacts.pyx":322
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_contacts_per_atom.time_array[tidx]):
  *                     protein.atoms.tempfactors = ts_contacts_per_atom.data_array[tidx, :]             # <<<<<<<<<<<<<<
  *                     PDB.write(self.u.atoms)
  *                     if self.verbose:
  */
-              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_data_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_data_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 322, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 321, __pyx_L8_error)
+              __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 322, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
               __Pyx_INCREF(__pyx_v_tidx);
               __Pyx_GIVEREF(__pyx_v_tidx);
@@ -7650,28 +7650,28 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
               __Pyx_INCREF(__pyx_slice__13);
               __Pyx_GIVEREF(__pyx_slice__13);
               PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_slice__13);
-              __pyx_t_16 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 321, __pyx_L8_error)
+              __pyx_t_16 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 322, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_16);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 321, __pyx_L8_error)
+              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 322, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
-              if (__Pyx_PyObject_SetAttrStr(__pyx_t_6, __pyx_n_s_tempfactors, __pyx_t_16) < 0) __PYX_ERR(0, 321, __pyx_L8_error)
+              if (__Pyx_PyObject_SetAttrStr(__pyx_t_6, __pyx_n_s_tempfactors, __pyx_t_16) < 0) __PYX_ERR(0, 322, __pyx_L8_error)
               __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-              /* "INDUSAnalysis/contacts.pyx":322
+              /* "INDUSAnalysis/contacts.pyx":323
  *                 if np.isclose(ts.time, ts_contacts_per_atom.time_array[tidx]):
  *                     protein.atoms.tempfactors = ts_contacts_per_atom.data_array[tidx, :]
  *                     PDB.write(self.u.atoms)             # <<<<<<<<<<<<<<
  *                     if self.verbose:
  *                         pbar.update(1)
  */
-              __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_PDB, __pyx_n_s_write); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 322, __pyx_L8_error)
+              __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_PDB, __pyx_n_s_write); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 323, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_16);
-              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 322, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 323, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_atoms); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 322, __pyx_L8_error)
+              __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_atoms); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 323, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_14);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __pyx_t_3 = NULL;
@@ -7687,33 +7687,33 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
               __pyx_t_6 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_3, __pyx_t_14) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_14);
               __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-              if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 322, __pyx_L8_error)
+              if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 323, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
               __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-              /* "INDUSAnalysis/contacts.pyx":323
+              /* "INDUSAnalysis/contacts.pyx":324
  *                     protein.atoms.tempfactors = ts_contacts_per_atom.data_array[tidx, :]
  *                     PDB.write(self.u.atoms)
  *                     if self.verbose:             # <<<<<<<<<<<<<<
  *                         pbar.update(1)
  * 
  */
-              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 323, __pyx_L8_error)
+              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 324, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 323, __pyx_L8_error)
+              __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 324, __pyx_L8_error)
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
               if (__pyx_t_4) {
 
-                /* "INDUSAnalysis/contacts.pyx":324
+                /* "INDUSAnalysis/contacts.pyx":325
  *                     PDB.write(self.u.atoms)
  *                     if self.verbose:
  *                         pbar.update(1)             # <<<<<<<<<<<<<<
  * 
  *                 else:
  */
-                if (unlikely(!__pyx_v_pbar)) { __Pyx_RaiseUnboundLocalError("pbar"); __PYX_ERR(0, 324, __pyx_L8_error) }
-                __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_pbar, __pyx_n_s_update); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 324, __pyx_L8_error)
+                if (unlikely(!__pyx_v_pbar)) { __Pyx_RaiseUnboundLocalError("pbar"); __PYX_ERR(0, 325, __pyx_L8_error) }
+                __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_pbar, __pyx_n_s_update); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 325, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_16);
                 __pyx_t_14 = NULL;
                 if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
@@ -7727,12 +7727,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
                 }
                 __pyx_t_6 = (__pyx_t_14) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_14, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_int_1);
                 __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 324, __pyx_L8_error)
+                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 325, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_6);
                 __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
                 __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-                /* "INDUSAnalysis/contacts.pyx":323
+                /* "INDUSAnalysis/contacts.pyx":324
  *                     protein.atoms.tempfactors = ts_contacts_per_atom.data_array[tidx, :]
  *                     PDB.write(self.u.atoms)
  *                     if self.verbose:             # <<<<<<<<<<<<<<
@@ -7741,7 +7741,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
  */
               }
 
-              /* "INDUSAnalysis/contacts.pyx":320
+              /* "INDUSAnalysis/contacts.pyx":321
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_contacts_per_atom.time_array[tidx]):             # <<<<<<<<<<<<<<
@@ -7751,7 +7751,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
               goto __pyx_L16;
             }
 
-            /* "INDUSAnalysis/contacts.pyx":327
+            /* "INDUSAnalysis/contacts.pyx":328
  * 
  *                 else:
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")             # <<<<<<<<<<<<<<
@@ -7759,15 +7759,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
  *     """call"""
  */
             /*else*/ {
-              __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 327, __pyx_L8_error)
+              __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 328, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
               __Pyx_Raise(__pyx_t_6, 0, 0, 0);
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __PYX_ERR(0, 327, __pyx_L8_error)
+              __PYX_ERR(0, 328, __pyx_L8_error)
             }
             __pyx_L16:;
 
-            /* "INDUSAnalysis/contacts.pyx":319
+            /* "INDUSAnalysis/contacts.pyx":320
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
@@ -7778,7 +7778,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "INDUSAnalysis/contacts.pyx":318
+          /* "INDUSAnalysis/contacts.pyx":319
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
@@ -7801,20 +7801,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("INDUSAnalysis.contacts.ContactsAnalysis.write_contacts_per_atom_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_7, &__pyx_t_6) < 0) __PYX_ERR(0, 318, __pyx_L10_except_error)
+          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_7, &__pyx_t_6) < 0) __PYX_ERR(0, 319, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_16 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 318, __pyx_L10_except_error)
+          __pyx_t_16 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 319, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_16);
           __pyx_t_17 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_16, NULL);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-          if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 318, __pyx_L10_except_error)
+          if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 319, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_17);
           __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_17);
           __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-          if (__pyx_t_4 < 0) __PYX_ERR(0, 318, __pyx_L10_except_error)
+          if (__pyx_t_4 < 0) __PYX_ERR(0, 319, __pyx_L10_except_error)
           __pyx_t_18 = ((!(__pyx_t_4 != 0)) != 0);
           if (__pyx_t_18) {
             __Pyx_GIVEREF(__pyx_t_2);
@@ -7822,7 +7822,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
             __Pyx_XGIVEREF(__pyx_t_6);
             __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_7, __pyx_t_6);
             __pyx_t_2 = 0; __pyx_t_7 = 0; __pyx_t_6 = 0; 
-            __PYX_ERR(0, 318, __pyx_L10_except_error)
+            __PYX_ERR(0, 319, __pyx_L10_except_error)
           }
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -7848,7 +7848,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
         if (__pyx_t_8) {
           __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_tuple__21, NULL);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 318, __pyx_L1_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 319, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         }
@@ -7863,7 +7863,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
     __pyx_L21:;
   }
 
-  /* "INDUSAnalysis/contacts.pyx":296
+  /* "INDUSAnalysis/contacts.pyx":297
  *             plt.close()
  * 
  *     def write_contacts_per_atom_pdb(self, u, skip, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
@@ -7898,7 +7898,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_18write_c
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/contacts.pyx":330
+/* "INDUSAnalysis/contacts.pyx":331
  * 
  *     """call"""
  *     def __call__(self):             # <<<<<<<<<<<<<<
@@ -7943,31 +7943,31 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   int __pyx_t_12;
   __Pyx_RefNannySetupContext("__call__", 0);
 
-  /* "INDUSAnalysis/contacts.pyx":334
+  /* "INDUSAnalysis/contacts.pyx":335
  * 
  *         """Raw data"""
  *         if self.replot:             # <<<<<<<<<<<<<<
  *             ts_contactmatrices = self.load_TimeSeries(self.opref + "_contactmatrices")
  *             ts_contacts_per_atom = self.load_TimeSeries(self.opref + "_contacts_per_atom")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 334, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 335, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 334, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 335, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "INDUSAnalysis/contacts.pyx":335
+    /* "INDUSAnalysis/contacts.pyx":336
  *         """Raw data"""
  *         if self.replot:
  *             ts_contactmatrices = self.load_TimeSeries(self.opref + "_contactmatrices")             # <<<<<<<<<<<<<<
  *             ts_contacts_per_atom = self.load_TimeSeries(self.opref + "_contacts_per_atom")
  *             ts_contacts = self.load_TimeSeries(self.opref + "_contacts")
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 335, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 335, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyNumber_Add(__pyx_t_4, __pyx_n_s_contactmatrices); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 335, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Add(__pyx_t_4, __pyx_n_s_contactmatrices); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -7983,24 +7983,24 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 335, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_ts_contactmatrices = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":336
+    /* "INDUSAnalysis/contacts.pyx":337
  *         if self.replot:
  *             ts_contactmatrices = self.load_TimeSeries(self.opref + "_contactmatrices")
  *             ts_contacts_per_atom = self.load_TimeSeries(self.opref + "_contacts_per_atom")             # <<<<<<<<<<<<<<
  *             ts_contacts = self.load_TimeSeries(self.opref + "_contacts")
  *         else:
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 336, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PyNumber_Add(__pyx_t_5, __pyx_n_s_contacts_per_atom_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 336, __pyx_L1_error)
+    __pyx_t_4 = PyNumber_Add(__pyx_t_5, __pyx_n_s_contacts_per_atom_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -8016,24 +8016,24 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_ts_contacts_per_atom = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":337
+    /* "INDUSAnalysis/contacts.pyx":338
  *             ts_contactmatrices = self.load_TimeSeries(self.opref + "_contactmatrices")
  *             ts_contacts_per_atom = self.load_TimeSeries(self.opref + "_contacts_per_atom")
  *             ts_contacts = self.load_TimeSeries(self.opref + "_contacts")             # <<<<<<<<<<<<<<
  *         else:
  *             # Calculate contacts along trajectory
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 338, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 337, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 338, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyNumber_Add(__pyx_t_4, __pyx_n_s_contacts_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 337, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Add(__pyx_t_4, __pyx_n_s_contacts_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 338, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -8049,13 +8049,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 338, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_ts_contacts = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":334
+    /* "INDUSAnalysis/contacts.pyx":335
  * 
  *         """Raw data"""
  *         if self.replot:             # <<<<<<<<<<<<<<
@@ -8065,7 +8065,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/contacts.pyx":340
+  /* "INDUSAnalysis/contacts.pyx":341
  *         else:
  *             # Calculate contacts along trajectory
  *             ts_contactmatrices = self.calc_trajcontacts(self.u, self.method, self.distcutoff,             # <<<<<<<<<<<<<<
@@ -8073,25 +8073,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
  *             # Compute reductions
  */
   /*else*/ {
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_trajcontacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_trajcontacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 341, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 340, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 341, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_method_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 340, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_method_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 341, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_distcutoff_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 340, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_distcutoff_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 341, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
 
-    /* "INDUSAnalysis/contacts.pyx":341
+    /* "INDUSAnalysis/contacts.pyx":342
  *             # Calculate contacts along trajectory
  *             ts_contactmatrices = self.calc_trajcontacts(self.u, self.method, self.distcutoff,
  *                                                         self.connthreshold, self.skip)             # <<<<<<<<<<<<<<
  *             # Compute reductions
  *             ts_contacts_per_atom = ts_contactmatrices.mean(axis=2)
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_connthreshold_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 341, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_connthreshold_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 342, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 341, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 342, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_9 = NULL;
     __pyx_t_10 = 0;
@@ -8108,7 +8108,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_5, __pyx_t_4, __pyx_t_6, __pyx_t_7, __pyx_t_8};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 341, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -8121,7 +8121,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_5, __pyx_t_4, __pyx_t_6, __pyx_t_7, __pyx_t_8};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 341, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -8132,7 +8132,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     } else
     #endif
     {
-      __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 340, __pyx_L1_error)
+      __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 341, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -8152,7 +8152,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
       __pyx_t_6 = 0;
       __pyx_t_7 = 0;
       __pyx_t_8 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 341, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
@@ -8160,38 +8160,38 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __pyx_v_ts_contactmatrices = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":343
+    /* "INDUSAnalysis/contacts.pyx":344
  *                                                         self.connthreshold, self.skip)
  *             # Compute reductions
  *             ts_contacts_per_atom = ts_contactmatrices.mean(axis=2)             # <<<<<<<<<<<<<<
  *             ts_contacts = ts_contacts_per_atom.mean(axis=1)
  * 
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contactmatrices, __pyx_n_s_mean); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contactmatrices, __pyx_n_s_mean); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 344, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 344, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_axis, __pyx_int_2) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
-    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 343, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_axis, __pyx_int_2) < 0) __PYX_ERR(0, 344, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 344, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_ts_contacts_per_atom = __pyx_t_11;
     __pyx_t_11 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":344
+    /* "INDUSAnalysis/contacts.pyx":345
  *             # Compute reductions
  *             ts_contacts_per_atom = ts_contactmatrices.mean(axis=2)
  *             ts_contacts = ts_contacts_per_atom.mean(axis=1)             # <<<<<<<<<<<<<<
  * 
  *         self.save_TimeSeries(ts_contactmatrices, self.opref + "_contactmatrices")
  */
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_mean); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 344, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_contacts_per_atom, __pyx_n_s_mean); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 345, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 344, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 345, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 344, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 344, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 345, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 345, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -8200,18 +8200,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/contacts.pyx":346
+  /* "INDUSAnalysis/contacts.pyx":347
  *             ts_contacts = ts_contacts_per_atom.mean(axis=1)
  * 
  *         self.save_TimeSeries(ts_contactmatrices, self.opref + "_contactmatrices")             # <<<<<<<<<<<<<<
  *         self.save_TimeSeries(ts_contacts_per_atom, self.opref + "_contacts_per_atom")
  *         self.save_TimeSeries(ts_contacts, self.opref + "_contacts")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_8 = PyNumber_Add(__pyx_t_11, __pyx_n_s_contactmatrices); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_Add(__pyx_t_11, __pyx_n_s_contactmatrices); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __pyx_t_11 = NULL;
@@ -8229,7 +8229,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_ts_contactmatrices, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -8238,14 +8238,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_ts_contactmatrices, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 347, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_11) {
       __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -8256,25 +8256,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __Pyx_GIVEREF(__pyx_t_8);
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_8);
     __pyx_t_8 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":347
+  /* "INDUSAnalysis/contacts.pyx":348
  * 
  *         self.save_TimeSeries(ts_contactmatrices, self.opref + "_contactmatrices")
  *         self.save_TimeSeries(ts_contacts_per_atom, self.opref + "_contacts_per_atom")             # <<<<<<<<<<<<<<
  *         self.save_TimeSeries(ts_contacts, self.opref + "_contacts")
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 348, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 348, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyNumber_Add(__pyx_t_7, __pyx_n_s_contacts_per_atom_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_Add(__pyx_t_7, __pyx_n_s_contacts_per_atom_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 348, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_t_7 = NULL;
@@ -8292,7 +8292,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_v_ts_contacts_per_atom, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -8301,14 +8301,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_v_ts_contacts_per_atom, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   } else
   #endif
   {
-    __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 347, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     if (__pyx_t_7) {
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -8319,25 +8319,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __Pyx_GIVEREF(__pyx_t_8);
     PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_8);
     __pyx_t_8 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":348
+  /* "INDUSAnalysis/contacts.pyx":349
  *         self.save_TimeSeries(ts_contactmatrices, self.opref + "_contactmatrices")
  *         self.save_TimeSeries(ts_contacts_per_atom, self.opref + "_contacts_per_atom")
  *         self.save_TimeSeries(ts_contacts, self.opref + "_contacts")             # <<<<<<<<<<<<<<
  * 
  *         # Calculate mean contactmatrix
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 348, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 348, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_8 = PyNumber_Add(__pyx_t_11, __pyx_n_s_contacts_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 348, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_Add(__pyx_t_11, __pyx_n_s_contacts_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __pyx_t_11 = NULL;
@@ -8355,7 +8355,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_ts_contacts, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -8364,14 +8364,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_v_ts_contacts, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_11) {
       __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -8382,57 +8382,57 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __Pyx_GIVEREF(__pyx_t_8);
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_8);
     __pyx_t_8 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":351
+  /* "INDUSAnalysis/contacts.pyx":352
  * 
  *         # Calculate mean contactmatrix
  *         mean_contactmatrix = ts_contactmatrices[self.obsstart:self.obsend].mean(axis=0)             # <<<<<<<<<<<<<<
  * 
  *         # Calculate mean number of contacts along trajectory
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_GetSlice(__pyx_v_ts_contactmatrices, 0, 0, &__pyx_t_1, &__pyx_t_3, NULL, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetSlice(__pyx_v_ts_contactmatrices, 0, 0, &__pyx_t_1, &__pyx_t_3, NULL, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 351, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_mean_contactmatrix = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":354
+  /* "INDUSAnalysis/contacts.pyx":355
  * 
  *         # Calculate mean number of contacts along trajectory
  *         mean_contacts = ts_contacts[self.obsstart:self.obsend].mean()             # <<<<<<<<<<<<<<
  *         # If no reference is set, use this as the reference value for fraction of contacts
  *         if self.refcontacts is None:
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_8 = __Pyx_PyObject_GetSlice(__pyx_v_ts_contacts, 0, 0, &__pyx_t_7, &__pyx_t_3, NULL, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetSlice(__pyx_v_ts_contacts, 0, 0, &__pyx_t_7, &__pyx_t_3, NULL, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_t_8 = NULL;
@@ -8447,36 +8447,36 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   }
   __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_mean_contacts = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":356
+  /* "INDUSAnalysis/contacts.pyx":357
  *         mean_contacts = ts_contacts[self.obsstart:self.obsend].mean()
  *         # If no reference is set, use this as the reference value for fraction of contacts
  *         if self.refcontacts is None:             # <<<<<<<<<<<<<<
  *             self.refcontacts = mean_contacts
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refcontacts_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 356, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refcontacts_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 357, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = (__pyx_t_1 == Py_None);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_12 = (__pyx_t_2 != 0);
   if (__pyx_t_12) {
 
-    /* "INDUSAnalysis/contacts.pyx":357
+    /* "INDUSAnalysis/contacts.pyx":358
  *         # If no reference is set, use this as the reference value for fraction of contacts
  *         if self.refcontacts is None:
  *             self.refcontacts = mean_contacts             # <<<<<<<<<<<<<<
  * 
  *         """Plots"""
  */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_refcontacts_2, __pyx_v_mean_contacts) < 0) __PYX_ERR(0, 357, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_refcontacts_2, __pyx_v_mean_contacts) < 0) __PYX_ERR(0, 358, __pyx_L1_error)
 
-    /* "INDUSAnalysis/contacts.pyx":356
+    /* "INDUSAnalysis/contacts.pyx":357
  *         mean_contacts = ts_contacts[self.obsstart:self.obsend].mean()
  *         # If no reference is set, use this as the reference value for fraction of contacts
  *         if self.refcontacts is None:             # <<<<<<<<<<<<<<
@@ -8485,14 +8485,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
  */
   }
 
-  /* "INDUSAnalysis/contacts.pyx":360
+  /* "INDUSAnalysis/contacts.pyx":361
  * 
  *         """Plots"""
  *         self.plot_mean_contactmatrix(mean_contactmatrix)             # <<<<<<<<<<<<<<
  *         self.plot_contacts_per_atom(ts_contacts_per_atom)
  *         self.plot_total_fraction_contacts(ts_contacts, self.refcontacts)
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_mean_contactmatrix); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_mean_contactmatrix); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_8 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -8506,19 +8506,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   }
   __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_v_mean_contactmatrix) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_mean_contactmatrix);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":361
+  /* "INDUSAnalysis/contacts.pyx":362
  *         """Plots"""
  *         self.plot_mean_contactmatrix(mean_contactmatrix)
  *         self.plot_contacts_per_atom(ts_contacts_per_atom)             # <<<<<<<<<<<<<<
  *         self.plot_total_fraction_contacts(ts_contacts, self.refcontacts)
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_contacts_per_atom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_contacts_per_atom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_8 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -8532,21 +8532,21 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   }
   __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_v_ts_contacts_per_atom) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ts_contacts_per_atom);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":362
+  /* "INDUSAnalysis/contacts.pyx":363
  *         self.plot_mean_contactmatrix(mean_contactmatrix)
  *         self.plot_contacts_per_atom(ts_contacts_per_atom)
  *         self.plot_total_fraction_contacts(ts_contacts, self.refcontacts)             # <<<<<<<<<<<<<<
  * 
  *         self.calc_plot_histogram_contacts(ts_contacts, self.bins)
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_total_fraction_contacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_total_fraction_contacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 363, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refcontacts_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refcontacts_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 363, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_7 = NULL;
   __pyx_t_10 = 0;
@@ -8563,7 +8563,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_v_ts_contacts, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 363, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -8572,14 +8572,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_v_ts_contacts, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 363, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   } else
   #endif
   {
-    __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 363, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     if (__pyx_t_7) {
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -8590,23 +8590,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __Pyx_GIVEREF(__pyx_t_8);
     PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_8);
     __pyx_t_8 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 363, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":364
+  /* "INDUSAnalysis/contacts.pyx":365
  *         self.plot_total_fraction_contacts(ts_contacts, self.refcontacts)
  * 
  *         self.calc_plot_histogram_contacts(ts_contacts, self.bins)             # <<<<<<<<<<<<<<
  * 
  *         """Store per-atom contacts in PDB"""
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_plot_histogram_contacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 364, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_plot_histogram_contacts); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bins_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 364, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bins_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __pyx_t_8 = NULL;
   __pyx_t_10 = 0;
@@ -8623,7 +8623,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_ts_contacts, __pyx_t_11};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 365, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
@@ -8632,14 +8632,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_ts_contacts, __pyx_t_11};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 365, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 365, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_8) {
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -8650,35 +8650,35 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     __Pyx_GIVEREF(__pyx_t_11);
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_10, __pyx_t_11);
     __pyx_t_11 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 365, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":367
+  /* "INDUSAnalysis/contacts.pyx":368
  * 
  *         """Store per-atom contacts in PDB"""
  *         if self.genpdb:             # <<<<<<<<<<<<<<
  *             self.write_contacts_per_atom_pdb(self.u, self.skip, ts_contacts_per_atom)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 367, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_12) {
 
-    /* "INDUSAnalysis/contacts.pyx":368
+    /* "INDUSAnalysis/contacts.pyx":369
  *         """Store per-atom contacts in PDB"""
  *         if self.genpdb:
  *             self.write_contacts_per_atom_pdb(self.u, self.skip, ts_contacts_per_atom)             # <<<<<<<<<<<<<<
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_write_contacts_per_atom_pdb); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 368, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_write_contacts_per_atom_pdb); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 369, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 368, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 369, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 368, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 369, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __pyx_t_8 = NULL;
     __pyx_t_10 = 0;
@@ -8695,7 +8695,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_7, __pyx_t_11, __pyx_v_ts_contacts_per_atom};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -8705,7 +8705,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_t_7, __pyx_t_11, __pyx_v_ts_contacts_per_atom};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -8713,7 +8713,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 368, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 369, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       if (__pyx_t_8) {
         __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -8727,14 +8727,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
       PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_10, __pyx_v_ts_contacts_per_atom);
       __pyx_t_7 = 0;
       __pyx_t_11 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/contacts.pyx":367
+    /* "INDUSAnalysis/contacts.pyx":368
  * 
  *         """Store per-atom contacts in PDB"""
  *         if self.genpdb:             # <<<<<<<<<<<<<<
@@ -8742,7 +8742,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_8contacts_16ContactsAnalysis_20__call_
  */
   }
 
-  /* "INDUSAnalysis/contacts.pyx":330
+  /* "INDUSAnalysis/contacts.pyx":331
  * 
  *     """call"""
  *     def __call__(self):             # <<<<<<<<<<<<<<
@@ -11654,61 +11654,61 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
 
-  /* "INDUSAnalysis/contacts.pyx":277
+  /* "INDUSAnalysis/contacts.pyx":278
  *         """
  *         hist, bin_edges = np.histogram(ts_contacts.data_array, bins=bins)
  *         bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])             # <<<<<<<<<<<<<<
  * 
  *         histogram = np.zeros((2, len(hist)))
  */
-  __pyx_slice__16 = PySlice_New(__pyx_int_1, Py_None, Py_None); if (unlikely(!__pyx_slice__16)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_slice__16 = PySlice_New(__pyx_int_1, Py_None, Py_None); if (unlikely(!__pyx_slice__16)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_slice__16);
   __Pyx_GIVEREF(__pyx_slice__16);
-  __pyx_slice__17 = PySlice_New(Py_None, __pyx_int_neg_1, Py_None); if (unlikely(!__pyx_slice__17)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_slice__17 = PySlice_New(Py_None, __pyx_int_neg_1, Py_None); if (unlikely(!__pyx_slice__17)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_slice__17);
   __Pyx_GIVEREF(__pyx_slice__17);
 
-  /* "INDUSAnalysis/contacts.pyx":280
+  /* "INDUSAnalysis/contacts.pyx":281
  * 
  *         histogram = np.zeros((2, len(hist)))
  *         histogram[0, :] = bin_centers             # <<<<<<<<<<<<<<
  *         histogram[1, :] = hist
  * 
  */
-  __pyx_tuple__18 = PyTuple_Pack(2, __pyx_int_0, __pyx_slice__13); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 280, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(2, __pyx_int_0, __pyx_slice__13); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "INDUSAnalysis/contacts.pyx":281
+  /* "INDUSAnalysis/contacts.pyx":282
  *         histogram = np.zeros((2, len(hist)))
  *         histogram[0, :] = bin_centers
  *         histogram[1, :] = hist             # <<<<<<<<<<<<<<
  * 
  *         np.save(self.opref + "_hist.npy", histogram)
  */
-  __pyx_tuple__19 = PyTuple_Pack(2, __pyx_int_1, __pyx_slice__13); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 281, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(2, __pyx_int_1, __pyx_slice__13); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "INDUSAnalysis/contacts.pyx":327
+  /* "INDUSAnalysis/contacts.pyx":328
  * 
  *                 else:
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")             # <<<<<<<<<<<<<<
  * 
  *     """call"""
  */
-  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_s_Trajectory_and_TimeSeries_times); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_s_Trajectory_and_TimeSeries_times); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
 
-  /* "INDUSAnalysis/contacts.pyx":318
+  /* "INDUSAnalysis/contacts.pyx":319
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_contacts_per_atom.time_array[tidx]):
  */
-  __pyx_tuple__21 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 318, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 319, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
 
@@ -11849,77 +11849,77 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__38);
   __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(2, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_protein_heavy_APSP, 177, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 177, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":222
+  /* "INDUSAnalysis/contacts.pyx":223
  *         return dist_matrix, idx_heavy_map
  * 
  *     def plot_mean_contactmatrix(self, mean_contactmatrix):             # <<<<<<<<<<<<<<
  *         """
  *         Plots mean contact matrix.
  */
-  __pyx_tuple__40 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_mean_contactmatrix, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_im); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_tuple__40 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_mean_contactmatrix, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_im); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__40);
   __Pyx_GIVEREF(__pyx_tuple__40);
-  __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_plot_mean_contactmatrix, 222, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_plot_mean_contactmatrix, 223, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) __PYX_ERR(0, 223, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":241
+  /* "INDUSAnalysis/contacts.pyx":242
  *             plt.close()
  * 
  *     def plot_contacts_per_atom(self, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
  *         """
  *         Plots timeseries contacts per atom.
  */
-  __pyx_tuple__42 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_contacts_per_atom, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_tuple__42 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_contacts_per_atom, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__42);
   __Pyx_GIVEREF(__pyx_tuple__42);
-  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_plot_contacts_per_atom, 241, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_plot_contacts_per_atom, 242, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 242, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":253
+  /* "INDUSAnalysis/contacts.pyx":254
  *             plt.close()
  * 
  *     def plot_total_fraction_contacts(self, ts_contacts, refcontacts):             # <<<<<<<<<<<<<<
  *         """
  *         Plots timeseries number of contacts and fraction of contacts.
  */
-  __pyx_tuple__44 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ts_contacts, __pyx_n_s_refcontacts_2, __pyx_n_s_fig1, __pyx_n_s_fig2); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_tuple__44 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ts_contacts, __pyx_n_s_refcontacts_2, __pyx_n_s_fig1, __pyx_n_s_fig2); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__44);
   __Pyx_GIVEREF(__pyx_tuple__44);
-  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_plot_total_fraction_contacts, 253, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_plot_total_fraction_contacts, 254, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(0, 254, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":271
+  /* "INDUSAnalysis/contacts.pyx":272
  *             plt.close()
  * 
  *     def calc_plot_histogram_contacts(self, ts_contacts, bins):             # <<<<<<<<<<<<<<
  *         """
  *         Calculates and plots histogram of contacts, and saves histogram of
  */
-  __pyx_tuple__46 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_ts_contacts, __pyx_n_s_bins_2, __pyx_n_s_hist, __pyx_n_s_bin_edges, __pyx_n_s_bin_centers, __pyx_n_s_histogram, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_tuple__46 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_ts_contacts, __pyx_n_s_bins_2, __pyx_n_s_hist, __pyx_n_s_bin_edges, __pyx_n_s_bin_centers, __pyx_n_s_histogram, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__46);
   __Pyx_GIVEREF(__pyx_tuple__46);
-  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(3, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_calc_plot_histogram_contacts, 271, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(3, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_calc_plot_histogram_contacts, 272, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(0, 272, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":296
+  /* "INDUSAnalysis/contacts.pyx":297
  *             plt.close()
  * 
  *     def write_contacts_per_atom_pdb(self, u, skip, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
  *         """
  *         Writes per-atom-contacts to PDB file.
  */
-  __pyx_tuple__48 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_skip_2, __pyx_n_s_ts_contacts_per_atom, __pyx_n_s_protein, __pyx_n_s_pdbtrj, __pyx_n_s_utraj, __pyx_n_s_pbar, __pyx_n_s_PDB, __pyx_n_s_tidx, __pyx_n_s_ts); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_tuple__48 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_skip_2, __pyx_n_s_ts_contacts_per_atom, __pyx_n_s_protein, __pyx_n_s_pdbtrj, __pyx_n_s_utraj, __pyx_n_s_pbar, __pyx_n_s_PDB, __pyx_n_s_tidx, __pyx_n_s_ts); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__48);
   __Pyx_GIVEREF(__pyx_tuple__48);
-  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(4, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_write_contacts_per_atom_pdb, 296, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(4, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_write_contacts_per_atom_pdb, 297, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(0, 297, __pyx_L1_error)
 
-  /* "INDUSAnalysis/contacts.pyx":330
+  /* "INDUSAnalysis/contacts.pyx":331
  * 
  *     """call"""
  *     def __call__(self):             # <<<<<<<<<<<<<<
  *         """Performs analysis."""
  * 
  */
-  __pyx_tuple__50 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_ts_contactmatrices, __pyx_n_s_ts_contacts_per_atom, __pyx_n_s_ts_contacts, __pyx_n_s_mean_contactmatrix, __pyx_n_s_mean_contacts); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_tuple__50 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_ts_contactmatrices, __pyx_n_s_ts_contacts_per_atom, __pyx_n_s_ts_contacts, __pyx_n_s_mean_contactmatrix, __pyx_n_s_mean_contacts); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__50);
   __Pyx_GIVEREF(__pyx_tuple__50);
-  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_call, 330, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_contacts_pyx, __pyx_n_s_call, 331, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -12538,76 +12538,76 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_protein_heavy_APSP, __pyx_t_5) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":222
+  /* "INDUSAnalysis/contacts.pyx":223
  *         return dist_matrix, idx_heavy_map
  * 
  *     def plot_mean_contactmatrix(self, mean_contactmatrix):             # <<<<<<<<<<<<<<
  *         """
  *         Plots mean contact matrix.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_11plot_mean_contactmatrix, 0, __pyx_n_s_ContactsAnalysis_plot_mean_conta, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__41)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_11plot_mean_contactmatrix, 0, __pyx_n_s_ContactsAnalysis_plot_mean_conta, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__41)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_mean_contactmatrix, __pyx_t_5) < 0) __PYX_ERR(0, 222, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_mean_contactmatrix, __pyx_t_5) < 0) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":241
+  /* "INDUSAnalysis/contacts.pyx":242
  *             plt.close()
  * 
  *     def plot_contacts_per_atom(self, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
  *         """
  *         Plots timeseries contacts per atom.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_13plot_contacts_per_atom, 0, __pyx_n_s_ContactsAnalysis_plot_contacts_p, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__43)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_13plot_contacts_per_atom, 0, __pyx_n_s_ContactsAnalysis_plot_contacts_p, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__43)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_contacts_per_atom, __pyx_t_5) < 0) __PYX_ERR(0, 241, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_contacts_per_atom, __pyx_t_5) < 0) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":253
+  /* "INDUSAnalysis/contacts.pyx":254
  *             plt.close()
  * 
  *     def plot_total_fraction_contacts(self, ts_contacts, refcontacts):             # <<<<<<<<<<<<<<
  *         """
  *         Plots timeseries number of contacts and fraction of contacts.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_15plot_total_fraction_contacts, 0, __pyx_n_s_ContactsAnalysis_plot_total_frac, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__45)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_15plot_total_fraction_contacts, 0, __pyx_n_s_ContactsAnalysis_plot_total_frac, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__45)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_total_fraction_contacts, __pyx_t_5) < 0) __PYX_ERR(0, 253, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_total_fraction_contacts, __pyx_t_5) < 0) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":271
+  /* "INDUSAnalysis/contacts.pyx":272
  *             plt.close()
  * 
  *     def calc_plot_histogram_contacts(self, ts_contacts, bins):             # <<<<<<<<<<<<<<
  *         """
  *         Calculates and plots histogram of contacts, and saves histogram of
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_17calc_plot_histogram_contacts, 0, __pyx_n_s_ContactsAnalysis_calc_plot_histo, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__47)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_17calc_plot_histogram_contacts, 0, __pyx_n_s_ContactsAnalysis_calc_plot_histo, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__47)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_plot_histogram_contacts, __pyx_t_5) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_plot_histogram_contacts, __pyx_t_5) < 0) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":296
+  /* "INDUSAnalysis/contacts.pyx":297
  *             plt.close()
  * 
  *     def write_contacts_per_atom_pdb(self, u, skip, ts_contacts_per_atom):             # <<<<<<<<<<<<<<
  *         """
  *         Writes per-atom-contacts to PDB file.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_19write_contacts_per_atom_pdb, 0, __pyx_n_s_ContactsAnalysis_write_contacts, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__49)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_19write_contacts_per_atom_pdb, 0, __pyx_n_s_ContactsAnalysis_write_contacts, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__49)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_write_contacts_per_atom_pdb, __pyx_t_5) < 0) __PYX_ERR(0, 296, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_write_contacts_per_atom_pdb, __pyx_t_5) < 0) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/contacts.pyx":330
+  /* "INDUSAnalysis/contacts.pyx":331
  * 
  *     """call"""
  *     def __call__(self):             # <<<<<<<<<<<<<<
  *         """Performs analysis."""
  * 
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_21__call__, 0, __pyx_n_s_ContactsAnalysis___call, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__51)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_8contacts_16ContactsAnalysis_21__call__, 0, __pyx_n_s_ContactsAnalysis___call, NULL, __pyx_n_s_INDUSAnalysis_contacts, __pyx_d, ((PyObject *)__pyx_codeobj__51)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_call, __pyx_t_5) < 0) __PYX_ERR(0, 330, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_call, __pyx_t_5) < 0) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "INDUSAnalysis/contacts.pyx":24

@@ -1,24 +1,24 @@
 """
 Helper function definitions for code profiling
-
-@Author: Akash Pallath
 """
 import time
 from functools import wraps
 
-"""
-Skip function exection
-"""
+
 def skipfunc(func):
+    """
+    Bypasses function execution [decorator]
+    """
     @wraps(func)
     def skippedfunc(*args, **kwargs):
         return True
     return skippedfunc
 
-"""
-Report function execution time to stdout
-"""
+
 def timefunc(func):
+    """
+    Reports function execution time to stdout [decorator]
+    """
     @wraps(func)
     def timedfunc(*args, **kwargs):
         tstart = time.time()
@@ -30,10 +30,11 @@ def timefunc(func):
         return output
     return timedfunc
 
-"""
-Report function execution time to file
-"""
+
 def timefuncfile(fname):
+    """
+    Reports function execution time to file [decorator]
+    """
     def timefunc(func):
         @wraps(func)
         def timedfunc(*args, **kwargs):
