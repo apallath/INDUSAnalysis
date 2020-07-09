@@ -13,3 +13,6 @@ tqdm
 
 #Testing
 pytest
+
+#Docs
+sphinxcontrib-napoleon
