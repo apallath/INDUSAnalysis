@@ -1278,7 +1278,7 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
     const char* function_name);
 
 /* PyIntCompare.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
+static CYTHON_INLINE PyObject* __Pyx_PyInt_NeObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
 
 /* GetItemInt.proto */
 #define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
@@ -1301,6 +1301,45 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize
 static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
                                                      int is_list, int wraparound, int boundscheck);
+
+/* PyThreadStateGet.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
+#define __Pyx_PyThreadState_assign  __pyx_tstate = __Pyx_PyThreadState_Current;
+#define __Pyx_PyErr_Occurred()  __pyx_tstate->curexc_type
+#else
+#define __Pyx_PyThreadState_declare
+#define __Pyx_PyThreadState_assign
+#define __Pyx_PyErr_Occurred()  PyErr_Occurred()
+#endif
+
+/* PyErrFetchRestore.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyErr_Clear() __Pyx_ErrRestore(NULL, NULL, NULL)
+#define __Pyx_ErrRestoreWithState(type, value, tb)  __Pyx_ErrRestoreInState(PyThreadState_GET(), type, value, tb)
+#define __Pyx_ErrFetchWithState(type, value, tb)    __Pyx_ErrFetchInState(PyThreadState_GET(), type, value, tb)
+#define __Pyx_ErrRestore(type, value, tb)  __Pyx_ErrRestoreInState(__pyx_tstate, type, value, tb)
+#define __Pyx_ErrFetch(type, value, tb)    __Pyx_ErrFetchInState(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#if CYTHON_COMPILING_IN_CPYTHON
+#define __Pyx_PyErr_SetNone(exc) (Py_INCREF(exc), __Pyx_ErrRestore((exc), NULL, NULL))
+#else
+#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
+#endif
+#else
+#define __Pyx_PyErr_Clear() PyErr_Clear()
+#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
+#define __Pyx_ErrRestoreWithState(type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetchWithState(type, value, tb)  PyErr_Fetch(type, value, tb)
+#define __Pyx_ErrRestoreInState(tstate, type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetchInState(tstate, type, value, tb)  PyErr_Fetch(type, value, tb)
+#define __Pyx_ErrRestore(type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
+#endif
+
+/* RaiseException.proto */
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
 /* PyObjectCall2Args.proto */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
@@ -1329,14 +1368,8 @@ static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
 #define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
 #endif
 
-/* PyObjectGetMethod.proto */
-static int __Pyx_PyObject_GetMethod(PyObject *obj, PyObject *name, PyObject **method);
-
-/* PyObjectCallMethod1.proto */
-static PyObject* __Pyx_PyObject_CallMethod1(PyObject* obj, PyObject* method_name, PyObject* arg);
-
-/* append.proto */
-static CYTHON_INLINE int __Pyx_PyObject_Append(PyObject* L, PyObject* x);
+/* PyIntCompare.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
 
 /* RaiseTooManyValuesToUnpack.proto */
 static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
@@ -1349,29 +1382,6 @@ static CYTHON_INLINE int __Pyx_IterFinish(void);
 
 /* UnpackItemEndCheck.proto */
 static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
-
-/* SliceObject.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(
-        PyObject* obj, Py_ssize_t cstart, Py_ssize_t cstop,
-        PyObject** py_start, PyObject** py_stop, PyObject** py_slice,
-        int has_cstart, int has_cstop, int wraparound);
-
-/* ListCompAppend.proto */
-#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
-static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
-    PyListObject* L = (PyListObject*) list;
-    Py_ssize_t len = Py_SIZE(list);
-    if (likely(L->allocated > len)) {
-        Py_INCREF(x);
-        PyList_SET_ITEM(list, len, x);
-        Py_SIZE(list) = len+1;
-        return 0;
-    }
-    return PyList_Append(list, x);
-}
-#else
-#define __Pyx_ListComp_Append(L,x) PyList_Append(L,x)
-#endif
 
 /* PyObjectLookupSpecial.proto */
 #if CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
@@ -1415,17 +1425,6 @@ static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname);
 static _PyErr_StackItem * __Pyx_PyErr_GetTopmostException(PyThreadState *tstate);
 #endif
 
-/* PyThreadStateGet.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
-#define __Pyx_PyThreadState_assign  __pyx_tstate = __Pyx_PyThreadState_Current;
-#define __Pyx_PyErr_Occurred()  __pyx_tstate->curexc_type
-#else
-#define __Pyx_PyThreadState_declare
-#define __Pyx_PyThreadState_assign
-#define __Pyx_PyErr_Occurred()  PyErr_Occurred()
-#endif
-
 /* SaveResetException.proto */
 #if CYTHON_FAST_THREAD_STATE
 #define __Pyx_ExceptionSave(type, value, tb)  __Pyx__ExceptionSave(__pyx_tstate, type, value, tb)
@@ -1444,34 +1443,6 @@ static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject 
 #else
 static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
 #endif
-
-/* PyErrFetchRestore.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_PyErr_Clear() __Pyx_ErrRestore(NULL, NULL, NULL)
-#define __Pyx_ErrRestoreWithState(type, value, tb)  __Pyx_ErrRestoreInState(PyThreadState_GET(), type, value, tb)
-#define __Pyx_ErrFetchWithState(type, value, tb)    __Pyx_ErrFetchInState(PyThreadState_GET(), type, value, tb)
-#define __Pyx_ErrRestore(type, value, tb)  __Pyx_ErrRestoreInState(__pyx_tstate, type, value, tb)
-#define __Pyx_ErrFetch(type, value, tb)    __Pyx_ErrFetchInState(__pyx_tstate, type, value, tb)
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#if CYTHON_COMPILING_IN_CPYTHON
-#define __Pyx_PyErr_SetNone(exc) (Py_INCREF(exc), __Pyx_ErrRestore((exc), NULL, NULL))
-#else
-#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
-#endif
-#else
-#define __Pyx_PyErr_Clear() PyErr_Clear()
-#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
-#define __Pyx_ErrRestoreWithState(type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetchWithState(type, value, tb)  PyErr_Fetch(type, value, tb)
-#define __Pyx_ErrRestoreInState(tstate, type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetchInState(tstate, type, value, tb)  PyErr_Fetch(type, value, tb)
-#define __Pyx_ErrRestore(type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
-#endif
-
-/* RaiseException.proto */
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
 /* DictGetItem.proto */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
@@ -1790,40 +1761,36 @@ int __pyx_module_is_main_INDUSAnalysis__protein_order_params = 0;
 
 /* Implementation of 'INDUSAnalysis.protein_order_params' */
 static PyObject *__pyx_builtin_super;
-static PyObject *__pyx_builtin_enumerate;
 static PyObject *__pyx_builtin_ValueError;
+static PyObject *__pyx_builtin_enumerate;
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_RuntimeError;
 static PyObject *__pyx_builtin_ImportError;
 static const char __pyx_k_R[] = "R";
 static const char __pyx_k_T[] = "T";
-static const char __pyx_k_t[] = "t";
 static const char __pyx_k_u[] = "u";
 static const char __pyx_k_Rg[] = "Rg";
 static const char __pyx_k_ax[] = "ax";
-static const char __pyx_k_im[] = "im";
 static const char __pyx_k_np[] = "np";
-static const char __pyx_k_rg[] = "rg";
 static const char __pyx_k_ts[] = "ts";
 static const char __pyx_k_PDB[] = "PDB";
-static const char __pyx_k__13[] = "_";
-static const char __pyx_k__23[] = "*";
+static const char __pyx_k_Rgs[] = "Rgs";
+static const char __pyx_k__14[] = "_";
+static const char __pyx_k__26[] = "*";
 static const char __pyx_k_com[] = "com";
 static const char __pyx_k_doc[] = "__doc__";
 static const char __pyx_k_dot[] = "dot";
-static const char __pyx_k_dpi[] = "dpi";
 static const char __pyx_k_fig[] = "fig";
+static const char __pyx_k_gca[] = "gca";
 static const char __pyx_k_get[] = "get";
 static const char __pyx_k_hot[] = "hot";
 static const char __pyx_k_mda[] = "mda";
-static const char __pyx_k_npy[] = ".npy";
+static const char __pyx_k_pkl[] = ".pkl";
 static const char __pyx_k_plt[] = "plt";
 static const char __pyx_k_sel[] = "sel";
 static const char __pyx_k_sum[] = "sum";
-static const char __pyx_k_Atom[] = "Atom";
-static const char __pyx_k_RMSD[] = "RMSD_";
+static const char __pyx_k_RMSD[] = "RMSD";
 static const char __pyx_k_args[] = "args";
-static const char __pyx_k_auto[] = "auto";
 static const char __pyx_k_axis[] = "axis";
 static const char __pyx_k_call[] = "__call__";
 static const char __pyx_k_cmap[] = "cmap";
@@ -1832,16 +1799,12 @@ static const char __pyx_k_desc[] = "desc";
 static const char __pyx_k_exit[] = "__exit__";
 static const char __pyx_k_help[] = "help";
 static const char __pyx_k_init[] = "__init__";
-static const char __pyx_k_item[] = "item";
-static const char __pyx_k_load[] = "load";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_mean[] = "mean";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_pbar[] = "pbar";
 static const char __pyx_k_plot[] = "plot";
 static const char __pyx_k_refu[] = "refu";
-static const char __pyx_k_rmsd[] = "rmsd";
-static const char __pyx_k_save[] = "save";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_show[] = "show";
 static const char __pyx_k_skip[] = "-skip";
@@ -1850,6 +1813,7 @@ static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_tidx[] = "tidx";
 static const char __pyx_k_time[] = "time";
 static const char __pyx_k_tqdm[] = "tqdm";
+static const char __pyx_k_RMSDs[] = "RMSDs";
 static const char __pyx_k_Rgval[] = "Rgval";
 static const char __pyx_k_align[] = "-align";
 static const char __pyx_k_array[] = "array";
@@ -1859,102 +1823,91 @@ static const char __pyx_k_close[] = "close";
 static const char __pyx_k_enter[] = "__enter__";
 static const char __pyx_k_heavy[] = "heavy";
 static const char __pyx_k_label[] = "label";
-static const char __pyx_k_lower[] = "lower";
 static const char __pyx_k_ma_Rg[] = "ma_Rg";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_opref[] = "opref";
 static const char __pyx_k_range[] = "range";
-static const char __pyx_k_rg_ma[] = "rg_ma";
 static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_super[] = "super";
-static const char __pyx_k_ticks[] = "ticks";
 static const char __pyx_k_times[] = "times";
 static const char __pyx_k_total[] = "total";
 static const char __pyx_k_trajf[] = "trajf";
+static const char __pyx_k_ts_Rg[] = "ts_Rg";
 static const char __pyx_k_utraj[] = "utraj";
 static const char __pyx_k_write[] = "write";
-static const char __pyx_k_RMSD_2[] = "_RMSD_";
-static const char __pyx_k_RMSD_3[] = "RMSD";
-static const char __pyx_k_Rg_npy[] = "_Rg.npy";
+static const char __pyx_k_RMSD_2[] = "RMSD_";
+static const char __pyx_k_RMSD_3[] = "_RMSD_";
+static const char __pyx_k_Rg_pkl[] = "_Rg.pkl";
 static const char __pyx_k_Writer[] = "Writer";
 static const char __pyx_k_action[] = "action";
-static const char __pyx_k_append[] = "append";
-static const char __pyx_k_aspect[] = "aspect";
 static const char __pyx_k_cma_Rg[] = "cma_Rg";
 static const char __pyx_k_coords[] = "coords";
-static const char __pyx_k_factor[] = "factor";
+static const char __pyx_k_format[] = "format";
 static const char __pyx_k_genpdb[] = "--genpdb";
 static const char __pyx_k_import[] = "__import__";
-static const char __pyx_k_imshow[] = "imshow";
+static const char __pyx_k_labels[] = "labels";
+static const char __pyx_k_legend[] = "legend";
 static const char __pyx_k_masses[] = "masses";
 static const char __pyx_k_module[] = "__module__";
-static const char __pyx_k_origin[] = "origin";
-static const char __pyx_k_parser[] = "parser";
 static const char __pyx_k_pdbtrj[] = "pdbtrj";
 static const char __pyx_k_refsel[] = "refsel";
 static const char __pyx_k_replot[] = "replot";
-static const char __pyx_k_rg_cma[] = "rg_cma";
-static const char __pyx_k_sel_Rg[] = "sel_Rg";
 static const char __pyx_k_select[] = "-select";
 static const char __pyx_k_skip_2[] = "skip";
 static const char __pyx_k_suffix[] = "suffix";
-static const char __pyx_k_tolist[] = "tolist";
 static const char __pyx_k_update[] = "update";
 static const char __pyx_k_window[] = "window";
-static const char __pyx_k_RMSD_AA[] = "RMSD ($\\AA$)";
 static const char __pyx_k_RMSDval[] = "RMSDval";
-static const char __pyx_k_Rg_data[] = "Rg_data";
-static const char __pyx_k_Time_ps[] = "Time (ps)";
 static const char __pyx_k_align_2[] = "align";
 static const char __pyx_k_average[] = "average";
 static const char __pyx_k_calc_Rg[] = "calc_Rg";
 static const char __pyx_k_initpos[] = "initpos";
+static const char __pyx_k_isclose[] = "isclose";
 static const char __pyx_k_ma_RMSD[] = "ma_RMSD_";
 static const char __pyx_k_min_rms[] = "min_rms";
 static const char __pyx_k_n_atoms[] = "n_atoms";
 static const char __pyx_k_plot_Rg[] = "plot_Rg";
 static const char __pyx_k_prepare[] = "__prepare__";
 static const char __pyx_k_protein[] = "protein";
-static const char __pyx_k_rmsd_ma[] = "rmsd_ma";
+static const char __pyx_k_set_dpi[] = "set_dpi";
 static const char __pyx_k_structf[] = "structf";
+static const char __pyx_k_ts_RMSD[] = "ts_RMSD";
 static const char __pyx_k_verbose[] = "--verbose";
 static const char __pyx_k_weights[] = "weights";
 static const char __pyx_k_Universe[] = "Universe";
 static const char __pyx_k_aligncog[] = "aligncog";
 static const char __pyx_k_analysis[] = "analysis";
 static const char __pyx_k_backbone[] = "backbone";
-static const char __pyx_k_cma_RMSD[] = "cma_RMSD";
-static const char __pyx_k_colorbar[] = "colorbar";
+static const char __pyx_k_cma_RMSD[] = "cma_RMSD_";
 static const char __pyx_k_genpdb_2[] = "genpdb";
+static const char __pyx_k_out_args[] = "out_args";
 static const char __pyx_k_qualname[] = "__qualname__";
 static const char __pyx_k_refalign[] = "refalign";
 static const char __pyx_k_reftrajf[] = "-reftrajf";
 static const char __pyx_k_reftstep[] = "-reftstep";
-static const char __pyx_k_save_pdb[] = "save_pdb";
-static const char __pyx_k_sel_RMSD[] = "sel_RMSD";
 static const char __pyx_k_select_2[] = "select";
-static const char __pyx_k_subplots[] = "subplots";
-static const char __pyx_k_timefunc[] = "timefunc";
-static const char __pyx_k_RMSD_data[] = "RMSD_data";
+static const char __pyx_k_Deviation[] = "Deviation";
 static const char __pyx_k_alignment[] = "alignment";
 static const char __pyx_k_calc_RMSD[] = "calc_RMSD";
-static const char __pyx_k_dev_times[] = "dev_times";
+static const char __pyx_k_calc_args[] = "calc_args";
 static const char __pyx_k_deviation[] = "deviation";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_mda_align[] = "mda_align";
 static const char __pyx_k_metaclass[] = "__metaclass__";
-static const char __pyx_k_newlabels[] = "newlabels";
+static const char __pyx_k_misc_args[] = "misc_args";
 static const char __pyx_k_plot_RMSD[] = "plot_RMSD";
 static const char __pyx_k_positions[] = "positions";
+static const char __pyx_k_profiling[] = "profiling";
 static const char __pyx_k_read_args[] = "read_args";
 static const char __pyx_k_selection[] = "selection";
 static const char __pyx_k_verbose_2[] = "verbose";
+static const char __pyx_k_Atom_index[] = "Atom index";
 static const char __pyx_k_MDAnalysis[] = "MDAnalysis";
 static const char __pyx_k_TimeSeries[] = "TimeSeries";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_aligncoods[] = "aligncoods";
+static const char __pyx_k_data_array[] = "data_array";
 static const char __pyx_k_deviations[] = "deviations";
-static const char __pyx_k_get_yticks[] = "get_yticks";
 static const char __pyx_k_initcoords[] = "initcoords";
 static const char __pyx_k_mda_select[] = "mda_select";
 static const char __pyx_k_multiframe[] = "multiframe";
@@ -1962,76 +1915,76 @@ static const char __pyx_k_plot_ma_Rg[] = "plot_ma_Rg";
 static const char __pyx_k_reftrajf_2[] = "reftrajf";
 static const char __pyx_k_reftstep_2[] = "reftstep";
 static const char __pyx_k_replotpref[] = "replotpref";
-static const char __pyx_k_set_xlabel[] = "set_xlabel";
-static const char __pyx_k_set_ylabel[] = "set_ylabel";
 static const char __pyx_k_side_chain[] = "side_chain";
 static const char __pyx_k_store_true[] = "store_true";
+static const char __pyx_k_time_array[] = "time_array";
+static const char __pyx_k_timeseries[] = "timeseries";
 static const char __pyx_k_trajectory[] = "trajectory";
+static const char __pyx_k_ts_RMSD_ma[] = "ts_RMSD_ma";
 static const char __pyx_k_ImportError[] = "ImportError";
-static const char __pyx_k_OrderParams[] = "OrderParams";
 static const char __pyx_k_Writing_PDB[] = "Writing PDB";
 static const char __pyx_k_aligncoords[] = "aligncoords";
-static const char __pyx_k_dev_times_2[] = "_dev_times";
 static const char __pyx_k_plot_cma_Rg[] = "plot_cma_Rg";
 static const char __pyx_k_save_figure[] = "save_figure";
 static const char __pyx_k_tempfactors[] = "tempfactors";
+static const char __pyx_k_ts_RMSD_cma[] = "ts_RMSD_cma";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_add_argument[] = "add_argument";
 static const char __pyx_k_aligninitcog[] = "aligninitcog";
 static const char __pyx_k_aligninitpos[] = "aligninitpos";
-static const char __pyx_k_deviations_2[] = "_deviations";
 static const char __pyx_k_plot_ma_RMSD[] = "plot_ma_RMSD";
 static const char __pyx_k_select_atoms[] = "select_atoms";
 static const char __pyx_k_sq_distances[] = "sq_distances";
-static const char __pyx_k_dev_times_npy[] = "_dev_times.npy";
+static const char __pyx_k_INDUSAnalysis[] = "INDUSAnalysis";
+static const char __pyx_k_opt_file_args[] = "opt_file_args";
 static const char __pyx_k_plot_cma_RMSD[] = "plot_cma_RMSD";
+static const char __pyx_k_req_file_args[] = "req_file_args";
+static const char __pyx_k_ts_deviations[] = "ts_deviations";
 static const char __pyx_k_calc_Rg_worker[] = "calc_Rg_worker";
-static const char __pyx_k_calc_deviation[] = "calc_deviation";
-static const char __pyx_k_deviations_npy[] = "_deviations.npy";
 static const char __pyx_k_deviations_pdb[] = "_deviations.pdb";
+static const char __pyx_k_deviations_pkl[] = "_deviations.pkl";
 static const char __pyx_k_moving_average[] = "moving_average";
 static const char __pyx_k_aligninitcoords[] = "aligninitcoords";
+static const char __pyx_k_calc_deviations[] = "calc_deviations";
+static const char __pyx_k_load_TimeSeries[] = "load_TimeSeries";
+static const char __pyx_k_plot_2d_heatmap[] = "plot_2d_heatmap";
 static const char __pyx_k_plot_deviations[] = "plot_deviations";
 static const char __pyx_k_rotation_matrix[] = "rotation_matrix";
-static const char __pyx_k_save_timeseries[] = "save_timeseries";
-static const char __pyx_k_set_yticklabels[] = "set_yticklabels";
+static const char __pyx_k_save_TimeSeries[] = "save_TimeSeries";
 static const char __pyx_k_Display_progress[] = "Display progress";
 static const char __pyx_k_add_TopologyAttr[] = "add_TopologyAttr";
 static const char __pyx_k_calc_RMSD_worker[] = "calc_RMSD_worker";
 static const char __pyx_k_selection_parser[] = "selection_parser";
 static const char __pyx_k_side_chain_heavy[] = "side_chain_heavy";
+static const char __pyx_k_INDUSAnalysis_lib[] = "INDUSAnalysis.lib";
 static const char __pyx_k_matplotlib_pyplot[] = "matplotlib.pyplot";
-static const char __pyx_k_OrderParams___call[] = "OrderParams.__call__";
-static const char __pyx_k_OrderParams___init[] = "OrderParams.__init__";
 static const char __pyx_k_Structure_file_gro[] = "Structure file (.gro)";
+static const char __pyx_k_TimeSeriesAnalysis[] = "TimeSeriesAnalysis";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
-static const char __pyx_k_OrderParams_calc_Rg[] = "OrderParams.calc_Rg";
-static const char __pyx_k_OrderParams_plot_Rg[] = "OrderParams.plot_Rg";
-static const char __pyx_k_OrderParams_save_pdb[] = "OrderParams.save_pdb";
+static const char __pyx_k_OrderParamsAnalysis[] = "OrderParamsAnalysis";
 static const char __pyx_k_mda_deviation_select[] = "mda_deviation_select";
 static const char __pyx_k_protein_subselection[] = "protein_subselection";
-static const char __pyx_k_OrderParams_calc_RMSD[] = "OrderParams.calc_RMSD";
-static const char __pyx_k_OrderParams_plot_RMSD[] = "OrderParams.plot_RMSD";
-static const char __pyx_k_OrderParams_read_args[] = "OrderParams.read_args";
-static const char __pyx_k_Radius_of_gyration_AA[] = "Radius of gyration ($\\AA$)";
+static const char __pyx_k_write_deviations_pdb[] = "write_deviations_pdb";
 static const char __pyx_k_calc_deviation_worker[] = "calc_deviation_worker";
-static const char __pyx_k_OrderParams_plot_ma_Rg[] = "OrderParams.plot_ma_Rg";
 static const char __pyx_k_protein_and_not_name_H[] = "protein and not name H*";
-static const char __pyx_k_OrderParams_plot_cma_Rg[] = "OrderParams.plot_cma_Rg";
-static const char __pyx_k_INDUSAnalysis_timeseries[] = "INDUSAnalysis.timeseries";
-static const char __pyx_k_OrderParams_plot_ma_RMSD[] = "OrderParams.plot_ma_RMSD";
+static const char __pyx_k_coords_not_3_dimensional[] = "coords not 3 dimensional";
 static const char __pyx_k_MDAnalysis_analysis_align[] = "MDAnalysis.analysis.align";
-static const char __pyx_k_OrderParams_plot_cma_RMSD[] = "OrderParams.plot_cma_RMSD";
 static const char __pyx_k_cumulative_moving_average[] = "cumulative_moving_average";
-static const char __pyx_k_OrderParams_calc_Rg_worker[] = "OrderParams.calc_Rg_worker";
-static const char __pyx_k_OrderParams_calc_deviation[] = "OrderParams.calc_deviation";
-static const char __pyx_k_INDUSAnalysis_lib_profiling[] = "INDUSAnalysis.lib.profiling";
-static const char __pyx_k_OrderParams_plot_deviations[] = "OrderParams.plot_deviations";
+static const char __pyx_k_OrderParamsAnalysis___call[] = "OrderParamsAnalysis.__call__";
+static const char __pyx_k_OrderParamsAnalysis___init[] = "OrderParamsAnalysis.__init__";
+static const char __pyx_k_Calculates_order_parameters[] = "\n    Calculates order parameters.\n    ";
+static const char __pyx_k_OrderParamsAnalysis_calc_Rg[] = "OrderParamsAnalysis.calc_Rg";
+static const char __pyx_k_OrderParamsAnalysis_plot_Rg[] = "OrderParamsAnalysis.plot_Rg";
 static const char __pyx_k_name_CA_or_name_C_or_name_N[] = "name CA or name C or name N";
 static const char __pyx_k_ndarray_is_not_C_contiguous[] = "ndarray is not C contiguous";
-static const char __pyx_k_OrderParams_calc_RMSD_worker[] = "OrderParams.calc_RMSD_worker";
+static const char __pyx_k_OrderParamsAnalysis_calc_RMSD[] = "OrderParamsAnalysis.calc_RMSD";
+static const char __pyx_k_OrderParamsAnalysis_plot_RMSD[] = "OrderParamsAnalysis.plot_RMSD";
+static const char __pyx_k_OrderParamsAnalysis_read_args[] = "OrderParamsAnalysis.read_args";
 static const char __pyx_k_Compressed_trajectory_file_xtc[] = "Compressed trajectory file (.xtc)";
-static const char __pyx_k_Calculate_time_series_Radius_of[] = "\nCalculate time series\n- Radius of gyration\n- RMSD\n- Per-atom-deviation\ngiven GROMACS trajectory of a protein\n\nUnits:\n- length: A\n- time: ps\n\n@Author: Akash Pallath\n";
+static const char __pyx_k_OrderParamsAnalysis_plot_ma_Rg[] = "OrderParamsAnalysis.plot_ma_Rg";
+static const char __pyx_k_Defines_class_for_analysing_pro[] = "\nDefines class for analysing protein order parameters along GROMACS\nsimulation trajectory.\n";
+static const char __pyx_k_OrderParamsAnalysis_plot_cma_Rg[] = "OrderParamsAnalysis.plot_cma_Rg";
+static const char __pyx_k_Trajectory_and_TimeSeries_times[] = "Trajectory and TimeSeries times do not match at same index.";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_unknown_dtype_code_in_numpy_pxd[] = "unknown dtype code in numpy.pxd (%d)";
 static const char __pyx_k_Atoms_groups_for_aligning_trajec[] = "Atoms/groups for aligning trajectories across timesteps (MDA selection string)";
@@ -2039,78 +1992,93 @@ static const char __pyx_k_Atoms_groups_to_track_order_para[] = "Atoms/groups to 
 static const char __pyx_k_Format_string_allocated_too_shor[] = "Format string allocated too short, see comment in numpy.pxd";
 static const char __pyx_k_INDUSAnalysis_protein_order_para[] = "INDUSAnalysis.protein_order_params";
 static const char __pyx_k_Non_native_byte_order_not_suppor[] = "Non-native byte order not supported";
-static const char __pyx_k_Number_of_frames_to_skip_between[] = "Number of frames to skip between analyses (default = 1)";
-static const char __pyx_k_OrderParams_calc_deviation_worke[] = "OrderParams.calc_deviation_worker";
-static const char __pyx_k_Reference_trajectory_file_xtc_fo[] = "Reference trajectory file (.xtc) for RMSD";
-static const char __pyx_k_Timestep_to_extract_reference_co[] = "Timestep to extract reference coordinates from reference trajectory file for RMSD";
+static const char __pyx_k_Number_of_frames_to_skip_between[] = "Number of frames to skip between analyses (default = None)";
+static const char __pyx_k_One_or_more_oordinates_are_not_3[] = "One or more oordinates are not 3 dimensional";
+static const char __pyx_k_OrderParamsAnalysis_calc_RMSD_wo[] = "OrderParamsAnalysis.calc_RMSD_worker";
+static const char __pyx_k_OrderParamsAnalysis_calc_Rg_work[] = "OrderParamsAnalysis.calc_Rg_worker";
+static const char __pyx_k_OrderParamsAnalysis_calc_deviati[] = "OrderParamsAnalysis.calc_deviation_worker";
+static const char __pyx_k_OrderParamsAnalysis_plot_cma_RMS[] = "OrderParamsAnalysis.plot_cma_RMSD";
+static const char __pyx_k_OrderParamsAnalysis_plot_deviati[] = "OrderParamsAnalysis.plot_deviations";
+static const char __pyx_k_OrderParamsAnalysis_plot_ma_RMSD[] = "OrderParamsAnalysis.plot_ma_RMSD";
+static const char __pyx_k_OrderParamsAnalysis_write_deviat[] = "OrderParamsAnalysis.write_deviations_pdb";
+static const char __pyx_k_RMSD_between_atoms_using_atoms_f[] = "RMSD between {} atoms, using {} atoms for alignment";
+static const char __pyx_k_Reference_trajectory_file_xtc_fo[] = "Reference trajectory file (.xtc) for RMSD (default: same as trajf)";
+static const char __pyx_k_Set_of_coordinates_and_reference[] = "Set of coordinates and reference set coordinates do not have same shape";
+static const char __pyx_k_Timestep_to_extract_reference_co[] = "Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)";
 static const char __pyx_k_Write_atoms_per_probe_volume_dat[] = "Write atoms per probe volume data to pdb file";
+static const char __pyx_k_coords_and_masses_not_of_same_le[] = "coords and masses not of same length";
 static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath failed to import";
 static const char __pyx_k_protein_and_not_name_N_or_name_C[] = "protein and not (name N or name CA or name C or name O or name H\n                or name H1 or name H2 or name H3 or name OC1 or name OC2)";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
 static const char __pyx_k_INDUSAnalysis_protein_order_para_2[] = "INDUSAnalysis/protein_order_params.pyx";
+static const char __pyx_k_OrderParamsAnalysis_calc_deviati_2[] = "OrderParamsAnalysis.calc_deviations";
 static const char __pyx_k_protein_and_not_name_N_or_name_C_2[] = "protein and not(name N or name CA or name C or name O\n                or name OC1 or name OC2 or name H*)";
-static PyObject *__pyx_n_s_Atom;
+static PyObject *__pyx_kp_s_Atom_index;
 static PyObject *__pyx_kp_s_Atoms_groups_for_aligning_trajec;
 static PyObject *__pyx_kp_s_Atoms_groups_to_track_order_para;
+static PyObject *__pyx_kp_s_Calculates_order_parameters;
 static PyObject *__pyx_kp_s_Compressed_trajectory_file_xtc;
+static PyObject *__pyx_n_s_Deviation;
 static PyObject *__pyx_kp_s_Display_progress;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
-static PyObject *__pyx_n_s_INDUSAnalysis_lib_profiling;
+static PyObject *__pyx_n_s_INDUSAnalysis;
+static PyObject *__pyx_n_s_INDUSAnalysis_lib;
 static PyObject *__pyx_n_s_INDUSAnalysis_protein_order_para;
 static PyObject *__pyx_kp_s_INDUSAnalysis_protein_order_para_2;
-static PyObject *__pyx_n_s_INDUSAnalysis_timeseries;
 static PyObject *__pyx_n_s_ImportError;
 static PyObject *__pyx_n_s_MDAnalysis;
 static PyObject *__pyx_n_s_MDAnalysis_analysis_align;
 static PyObject *__pyx_kp_u_Non_native_byte_order_not_suppor;
 static PyObject *__pyx_kp_s_Number_of_frames_to_skip_between;
-static PyObject *__pyx_n_s_OrderParams;
-static PyObject *__pyx_n_s_OrderParams___call;
-static PyObject *__pyx_n_s_OrderParams___init;
-static PyObject *__pyx_n_s_OrderParams_calc_RMSD;
-static PyObject *__pyx_n_s_OrderParams_calc_RMSD_worker;
-static PyObject *__pyx_n_s_OrderParams_calc_Rg;
-static PyObject *__pyx_n_s_OrderParams_calc_Rg_worker;
-static PyObject *__pyx_n_s_OrderParams_calc_deviation;
-static PyObject *__pyx_n_s_OrderParams_calc_deviation_worke;
-static PyObject *__pyx_n_s_OrderParams_plot_RMSD;
-static PyObject *__pyx_n_s_OrderParams_plot_Rg;
-static PyObject *__pyx_n_s_OrderParams_plot_cma_RMSD;
-static PyObject *__pyx_n_s_OrderParams_plot_cma_Rg;
-static PyObject *__pyx_n_s_OrderParams_plot_deviations;
-static PyObject *__pyx_n_s_OrderParams_plot_ma_RMSD;
-static PyObject *__pyx_n_s_OrderParams_plot_ma_Rg;
-static PyObject *__pyx_n_s_OrderParams_read_args;
-static PyObject *__pyx_n_s_OrderParams_save_pdb;
+static PyObject *__pyx_kp_s_One_or_more_oordinates_are_not_3;
+static PyObject *__pyx_n_s_OrderParamsAnalysis;
+static PyObject *__pyx_n_s_OrderParamsAnalysis___call;
+static PyObject *__pyx_n_s_OrderParamsAnalysis___init;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_calc_RMSD;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_calc_RMSD_wo;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_calc_Rg;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_calc_Rg_work;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_calc_deviati;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_calc_deviati_2;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_plot_RMSD;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_plot_Rg;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_plot_cma_RMS;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_plot_cma_Rg;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_plot_deviati;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_plot_ma_RMSD;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_plot_ma_Rg;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_read_args;
+static PyObject *__pyx_n_s_OrderParamsAnalysis_write_deviat;
 static PyObject *__pyx_n_s_PDB;
 static PyObject *__pyx_n_s_R;
 static PyObject *__pyx_n_s_RMSD;
 static PyObject *__pyx_n_s_RMSD_2;
 static PyObject *__pyx_n_s_RMSD_3;
-static PyObject *__pyx_kp_s_RMSD_AA;
-static PyObject *__pyx_n_s_RMSD_data;
+static PyObject *__pyx_kp_s_RMSD_between_atoms_using_atoms_f;
+static PyObject *__pyx_n_s_RMSDs;
 static PyObject *__pyx_n_s_RMSDval;
-static PyObject *__pyx_kp_s_Radius_of_gyration_AA;
 static PyObject *__pyx_kp_s_Reference_trajectory_file_xtc_fo;
 static PyObject *__pyx_n_s_Rg;
-static PyObject *__pyx_n_s_Rg_data;
-static PyObject *__pyx_kp_s_Rg_npy;
+static PyObject *__pyx_kp_s_Rg_pkl;
+static PyObject *__pyx_n_s_Rgs;
 static PyObject *__pyx_n_s_Rgval;
 static PyObject *__pyx_n_s_RuntimeError;
+static PyObject *__pyx_kp_s_Set_of_coordinates_and_reference;
 static PyObject *__pyx_kp_s_Structure_file_gro;
 static PyObject *__pyx_n_s_T;
 static PyObject *__pyx_n_s_TimeSeries;
-static PyObject *__pyx_kp_s_Time_ps;
+static PyObject *__pyx_n_s_TimeSeriesAnalysis;
 static PyObject *__pyx_kp_s_Timestep_to_extract_reference_co;
+static PyObject *__pyx_kp_s_Trajectory_and_TimeSeries_times;
 static PyObject *__pyx_n_s_Universe;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_kp_s_Write_atoms_per_probe_volume_dat;
 static PyObject *__pyx_n_s_Writer;
 static PyObject *__pyx_kp_s_Writing_PDB;
-static PyObject *__pyx_n_s__13;
-static PyObject *__pyx_n_s__23;
+static PyObject *__pyx_n_s__14;
+static PyObject *__pyx_n_s__26;
 static PyObject *__pyx_n_s_action;
 static PyObject *__pyx_n_s_add_TopologyAttr;
 static PyObject *__pyx_n_s_add_argument;
@@ -2124,12 +2092,9 @@ static PyObject *__pyx_n_s_aligninitcoords;
 static PyObject *__pyx_n_s_aligninitpos;
 static PyObject *__pyx_n_s_alignment;
 static PyObject *__pyx_n_s_analysis;
-static PyObject *__pyx_n_s_append;
 static PyObject *__pyx_n_s_args;
 static PyObject *__pyx_n_s_array;
-static PyObject *__pyx_n_s_aspect;
 static PyObject *__pyx_n_s_atoms;
-static PyObject *__pyx_n_s_auto;
 static PyObject *__pyx_n_s_average;
 static PyObject *__pyx_n_s_ax;
 static PyObject *__pyx_n_s_axis;
@@ -2139,53 +2104,50 @@ static PyObject *__pyx_n_s_calc_RMSD;
 static PyObject *__pyx_n_s_calc_RMSD_worker;
 static PyObject *__pyx_n_s_calc_Rg;
 static PyObject *__pyx_n_s_calc_Rg_worker;
-static PyObject *__pyx_n_s_calc_deviation;
+static PyObject *__pyx_n_s_calc_args;
 static PyObject *__pyx_n_s_calc_deviation_worker;
+static PyObject *__pyx_n_s_calc_deviations;
 static PyObject *__pyx_n_s_call;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_close;
 static PyObject *__pyx_n_s_cma_RMSD;
 static PyObject *__pyx_n_s_cma_Rg;
 static PyObject *__pyx_n_s_cmap;
-static PyObject *__pyx_n_s_colorbar;
 static PyObject *__pyx_n_s_com;
 static PyObject *__pyx_n_s_coords;
+static PyObject *__pyx_kp_s_coords_and_masses_not_of_same_le;
+static PyObject *__pyx_kp_s_coords_not_3_dimensional;
 static PyObject *__pyx_n_s_copy;
 static PyObject *__pyx_n_s_cumulative_moving_average;
+static PyObject *__pyx_n_s_data_array;
 static PyObject *__pyx_n_s_desc;
-static PyObject *__pyx_n_s_dev_times;
-static PyObject *__pyx_n_s_dev_times_2;
-static PyObject *__pyx_kp_s_dev_times_npy;
 static PyObject *__pyx_n_s_deviation;
 static PyObject *__pyx_n_s_deviations;
-static PyObject *__pyx_n_s_deviations_2;
-static PyObject *__pyx_kp_s_deviations_npy;
 static PyObject *__pyx_kp_s_deviations_pdb;
+static PyObject *__pyx_kp_s_deviations_pkl;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_dot;
-static PyObject *__pyx_n_s_dpi;
 static PyObject *__pyx_n_s_enter;
 static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_exit;
-static PyObject *__pyx_n_s_factor;
 static PyObject *__pyx_n_s_fig;
+static PyObject *__pyx_n_s_format;
+static PyObject *__pyx_n_s_gca;
 static PyObject *__pyx_kp_s_genpdb;
 static PyObject *__pyx_n_s_genpdb_2;
 static PyObject *__pyx_n_s_get;
-static PyObject *__pyx_n_s_get_yticks;
 static PyObject *__pyx_n_s_heavy;
 static PyObject *__pyx_n_s_help;
 static PyObject *__pyx_n_s_hot;
-static PyObject *__pyx_n_s_im;
 static PyObject *__pyx_n_s_import;
-static PyObject *__pyx_n_s_imshow;
 static PyObject *__pyx_n_s_init;
 static PyObject *__pyx_n_s_initcoords;
 static PyObject *__pyx_n_s_initpos;
-static PyObject *__pyx_n_s_item;
+static PyObject *__pyx_n_s_isclose;
 static PyObject *__pyx_n_s_label;
-static PyObject *__pyx_n_s_load;
-static PyObject *__pyx_n_s_lower;
+static PyObject *__pyx_n_s_labels;
+static PyObject *__pyx_n_s_legend;
+static PyObject *__pyx_n_s_load_TimeSeries;
 static PyObject *__pyx_n_s_ma_RMSD;
 static PyObject *__pyx_n_s_ma_Rg;
 static PyObject *__pyx_n_s_main;
@@ -2198,6 +2160,7 @@ static PyObject *__pyx_n_s_mda_select;
 static PyObject *__pyx_n_s_mean;
 static PyObject *__pyx_n_s_metaclass;
 static PyObject *__pyx_n_s_min_rms;
+static PyObject *__pyx_n_s_misc_args;
 static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_moving_average;
 static PyObject *__pyx_n_s_multiframe;
@@ -2206,18 +2169,18 @@ static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_kp_s_name_CA_or_name_C_or_name_N;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
-static PyObject *__pyx_n_s_newlabels;
 static PyObject *__pyx_n_s_np;
-static PyObject *__pyx_kp_s_npy;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_kp_s_numpy_core_multiarray_failed_to;
 static PyObject *__pyx_kp_s_numpy_core_umath_failed_to_impor;
 static PyObject *__pyx_n_s_opref;
-static PyObject *__pyx_n_s_origin;
-static PyObject *__pyx_n_s_parser;
+static PyObject *__pyx_n_s_opt_file_args;
+static PyObject *__pyx_n_s_out_args;
 static PyObject *__pyx_n_s_pbar;
 static PyObject *__pyx_n_s_pdbtrj;
+static PyObject *__pyx_kp_s_pkl;
 static PyObject *__pyx_n_s_plot;
+static PyObject *__pyx_n_s_plot_2d_heatmap;
 static PyObject *__pyx_n_s_plot_RMSD;
 static PyObject *__pyx_n_s_plot_Rg;
 static PyObject *__pyx_n_s_plot_cma_RMSD;
@@ -2228,6 +2191,7 @@ static PyObject *__pyx_n_s_plot_ma_Rg;
 static PyObject *__pyx_n_s_plt;
 static PyObject *__pyx_n_s_positions;
 static PyObject *__pyx_n_s_prepare;
+static PyObject *__pyx_n_s_profiling;
 static PyObject *__pyx_n_s_protein;
 static PyObject *__pyx_kp_s_protein_and_not_name_H;
 static PyObject *__pyx_kp_s_protein_and_not_name_N_or_name_C;
@@ -2245,28 +2209,18 @@ static PyObject *__pyx_n_s_reftstep_2;
 static PyObject *__pyx_n_s_refu;
 static PyObject *__pyx_n_s_replot;
 static PyObject *__pyx_n_s_replotpref;
-static PyObject *__pyx_n_s_rg;
-static PyObject *__pyx_n_s_rg_cma;
-static PyObject *__pyx_n_s_rg_ma;
-static PyObject *__pyx_n_s_rmsd;
-static PyObject *__pyx_n_s_rmsd_ma;
+static PyObject *__pyx_n_s_req_file_args;
 static PyObject *__pyx_n_s_rotation_matrix;
-static PyObject *__pyx_n_s_save;
+static PyObject *__pyx_n_s_save_TimeSeries;
 static PyObject *__pyx_n_s_save_figure;
-static PyObject *__pyx_n_s_save_pdb;
-static PyObject *__pyx_n_s_save_timeseries;
 static PyObject *__pyx_n_s_sel;
-static PyObject *__pyx_n_s_sel_RMSD;
-static PyObject *__pyx_n_s_sel_Rg;
 static PyObject *__pyx_kp_s_select;
 static PyObject *__pyx_n_s_select_2;
 static PyObject *__pyx_n_s_select_atoms;
 static PyObject *__pyx_n_s_selection;
 static PyObject *__pyx_n_s_selection_parser;
 static PyObject *__pyx_n_s_self;
-static PyObject *__pyx_n_s_set_xlabel;
-static PyObject *__pyx_n_s_set_ylabel;
-static PyObject *__pyx_n_s_set_yticklabels;
+static PyObject *__pyx_n_s_set_dpi;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_show;
 static PyObject *__pyx_n_s_side_chain;
@@ -2277,24 +2231,26 @@ static PyObject *__pyx_n_s_sq_distances;
 static PyObject *__pyx_n_s_sqrt;
 static PyObject *__pyx_n_s_store_true;
 static PyObject *__pyx_n_s_structf;
-static PyObject *__pyx_n_s_subplots;
 static PyObject *__pyx_n_s_suffix;
 static PyObject *__pyx_n_s_sum;
 static PyObject *__pyx_n_s_super;
-static PyObject *__pyx_n_s_t;
 static PyObject *__pyx_n_s_tempfactors;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_n_s_ticks;
 static PyObject *__pyx_n_s_tidx;
 static PyObject *__pyx_n_s_time;
-static PyObject *__pyx_n_s_timefunc;
+static PyObject *__pyx_n_s_time_array;
 static PyObject *__pyx_n_s_times;
-static PyObject *__pyx_n_s_tolist;
+static PyObject *__pyx_n_s_timeseries;
 static PyObject *__pyx_n_s_total;
 static PyObject *__pyx_n_s_tqdm;
 static PyObject *__pyx_n_s_trajectory;
 static PyObject *__pyx_n_s_trajf;
 static PyObject *__pyx_n_s_ts;
+static PyObject *__pyx_n_s_ts_RMSD;
+static PyObject *__pyx_n_s_ts_RMSD_cma;
+static PyObject *__pyx_n_s_ts_RMSD_ma;
+static PyObject *__pyx_n_s_ts_Rg;
+static PyObject *__pyx_n_s_ts_deviations;
 static PyObject *__pyx_n_s_u;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_update;
@@ -2304,23 +2260,24 @@ static PyObject *__pyx_n_s_verbose_2;
 static PyObject *__pyx_n_s_weights;
 static PyObject *__pyx_n_s_window;
 static PyObject *__pyx_n_s_write;
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2read_args(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_4calc_Rg_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_coords, PyObject *__pyx_v_masses); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_6calc_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_selection); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_8plot_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_Rg_data); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_10plot_ma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_Rg_data); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_12plot_cma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_Rg_data); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_14calc_RMSD_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_16calc_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_18plot_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_RMSD_data); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_20plot_ma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_RMSD_data); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_22plot_cma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_RMSD_data); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_24calc_deviation_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_26calc_deviation(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_28plot_deviations(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_times, PyObject *__pyx_v_deviations); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_30save_pdb(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_selection); /* proto */
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_32__call__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_n_s_write_deviations_pdb;
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_2read_args(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_4calc_Rg_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_coords, PyObject *__pyx_v_masses); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_6calc_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_skip, PyObject *__pyx_v_selection); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_8plot_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_Rg); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_10plot_ma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_Rg, PyObject *__pyx_v_window); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_12plot_cma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_Rg); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_14calc_RMSD_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_16calc_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_skip, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_18plot_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_RMSD); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_20plot_ma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_RMSD, PyObject *__pyx_v_window); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_22plot_cma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_RMSD); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_24calc_deviation_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_26calc_deviations(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_skip, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_28plot_deviations(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_deviations); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_30write_deviations_pdb(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_select, PyObject *__pyx_v_skip, PyObject *__pyx_v_ts_deviations); /* proto */
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_32__call__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_int_0;
@@ -2337,11 +2294,11 @@ static PyObject *__pyx_tuple__6;
 static PyObject *__pyx_tuple__7;
 static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
-static PyObject *__pyx_slice__10;
+static PyObject *__pyx_slice__15;
+static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
 static PyObject *__pyx_tuple__12;
-static PyObject *__pyx_tuple__14;
-static PyObject *__pyx_tuple__15;
+static PyObject *__pyx_tuple__13;
 static PyObject *__pyx_tuple__16;
 static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_tuple__18;
@@ -2349,65 +2306,68 @@ static PyObject *__pyx_tuple__19;
 static PyObject *__pyx_tuple__20;
 static PyObject *__pyx_tuple__21;
 static PyObject *__pyx_tuple__22;
+static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_tuple__24;
-static PyObject *__pyx_tuple__26;
-static PyObject *__pyx_tuple__28;
-static PyObject *__pyx_tuple__30;
-static PyObject *__pyx_tuple__32;
-static PyObject *__pyx_tuple__34;
-static PyObject *__pyx_tuple__36;
-static PyObject *__pyx_tuple__38;
-static PyObject *__pyx_tuple__40;
-static PyObject *__pyx_tuple__42;
-static PyObject *__pyx_tuple__44;
-static PyObject *__pyx_tuple__46;
-static PyObject *__pyx_tuple__48;
-static PyObject *__pyx_tuple__50;
-static PyObject *__pyx_tuple__52;
-static PyObject *__pyx_tuple__54;
-static PyObject *__pyx_tuple__56;
-static PyObject *__pyx_codeobj__25;
-static PyObject *__pyx_codeobj__27;
-static PyObject *__pyx_codeobj__29;
-static PyObject *__pyx_codeobj__31;
-static PyObject *__pyx_codeobj__33;
-static PyObject *__pyx_codeobj__35;
-static PyObject *__pyx_codeobj__37;
-static PyObject *__pyx_codeobj__39;
-static PyObject *__pyx_codeobj__41;
-static PyObject *__pyx_codeobj__43;
-static PyObject *__pyx_codeobj__45;
-static PyObject *__pyx_codeobj__47;
-static PyObject *__pyx_codeobj__49;
-static PyObject *__pyx_codeobj__51;
-static PyObject *__pyx_codeobj__53;
-static PyObject *__pyx_codeobj__55;
-static PyObject *__pyx_codeobj__57;
+static PyObject *__pyx_tuple__25;
+static PyObject *__pyx_tuple__27;
+static PyObject *__pyx_tuple__29;
+static PyObject *__pyx_tuple__31;
+static PyObject *__pyx_tuple__33;
+static PyObject *__pyx_tuple__35;
+static PyObject *__pyx_tuple__37;
+static PyObject *__pyx_tuple__39;
+static PyObject *__pyx_tuple__41;
+static PyObject *__pyx_tuple__43;
+static PyObject *__pyx_tuple__45;
+static PyObject *__pyx_tuple__47;
+static PyObject *__pyx_tuple__49;
+static PyObject *__pyx_tuple__51;
+static PyObject *__pyx_tuple__53;
+static PyObject *__pyx_tuple__55;
+static PyObject *__pyx_tuple__57;
+static PyObject *__pyx_tuple__59;
+static PyObject *__pyx_codeobj__28;
+static PyObject *__pyx_codeobj__30;
+static PyObject *__pyx_codeobj__32;
+static PyObject *__pyx_codeobj__34;
+static PyObject *__pyx_codeobj__36;
+static PyObject *__pyx_codeobj__38;
+static PyObject *__pyx_codeobj__40;
+static PyObject *__pyx_codeobj__42;
+static PyObject *__pyx_codeobj__44;
+static PyObject *__pyx_codeobj__46;
+static PyObject *__pyx_codeobj__48;
+static PyObject *__pyx_codeobj__50;
+static PyObject *__pyx_codeobj__52;
+static PyObject *__pyx_codeobj__54;
+static PyObject *__pyx_codeobj__56;
+static PyObject *__pyx_codeobj__58;
+static PyObject *__pyx_codeobj__60;
 /* Late includes */
 
-/* "INDUSAnalysis/protein_order_params.pyx":29
- * 
- * class OrderParams(TimeSeries):
+/* "INDUSAnalysis/protein_order_params.pyx":25
+ *     Calculates order parameters.
+ *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1__init__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_1__init__ = {"__init__", (PyCFunction)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1__init__, METH_O, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1__init__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_1__init__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_1__init__ = {"__init__", (PyCFunction)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_1__init__, METH_O, 0};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_1__init__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams___init__(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis___init__(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2415,17 +2375,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams__
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":30
- * class OrderParams(TimeSeries):
+  /* "INDUSAnalysis/protein_order_params.pyx":26
+ *     """
  *     def __init__(self):
  *         super().__init__()             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
  */
   __pyx_t_2 = __Pyx_CyFunction_GetClassObj(__pyx_self);
-  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 30, __pyx_L1_error) }
+  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 26, __pyx_L1_error) }
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -2433,10 +2393,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams__
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_self);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_init); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_init); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2451,208 +2411,320 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams__
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":31
+  /* "INDUSAnalysis/protein_order_params.pyx":27
  *     def __init__(self):
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")             # <<<<<<<<<<<<<<
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+ * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Structure_file_gro) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple_, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Structure_file_gro) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple_, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":32
+  /* "INDUSAnalysis/protein_order_params.pyx":28
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")             # <<<<<<<<<<<<<<
+ * 
+ *         self.opt_file_args.add_argument("-reftrajf",
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Compressed_trajectory_file_xtc) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Compressed_trajectory_file_xtc) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":30
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+ * 
+ *         self.opt_file_args.add_argument("-reftrajf",             # <<<<<<<<<<<<<<
+ *                                         help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")
+ * 
+ */
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opt_file_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":31
+ * 
+ *         self.opt_file_args.add_argument("-reftrajf",
+ *                                         help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")             # <<<<<<<<<<<<<<
+ * 
+ *         self.calc_args.add_argument("-select",
+ */
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Reference_trajectory_file_xtc_fo) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":30
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+ * 
+ *         self.opt_file_args.add_argument("-reftrajf",             # <<<<<<<<<<<<<<
+ *                                         help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__3, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":33
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
+ *                                         help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")
+ * 
+ *         self.calc_args.add_argument("-select",             # <<<<<<<<<<<<<<
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")
+ *         self.calc_args.add_argument("-align",
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 33, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 33, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Reference_trajectory_file_xtc_fo) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__3, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":34
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ * 
+ *         self.calc_args.add_argument("-select",
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")             # <<<<<<<<<<<<<<
+ *         self.calc_args.add_argument("-align",
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 34, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Timestep_to_extract_reference_co) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 34, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Atoms_groups_to_track_order_para) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":33
+ *                                         help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")
+ * 
+ *         self.calc_args.add_argument("-select",             # <<<<<<<<<<<<<<
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")
+ *         self.calc_args.add_argument("-align",
+ */
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":35
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
- *         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
+ *         self.calc_args.add_argument("-select",
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")
+ *         self.calc_args.add_argument("-align",             # <<<<<<<<<<<<<<
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ *         self.calc_args.add_argument("-skip",
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":36
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")
+ *         self.calc_args.add_argument("-align",
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")             # <<<<<<<<<<<<<<
+ *         self.calc_args.add_argument("-skip",
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ */
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Atoms_groups_to_track_order_para) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Atoms_groups_for_aligning_trajec) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":35
+ *         self.calc_args.add_argument("-select",
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")
+ *         self.calc_args.add_argument("-align",             # <<<<<<<<<<<<<<
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ *         self.calc_args.add_argument("-skip",
+ */
   __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":36
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
- * 
+  /* "INDUSAnalysis/protein_order_params.pyx":37
+ *         self.calc_args.add_argument("-align",
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ *         self.calc_args.add_argument("-skip",             # <<<<<<<<<<<<<<
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ *         self.calc_args.add_argument("-reftstep",
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 36, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":38
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ *         self.calc_args.add_argument("-skip",
+ *                                     help="Number of frames to skip between analyses (default = None)")             # <<<<<<<<<<<<<<
+ *         self.calc_args.add_argument("-reftstep",
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
+ */
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Atoms_groups_for_aligning_trajec) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Number_of_frames_to_skip_between) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
 
   /* "INDUSAnalysis/protein_order_params.pyx":37
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
- *         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")             # <<<<<<<<<<<<<<
- * 
- *         #Output control
+ *         self.calc_args.add_argument("-align",
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ *         self.calc_args.add_argument("-skip",             # <<<<<<<<<<<<<<
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ *         self.calc_args.add_argument("-reftstep",
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Number_of_frames_to_skip_between) < 0) __PYX_ERR(0, 37, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__7, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":39
+ *         self.calc_args.add_argument("-skip",
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ *         self.calc_args.add_argument("-reftstep",             # <<<<<<<<<<<<<<
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":40
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ *         self.calc_args.add_argument("-reftstep",
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")             # <<<<<<<<<<<<<<
  * 
- *         #Output control
- *         self.parser.add_argument("--genpdb", action="store_true", help="Write atoms per probe volume data to pdb file")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")
+ *         self.out_args.add_argument("--genpdb",
+ */
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Timestep_to_extract_reference_co) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":39
+ *         self.calc_args.add_argument("-skip",
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ *         self.calc_args.add_argument("-reftstep",             # <<<<<<<<<<<<<<
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__7, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":42
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
+ * 
+ *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
+ *                                    action="store_true",
+ *                                    help="Write atoms per probe volume data to pdb file")
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":43
+ * 
+ *         self.out_args.add_argument("--genpdb",
+ *                                    action="store_true",             # <<<<<<<<<<<<<<
+ *                                    help="Write atoms per probe volume data to pdb file")
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Write_atoms_per_probe_volume_dat) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Write_atoms_per_probe_volume_dat) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":42
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
+ * 
+ *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
+ *                                    action="store_true",
+ *                                    help="Write atoms per probe volume data to pdb file")
+ */
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":41
- *         #Output control
- *         self.parser.add_argument("--genpdb", action="store_true", help="Write atoms per probe volume data to pdb file")
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":46
+ *                                    help="Write atoms per probe volume data to pdb file")
  * 
- *     def read_args(self):
+ *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
+ *                                     action="store_true",
+ *                                     help="Display progress")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_misc_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":47
+ * 
+ *         self.misc_args.add_argument("--verbose",
+ *                                     action="store_true",             # <<<<<<<<<<<<<<
+ *                                     help="Display progress")
+ * 
+ */
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Display_progress) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 47, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Display_progress) < 0) __PYX_ERR(0, 47, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":46
+ *                                    help="Write atoms per probe volume data to pdb file")
+ * 
+ *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
+ *                                     action="store_true",
+ *                                     help="Display progress")
+ */
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":29
- * 
- * class OrderParams(TimeSeries):
+  /* "INDUSAnalysis/protein_order_params.pyx":25
+ *     Calculates order parameters.
+ *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
  */
 
   /* function exit code */
@@ -2662,7 +2734,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams__
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -2670,68 +2742,69 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams__
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":43
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")
+/* "INDUSAnalysis/protein_order_params.pyx":50
+ *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
- *         #POPULATE AS REQUIRED
- *         self.selection_parser = {
+ *         """
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_3read_args(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_3read_args = {"read_args", (PyCFunction)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_3read_args, METH_O, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_3read_args(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_3read_args(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_2read_args[] = "\n        Stores arguments from TimeSeries `args` parameter in class variables.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_3read_args = {"read_args", (PyCFunction)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_3read_args, METH_O, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_2read_args};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_3read_args(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("read_args (wrapper)", 0);
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2read_args(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_2read_args(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2read_args(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_2read_args(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
-  int __pyx_t_4;
-  int __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  int __pyx_t_6;
   PyObject *__pyx_t_7 = NULL;
   int __pyx_t_8;
-  PyObject *__pyx_t_9 = NULL;
+  int __pyx_t_9;
   __Pyx_RefNannySetupContext("read_args", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":46
- *         #POPULATE AS REQUIRED
+  /* "INDUSAnalysis/protein_order_params.pyx":55
+ *         """
  *         self.selection_parser = {
  *             'protein': """protein""",             # <<<<<<<<<<<<<<
  *             'backbone': """name CA or name C or name N""",
  *             'side_chain': """protein and not (name N or name CA or name C or name O or name H
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_protein, __pyx_n_s_protein) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_backbone, __pyx_kp_s_name_CA_or_name_C_or_name_N) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_side_chain, __pyx_kp_s_protein_and_not_name_N_or_name_C) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_heavy, __pyx_kp_s_protein_and_not_name_H) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_side_chain_heavy, __pyx_kp_s_protein_and_not_name_N_or_name_C_2) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_protein, __pyx_n_s_protein) < 0) __PYX_ERR(0, 55, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_backbone, __pyx_kp_s_name_CA_or_name_C_or_name_N) < 0) __PYX_ERR(0, 55, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_side_chain, __pyx_kp_s_protein_and_not_name_N_or_name_C) < 0) __PYX_ERR(0, 55, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_heavy, __pyx_kp_s_protein_and_not_name_H) < 0) __PYX_ERR(0, 55, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_side_chain_heavy, __pyx_kp_s_protein_and_not_name_N_or_name_C_2) < 0) __PYX_ERR(0, 55, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":45
- *     def read_args(self):
- *         #POPULATE AS REQUIRED
+  /* "INDUSAnalysis/protein_order_params.pyx":54
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
+ *         """
  *         self.selection_parser = {             # <<<<<<<<<<<<<<
  *             'protein': """protein""",
  *             'backbone': """name CA or name C or name N""",
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser, __pyx_t_1) < 0) __PYX_ERR(0, 45, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser, __pyx_t_1) < 0) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":55
+  /* "INDUSAnalysis/protein_order_params.pyx":64
  *         }
  * 
  *         super().read_args()             # <<<<<<<<<<<<<<
@@ -2739,9 +2812,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
  *         self.trajf = self.args.trajf
  */
   __pyx_t_2 = __Pyx_CyFunction_GetClassObj(__pyx_self);
-  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 55, __pyx_L1_error) }
+  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 64, __pyx_L1_error) }
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -2749,10 +2822,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_self);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_read_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_read_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2767,494 +2840,494 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":56
+  /* "INDUSAnalysis/protein_order_params.pyx":65
  * 
  *         super().read_args()
  *         self.structf = self.args.structf             # <<<<<<<<<<<<<<
  *         self.trajf = self.args.trajf
- *         self.reftrajf = self.args.reftrajf
+ * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_structf); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_structf); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_structf, __pyx_t_3) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_structf, __pyx_t_3) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":57
+  /* "INDUSAnalysis/protein_order_params.pyx":66
  *         super().read_args()
  *         self.structf = self.args.structf
  *         self.trajf = self.args.trajf             # <<<<<<<<<<<<<<
- *         self.reftrajf = self.args.reftrajf
- *         self.reftstep = self.args.reftstep
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_trajf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 57, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_trajf, __pyx_t_1) < 0) __PYX_ERR(0, 57, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":58
- *         self.structf = self.args.structf
- *         self.trajf = self.args.trajf
- *         self.reftrajf = self.args.reftrajf             # <<<<<<<<<<<<<<
- *         self.reftstep = self.args.reftstep
- *         self.select = self.args.select
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_reftrajf_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftrajf_2, __pyx_t_3) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":59
- *         self.trajf = self.args.trajf
- *         self.reftrajf = self.args.reftrajf
- *         self.reftstep = self.args.reftstep             # <<<<<<<<<<<<<<
- *         self.select = self.args.select
- *         if self.select is None:
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2, __pyx_t_1) < 0) __PYX_ERR(0, 59, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":60
- *         self.reftrajf = self.args.reftrajf
- *         self.reftstep = self.args.reftstep
- *         self.select = self.args.select             # <<<<<<<<<<<<<<
- *         if self.select is None:
- *             self.select = 'protein'
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_select_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_select_2, __pyx_t_3) < 0) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":61
- *         self.reftstep = self.args.reftstep
- *         self.select = self.args.select
- *         if self.select is None:             # <<<<<<<<<<<<<<
- *             self.select = 'protein'
- *         self.align = self.args.align
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = (__pyx_t_3 == Py_None);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = (__pyx_t_4 != 0);
-  if (__pyx_t_5) {
-
-    /* "INDUSAnalysis/protein_order_params.pyx":62
- *         self.select = self.args.select
- *         if self.select is None:
- *             self.select = 'protein'             # <<<<<<<<<<<<<<
- *         self.align = self.args.align
- *         if self.align is None:
- */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_select_2, __pyx_n_s_protein) < 0) __PYX_ERR(0, 62, __pyx_L1_error)
-
-    /* "INDUSAnalysis/protein_order_params.pyx":61
- *         self.reftstep = self.args.reftstep
- *         self.select = self.args.select
- *         if self.select is None:             # <<<<<<<<<<<<<<
- *             self.select = 'protein'
- *         self.align = self.args.align
- */
-  }
-
-  /* "INDUSAnalysis/protein_order_params.pyx":63
- *         if self.select is None:
- *             self.select = 'protein'
- *         self.align = self.args.align             # <<<<<<<<<<<<<<
- *         if self.align is None:
- *             self.align = 'backbone'
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_align_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_align_2, __pyx_t_1) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":64
- *             self.select = 'protein'
- *         self.align = self.args.align
- *         if self.align is None:             # <<<<<<<<<<<<<<
- *             self.align = 'backbone'
  * 
+ *         self.u = mda.Universe(self.structf, self.trajf)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = (__pyx_t_1 == Py_None);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = (__pyx_t_5 != 0);
-  if (__pyx_t_4) {
-
-    /* "INDUSAnalysis/protein_order_params.pyx":65
- *         self.align = self.args.align
- *         if self.align is None:
- *             self.align = 'backbone'             # <<<<<<<<<<<<<<
- * 
- *         self.skip = self.args.skip
- */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_align_2, __pyx_n_s_backbone) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
-
-    /* "INDUSAnalysis/protein_order_params.pyx":64
- *             self.select = 'protein'
- *         self.align = self.args.align
- *         if self.align is None:             # <<<<<<<<<<<<<<
- *             self.align = 'backbone'
- * 
- */
-  }
-
-  /* "INDUSAnalysis/protein_order_params.pyx":67
- *             self.align = 'backbone'
- * 
- *         self.skip = self.args.skip             # <<<<<<<<<<<<<<
- *         if self.skip is not None:
- *             self.skip = int(self.skip)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_3) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_trajf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_trajf, __pyx_t_1) < 0) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":68
+ *         self.trajf = self.args.trajf
  * 
- *         self.skip = self.args.skip
- *         if self.skip is not None:             # <<<<<<<<<<<<<<
- *             self.skip = int(self.skip)
- *         else:
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = (__pyx_t_3 != Py_None);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = (__pyx_t_4 != 0);
-  if (__pyx_t_5) {
-
-    /* "INDUSAnalysis/protein_order_params.pyx":69
- *         self.skip = self.args.skip
- *         if self.skip is not None:
- *             self.skip = int(self.skip)             # <<<<<<<<<<<<<<
- *         else:
- *             self.skip = 1
- */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_1) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":68
- * 
- *         self.skip = self.args.skip
- *         if self.skip is not None:             # <<<<<<<<<<<<<<
- *             self.skip = int(self.skip)
- *         else:
- */
-    goto __pyx_L5;
-  }
-
-  /* "INDUSAnalysis/protein_order_params.pyx":71
- *             self.skip = int(self.skip)
- *         else:
- *             self.skip = 1             # <<<<<<<<<<<<<<
- * 
- *         # Prepare system from args
- */
-  /*else*/ {
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_int_1) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  }
-  __pyx_L5:;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":74
- * 
- *         # Prepare system from args
  *         self.u = mda.Universe(self.structf, self.trajf)             # <<<<<<<<<<<<<<
  * 
- *         if self.reftrajf is not None:
+ *         self.reftrajf = self.args.reftrajf
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_mda); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_mda); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_Universe); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_Universe); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 74, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = NULL;
-  __pyx_t_8 = 0;
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = NULL;
+  __pyx_t_6 = 0;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_7)) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_5)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_8 = 1;
+      __pyx_t_6 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_3, __pyx_t_6};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_3, __pyx_t_6};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else
   #endif
   {
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    if (__pyx_t_7) {
-      __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    if (__pyx_t_5) {
+      __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
     }
     __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_8, __pyx_t_3);
-    __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_6, __pyx_t_3);
+    __Pyx_GIVEREF(__pyx_t_4);
+    PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_3 = 0;
-    __pyx_t_6 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
+    __pyx_t_4 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_u, __pyx_t_1) < 0) __PYX_ERR(0, 74, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_u, __pyx_t_1) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":76
+  /* "INDUSAnalysis/protein_order_params.pyx":70
  *         self.u = mda.Universe(self.structf, self.trajf)
+ * 
+ *         self.reftrajf = self.args.reftrajf             # <<<<<<<<<<<<<<
+ * 
+ *         if self.reftrajf is not None:
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_reftrajf_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftrajf_2, __pyx_t_2) < 0) __PYX_ERR(0, 70, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":72
+ *         self.reftrajf = self.args.reftrajf
  * 
  *         if self.reftrajf is not None:             # <<<<<<<<<<<<<<
  *             self.refu = mda.Universe(self.structf, self.reftrajf)
  *         else:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftrajf_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = (__pyx_t_1 != Py_None);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = (__pyx_t_5 != 0);
-  if (__pyx_t_4) {
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftrajf_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_8 = (__pyx_t_2 != Py_None);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_9 = (__pyx_t_8 != 0);
+  if (__pyx_t_9) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":77
+    /* "INDUSAnalysis/protein_order_params.pyx":73
  * 
  *         if self.reftrajf is not None:
  *             self.refu = mda.Universe(self.structf, self.reftrajf)             # <<<<<<<<<<<<<<
  *         else:
  *             self.refu = mda.Universe(self.structf, self.trajf)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Universe); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 77, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftrajf_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 77, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_mda); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Universe); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 73, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftrajf_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 73, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_3 = NULL;
-    __pyx_t_8 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
-      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_9);
+    __pyx_t_6 = 0;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
       if (likely(__pyx_t_3)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
         __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_9, function);
-        __pyx_t_8 = 1;
+        __Pyx_DECREF_SET(__pyx_t_7, function);
+        __pyx_t_6 = 1;
       }
     }
     #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_9)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_2, __pyx_t_6};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+    if (PyFunction_Check(__pyx_t_7)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_1, __pyx_t_4};
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_2, __pyx_t_6};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_1, __pyx_t_4};
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_7 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 77, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 73, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
       if (__pyx_t_3) {
-        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_3); __pyx_t_3 = NULL;
+        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
       }
-      __Pyx_GIVEREF(__pyx_t_2);
-      PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_8, __pyx_t_2);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_8, __pyx_t_6);
-      __pyx_t_2 = 0;
-      __pyx_t_6 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_GIVEREF(__pyx_t_1);
+      PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_6, __pyx_t_1);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_4);
+      __pyx_t_1 = 0;
+      __pyx_t_4 = 0;
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_refu, __pyx_t_1) < 0) __PYX_ERR(0, 77, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_refu, __pyx_t_2) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":76
- *         self.u = mda.Universe(self.structf, self.trajf)
+    /* "INDUSAnalysis/protein_order_params.pyx":72
+ *         self.reftrajf = self.args.reftrajf
  * 
  *         if self.reftrajf is not None:             # <<<<<<<<<<<<<<
  *             self.refu = mda.Universe(self.structf, self.reftrajf)
  *         else:
  */
-    goto __pyx_L6;
+    goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":79
+  /* "INDUSAnalysis/protein_order_params.pyx":75
  *             self.refu = mda.Universe(self.structf, self.reftrajf)
  *         else:
  *             self.refu = mda.Universe(self.structf, self.trajf)             # <<<<<<<<<<<<<<
  * 
- *         if self.reftstep is not None:
+ *         self.select = self.args.select
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_mda); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 79, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_Universe); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 79, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_mda); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 75, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 79, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 79, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = NULL;
-    __pyx_t_8 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_7);
-      if (likely(__pyx_t_2)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-        __Pyx_INCREF(__pyx_t_2);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_Universe); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 75, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 75, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 75, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = NULL;
+    __pyx_t_6 = 0;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+        __Pyx_INCREF(__pyx_t_1);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_7, function);
-        __pyx_t_8 = 1;
+        __Pyx_DECREF_SET(__pyx_t_5, function);
+        __pyx_t_6 = 1;
       }
     }
     #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_7)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_t_9, __pyx_t_6};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (PyFunction_Check(__pyx_t_5)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_t_7, __pyx_t_4};
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_t_9, __pyx_t_6};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_1, __pyx_t_7, __pyx_t_4};
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_3 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 79, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 75, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      if (__pyx_t_2) {
-        __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2); __pyx_t_2 = NULL;
+      if (__pyx_t_1) {
+        __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1); __pyx_t_1 = NULL;
       }
-      __Pyx_GIVEREF(__pyx_t_9);
-      PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_8, __pyx_t_9);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_8, __pyx_t_6);
-      __pyx_t_9 = 0;
-      __pyx_t_6 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 79, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_GIVEREF(__pyx_t_7);
+      PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_6, __pyx_t_7);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_6, __pyx_t_4);
+      __pyx_t_7 = 0;
+      __pyx_t_4 = 0;
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_refu, __pyx_t_1) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_refu, __pyx_t_2) < 0) __PYX_ERR(0, 75, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  }
+  __pyx_L3:;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":77
+ *             self.refu = mda.Universe(self.structf, self.trajf)
+ * 
+ *         self.select = self.args.select             # <<<<<<<<<<<<<<
+ *         if self.select is None:
+ *             self.select = 'protein'
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_select_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_select_2, __pyx_t_5) < 0) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":78
+ * 
+ *         self.select = self.args.select
+ *         if self.select is None:             # <<<<<<<<<<<<<<
+ *             self.select = 'protein'
+ * 
+ */
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = (__pyx_t_5 == Py_None);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_8 = (__pyx_t_9 != 0);
+  if (__pyx_t_8) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":79
+ *         self.select = self.args.select
+ *         if self.select is None:
+ *             self.select = 'protein'             # <<<<<<<<<<<<<<
+ * 
+ *         self.align = self.args.align
+ */
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_select_2, __pyx_n_s_protein) < 0) __PYX_ERR(0, 79, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":78
+ * 
+ *         self.select = self.args.select
+ *         if self.select is None:             # <<<<<<<<<<<<<<
+ *             self.select = 'protein'
+ * 
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":81
+ *             self.select = 'protein'
+ * 
+ *         self.align = self.args.align             # <<<<<<<<<<<<<<
+ *         if self.align is None:
+ *             self.align = 'backbone'
+ */
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_align_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_align_2, __pyx_t_2) < 0) __PYX_ERR(0, 81, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":82
+ * 
+ *         self.align = self.args.align
+ *         if self.align is None:             # <<<<<<<<<<<<<<
+ *             self.align = 'backbone'
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_8 = (__pyx_t_2 == Py_None);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_9 = (__pyx_t_8 != 0);
+  if (__pyx_t_9) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":83
+ *         self.align = self.args.align
+ *         if self.align is None:
+ *             self.align = 'backbone'             # <<<<<<<<<<<<<<
+ * 
+ *         self.skip = self.args.skip
+ */
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_align_2, __pyx_n_s_backbone) < 0) __PYX_ERR(0, 83, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":82
+ * 
+ *         self.align = self.args.align
+ *         if self.align is None:             # <<<<<<<<<<<<<<
+ *             self.align = 'backbone'
+ * 
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":85
+ *             self.align = 'backbone'
+ * 
+ *         self.skip = self.args.skip             # <<<<<<<<<<<<<<
+ *         if self.skip is not None:
+ *             self.skip = int(self.skip)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_5) < 0) __PYX_ERR(0, 85, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":86
+ * 
+ *         self.skip = self.args.skip
+ *         if self.skip is not None:             # <<<<<<<<<<<<<<
+ *             self.skip = int(self.skip)
+ *         else:
+ */
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = (__pyx_t_5 != Py_None);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_8 = (__pyx_t_9 != 0);
+  if (__pyx_t_8) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":87
+ *         self.skip = self.args.skip
+ *         if self.skip is not None:
+ *             self.skip = int(self.skip)             # <<<<<<<<<<<<<<
+ *         else:
+ *             self.skip = 1
+ */
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 87, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 87, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_2) < 0) __PYX_ERR(0, 87, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":86
+ * 
+ *         self.skip = self.args.skip
+ *         if self.skip is not None:             # <<<<<<<<<<<<<<
+ *             self.skip = int(self.skip)
+ *         else:
+ */
+    goto __pyx_L6;
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":89
+ *             self.skip = int(self.skip)
+ *         else:
+ *             self.skip = 1             # <<<<<<<<<<<<<<
+ * 
+ *         self.reftstep = self.args.reftstep
+ */
+  /*else*/ {
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_int_1) < 0) __PYX_ERR(0, 89, __pyx_L1_error)
   }
   __pyx_L6:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":81
- *             self.refu = mda.Universe(self.structf, self.trajf)
+  /* "INDUSAnalysis/protein_order_params.pyx":91
+ *             self.skip = 1
  * 
+ *         self.reftstep = self.args.reftstep             # <<<<<<<<<<<<<<
+ *         if self.reftstep is not None:
+ *             self.reftstep = int(self.reftstep)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2, __pyx_t_5) < 0) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":92
+ * 
+ *         self.reftstep = self.args.reftstep
  *         if self.reftstep is not None:             # <<<<<<<<<<<<<<
  *             self.reftstep = int(self.reftstep)
  *         else:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = (__pyx_t_1 != Py_None);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = (__pyx_t_4 != 0);
-  if (__pyx_t_5) {
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 92, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_8 = (__pyx_t_5 != Py_None);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_9 = (__pyx_t_8 != 0);
+  if (__pyx_t_9) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":82
- * 
+    /* "INDUSAnalysis/protein_order_params.pyx":93
+ *         self.reftstep = self.args.reftstep
  *         if self.reftstep is not None:
  *             self.reftstep = int(self.reftstep)             # <<<<<<<<<<<<<<
  *         else:
  *             self.reftstep = 0
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 82, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2, __pyx_t_7) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 93, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 93, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2, __pyx_t_2) < 0) __PYX_ERR(0, 93, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":81
- *             self.refu = mda.Universe(self.structf, self.trajf)
+    /* "INDUSAnalysis/protein_order_params.pyx":92
  * 
+ *         self.reftstep = self.args.reftstep
  *         if self.reftstep is not None:             # <<<<<<<<<<<<<<
  *             self.reftstep = int(self.reftstep)
  *         else:
@@ -3262,7 +3335,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
     goto __pyx_L7;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":84
+  /* "INDUSAnalysis/protein_order_params.pyx":95
  *             self.reftstep = int(self.reftstep)
  *         else:
  *             self.reftstep = 0             # <<<<<<<<<<<<<<
@@ -3270,46 +3343,46 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
  *         self.genpdb = self.args.genpdb
  */
   /*else*/ {
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2, __pyx_int_0) < 0) __PYX_ERR(0, 84, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2, __pyx_int_0) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
   }
   __pyx_L7:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":86
+  /* "INDUSAnalysis/protein_order_params.pyx":97
  *             self.reftstep = 0
  * 
  *         self.genpdb = self.args.genpdb             # <<<<<<<<<<<<<<
  *         self.verbose = self.args.verbose
  * 
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 86, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2, __pyx_t_1) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2, __pyx_t_5) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":87
+  /* "INDUSAnalysis/protein_order_params.pyx":98
  * 
  *         self.genpdb = self.args.genpdb
  *         self.verbose = self.args.verbose             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def calc_Rg_worker(self, coords, masses):
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 87, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2, __pyx_t_7) < 0) __PYX_ERR(0, 87, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2, __pyx_t_2) < 0) __PYX_ERR(0, 98, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":43
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")
+  /* "INDUSAnalysis/protein_order_params.pyx":50
+ *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
- *         #POPULATE AS REQUIRED
- *         self.selection_parser = {
+ *         """
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
 
   /* function exit code */
@@ -3319,10 +3392,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.read_args", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.read_args", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -3330,18 +3403,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":94
- *     Tests in tests/test_orderparams.py
- *     """
+/* "INDUSAnalysis/protein_order_params.pyx":100
+ *         self.verbose = self.args.verbose
+ * 
  *     def calc_Rg_worker(self, coords, masses):             # <<<<<<<<<<<<<<
- *         #quick test
- *         assert(coords.shape[1] == 3)
+ *         """
+ *         Calculates radius of gyration of atoms with given coordinates and
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_5calc_Rg_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_5calc_Rg_worker = {"calc_Rg_worker", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_5calc_Rg_worker, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_5calc_Rg_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_5calc_Rg_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_4calc_Rg_worker[] = "\n        Calculates radius of gyration of atoms with given coordinates and\n        masses.\n\n        Args:\n            coords (np.array): Array of shape (N, 3) containing atomic coordinates.\n            masses (np.array): Array of shape (N,) containing atomic masses.\n\n        Returns:\n            Radius of gyration (np.float).\n\n        Raises:\n            ValueError if coords does not have the right shape, or if the\n            lengths of coords and masses do not match.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_5calc_Rg_worker = {"calc_Rg_worker", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_5calc_Rg_worker, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_4calc_Rg_worker};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_5calc_Rg_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_coords = 0;
   PyObject *__pyx_v_masses = 0;
@@ -3373,17 +3447,17 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_5
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_coords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_Rg_worker", 1, 3, 3, 1); __PYX_ERR(0, 94, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_Rg_worker", 1, 3, 3, 1); __PYX_ERR(0, 100, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_masses)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_Rg_worker", 1, 3, 3, 2); __PYX_ERR(0, 94, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_Rg_worker", 1, 3, 3, 2); __PYX_ERR(0, 100, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_Rg_worker") < 0)) __PYX_ERR(0, 94, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_Rg_worker") < 0)) __PYX_ERR(0, 100, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -3398,20 +3472,20 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_5
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_Rg_worker", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 94, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calc_Rg_worker", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 100, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_Rg_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_4calc_Rg_worker(__pyx_self, __pyx_v_self, __pyx_v_coords, __pyx_v_masses);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_4calc_Rg_worker(__pyx_self, __pyx_v_self, __pyx_v_coords, __pyx_v_masses);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_4calc_Rg_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_coords, PyObject *__pyx_v_masses) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_4calc_Rg_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_coords, PyObject *__pyx_v_masses) {
   PyObject *__pyx_v_com = NULL;
   PyObject *__pyx_v_sq_distances = NULL;
   PyObject *__pyx_v_Rg = NULL;
@@ -3426,122 +3500,183 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_4
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("calc_Rg_worker", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":96
- *     def calc_Rg_worker(self, coords, masses):
- *         #quick test
- *         assert(coords.shape[1] == 3)             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":116
+ *             lengths of coords and masses do not match.
+ *         """
+ *         if coords.shape[1] != 3:             # <<<<<<<<<<<<<<
+ *             raise ValueError("coords not 3 dimensional")
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(__pyx_t_3)) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":117
+ *         """
+ *         if coords.shape[1] != 3:
+ *             raise ValueError("coords not 3 dimensional")             # <<<<<<<<<<<<<<
+ * 
+ *         if coords.shape[0] != masses.shape[0]:
+ */
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __PYX_ERR(0, 117, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":116
+ *             lengths of coords and masses do not match.
+ *         """
+ *         if coords.shape[1] != 3:             # <<<<<<<<<<<<<<
+ *             raise ValueError("coords not 3 dimensional")
+ * 
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":119
+ *             raise ValueError("coords not 3 dimensional")
+ * 
+ *         if coords.shape[0] != masses.shape[0]:             # <<<<<<<<<<<<<<
+ *             raise ValueError("coords and masses not of same length")
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_masses, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_2, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(__pyx_t_3)) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":120
+ * 
+ *         if coords.shape[0] != masses.shape[0]:
+ *             raise ValueError("coords and masses not of same length")             # <<<<<<<<<<<<<<
  * 
  *         com = np.average(coords, weights=masses, axis=0)
  */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 96, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) {
-      PyErr_SetNone(PyExc_AssertionError);
-      __PYX_ERR(0, 96, __pyx_L1_error)
-    }
-  }
-  #endif
+    __PYX_ERR(0, 120, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":98
- *         assert(coords.shape[1] == 3)
+    /* "INDUSAnalysis/protein_order_params.pyx":119
+ *             raise ValueError("coords not 3 dimensional")
+ * 
+ *         if coords.shape[0] != masses.shape[0]:             # <<<<<<<<<<<<<<
+ *             raise ValueError("coords and masses not of same length")
+ * 
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":122
+ *             raise ValueError("coords and masses not of same length")
  * 
  *         com = np.average(coords, weights=masses, axis=0)             # <<<<<<<<<<<<<<
- *         sq_distances = np.sum((coords - com)**2, axis = 1)
+ *         sq_distances = np.sum((coords - com)**2, axis=1)
  *         Rg = np.sqrt(np.average(sq_distances, weights=masses))
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 98, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_average); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_coords);
   __Pyx_GIVEREF(__pyx_v_coords);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_coords);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 98, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_weights, __pyx_v_masses) < 0) __PYX_ERR(0, 98, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 98, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_weights, __pyx_v_masses) < 0) __PYX_ERR(0, 122, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_com = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":99
+  /* "INDUSAnalysis/protein_order_params.pyx":123
  * 
  *         com = np.average(coords, weights=masses, axis=0)
- *         sq_distances = np.sum((coords - com)**2, axis = 1)             # <<<<<<<<<<<<<<
+ *         sq_distances = np.sum((coords - com)**2, axis=1)             # <<<<<<<<<<<<<<
  *         Rg = np.sqrt(np.average(sq_distances, weights=masses))
  *         return Rg
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sum); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 99, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sum); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_com); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_com); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 99, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 123, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_sq_distances = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_v_sq_distances = __pyx_t_4;
+  __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":100
+  /* "INDUSAnalysis/protein_order_params.pyx":124
  *         com = np.average(coords, weights=masses, axis=0)
- *         sq_distances = np.sum((coords - com)**2, axis = 1)
+ *         sq_distances = np.sum((coords - com)**2, axis=1)
  *         Rg = np.sqrt(np.average(sq_distances, weights=masses))             # <<<<<<<<<<<<<<
  *         return Rg
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_average); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 100, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_sq_distances);
   __Pyx_GIVEREF(__pyx_v_sq_distances);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_sq_distances);
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_weights, __pyx_v_masses) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
-  __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 100, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_weights, __pyx_v_masses) < 0) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_6 = NULL;
@@ -3554,33 +3689,33 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_4
       __Pyx_DECREF_SET(__pyx_t_5, function);
     }
   }
-  __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_6, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_7);
+  __pyx_t_4 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_6, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_7);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_Rg = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_v_Rg = __pyx_t_4;
+  __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":101
- *         sq_distances = np.sum((coords - com)**2, axis = 1)
+  /* "INDUSAnalysis/protein_order_params.pyx":125
+ *         sq_distances = np.sum((coords - com)**2, axis=1)
  *         Rg = np.sqrt(np.average(sq_distances, weights=masses))
  *         return Rg             # <<<<<<<<<<<<<<
  * 
- *     def calc_Rg(self, u, selection):
+ *     def calc_Rg(self, u, skip, selection):
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_Rg);
   __pyx_r = __pyx_v_Rg;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":94
- *     Tests in tests/test_orderparams.py
- *     """
+  /* "INDUSAnalysis/protein_order_params.pyx":100
+ *         self.verbose = self.args.verbose
+ * 
  *     def calc_Rg_worker(self, coords, masses):             # <<<<<<<<<<<<<<
- *         #quick test
- *         assert(coords.shape[1] == 3)
+ *         """
+ *         Calculates radius of gyration of atoms with given coordinates and
  */
 
   /* function exit code */
@@ -3591,7 +3726,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_4
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_Rg_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_com);
@@ -3602,26 +3737,751 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_4
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":103
+/* "INDUSAnalysis/protein_order_params.pyx":127
  *         return Rg
  * 
- *     def calc_Rg(self, u, selection):             # <<<<<<<<<<<<<<
- *         Rg = []
- *         sel = u.select_atoms(selection)
+ *     def calc_Rg(self, u, skip, selection):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates radius of gyration of selection along trajectory.
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_7calc_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_7calc_Rg = {"calc_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_7calc_Rg, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_7calc_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_7calc_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_6calc_Rg[] = "\n        Calculates radius of gyration of selection along trajectory.\n\n        Args:\n            u (mda.Universe): Universe.\n            skip (int): Resampling interval.\n            selection (str): MDAnalysis selection string.\n\n        Returns:\n            TimeSeries object containing Rg values along trajectory.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_7calc_Rg = {"calc_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_7calc_Rg, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_6calc_Rg};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_7calc_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_u = 0;
+  PyObject *__pyx_v_skip = 0;
   PyObject *__pyx_v_selection = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calc_Rg (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_u,&__pyx_n_s_selection,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_u,&__pyx_n_s_skip_2,&__pyx_n_s_selection,0};
+    PyObject* values[4] = {0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calc_Rg", 1, 4, 4, 1); __PYX_ERR(0, 127, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_skip_2)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calc_Rg", 1, 4, 4, 2); __PYX_ERR(0, 127, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selection)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calc_Rg", 1, 4, 4, 3); __PYX_ERR(0, 127, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_Rg") < 0)) __PYX_ERR(0, 127, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+    }
+    __pyx_v_self = values[0];
+    __pyx_v_u = values[1];
+    __pyx_v_skip = values[2];
+    __pyx_v_selection = values[3];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("calc_Rg", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 127, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_6calc_Rg(__pyx_self, __pyx_v_self, __pyx_v_u, __pyx_v_skip, __pyx_v_selection);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_6calc_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_skip, PyObject *__pyx_v_selection) {
+  PyObject *__pyx_v_times = NULL;
+  PyObject *__pyx_v_Rgs = NULL;
+  PyObject *__pyx_v_sel = NULL;
+  PyObject *__pyx_v_ts = NULL;
+  PyObject *__pyx_v_Rgval = NULL;
+  PyObject *__pyx_v_ts_Rg = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  Py_ssize_t __pyx_t_4;
+  PyObject *(*__pyx_t_5)(PyObject *);
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  int __pyx_t_9;
+  PyObject *__pyx_t_10 = NULL;
+  int __pyx_t_11;
+  __Pyx_RefNannySetupContext("calc_Rg", 0);
+
+  /* "INDUSAnalysis/protein_order_params.pyx":139
+ *             TimeSeries object containing Rg values along trajectory.
+ *         """
+ *         times = []             # <<<<<<<<<<<<<<
+ *         Rgs = []
+ *         sel = u.select_atoms(selection)
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_times = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":140
+ *         """
+ *         times = []
+ *         Rgs = []             # <<<<<<<<<<<<<<
+ *         sel = u.select_atoms(selection)
+ *         for ts in u.trajectory[0::skip]:
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_Rgs = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":141
+ *         times = []
+ *         Rgs = []
+ *         sel = u.select_atoms(selection)             # <<<<<<<<<<<<<<
+ *         for ts in u.trajectory[0::skip]:
+ *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_selection) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_selection);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_sel = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":142
+ *         Rgs = []
+ *         sel = u.select_atoms(selection)
+ *         for ts in u.trajectory[0::skip]:             # <<<<<<<<<<<<<<
+ *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
+ *             times.append(ts.time)
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PySlice_New(__pyx_int_0, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
+    __pyx_t_2 = __pyx_t_3; __Pyx_INCREF(__pyx_t_2); __pyx_t_4 = 0;
+    __pyx_t_5 = NULL;
+  } else {
+    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_5 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error)
+  }
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  for (;;) {
+    if (likely(!__pyx_t_5)) {
+      if (likely(PyList_CheckExact(__pyx_t_2))) {
+        if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_2)) break;
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
+        #else
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        #endif
+      } else {
+        if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
+        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
+        #else
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        #endif
+      }
+    } else {
+      __pyx_t_3 = __pyx_t_5(__pyx_t_2);
+      if (unlikely(!__pyx_t_3)) {
+        PyObject* exc_type = PyErr_Occurred();
+        if (exc_type) {
+          if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+          else __PYX_ERR(0, 142, __pyx_L1_error)
+        }
+        break;
+      }
+      __Pyx_GOTREF(__pyx_t_3);
+    }
+    __Pyx_XDECREF_SET(__pyx_v_ts, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":143
+ *         sel = u.select_atoms(selection)
+ *         for ts in u.trajectory[0::skip]:
+ *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)             # <<<<<<<<<<<<<<
+ *             times.append(ts.time)
+ *             Rgs.append(Rgval)
+ */
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_Rg_worker); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_positions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_masses); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_8 = NULL;
+    __pyx_t_9 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_1);
+      if (likely(__pyx_t_8)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+        __Pyx_INCREF(__pyx_t_8);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_1, function);
+        __pyx_t_9 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_1)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_7};
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_7};
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_10 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      if (__pyx_t_8) {
+        __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
+      }
+      __Pyx_GIVEREF(__pyx_t_6);
+      PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_t_6);
+      __Pyx_GIVEREF(__pyx_t_7);
+      PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_7);
+      __pyx_t_6 = 0;
+      __pyx_t_7 = 0;
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_Rgval, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":144
+ *         for ts in u.trajectory[0::skip]:
+ *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
+ *             times.append(ts.time)             # <<<<<<<<<<<<<<
+ *             Rgs.append(Rgval)
+ *         ts_Rg = timeseries.TimeSeries(np.array(times), np.array(Rgs),
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_times, __pyx_t_3); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":145
+ *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
+ *             times.append(ts.time)
+ *             Rgs.append(Rgval)             # <<<<<<<<<<<<<<
+ *         ts_Rg = timeseries.TimeSeries(np.array(times), np.array(Rgs),
+ *                                       labels=['Rg'])
+ */
+    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_Rgs, __pyx_v_Rgval); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 145, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":142
+ *         Rgs = []
+ *         sel = u.select_atoms(selection)
+ *         for ts in u.trajectory[0::skip]:             # <<<<<<<<<<<<<<
+ *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
+ *             times.append(ts.time)
+ */
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":146
+ *             times.append(ts.time)
+ *             Rgs.append(Rgval)
+ *         ts_Rg = timeseries.TimeSeries(np.array(times), np.array(Rgs),             # <<<<<<<<<<<<<<
+ *                                       labels=['Rg'])
+ *         return ts_Rg
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_10);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_10, function);
+    }
+  }
+  __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_1, __pyx_v_times) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_v_times);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_10 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_1, __pyx_v_Rgs) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_Rgs);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_10);
+  PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_10);
+  __pyx_t_2 = 0;
+  __pyx_t_10 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":147
+ *             Rgs.append(Rgval)
+ *         ts_Rg = timeseries.TimeSeries(np.array(times), np.array(Rgs),
+ *                                       labels=['Rg'])             # <<<<<<<<<<<<<<
+ *         return ts_Rg
+ * 
+ */
+  __pyx_t_10 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_n_s_Rg);
+  __Pyx_GIVEREF(__pyx_n_s_Rg);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_Rg);
+  if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_labels, __pyx_t_2) < 0) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":146
+ *             times.append(ts.time)
+ *             Rgs.append(Rgval)
+ *         ts_Rg = timeseries.TimeSeries(np.array(times), np.array(Rgs),             # <<<<<<<<<<<<<<
+ *                                       labels=['Rg'])
+ *         return ts_Rg
+ */
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, __pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_v_ts_Rg = __pyx_t_2;
+  __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":148
+ *         ts_Rg = timeseries.TimeSeries(np.array(times), np.array(Rgs),
+ *                                       labels=['Rg'])
+ *         return ts_Rg             # <<<<<<<<<<<<<<
+ * 
+ *     def plot_Rg(self, ts_Rg):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_ts_Rg);
+  __pyx_r = __pyx_v_ts_Rg;
+  goto __pyx_L0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":127
+ *         return Rg
+ * 
+ *     def calc_Rg(self, u, skip, selection):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates radius of gyration of selection along trajectory.
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_times);
+  __Pyx_XDECREF(__pyx_v_Rgs);
+  __Pyx_XDECREF(__pyx_v_sel);
+  __Pyx_XDECREF(__pyx_v_ts);
+  __Pyx_XDECREF(__pyx_v_Rgval);
+  __Pyx_XDECREF(__pyx_v_ts_Rg);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "INDUSAnalysis/protein_order_params.pyx":150
+ *         return ts_Rg
+ * 
+ *     def plot_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots Rg and saves figure to file."""
+ *         fig = ts_Rg.plot()
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_9plot_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_8plot_Rg[] = "Plots Rg and saves figure to file.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_9plot_Rg = {"plot_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_9plot_Rg, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_8plot_Rg};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_9plot_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_self = 0;
+  PyObject *__pyx_v_ts_Rg = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("plot_Rg (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_ts_Rg,0};
+    PyObject* values[2] = {0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_Rg)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("plot_Rg", 1, 2, 2, 1); __PYX_ERR(0, 150, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_Rg") < 0)) __PYX_ERR(0, 150, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+    }
+    __pyx_v_self = values[0];
+    __pyx_v_ts_Rg = values[1];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("plot_Rg", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 150, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_8plot_Rg(__pyx_self, __pyx_v_self, __pyx_v_ts_Rg);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_8plot_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_Rg) {
+  PyObject *__pyx_v_fig = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  __Pyx_RefNannySetupContext("plot_Rg", 0);
+
+  /* "INDUSAnalysis/protein_order_params.pyx":152
+ *     def plot_Rg(self, ts_Rg):
+ *         """Plots Rg and saves figure to file."""
+ *         fig = ts_Rg.plot()             # <<<<<<<<<<<<<<
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="Rg")
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Rg, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_fig = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":153
+ *         """Plots Rg and saves figure to file."""
+ *         fig = ts_Rg.plot()
+ *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
+ *         self.save_figure(fig, suffix="Rg")
+ *         if self.show:
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":154
+ *         fig = ts_Rg.plot()
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="Rg")             # <<<<<<<<<<<<<<
+ *         if self.show:
+ *             plt.show()
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_v_fig);
+  __Pyx_GIVEREF(__pyx_v_fig);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_Rg) < 0) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":155
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="Rg")
+ *         if self.show:             # <<<<<<<<<<<<<<
+ *             plt.show()
+ *         else:
+ */
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__pyx_t_5) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":156
+ *         self.save_figure(fig, suffix="Rg")
+ *         if self.show:
+ *             plt.show()             # <<<<<<<<<<<<<<
+ *         else:
+ *             plt.close()
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":155
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="Rg")
+ *         if self.show:             # <<<<<<<<<<<<<<
+ *             plt.show()
+ *         else:
+ */
+    goto __pyx_L3;
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":158
+ *             plt.show()
+ *         else:
+ *             plt.close()             # <<<<<<<<<<<<<<
+ * 
+ *     def plot_ma_Rg(self, ts_Rg, window):
+ */
+  /*else*/ {
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_2)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+  __pyx_L3:;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":150
+ *         return ts_Rg
+ * 
+ *     def plot_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots Rg and saves figure to file."""
+ *         fig = ts_Rg.plot()
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_fig);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "INDUSAnalysis/protein_order_params.pyx":160
+ *             plt.close()
+ * 
+ *     def plot_ma_Rg(self, ts_Rg, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.moving_average(window=window).plot()
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_11plot_ma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_10plot_ma_Rg[] = "Plots moving average Rg and saves figure to file.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_11plot_ma_Rg = {"plot_ma_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_11plot_ma_Rg, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_10plot_ma_Rg};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_11plot_ma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_self = 0;
+  PyObject *__pyx_v_ts_Rg = 0;
+  PyObject *__pyx_v_window = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("plot_ma_Rg (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_ts_Rg,&__pyx_n_s_window,0};
     PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -3643,19 +4503,19 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_7
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_Rg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_Rg", 1, 3, 3, 1); __PYX_ERR(0, 103, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_ma_Rg", 1, 3, 3, 1); __PYX_ERR(0, 160, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selection)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_window)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_Rg", 1, 3, 3, 2); __PYX_ERR(0, 103, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_ma_Rg", 1, 3, 3, 2); __PYX_ERR(0, 160, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_Rg") < 0)) __PYX_ERR(0, 103, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_ma_Rg") < 0)) __PYX_ERR(0, 160, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -3665,821 +4525,26 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_7
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_self = values[0];
-    __pyx_v_u = values[1];
-    __pyx_v_selection = values[2];
+    __pyx_v_ts_Rg = values[1];
+    __pyx_v_window = values[2];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_Rg", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 103, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_ma_Rg", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 160, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_6calc_Rg(__pyx_self, __pyx_v_self, __pyx_v_u, __pyx_v_selection);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_10plot_ma_Rg(__pyx_self, __pyx_v_self, __pyx_v_ts_Rg, __pyx_v_window);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_6calc_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_selection) {
-  PyObject *__pyx_v_Rg = NULL;
-  PyObject *__pyx_v_sel = NULL;
-  CYTHON_UNUSED PyObject *__pyx_v_ts = NULL;
-  PyObject *__pyx_v_Rgval = NULL;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  Py_ssize_t __pyx_t_4;
-  PyObject *(*__pyx_t_5)(PyObject *);
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  int __pyx_t_9;
-  PyObject *__pyx_t_10 = NULL;
-  int __pyx_t_11;
-  __Pyx_RefNannySetupContext("calc_Rg", 0);
-
-  /* "INDUSAnalysis/protein_order_params.pyx":104
- * 
- *     def calc_Rg(self, u, selection):
- *         Rg = []             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         for ts in u.trajectory[0::self.skip]:
- */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_Rg = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":105
- *     def calc_Rg(self, u, selection):
- *         Rg = []
- *         sel = u.select_atoms(selection)             # <<<<<<<<<<<<<<
- *         for ts in u.trajectory[0::self.skip]:
- *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_selection) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_selection);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_sel = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":106
- *         Rg = []
- *         sel = u.select_atoms(selection)
- *         for ts in u.trajectory[0::self.skip]:             # <<<<<<<<<<<<<<
- *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
- *             Rg.append((u.trajectory.time, Rgval))
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PySlice_New(__pyx_int_0, Py_None, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
-    __pyx_t_3 = __pyx_t_2; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
-    __pyx_t_5 = NULL;
-  } else {
-    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 106, __pyx_L1_error)
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  for (;;) {
-    if (likely(!__pyx_t_5)) {
-      if (likely(PyList_CheckExact(__pyx_t_3))) {
-        if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 106, __pyx_L1_error)
-        #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        #endif
-      } else {
-        if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_2); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 106, __pyx_L1_error)
-        #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        #endif
-      }
-    } else {
-      __pyx_t_2 = __pyx_t_5(__pyx_t_3);
-      if (unlikely(!__pyx_t_2)) {
-        PyObject* exc_type = PyErr_Occurred();
-        if (exc_type) {
-          if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 106, __pyx_L1_error)
-        }
-        break;
-      }
-      __Pyx_GOTREF(__pyx_t_2);
-    }
-    __Pyx_XDECREF_SET(__pyx_v_ts, __pyx_t_2);
-    __pyx_t_2 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":107
- *         sel = u.select_atoms(selection)
- *         for ts in u.trajectory[0::self.skip]:
- *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)             # <<<<<<<<<<<<<<
- *             Rg.append((u.trajectory.time, Rgval))
- *         Rg = np.array(Rg)
- */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_Rg_worker); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_positions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 107, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_masses); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 107, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = NULL;
-    __pyx_t_9 = 0;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_1);
-      if (likely(__pyx_t_8)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-        __Pyx_INCREF(__pyx_t_8);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_1, function);
-        __pyx_t_9 = 1;
-      }
-    }
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_1)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_7};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_t_6, __pyx_t_7};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    } else
-    #endif
-    {
-      __pyx_t_10 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 107, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_10);
-      if (__pyx_t_8) {
-        __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_7);
-      __pyx_t_6 = 0;
-      __pyx_t_7 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_Rgval, __pyx_t_2);
-    __pyx_t_2 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":108
- *         for ts in u.trajectory[0::self.skip]:
- *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
- *             Rg.append((u.trajectory.time, Rgval))             # <<<<<<<<<<<<<<
- *         Rg = np.array(Rg)
- *         return Rg
- */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 108, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 108, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_1);
-    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
-    __Pyx_INCREF(__pyx_v_Rgval);
-    __Pyx_GIVEREF(__pyx_v_Rgval);
-    PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_Rgval);
-    __pyx_t_1 = 0;
-    __pyx_t_11 = __Pyx_PyObject_Append(__pyx_v_Rg, __pyx_t_2); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 108, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":106
- *         Rg = []
- *         sel = u.select_atoms(selection)
- *         for ts in u.trajectory[0::self.skip]:             # <<<<<<<<<<<<<<
- *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
- *             Rg.append((u.trajectory.time, Rgval))
- */
-  }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":109
- *             Rgval = self.calc_Rg_worker(sel.positions, sel.masses)
- *             Rg.append((u.trajectory.time, Rgval))
- *         Rg = np.array(Rg)             # <<<<<<<<<<<<<<
- *         return Rg
- * 
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 109, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_v_Rg) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_Rg);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF_SET(__pyx_v_Rg, __pyx_t_3);
-  __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":110
- *             Rg.append((u.trajectory.time, Rgval))
- *         Rg = np.array(Rg)
- *         return Rg             # <<<<<<<<<<<<<<
- * 
- *     """
- */
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_v_Rg);
-  __pyx_r = __pyx_v_Rg;
-  goto __pyx_L0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":103
- *         return Rg
- * 
- *     def calc_Rg(self, u, selection):             # <<<<<<<<<<<<<<
- *         Rg = []
- *         sel = u.select_atoms(selection)
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_Rg);
-  __Pyx_XDECREF(__pyx_v_sel);
-  __Pyx_XDECREF(__pyx_v_ts);
-  __Pyx_XDECREF(__pyx_v_Rgval);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "INDUSAnalysis/protein_order_params.pyx":115
- *     Plot radius of gyration
- *     """
- *     def plot_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_9plot_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_9plot_Rg = {"plot_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_9plot_Rg, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_9plot_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_Rg_data = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("plot_Rg (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_Rg_data,0};
-    PyObject* values[2] = {0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Rg_data)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("plot_Rg", 1, 2, 2, 1); __PYX_ERR(0, 115, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_Rg") < 0)) __PYX_ERR(0, 115, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-    }
-    __pyx_v_self = values[0];
-    __pyx_v_Rg_data = values[1];
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_Rg", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 115, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_8plot_Rg(__pyx_self, __pyx_v_self, __pyx_v_Rg_data);
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_8plot_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_Rg_data) {
-  PyObject *__pyx_v_t = NULL;
-  PyObject *__pyx_v_rg = NULL;
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_10plot_ma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_Rg, PyObject *__pyx_v_window) {
   PyObject *__pyx_v_fig = NULL;
-  PyObject *__pyx_v_ax = NULL;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *(*__pyx_t_5)(PyObject *);
-  int __pyx_t_6;
-  int __pyx_t_7;
-  __Pyx_RefNannySetupContext("plot_Rg", 0);
-
-  /* "INDUSAnalysis/protein_order_params.pyx":116
- *     """
- *     def plot_Rg(self, Rg_data):
- *         t = Rg_data[:,0]             # <<<<<<<<<<<<<<
- *         rg = Rg_data[:,1]
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_Rg_data, __pyx_tuple__11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_t = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":117
- *     def plot_Rg(self, Rg_data):
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]             # <<<<<<<<<<<<<<
- * 
- *         fig, ax = plt.subplots()
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_Rg_data, __pyx_tuple__12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_rg = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":119
- *         rg = Rg_data[:,1]
- * 
- *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
- *         ax.plot(t,rg)
- *         ax.set_xlabel("Time (ps)")
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
-    PyObject* sequence = __pyx_t_1;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 2)) {
-      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 119, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-    } else {
-      __pyx_t_3 = PyList_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-    }
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    #else
-    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 119, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    #endif
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 119, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
-    index = 0; __pyx_t_3 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_3);
-    index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 119, __pyx_L1_error)
-    __pyx_t_5 = NULL;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    goto __pyx_L4_unpacking_done;
-    __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_5 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 119, __pyx_L1_error)
-    __pyx_L4_unpacking_done:;
-  }
-  __pyx_v_fig = __pyx_t_3;
-  __pyx_t_3 = 0;
-  __pyx_v_ax = __pyx_t_2;
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":120
- * 
- *         fig, ax = plt.subplots()
- *         ax.plot(t,rg)             # <<<<<<<<<<<<<<
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  __pyx_t_6 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_6 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rg};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rg};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-  } else
-  #endif
-  {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__pyx_t_3) {
-      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
-    }
-    __Pyx_INCREF(__pyx_v_t);
-    __Pyx_GIVEREF(__pyx_v_t);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_6, __pyx_v_t);
-    __Pyx_INCREF(__pyx_v_rg);
-    __Pyx_GIVEREF(__pyx_v_rg);
-    PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_v_rg);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":121
- *         fig, ax = plt.subplots()
- *         ax.plot(t,rg)
- *         ax.set_xlabel("Time (ps)")             # <<<<<<<<<<<<<<
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- *         self.save_figure(fig, suffix="Rg")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Time_ps) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Time_ps);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":122
- *         ax.plot(t,rg)
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")             # <<<<<<<<<<<<<<
- *         self.save_figure(fig, suffix="Rg")
- *         if self.show:
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Radius_of_gyration_AA) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Radius_of_gyration_AA);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":123
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- *         self.save_figure(fig, suffix="Rg")             # <<<<<<<<<<<<<<
- *         if self.show:
- *             plt.show()
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_v_fig);
-  __Pyx_GIVEREF(__pyx_v_fig);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_n_s_Rg) < 0) __PYX_ERR(0, 123, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":124
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- *         self.save_figure(fig, suffix="Rg")
- *         if self.show:             # <<<<<<<<<<<<<<
- *             plt.show()
- *         else:
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 124, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__pyx_t_7) {
-
-    /* "INDUSAnalysis/protein_order_params.pyx":125
- *         self.save_figure(fig, suffix="Rg")
- *         if self.show:
- *             plt.show()             # <<<<<<<<<<<<<<
- *         else:
- *             plt.close()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
-      }
-    }
-    __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":124
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- *         self.save_figure(fig, suffix="Rg")
- *         if self.show:             # <<<<<<<<<<<<<<
- *             plt.show()
- *         else:
- */
-    goto __pyx_L5;
-  }
-
-  /* "INDUSAnalysis/protein_order_params.pyx":127
- *             plt.show()
- *         else:
- *             plt.close()             # <<<<<<<<<<<<<<
- * 
- *     """
- */
-  /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 127, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
-      if (likely(__pyx_t_2)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_2);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
-      }
-    }
-    __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 127, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  }
-  __pyx_L5:;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":115
- *     Plot radius of gyration
- *     """
- *     def plot_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
- */
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_t);
-  __Pyx_XDECREF(__pyx_v_rg);
-  __Pyx_XDECREF(__pyx_v_fig);
-  __Pyx_XDECREF(__pyx_v_ax);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "INDUSAnalysis/protein_order_params.pyx":132
- *     Plot moving (sliding window) average of radius of gyration
- *     """
- *     def plot_ma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_11plot_ma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_11plot_ma_Rg = {"plot_ma_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_11plot_ma_Rg, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_11plot_ma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_Rg_data = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("plot_ma_Rg (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_Rg_data,0};
-    PyObject* values[2] = {0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Rg_data)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("plot_ma_Rg", 1, 2, 2, 1); __PYX_ERR(0, 132, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_ma_Rg") < 0)) __PYX_ERR(0, 132, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-    }
-    __pyx_v_self = values[0];
-    __pyx_v_Rg_data = values[1];
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_ma_Rg", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 132, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_ma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_10plot_ma_Rg(__pyx_self, __pyx_v_self, __pyx_v_Rg_data);
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_10plot_ma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_Rg_data) {
-  PyObject *__pyx_v_t = NULL;
-  PyObject *__pyx_v_rg = NULL;
-  PyObject *__pyx_v_rg_ma = NULL;
-  PyObject *__pyx_v_fig = NULL;
-  PyObject *__pyx_v_ax = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4487,407 +4552,185 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   int __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *(*__pyx_t_7)(PyObject *);
-  Py_ssize_t __pyx_t_8;
-  Py_ssize_t __pyx_t_9;
-  int __pyx_t_10;
   __Pyx_RefNannySetupContext("plot_ma_Rg", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":133
- *     """
- *     def plot_ma_Rg(self, Rg_data):
- *         t = Rg_data[:,0]             # <<<<<<<<<<<<<<
- *         rg = Rg_data[:,1]
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_Rg_data, __pyx_tuple__11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_t = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":134
- *     def plot_ma_Rg(self, Rg_data):
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]             # <<<<<<<<<<<<<<
- * 
- *         rg_ma = self.moving_average(t, rg, self.window)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_Rg_data, __pyx_tuple__12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_rg = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":136
- *         rg = Rg_data[:,1]
- * 
- *         rg_ma = self.moving_average(t, rg, self.window)             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots()
- *         ax.plot(t[len(t) - len(rg_ma):], rg_ma)
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  __pyx_t_5 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_5 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_t, __pyx_v_rg, __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_t, __pyx_v_rg, __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  } else
-  #endif
-  {
-    __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__pyx_t_4) {
-      __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
-    }
-    __Pyx_INCREF(__pyx_v_t);
-    __Pyx_GIVEREF(__pyx_v_t);
-    PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_5, __pyx_v_t);
-    __Pyx_INCREF(__pyx_v_rg);
-    __Pyx_GIVEREF(__pyx_v_rg);
-    PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_v_rg);
-    __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_t_3);
-    __pyx_t_3 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_rg_ma = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":137
- * 
- *         rg_ma = self.moving_average(t, rg, self.window)
- *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
- *         ax.plot(t[len(t) - len(rg_ma):], rg_ma)
- *         ax.set_xlabel("Time (ps)")
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 137, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_6))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_6);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_6, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
-    PyObject* sequence = __pyx_t_1;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 2)) {
-      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 137, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_6 = PyTuple_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-    } else {
-      __pyx_t_6 = PyList_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-    }
-    __Pyx_INCREF(__pyx_t_6);
-    __Pyx_INCREF(__pyx_t_2);
-    #else
-    __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 137, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    #endif
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_7 = Py_TYPE(__pyx_t_3)->tp_iternext;
-    index = 0; __pyx_t_6 = __pyx_t_7(__pyx_t_3); if (unlikely(!__pyx_t_6)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_6);
-    index = 1; __pyx_t_2 = __pyx_t_7(__pyx_t_3); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_3), 2) < 0) __PYX_ERR(0, 137, __pyx_L1_error)
-    __pyx_t_7 = NULL;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    goto __pyx_L4_unpacking_done;
-    __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_7 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 137, __pyx_L1_error)
-    __pyx_L4_unpacking_done:;
-  }
-  __pyx_v_fig = __pyx_t_6;
-  __pyx_t_6 = 0;
-  __pyx_v_ax = __pyx_t_2;
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":138
- *         rg_ma = self.moving_average(t, rg, self.window)
- *         fig, ax = plt.subplots()
- *         ax.plot(t[len(t) - len(rg_ma):], rg_ma)             # <<<<<<<<<<<<<<
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = PyObject_Length(__pyx_v_t); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 138, __pyx_L1_error)
-  __pyx_t_9 = PyObject_Length(__pyx_v_rg_ma); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 138, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_GetSlice(__pyx_v_t, (__pyx_t_8 - __pyx_t_9), 0, NULL, NULL, NULL, 1, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 138, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_3 = NULL;
-  __pyx_t_5 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_5 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_6, __pyx_v_rg_ma};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_6, __pyx_v_rg_ma};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  } else
-  #endif
-  {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 138, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__pyx_t_3) {
-      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
-    }
-    __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_5, __pyx_t_6);
-    __Pyx_INCREF(__pyx_v_rg_ma);
-    __Pyx_GIVEREF(__pyx_v_rg_ma);
-    PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_5, __pyx_v_rg_ma);
-    __pyx_t_6 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":139
- *         fig, ax = plt.subplots()
- *         ax.plot(t[len(t) - len(rg_ma):], rg_ma)
- *         ax.set_xlabel("Time (ps)")             # <<<<<<<<<<<<<<
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+  /* "INDUSAnalysis/protein_order_params.pyx":162
+ *     def plot_ma_Rg(self, ts_Rg, window):
+ *         """Plots moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.moving_average(window=window).plot()             # <<<<<<<<<<<<<<
+ *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_Rg")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Rg, __pyx_n_s_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 162, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_window, __pyx_v_window) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_plot); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
     if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Time_ps) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Time_ps);
+  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_fig = __pyx_t_1;
+  __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":140
- *         ax.plot(t[len(t) - len(rg_ma):], rg_ma)
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":163
+ *         """Plots moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.moving_average(window=window).plot()
+ *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="ma_Rg")
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
     if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Radius_of_gyration_AA) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Radius_of_gyration_AA);
+  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":141
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+  /* "INDUSAnalysis/protein_order_params.pyx":164
+ *         fig = ts_Rg.moving_average(window=window).plot()
+ *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_Rg")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_fig);
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_n_s_ma_Rg) < 0) __PYX_ERR(0, 141, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 141, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_n_s_ma_Rg) < 0) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":142
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+  /* "INDUSAnalysis/protein_order_params.pyx":165
+ *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_Rg")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 142, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (__pyx_t_10) {
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":143
+    /* "INDUSAnalysis/protein_order_params.pyx":166
  *         self.save_figure(fig, suffix="ma_Rg")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
       if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_4);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
       }
     }
-    __pyx_t_6 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 143, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":142
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+    /* "INDUSAnalysis/protein_order_params.pyx":165
+ *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_Rg")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-    goto __pyx_L5;
+    goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":145
+  /* "INDUSAnalysis/protein_order_params.pyx":168
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def plot_cma_Rg(self, ts_Rg):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = NULL;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
-      if (likely(__pyx_t_2)) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_3)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_4, function);
       }
     }
-    __pyx_t_6 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 145, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_L5:;
+  __pyx_L3:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":132
- *     Plot moving (sliding window) average of radius of gyration
- *     """
- *     def plot_ma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
+  /* "INDUSAnalysis/protein_order_params.pyx":160
+ *             plt.close()
+ * 
+ *     def plot_ma_Rg(self, ts_Rg, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.moving_average(window=window).plot()
  */
 
   /* function exit code */
@@ -4898,39 +4741,35 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_ma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_t);
-  __Pyx_XDECREF(__pyx_v_rg);
-  __Pyx_XDECREF(__pyx_v_rg_ma);
   __Pyx_XDECREF(__pyx_v_fig);
-  __Pyx_XDECREF(__pyx_v_ax);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":150
- *     Plot cumulative moving (running) average of radius of gyration
- *     """
- *     def plot_cma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
+/* "INDUSAnalysis/protein_order_params.pyx":170
+ *             plt.close()
+ * 
+ *     def plot_cma_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.cumulative_moving_average().plot()
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_13plot_cma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_13plot_cma_Rg = {"plot_cma_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_13plot_cma_Rg, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_13plot_cma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_13plot_cma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_12plot_cma_Rg[] = "Plots cumulative moving average Rg and saves figure to file.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_13plot_cma_Rg = {"plot_cma_Rg", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_13plot_cma_Rg, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_12plot_cma_Rg};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_13plot_cma_Rg(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_Rg_data = 0;
+  PyObject *__pyx_v_ts_Rg = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plot_cma_Rg (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_Rg_data,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_ts_Rg,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -4950,13 +4789,13 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_Rg_data)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_Rg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_cma_Rg", 1, 2, 2, 1); __PYX_ERR(0, 150, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_cma_Rg", 1, 2, 2, 1); __PYX_ERR(0, 170, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_cma_Rg") < 0)) __PYX_ERR(0, 150, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_cma_Rg") < 0)) __PYX_ERR(0, 170, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4965,105 +4804,63 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_self = values[0];
-    __pyx_v_Rg_data = values[1];
+    __pyx_v_ts_Rg = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_cma_Rg", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 150, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_cma_Rg", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 170, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_cma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_12plot_cma_Rg(__pyx_self, __pyx_v_self, __pyx_v_Rg_data);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_12plot_cma_Rg(__pyx_self, __pyx_v_self, __pyx_v_ts_Rg);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_12plot_cma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_Rg_data) {
-  PyObject *__pyx_v_t = NULL;
-  PyObject *__pyx_v_rg = NULL;
-  PyObject *__pyx_v_rg_cma = NULL;
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_12plot_cma_Rg(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_Rg) {
   PyObject *__pyx_v_fig = NULL;
-  PyObject *__pyx_v_ax = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
-  PyObject *(*__pyx_t_5)(PyObject *);
-  int __pyx_t_6;
-  int __pyx_t_7;
+  int __pyx_t_5;
   __Pyx_RefNannySetupContext("plot_cma_Rg", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":151
- *     """
- *     def plot_cma_Rg(self, Rg_data):
- *         t = Rg_data[:,0]             # <<<<<<<<<<<<<<
- *         rg = Rg_data[:,1]
- * 
+  /* "INDUSAnalysis/protein_order_params.pyx":172
+ *     def plot_cma_Rg(self, ts_Rg):
+ *         """Plots cumulative moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.cumulative_moving_average().plot()             # <<<<<<<<<<<<<<
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="cma_Rg")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_Rg_data, __pyx_tuple__11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 151, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_t = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":152
- *     def plot_cma_Rg(self, Rg_data):
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]             # <<<<<<<<<<<<<<
- * 
- *         rg_cma = self.cumulative_moving_average(rg)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_Rg_data, __pyx_tuple__12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_rg = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":154
- *         rg = Rg_data[:,1]
- * 
- *         rg_cma = self.cumulative_moving_average(rg)             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots()
- *         ax.plot(t, rg_cma)
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_cumulative_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Rg, __pyx_n_s_cumulative_moving_average); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_rg) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_rg);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_rg_cma = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":155
- * 
- *         rg_cma = self.cumulative_moving_average(rg)
- *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
- *         ax.plot(t, rg_cma)
- *         ax.set_xlabel("Time (ps)")
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_plot); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
     __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
     if (likely(__pyx_t_2)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
@@ -5074,282 +4871,152 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 155, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
-    PyObject* sequence = __pyx_t_1;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 2)) {
-      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 155, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-    } else {
-      __pyx_t_3 = PyList_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-    }
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    #else
-    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 155, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 155, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    #endif
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 155, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
-    index = 0; __pyx_t_3 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_3);
-    index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
-    __pyx_t_5 = NULL;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    goto __pyx_L4_unpacking_done;
-    __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_5 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 155, __pyx_L1_error)
-    __pyx_L4_unpacking_done:;
-  }
-  __pyx_v_fig = __pyx_t_3;
-  __pyx_t_3 = 0;
-  __pyx_v_ax = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_v_fig = __pyx_t_1;
+  __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":156
- *         rg_cma = self.cumulative_moving_average(rg)
- *         fig, ax = plt.subplots()
- *         ax.plot(t, rg_cma)             # <<<<<<<<<<<<<<
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  __pyx_t_6 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_6 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rg_cma};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rg_cma};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-  } else
-  #endif
-  {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__pyx_t_3) {
-      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
-    }
-    __Pyx_INCREF(__pyx_v_t);
-    __Pyx_GIVEREF(__pyx_v_t);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_6, __pyx_v_t);
-    __Pyx_INCREF(__pyx_v_rg_cma);
-    __Pyx_GIVEREF(__pyx_v_rg_cma);
-    PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_v_rg_cma);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":157
- *         fig, ax = plt.subplots()
- *         ax.plot(t, rg_cma)
- *         ax.set_xlabel("Time (ps)")             # <<<<<<<<<<<<<<
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
- *         self.save_figure(fig, suffix="cma_Rg")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 157, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Time_ps) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Time_ps);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":158
- *         ax.plot(t, rg_cma)
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":173
+ *         """Plots cumulative moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.cumulative_moving_average().plot()
+ *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="cma_Rg")
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Radius_of_gyration_AA) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Radius_of_gyration_AA);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_int_300);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":159
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+  /* "INDUSAnalysis/protein_order_params.pyx":174
+ *         fig = ts_Rg.cumulative_moving_average().plot()
+ *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="cma_Rg")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_fig);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_suffix, __pyx_n_s_cma_Rg) < 0) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 174, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_n_s_cma_Rg) < 0) __PYX_ERR(0, 159, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 159, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":160
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+  /* "INDUSAnalysis/protein_order_params.pyx":175
+ *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="cma_Rg")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 160, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 160, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__pyx_t_7) {
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":161
+    /* "INDUSAnalysis/protein_order_params.pyx":176
  *         self.save_figure(fig, suffix="cma_Rg")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
-      }
-    }
-    __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_2)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 176, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":160
- *         ax.set_ylabel(r"Radius of gyration ($\AA$)")
+    /* "INDUSAnalysis/protein_order_params.pyx":175
+ *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="cma_Rg")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-    goto __pyx_L5;
+    goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":163
+  /* "INDUSAnalysis/protein_order_params.pyx":178
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_close); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
-      if (likely(__pyx_t_2)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
       }
     }
-    __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __pyx_L5:;
+  __pyx_L3:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":150
- *     Plot cumulative moving (running) average of radius of gyration
- *     """
- *     def plot_cma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
+  /* "INDUSAnalysis/protein_order_params.pyx":170
+ *             plt.close()
+ * 
+ *     def plot_cma_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.cumulative_moving_average().plot()
  */
 
   /* function exit code */
@@ -5360,31 +5027,28 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_cma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_Rg", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_t);
-  __Pyx_XDECREF(__pyx_v_rg);
-  __Pyx_XDECREF(__pyx_v_rg_cma);
   __Pyx_XDECREF(__pyx_v_fig);
-  __Pyx_XDECREF(__pyx_v_ax);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":170
- *     Tests in tests/test_orderparams.py
- *     """
+/* "INDUSAnalysis/protein_order_params.pyx":180
+ *             plt.close()
+ * 
  *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *         """
+ *         Calculates RMSD of coordinates from reference after aligning them using
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_15calc_RMSD_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_15calc_RMSD_worker = {"calc_RMSD_worker", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_15calc_RMSD_worker, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_15calc_RMSD_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_15calc_RMSD_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_14calc_RMSD_worker[] = "\n        Calculates RMSD of coordinates from reference after aligning them using\n        a subset of coordinates.\n\n        Aligns coords and initcoords by performing translation and rotation\n        transformations which, when applied to aligncoords and aligninitcoords,\n        minimizes the RMSD between them.\n\n        Args:\n            initcoords (np.array): Array of shape (N, 3) containing reference coordinates.\n            coords (np.array): Array of shape (N, 3) containing coordinates.\n            aligninitcoords (np.array): Array of shape (N, 3) containing alignment group of reference coordinates.\n            aligncoords (np.Array): Array of shape (N, 3) containing alignment group of coordinates.\n\n        Returns:\n            RMSD (np.float).\n\n        Raises:\n            ValueError if the coordinates are not 3-dimensional or are inconsistent.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_15calc_RMSD_worker = {"calc_RMSD_worker", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_15calc_RMSD_worker, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_14calc_RMSD_worker};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_15calc_RMSD_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_initcoords = 0;
   PyObject *__pyx_v_coords = 0;
@@ -5422,29 +5086,29 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_initcoords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 1); __PYX_ERR(0, 170, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 1); __PYX_ERR(0, 180, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_coords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 2); __PYX_ERR(0, 170, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 2); __PYX_ERR(0, 180, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_aligninitcoords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 3); __PYX_ERR(0, 170, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 3); __PYX_ERR(0, 180, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_aligncoords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 4); __PYX_ERR(0, 170, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, 4); __PYX_ERR(0, 180, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_RMSD_worker") < 0)) __PYX_ERR(0, 170, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_RMSD_worker") < 0)) __PYX_ERR(0, 180, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -5463,20 +5127,20 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 170, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calc_RMSD_worker", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 180, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_RMSD_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_14calc_RMSD_worker(__pyx_self, __pyx_v_self, __pyx_v_initcoords, __pyx_v_coords, __pyx_v_aligninitcoords, __pyx_v_aligncoords);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_14calc_RMSD_worker(__pyx_self, __pyx_v_self, __pyx_v_initcoords, __pyx_v_coords, __pyx_v_aligninitcoords, __pyx_v_aligncoords);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_14calc_RMSD_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_14calc_RMSD_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords) {
   PyObject *__pyx_v_aligninitcog = NULL;
   PyObject *__pyx_v_aligncog = NULL;
   CYTHON_UNUSED PyObject *__pyx_v_aligncoods = NULL;
@@ -5500,157 +5164,173 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_INCREF(__pyx_v_coords);
   __Pyx_INCREF(__pyx_v_aligninitcoords);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":171
- *     """
- *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \             # <<<<<<<<<<<<<<
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
- *         assert(coords.shape == initcoords.shape and \
+  /* "INDUSAnalysis/protein_order_params.pyx":201
+ *             ValueError if the coordinates are not 3-dimensional or are inconsistent.
+ *         """
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):             # <<<<<<<<<<<<<<
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
  */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L3_bool_binop_done;
-    }
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L3_bool_binop_done;
-    }
-
-    /* "INDUSAnalysis/protein_order_params.pyx":172
- *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)             # <<<<<<<<<<<<<<
- *         assert(coords.shape == initcoords.shape and \
- *             aligncoords.shape == aligninitcoords.shape)
- */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L3_bool_binop_done;
-    }
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 172, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_1 = __pyx_t_4;
-    __pyx_L3_bool_binop_done:;
-    if (unlikely(!__pyx_t_1)) {
-      PyErr_SetNone(PyExc_AssertionError);
-      __PYX_ERR(0, 171, __pyx_L1_error)
-    }
-  }
-  #endif
-
-  /* "INDUSAnalysis/protein_order_params.pyx":173
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
- *         assert(coords.shape == initcoords.shape and \             # <<<<<<<<<<<<<<
- *             aligncoords.shape == aligninitcoords.shape)
- * 
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 173, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = PyObject_RichCompare(__pyx_t_2, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 173, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 173, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L7_bool_binop_done;
-    }
-
-    /* "INDUSAnalysis/protein_order_params.pyx":174
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
- *         assert(coords.shape == initcoords.shape and \
- *             aligncoords.shape == aligninitcoords.shape)             # <<<<<<<<<<<<<<
- * 
- *         #calculate centers of geometry of alignment coordinates
- */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 174, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 174, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 174, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_1 = __pyx_t_4;
-    __pyx_L7_bool_binop_done:;
-    if (unlikely(!__pyx_t_1)) {
-      PyErr_SetNone(PyExc_AssertionError);
-      __PYX_ERR(0, 173, __pyx_L1_error)
-    }
-  }
-  #endif
-
-  /* "INDUSAnalysis/protein_order_params.pyx":177
- * 
- *         #calculate centers of geometry of alignment coordinates
- *         aligninitcog = np.mean(aligninitcoords, axis = 0)             # <<<<<<<<<<<<<<
- *         aligncog = np.mean(aligncoords, axis = 0)
- *         #center both alignment coordinates and coordinates
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_1 = __pyx_t_4;
+  __pyx_L4_bool_binop_done:;
+  __pyx_t_4 = ((!__pyx_t_1) != 0);
+  if (unlikely(__pyx_t_4)) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":202
+ *         """
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):
+ *             raise ValueError('One or more oordinates are not 3 dimensional')             # <<<<<<<<<<<<<<
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 202, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 202, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":201
+ *             ValueError if the coordinates are not 3-dimensional or are inconsistent.
+ *         """
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):             # <<<<<<<<<<<<<<
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":203
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):             # <<<<<<<<<<<<<<
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = PyObject_RichCompare(__pyx_t_2, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (__pyx_t_1) {
+  } else {
+    __pyx_t_4 = __pyx_t_1;
+    goto __pyx_L9_bool_binop_done;
+  }
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_4 = __pyx_t_1;
+  __pyx_L9_bool_binop_done:;
+  __pyx_t_1 = ((!__pyx_t_4) != 0);
+  if (unlikely(__pyx_t_1)) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":204
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')             # <<<<<<<<<<<<<<
+ * 
+ *         # Calculate centers of geometry of alignment coordinates
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 204, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 204, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":203
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):             # <<<<<<<<<<<<<<
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')
+ * 
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":207
+ * 
+ *         # Calculate centers of geometry of alignment coordinates
+ *         aligninitcog = np.mean(aligninitcoords, axis=0)             # <<<<<<<<<<<<<<
+ *         aligncog = np.mean(aligncoords, axis=0)
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_aligninitcoords);
   __Pyx_GIVEREF(__pyx_v_aligninitcoords);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_aligninitcoords);
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5658,27 +5338,27 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __pyx_v_aligninitcog = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":178
- *         #calculate centers of geometry of alignment coordinates
- *         aligninitcog = np.mean(aligninitcoords, axis = 0)
- *         aligncog = np.mean(aligncoords, axis = 0)             # <<<<<<<<<<<<<<
- *         #center both alignment coordinates and coordinates
- *         aligninitcoords = aligninitcoords - aligninitcog
+  /* "INDUSAnalysis/protein_order_params.pyx":208
+ *         # Calculate centers of geometry of alignment coordinates
+ *         aligninitcog = np.mean(aligninitcoords, axis=0)
+ *         aligncog = np.mean(aligncoords, axis=0)             # <<<<<<<<<<<<<<
+ * 
+ *         # Center both alignment coordinates and coordinates
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_mean); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_mean); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_INCREF(__pyx_v_aligncoords);
   __Pyx_GIVEREF(__pyx_v_aligncoords);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_aligncoords);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 178, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -5686,70 +5366,70 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __pyx_v_aligncog = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":180
- *         aligncog = np.mean(aligncoords, axis = 0)
- *         #center both alignment coordinates and coordinates
+  /* "INDUSAnalysis/protein_order_params.pyx":211
+ * 
+ *         # Center both alignment coordinates and coordinates
  *         aligninitcoords = aligninitcoords - aligninitcog             # <<<<<<<<<<<<<<
  *         initcoords = initcoords - aligninitcog
  *         aligncoods = aligncoords - aligncog
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligninitcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligninitcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF_SET(__pyx_v_aligninitcoords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":181
- *         #center both alignment coordinates and coordinates
+  /* "INDUSAnalysis/protein_order_params.pyx":212
+ *         # Center both alignment coordinates and coordinates
  *         aligninitcoords = aligninitcoords - aligninitcog
  *         initcoords = initcoords - aligninitcog             # <<<<<<<<<<<<<<
  *         aligncoods = aligncoords - aligncog
  *         coords = coords - aligncog
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_initcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_initcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF_SET(__pyx_v_initcoords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":182
+  /* "INDUSAnalysis/protein_order_params.pyx":213
  *         aligninitcoords = aligninitcoords - aligninitcog
  *         initcoords = initcoords - aligninitcog
  *         aligncoods = aligncoords - aligncog             # <<<<<<<<<<<<<<
  *         coords = coords - aligncog
  * 
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligncoords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligncoords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_aligncoods = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":183
+  /* "INDUSAnalysis/protein_order_params.pyx":214
  *         initcoords = initcoords - aligninitcog
  *         aligncoods = aligncoords - aligncog
  *         coords = coords - aligncog             # <<<<<<<<<<<<<<
  * 
- *         #get rotation matrix by minimizing RMSD between centered alignment coordinates
+ *         # Get rotation matrix by minimizing RMSD between centered alignment coordinates
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF_SET(__pyx_v_coords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":186
+  /* "INDUSAnalysis/protein_order_params.pyx":217
  * 
- *         #get rotation matrix by minimizing RMSD between centered alignment coordinates
+ *         # Get rotation matrix by minimizing RMSD between centered alignment coordinates
  *         R, min_rms = mda.analysis.align.rotation_matrix(aligncoords, aligninitcoords)             # <<<<<<<<<<<<<<
  * 
- *         #rotate coords
+ *         # Rotate coords
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_analysis); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_analysis); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_align_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_align_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_rotation_matrix); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_rotation_matrix); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -5767,7 +5447,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_aligncoords, __pyx_v_aligninitcoords};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else
@@ -5775,13 +5455,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_aligncoords, __pyx_v_aligninitcoords};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -5792,7 +5472,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
     __Pyx_INCREF(__pyx_v_aligninitcoords);
     __Pyx_GIVEREF(__pyx_v_aligninitcoords);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_7, __pyx_v_aligninitcoords);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
@@ -5803,7 +5483,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 186, __pyx_L1_error)
+      __PYX_ERR(0, 217, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -5816,51 +5496,51 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
     __Pyx_INCREF(__pyx_t_6);
     __Pyx_INCREF(__pyx_t_5);
     #else
-    __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     #endif
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_2 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_2 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_8 = Py_TYPE(__pyx_t_2)->tp_iternext;
-    index = 0; __pyx_t_6 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_6)) goto __pyx_L9_unpacking_failed;
+    index = 0; __pyx_t_6 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_6)) goto __pyx_L11_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_6);
-    index = 1; __pyx_t_5 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_5)) goto __pyx_L9_unpacking_failed;
+    index = 1; __pyx_t_5 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_5)) goto __pyx_L11_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_5);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_2), 2) < 0) __PYX_ERR(0, 186, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_2), 2) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    goto __pyx_L10_unpacking_done;
-    __pyx_L9_unpacking_failed:;
+    goto __pyx_L12_unpacking_done;
+    __pyx_L11_unpacking_failed:;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 186, __pyx_L1_error)
-    __pyx_L10_unpacking_done:;
+    __PYX_ERR(0, 217, __pyx_L1_error)
+    __pyx_L12_unpacking_done:;
   }
   __pyx_v_R = __pyx_t_6;
   __pyx_t_6 = 0;
   __pyx_v_min_rms = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":189
+  /* "INDUSAnalysis/protein_order_params.pyx":220
  * 
- *         #rotate coords
+ *         # Rotate coords
  *         coords = np.dot(coords, R.T)             # <<<<<<<<<<<<<<
  * 
- *         #calculate RMSD
+ *         # Calculate RMSD
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dot); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dot); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_R, __pyx_n_s_T); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_R, __pyx_n_s_T); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_2 = NULL;
   __pyx_t_7 = 0;
@@ -5877,7 +5557,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_coords, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -5886,14 +5566,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_coords, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else
   #endif
   {
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -5904,7 +5584,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
     __Pyx_GIVEREF(__pyx_t_5);
     PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_7, __pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   }
@@ -5912,32 +5592,32 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_DECREF_SET(__pyx_v_coords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":192
+  /* "INDUSAnalysis/protein_order_params.pyx":223
  * 
- *         #calculate RMSD
- *         sq_distances = np.sum((coords - initcoords)**2, axis = 1)             # <<<<<<<<<<<<<<
+ *         # Calculate RMSD
+ *         sq_distances = np.sum((coords - initcoords)**2, axis=1)             # <<<<<<<<<<<<<<
  *         RMSD = np.sqrt(np.mean(sq_distances))
  *         return RMSD
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_sum); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_sum); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_initcoords); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_initcoords); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_9 = PyNumber_Power(__pyx_t_3, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_9 = PyNumber_Power(__pyx_t_3, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_9);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_9);
   __pyx_t_9 = 0;
-  __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 192, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 192, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -5945,21 +5625,21 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __pyx_v_sq_distances = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":193
- *         #calculate RMSD
- *         sq_distances = np.sum((coords - initcoords)**2, axis = 1)
+  /* "INDUSAnalysis/protein_order_params.pyx":224
+ *         # Calculate RMSD
+ *         sq_distances = np.sum((coords - initcoords)**2, axis=1)
  *         RMSD = np.sqrt(np.mean(sq_distances))             # <<<<<<<<<<<<<<
  *         return RMSD
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_mean); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_mean); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_t_6 = NULL;
@@ -5974,7 +5654,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_9 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_6, __pyx_v_sq_distances) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_sq_distances);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 193, __pyx_L1_error)
+  if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -5990,30 +5670,30 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __pyx_t_5 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 193, __pyx_L1_error)
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_RMSD = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":194
- *         sq_distances = np.sum((coords - initcoords)**2, axis = 1)
+  /* "INDUSAnalysis/protein_order_params.pyx":225
+ *         sq_distances = np.sum((coords - initcoords)**2, axis=1)
  *         RMSD = np.sqrt(np.mean(sq_distances))
  *         return RMSD             # <<<<<<<<<<<<<<
  * 
- *     def calc_RMSD(self, u, refu, reftstep, selection, alignment):
+ *     def calc_RMSD(self, u, refu, reftstep, skip, selection, alignment):
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_RMSD);
   __pyx_r = __pyx_v_RMSD;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":170
- *     Tests in tests/test_orderparams.py
- *     """
+  /* "INDUSAnalysis/protein_order_params.pyx":180
+ *             plt.close()
+ * 
  *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *         """
+ *         Calculates RMSD of coordinates from reference after aligning them using
  */
 
   /* function exit code */
@@ -6023,7 +5703,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_RMSD_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_aligninitcog);
@@ -6041,34 +5721,38 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":196
+/* "INDUSAnalysis/protein_order_params.pyx":227
  *         return RMSD
  * 
- *     def calc_RMSD(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_RMSD(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates RMSD of `selection` atom group in `u` from `selection` atom group
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_17calc_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_17calc_RMSD = {"calc_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_17calc_RMSD, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_17calc_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_17calc_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_16calc_RMSD[] = "\n        Calculates RMSD of `selection` atom group in `u` from `selection` atom group\n        in `refu` at `reftstep`, using `alignment` for alignment.\n\n        Args:\n            u (mda.Universe): Universe object.\n            refu (mda.Universe): Reference Universe object.\n            reftstep (int): Reference timestep to calculate RMSD from.\n            skip (int): Resampling interval.\n            selection (mda.AtomGroup): MDAnalysis AtomGroup object containing atoms\n                to calculate RMSD for.\n            alignment (mda.AtomGroup): MDAnalysis AtomGroup object containing atoms\n                to use for alignment before calculating RMSD.\n\n        Returns:\n            TimeSeries object containing RMSD values along trajectory.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_17calc_RMSD = {"calc_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_17calc_RMSD, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_16calc_RMSD};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_17calc_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_u = 0;
   PyObject *__pyx_v_refu = 0;
   PyObject *__pyx_v_reftstep = 0;
+  PyObject *__pyx_v_skip = 0;
   PyObject *__pyx_v_selection = 0;
   PyObject *__pyx_v_alignment = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calc_RMSD (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_u,&__pyx_n_s_refu,&__pyx_n_s_reftstep_2,&__pyx_n_s_selection,&__pyx_n_s_alignment,0};
-    PyObject* values[6] = {0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_u,&__pyx_n_s_refu,&__pyx_n_s_reftstep_2,&__pyx_n_s_skip_2,&__pyx_n_s_selection,&__pyx_n_s_alignment,0};
+    PyObject* values[7] = {0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
         case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
         CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
@@ -6093,37 +5777,43 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 6, 6, 1); __PYX_ERR(0, 196, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 7, 7, 1); __PYX_ERR(0, 227, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_refu)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 6, 6, 2); __PYX_ERR(0, 196, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 7, 7, 2); __PYX_ERR(0, 227, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reftstep_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 6, 6, 3); __PYX_ERR(0, 196, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 7, 7, 3); __PYX_ERR(0, 227, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selection)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_skip_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 6, 6, 4); __PYX_ERR(0, 196, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 7, 7, 4); __PYX_ERR(0, 227, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alignment)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selection)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 6, 6, 5); __PYX_ERR(0, 196, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 7, 7, 5); __PYX_ERR(0, 227, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alignment)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 7, 7, 6); __PYX_ERR(0, 227, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_RMSD") < 0)) __PYX_ERR(0, 196, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_RMSD") < 0)) __PYX_ERR(0, 227, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 7) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -6132,38 +5822,41 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
     }
     __pyx_v_self = values[0];
     __pyx_v_u = values[1];
     __pyx_v_refu = values[2];
     __pyx_v_reftstep = values[3];
-    __pyx_v_selection = values[4];
-    __pyx_v_alignment = values[5];
+    __pyx_v_skip = values[4];
+    __pyx_v_selection = values[5];
+    __pyx_v_alignment = values[6];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 196, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calc_RMSD", 1, 7, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 227, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_16calc_RMSD(__pyx_self, __pyx_v_self, __pyx_v_u, __pyx_v_refu, __pyx_v_reftstep, __pyx_v_selection, __pyx_v_alignment);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_16calc_RMSD(__pyx_self, __pyx_v_self, __pyx_v_u, __pyx_v_refu, __pyx_v_reftstep, __pyx_v_skip, __pyx_v_selection, __pyx_v_alignment);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_16calc_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_16calc_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_skip, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment) {
   PyObject *__pyx_v_sel = NULL;
   PyObject *__pyx_v_refsel = NULL;
   PyObject *__pyx_v_align = NULL;
   PyObject *__pyx_v_refalign = NULL;
   PyObject *__pyx_v_initpos = NULL;
   PyObject *__pyx_v_aligninitpos = NULL;
-  PyObject *__pyx_v_RMSD = NULL;
-  CYTHON_UNUSED PyObject *__pyx_v_ts = NULL;
+  PyObject *__pyx_v_times = NULL;
+  PyObject *__pyx_v_RMSDs = NULL;
+  PyObject *__pyx_v_ts = NULL;
   PyObject *__pyx_v_RMSDval = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -6180,14 +5873,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   int __pyx_t_11;
   __Pyx_RefNannySetupContext("calc_RMSD", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":197
- * 
- *     def calc_RMSD(self, u, refu, reftstep, selection, alignment):
+  /* "INDUSAnalysis/protein_order_params.pyx":245
+ *             TimeSeries object containing RMSD values along trajectory.
+ *         """
  *         sel = u.select_atoms(selection)             # <<<<<<<<<<<<<<
  *         refsel = refu.select_atoms(selection)
  *         align = u.select_atoms(alignment)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6201,20 +5894,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_selection) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_selection);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_sel = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":198
- *     def calc_RMSD(self, u, refu, reftstep, selection, alignment):
+  /* "INDUSAnalysis/protein_order_params.pyx":246
+ *         """
  *         sel = u.select_atoms(selection)
  *         refsel = refu.select_atoms(selection)             # <<<<<<<<<<<<<<
  *         align = u.select_atoms(alignment)
  *         refalign = refu.select_atoms(alignment)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6228,20 +5921,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_selection) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_selection);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_refsel = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":199
+  /* "INDUSAnalysis/protein_order_params.pyx":247
  *         sel = u.select_atoms(selection)
  *         refsel = refu.select_atoms(selection)
  *         align = u.select_atoms(alignment)             # <<<<<<<<<<<<<<
  *         refalign = refu.select_atoms(alignment)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6255,20 +5948,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_alignment) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_alignment);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_align = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":200
+  /* "INDUSAnalysis/protein_order_params.pyx":248
  *         refsel = refu.select_atoms(selection)
  *         align = u.select_atoms(alignment)
  *         refalign = refu.select_atoms(alignment)             # <<<<<<<<<<<<<<
  * 
  *         refu.trajectory[reftstep]
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6282,36 +5975,36 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_alignment) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_alignment);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_refalign = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":202
+  /* "INDUSAnalysis/protein_order_params.pyx":250
  *         refalign = refu.select_atoms(alignment)
  * 
  *         refu.trajectory[reftstep]             # <<<<<<<<<<<<<<
  *         initpos = refsel.positions.copy()
  *         aligninitpos = refalign.positions.copy()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_reftstep); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_reftstep); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":203
+  /* "INDUSAnalysis/protein_order_params.pyx":251
  * 
  *         refu.trajectory[reftstep]
  *         initpos = refsel.positions.copy()             # <<<<<<<<<<<<<<
  *         aligninitpos = refalign.positions.copy()
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refsel, __pyx_n_s_positions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refsel, __pyx_n_s_positions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 251, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -6326,22 +6019,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 251, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_initpos = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":204
+  /* "INDUSAnalysis/protein_order_params.pyx":252
  *         refu.trajectory[reftstep]
  *         initpos = refsel.positions.copy()
  *         aligninitpos = refalign.positions.copy()             # <<<<<<<<<<<<<<
  * 
- *         RMSD = []
+ *         times = []
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_refalign, __pyx_n_s_positions); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_refalign, __pyx_n_s_positions); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -6356,97 +6049,106 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   }
   __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 204, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_aligninitpos = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":206
+  /* "INDUSAnalysis/protein_order_params.pyx":254
  *         aligninitpos = refalign.positions.copy()
  * 
- *         RMSD = []             # <<<<<<<<<<<<<<
- *         for ts in u.trajectory[0::self.skip]:
- *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)
+ *         times = []             # <<<<<<<<<<<<<<
+ *         RMSDs = []
+ *         for ts in u.trajectory[0::skip]:
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_v_RMSD = __pyx_t_2;
+  __pyx_v_times = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":207
+  /* "INDUSAnalysis/protein_order_params.pyx":255
  * 
- *         RMSD = []
- *         for ts in u.trajectory[0::self.skip]:             # <<<<<<<<<<<<<<
+ *         times = []
+ *         RMSDs = []             # <<<<<<<<<<<<<<
+ *         for ts in u.trajectory[0::skip]:
  *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)
- *             RMSD.append((u.trajectory.time, RMSDval))
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_v_RMSDs = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":256
+ *         times = []
+ *         RMSDs = []
+ *         for ts in u.trajectory[0::skip]:             # <<<<<<<<<<<<<<
+ *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)
+ *             times.append(ts.time)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = PySlice_New(__pyx_int_0, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PySlice_New(__pyx_int_0, Py_None, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
-    __pyx_t_3 = __pyx_t_1; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
+    __pyx_t_1 = __pyx_t_3; __Pyx_INCREF(__pyx_t_1); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_5 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 256, __pyx_L1_error)
   }
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   for (;;) {
     if (likely(!__pyx_t_5)) {
-      if (likely(PyList_CheckExact(__pyx_t_3))) {
-        if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
+      if (likely(PyList_CheckExact(__pyx_t_1))) {
+        if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 256, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
-        if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
+        if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 256, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
     } else {
-      __pyx_t_1 = __pyx_t_5(__pyx_t_3);
-      if (unlikely(!__pyx_t_1)) {
+      __pyx_t_3 = __pyx_t_5(__pyx_t_1);
+      if (unlikely(!__pyx_t_3)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 207, __pyx_L1_error)
+          else __PYX_ERR(0, 256, __pyx_L1_error)
         }
         break;
       }
-      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_GOTREF(__pyx_t_3);
     }
-    __Pyx_XDECREF_SET(__pyx_v_ts, __pyx_t_1);
-    __pyx_t_1 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_ts, __pyx_t_3);
+    __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":208
- *         RMSD = []
- *         for ts in u.trajectory[0::self.skip]:
+    /* "INDUSAnalysis/protein_order_params.pyx":257
+ *         RMSDs = []
+ *         for ts in u.trajectory[0::skip]:
  *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)             # <<<<<<<<<<<<<<
- *             RMSD.append((u.trajectory.time, RMSDval))
- *         RMSD = np.array(RMSD)
+ *             times.append(ts.time)
+ *             RMSDs.append(RMSDval)
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_RMSD_worker); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_RMSD_worker); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_positions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_positions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_align, __pyx_n_s_positions); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_align, __pyx_n_s_positions); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_8 = NULL;
     __pyx_t_9 = 0;
@@ -6463,9 +6165,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_initpos, __pyx_t_6, __pyx_v_aligninitpos, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else
@@ -6473,15 +6175,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_initpos, __pyx_t_6, __pyx_v_aligninitpos, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else
     #endif
     {
-      __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 208, __pyx_L1_error)
+      __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 257, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       if (__pyx_t_8) {
         __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -6498,95 +6200,130 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
       PyTuple_SET_ITEM(__pyx_t_10, 3+__pyx_t_9, __pyx_t_7);
       __pyx_t_6 = 0;
       __pyx_t_7 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_RMSDval, __pyx_t_1);
-    __pyx_t_1 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_RMSDval, __pyx_t_3);
+    __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":209
- *         for ts in u.trajectory[0::self.skip]:
+    /* "INDUSAnalysis/protein_order_params.pyx":258
+ *         for ts in u.trajectory[0::skip]:
  *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)
- *             RMSD.append((u.trajectory.time, RMSDval))             # <<<<<<<<<<<<<<
- *         RMSD = np.array(RMSD)
- *         return RMSD
+ *             times.append(ts.time)             # <<<<<<<<<<<<<<
+ *             RMSDs.append(RMSDval)
+ *         return timeseries.TimeSeries(np.array(times), np.array(RMSDs), labels=['RMSD'])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
-    __Pyx_INCREF(__pyx_v_RMSDval);
-    __Pyx_GIVEREF(__pyx_v_RMSDval);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_RMSDval);
-    __pyx_t_2 = 0;
-    __pyx_t_11 = __Pyx_PyObject_Append(__pyx_v_RMSD, __pyx_t_1); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 209, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 258, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_times, __pyx_t_3); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 258, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":207
- * 
- *         RMSD = []
- *         for ts in u.trajectory[0::self.skip]:             # <<<<<<<<<<<<<<
+    /* "INDUSAnalysis/protein_order_params.pyx":259
  *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)
- *             RMSD.append((u.trajectory.time, RMSDval))
+ *             times.append(ts.time)
+ *             RMSDs.append(RMSDval)             # <<<<<<<<<<<<<<
+ *         return timeseries.TimeSeries(np.array(times), np.array(RMSDs), labels=['RMSD'])
+ * 
+ */
+    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_RMSDs, __pyx_v_RMSDval); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 259, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":256
+ *         times = []
+ *         RMSDs = []
+ *         for ts in u.trajectory[0::skip]:             # <<<<<<<<<<<<<<
+ *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)
+ *             times.append(ts.time)
  */
   }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":210
- *             RMSDval = self.calc_RMSD_worker(initpos, sel.positions, aligninitpos, align.positions)
- *             RMSD.append((u.trajectory.time, RMSDval))
- *         RMSD = np.array(RMSD)             # <<<<<<<<<<<<<<
- *         return RMSD
- * 
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 210, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_1)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_1);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_RMSD) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_RMSD);
-  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF_SET(__pyx_v_RMSD, __pyx_t_3);
-  __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":211
- *             RMSD.append((u.trajectory.time, RMSDval))
- *         RMSD = np.array(RMSD)
- *         return RMSD             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":260
+ *             times.append(ts.time)
+ *             RMSDs.append(RMSDval)
+ *         return timeseries.TimeSeries(np.array(times), np.array(RMSDs), labels=['RMSD'])             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def plot_RMSD(self, ts_RMSD):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_v_RMSD);
-  __pyx_r = __pyx_v_RMSD;
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_10);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_10, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_2, __pyx_v_times) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_v_times);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_10 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_2, __pyx_v_RMSDs) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_RMSDs);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_10);
+  PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_10);
+  __pyx_t_1 = 0;
+  __pyx_t_10 = 0;
+  __pyx_t_10 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_RMSD);
+  __Pyx_GIVEREF(__pyx_n_s_RMSD);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_RMSD);
+  if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_labels, __pyx_t_1) < 0) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, __pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":196
+  /* "INDUSAnalysis/protein_order_params.pyx":227
  *         return RMSD
  * 
- *     def calc_RMSD(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_RMSD(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates RMSD of `selection` atom group in `u` from `selection` atom group
  */
 
   /* function exit code */
@@ -6598,7 +6335,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_sel);
@@ -6607,7 +6344,8 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_XDECREF(__pyx_v_refalign);
   __Pyx_XDECREF(__pyx_v_initpos);
   __Pyx_XDECREF(__pyx_v_aligninitpos);
-  __Pyx_XDECREF(__pyx_v_RMSD);
+  __Pyx_XDECREF(__pyx_v_times);
+  __Pyx_XDECREF(__pyx_v_RMSDs);
   __Pyx_XDECREF(__pyx_v_ts);
   __Pyx_XDECREF(__pyx_v_RMSDval);
   __Pyx_XGIVEREF(__pyx_r);
@@ -6615,25 +6353,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":216
- *     Plot RMSD
- *     """
- *     def plot_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+/* "INDUSAnalysis/protein_order_params.pyx":262
+ *         return timeseries.TimeSeries(np.array(times), np.array(RMSDs), labels=['RMSD'])
+ * 
+ *     def plot_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots RMSD and saves figure to file."""
+ *         fig = ts_RMSD.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_19plot_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_19plot_RMSD = {"plot_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_19plot_RMSD, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_19plot_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_19plot_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_18plot_RMSD[] = "Plots RMSD and saves figure to file.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_19plot_RMSD = {"plot_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_19plot_RMSD, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_18plot_RMSD};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_19plot_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_RMSD_data = 0;
+  PyObject *__pyx_v_ts_RMSD = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plot_RMSD (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_RMSD_data,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_ts_RMSD,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -6653,13 +6392,13 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_RMSD_data)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_RMSD)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_RMSD", 1, 2, 2, 1); __PYX_ERR(0, 216, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_RMSD", 1, 2, 2, 1); __PYX_ERR(0, 262, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_RMSD") < 0)) __PYX_ERR(0, 216, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_RMSD") < 0)) __PYX_ERR(0, 262, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -6668,26 +6407,24 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_1
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_self = values[0];
-    __pyx_v_RMSD_data = values[1];
+    __pyx_v_ts_RMSD = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_RMSD", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 216, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_RMSD", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 262, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_18plot_RMSD(__pyx_self, __pyx_v_self, __pyx_v_RMSD_data);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_18plot_RMSD(__pyx_self, __pyx_v_self, __pyx_v_ts_RMSD);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_18plot_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_RMSD_data) {
-  PyObject *__pyx_v_rmsd = NULL;
-  PyObject *__pyx_v_t = NULL;
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_18plot_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_RMSD) {
   PyObject *__pyx_v_fig = NULL;
   PyObject *__pyx_v_ax = NULL;
   PyObject *__pyx_r = NULL;
@@ -6696,352 +6433,297 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
-  PyObject *(*__pyx_t_5)(PyObject *);
-  int __pyx_t_6;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  int __pyx_t_9;
+  int __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  int __pyx_t_10;
   __Pyx_RefNannySetupContext("plot_RMSD", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":217
- *     """
- *     def plot_RMSD(self, RMSD_data):
- *         rmsd = RMSD_data[:,1]             # <<<<<<<<<<<<<<
- *         t = RMSD_data[:,0]
- * 
+  /* "INDUSAnalysis/protein_order_params.pyx":264
+ *     def plot_RMSD(self, ts_RMSD):
+ *         """Plots RMSD and saves figure to file."""
+ *         fig = ts_RMSD.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))             # <<<<<<<<<<<<<<
+ *         ax = fig.gca()
+ *         ax.legend()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_RMSD_data, __pyx_tuple__12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_RMSD, __pyx_n_s_plot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_rmsd = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":218
- *     def plot_RMSD(self, RMSD_data):
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]             # <<<<<<<<<<<<<<
- * 
- *         fig, ax = plt.subplots()
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_RMSD_data, __pyx_tuple__11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_t = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":220
- *         t = RMSD_data[:,0]
- * 
- *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
- *         ax.plot(t,rmsd)
- *         ax.set_xlabel("Time (ps)")
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_RMSD_between_atoms_using_atoms_f, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = NULL;
+  __pyx_t_8 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_7)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
-    PyObject* sequence = __pyx_t_1;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 2)) {
-      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 220, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-    } else {
-      __pyx_t_3 = PyList_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-    }
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    #else
-    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    #endif
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
-    index = 0; __pyx_t_3 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_3);
-    index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 220, __pyx_L1_error)
-    __pyx_t_5 = NULL;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    goto __pyx_L4_unpacking_done;
-    __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_5 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 220, __pyx_L1_error)
-    __pyx_L4_unpacking_done:;
-  }
-  __pyx_v_fig = __pyx_t_3;
-  __pyx_t_3 = 0;
-  __pyx_v_ax = __pyx_t_2;
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":221
- * 
- *         fig, ax = plt.subplots()
- *         ax.plot(t,rmsd)             # <<<<<<<<<<<<<<
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 221, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  __pyx_t_6 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_6 = 1;
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+      __pyx_t_8 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rmsd};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rmsd};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 221, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__pyx_t_3) {
-      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 264, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    if (__pyx_t_7) {
+      __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
     }
-    __Pyx_INCREF(__pyx_v_t);
-    __Pyx_GIVEREF(__pyx_v_t);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_6, __pyx_v_t);
-    __Pyx_INCREF(__pyx_v_rmsd);
-    __Pyx_GIVEREF(__pyx_v_rmsd);
-    PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_v_rmsd);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_8, __pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_t_6);
+    __pyx_t_5 = 0;
+    __pyx_t_6 = 0;
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_label, __pyx_t_3) < 0) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_fig = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":222
- *         fig, ax = plt.subplots()
- *         ax.plot(t,rmsd)
- *         ax.set_xlabel("Time (ps)")             # <<<<<<<<<<<<<<
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":265
+ *         """Plots RMSD and saves figure to file."""
+ *         fig = ts_RMSD.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()             # <<<<<<<<<<<<<<
+ *         ax.legend()
+ *         fig.set_dpi(300)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_gca); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
+  __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Time_ps) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Time_ps);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_ax = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":223
- *         ax.plot(t,rmsd)
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")             # <<<<<<<<<<<<<<
- *         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":266
+ *         fig = ts_RMSD.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()
+ *         ax.legend()             # <<<<<<<<<<<<<<
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="RMSD_" + self.align + "_" + self.select)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_legend); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 266, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":267
+ *         ax = fig.gca()
+ *         ax.legend()
+ *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
+ *         self.save_figure(fig, suffix="RMSD_" + self.align + "_" + self.select)
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
+  __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_RMSD_AA) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_RMSD_AA);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 223, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":224
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":268
+ *         ax.legend()
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="RMSD_" + self.align + "_" + self.select)             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = PyNumber_Add(__pyx_n_s_RMSD, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_n_s__13); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyNumber_Add(__pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_t_8) < 0) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_9 = PyNumber_Add(__pyx_n_s_RMSD_2, __pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_4 = PyNumber_Add(__pyx_t_9, __pyx_n_s__14); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_6 = PyNumber_Add(__pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_t_6) < 0) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":225
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":269
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="RMSD_" + self.align + "_" + self.select)
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 225, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 225, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (__pyx_t_9) {
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  if (__pyx_t_10) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":226
- *         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
+    /* "INDUSAnalysis/protein_order_params.pyx":270
+ *         self.save_figure(fig, suffix="RMSD_" + self.align + "_" + self.select)
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_4)) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_1)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_1);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_2, function);
       }
     }
-    __pyx_t_8 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 226, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 270, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":225
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="RMSD_"+self.align+"_"+self.select)
+    /* "INDUSAnalysis/protein_order_params.pyx":269
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="RMSD_" + self.align + "_" + self.select)
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-    goto __pyx_L5;
+    goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":228
+  /* "INDUSAnalysis/protein_order_params.pyx":272
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def plot_ma_RMSD(self, ts_RMSD, window):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 228, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
       if (likely(__pyx_t_2)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
         __Pyx_INCREF(__pyx_t_2);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
+        __Pyx_DECREF_SET(__pyx_t_1, function);
       }
     }
-    __pyx_t_8 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+    __pyx_t_6 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 228, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 272, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
-  __pyx_L5:;
+  __pyx_L3:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":216
- *     Plot RMSD
- *     """
- *     def plot_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":262
+ *         return timeseries.TimeSeries(np.array(times), np.array(RMSDs), labels=['RMSD'])
+ * 
+ *     def plot_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots RMSD and saves figure to file."""
+ *         fig = ts_RMSD.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
  */
 
   /* function exit code */
@@ -7052,13 +6734,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_rmsd);
-  __Pyx_XDECREF(__pyx_v_t);
   __Pyx_XDECREF(__pyx_v_fig);
   __Pyx_XDECREF(__pyx_v_ax);
   __Pyx_XGIVEREF(__pyx_r);
@@ -7066,30 +6748,34 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_1
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":233
- *     Plot moving (sliding window) average of RMSD
- *     """
- *     def plot_ma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+/* "INDUSAnalysis/protein_order_params.pyx":274
+ *             plt.close()
+ * 
+ *     def plot_ma_RMSD(self, ts_RMSD, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average RMSD and saves figure to file."""
+ *         ts_RMSD_ma = ts_RMSD.moving_average(window=window)
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_21plot_ma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_21plot_ma_RMSD = {"plot_ma_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_21plot_ma_RMSD, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_21plot_ma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_21plot_ma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_20plot_ma_RMSD[] = "Plots moving average RMSD and saves figure to file.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_21plot_ma_RMSD = {"plot_ma_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_21plot_ma_RMSD, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_20plot_ma_RMSD};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_21plot_ma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_RMSD_data = 0;
+  PyObject *__pyx_v_ts_RMSD = 0;
+  PyObject *__pyx_v_window = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plot_ma_RMSD (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_RMSD_data,0};
-    PyObject* values[2] = {0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_ts_RMSD,&__pyx_n_s_window,0};
+    PyObject* values[3] = {0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
         CYTHON_FALLTHROUGH;
         case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -7104,42 +6790,48 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_2
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_RMSD_data)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_RMSD)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_ma_RMSD", 1, 2, 2, 1); __PYX_ERR(0, 233, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_ma_RMSD", 1, 3, 3, 1); __PYX_ERR(0, 274, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_window)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("plot_ma_RMSD", 1, 3, 3, 2); __PYX_ERR(0, 274, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_ma_RMSD") < 0)) __PYX_ERR(0, 233, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_ma_RMSD") < 0)) __PYX_ERR(0, 274, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_self = values[0];
-    __pyx_v_RMSD_data = values[1];
+    __pyx_v_ts_RMSD = values[1];
+    __pyx_v_window = values[2];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_ma_RMSD", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 233, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_ma_RMSD", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 274, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_ma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_20plot_ma_RMSD(__pyx_self, __pyx_v_self, __pyx_v_RMSD_data);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_20plot_ma_RMSD(__pyx_self, __pyx_v_self, __pyx_v_ts_RMSD, __pyx_v_window);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_20plot_ma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_RMSD_data) {
-  PyObject *__pyx_v_rmsd = NULL;
-  PyObject *__pyx_v_t = NULL;
-  PyObject *__pyx_v_rmsd_ma = NULL;
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_20plot_ma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_RMSD, PyObject *__pyx_v_window) {
+  PyObject *__pyx_v_ts_RMSD_ma = NULL;
   PyObject *__pyx_v_fig = NULL;
   PyObject *__pyx_v_ax = NULL;
   PyObject *__pyx_r = NULL;
@@ -7148,196 +6840,118 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
-  int __pyx_t_5;
+  PyObject *__pyx_t_5 = NULL;
   PyObject *__pyx_t_6 = NULL;
-  PyObject *(*__pyx_t_7)(PyObject *);
-  Py_ssize_t __pyx_t_8;
-  Py_ssize_t __pyx_t_9;
-  PyObject *__pyx_t_10 = NULL;
-  int __pyx_t_11;
+  PyObject *__pyx_t_7 = NULL;
+  int __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  int __pyx_t_10;
   __Pyx_RefNannySetupContext("plot_ma_RMSD", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":234
- *     """
- *     def plot_ma_RMSD(self, RMSD_data):
- *         rmsd = RMSD_data[:,1]             # <<<<<<<<<<<<<<
- *         t = RMSD_data[:,0]
- * 
+  /* "INDUSAnalysis/protein_order_params.pyx":276
+ *     def plot_ma_RMSD(self, ts_RMSD, window):
+ *         """Plots moving average RMSD and saves figure to file."""
+ *         ts_RMSD_ma = ts_RMSD.moving_average(window=window)             # <<<<<<<<<<<<<<
+ *         fig = ts_RMSD_ma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_RMSD_data, __pyx_tuple__12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_RMSD, __pyx_n_s_moving_average); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_rmsd = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":235
- *     def plot_ma_RMSD(self, RMSD_data):
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]             # <<<<<<<<<<<<<<
- * 
- *         rmsd_ma = self.moving_average(t, rmsd, self.window)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_RMSD_data, __pyx_tuple__11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_t = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":237
- *         t = RMSD_data[:,0]
- * 
- *         rmsd_ma = self.moving_average(t, rmsd, self.window)             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots()
- *         ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_window, __pyx_v_window) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 276, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  __pyx_t_5 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_ts_RMSD_ma = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":277
+ *         """Plots moving average RMSD and saves figure to file."""
+ *         ts_RMSD_ma = ts_RMSD.moving_average(window=window)
+ *         fig = ts_RMSD_ma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))             # <<<<<<<<<<<<<<
+ *         ax = fig.gca()
+ *         ax.legend()
+ */
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_RMSD_ma, __pyx_n_s_plot); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_RMSD_between_atoms_using_atoms_f, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = NULL;
+  __pyx_t_8 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_7)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_5 = 1;
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+      __pyx_t_8 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_t, __pyx_v_rmsd, __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_t, __pyx_v_rmsd, __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   {
-    __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 237, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__pyx_t_4) {
-      __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 277, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    if (__pyx_t_7) {
+      __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
     }
-    __Pyx_INCREF(__pyx_v_t);
-    __Pyx_GIVEREF(__pyx_v_t);
-    PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_5, __pyx_v_t);
-    __Pyx_INCREF(__pyx_v_rmsd);
-    __Pyx_GIVEREF(__pyx_v_rmsd);
-    PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_v_rmsd);
-    __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_t_3);
-    __pyx_t_3 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_8, __pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_t_6);
+    __pyx_t_5 = 0;
+    __pyx_t_6 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   }
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_label, __pyx_t_1) < 0) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_rmsd_ma = __pyx_t_1;
+  __pyx_v_fig = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":238
- * 
- *         rmsd_ma = self.moving_average(t, rmsd, self.window)
- *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
- *         ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
- *         ax.set_xlabel("Time (ps)")
+  /* "INDUSAnalysis/protein_order_params.pyx":278
+ *         ts_RMSD_ma = ts_RMSD.moving_average(window=window)
+ *         fig = ts_RMSD_ma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()             # <<<<<<<<<<<<<<
+ *         ax.legend()
+ *         fig.set_dpi(300)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_gca); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 238, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_6))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_6);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_6, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
-    PyObject* sequence = __pyx_t_1;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 2)) {
-      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 238, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_6 = PyTuple_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-    } else {
-      __pyx_t_6 = PyList_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-    }
-    __Pyx_INCREF(__pyx_t_6);
-    __Pyx_INCREF(__pyx_t_2);
-    #else
-    __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 238, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    #endif
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 238, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_7 = Py_TYPE(__pyx_t_3)->tp_iternext;
-    index = 0; __pyx_t_6 = __pyx_t_7(__pyx_t_3); if (unlikely(!__pyx_t_6)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_6);
-    index = 1; __pyx_t_2 = __pyx_t_7(__pyx_t_3); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_3), 2) < 0) __PYX_ERR(0, 238, __pyx_L1_error)
-    __pyx_t_7 = NULL;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    goto __pyx_L4_unpacking_done;
-    __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_7 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 238, __pyx_L1_error)
-    __pyx_L4_unpacking_done:;
-  }
-  __pyx_v_fig = __pyx_t_6;
-  __pyx_t_6 = 0;
-  __pyx_v_ax = __pyx_t_2;
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":239
- *         rmsd_ma = self.moving_average(t, rmsd, self.window)
- *         fig, ax = plt.subplots()
- *         ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)             # <<<<<<<<<<<<<<
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 239, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = PyObject_Length(__pyx_v_t); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 239, __pyx_L1_error)
-  __pyx_t_9 = PyObject_Length(__pyx_v_rmsd_ma); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 239, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_GetSlice(__pyx_v_t, (__pyx_t_8 - __pyx_t_9), 0, NULL, NULL, NULL, 1, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 239, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_3 = NULL;
-  __pyx_t_5 = 0;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
     __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
     if (likely(__pyx_t_3)) {
@@ -7345,227 +6959,197 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_5 = 1;
     }
   }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_6, __pyx_v_rmsd_ma};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_6, __pyx_v_rmsd_ma};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  } else
-  #endif
-  {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 239, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__pyx_t_3) {
-      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
-    }
-    __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_5, __pyx_t_6);
-    __Pyx_INCREF(__pyx_v_rmsd_ma);
-    __Pyx_GIVEREF(__pyx_v_rmsd_ma);
-    PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_5, __pyx_v_rmsd_ma);
-    __pyx_t_6 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_ax = __pyx_t_1;
+  __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":240
- *         fig, ax = plt.subplots()
- *         ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
- *         ax.set_xlabel("Time (ps)")             # <<<<<<<<<<<<<<
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":279
+ *         fig = ts_RMSD_ma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()
+ *         ax.legend()             # <<<<<<<<<<<<<<
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="ma_RMSD_" + self.align + "_" + self.select)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_legend); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
+  __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Time_ps) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Time_ps);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":241
- *         ax.plot(t[len(t) - len(rmsd_ma):], rmsd_ma)
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")             # <<<<<<<<<<<<<<
- *         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":280
+ *         ax = fig.gca()
+ *         ax.legend()
+ *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
+ *         self.save_figure(fig, suffix="ma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
+  __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_RMSD_AA) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_RMSD_AA);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":242
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":281
+ *         ax.legend()
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="ma_RMSD_" + self.align + "_" + self.select)             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 281, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_9 = PyNumber_Add(__pyx_n_s_ma_RMSD, __pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 281, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = PyNumber_Add(__pyx_t_9, __pyx_n_s__14); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 281, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 281, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_6 = PyNumber_Add(__pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_3 = PyNumber_Add(__pyx_n_s_ma_RMSD, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_t_6) < 0) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyNumber_Add(__pyx_t_3, __pyx_n_s__13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_10 = PyNumber_Add(__pyx_t_6, __pyx_t_3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 242, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_t_10) < 0) __PYX_ERR(0, 242, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 242, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":243
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":282
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="ma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 243, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_10); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 243, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  if (__pyx_t_11) {
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 282, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 282, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  if (__pyx_t_10) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":244
- *         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
+    /* "INDUSAnalysis/protein_order_params.pyx":283
+ *         self.save_figure(fig, suffix="ma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 244, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_4)) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_3)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_2, function);
       }
     }
-    __pyx_t_10 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 244, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_6 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":243
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig,suffix="ma_RMSD_"+self.align+"_"+self.select)
+    /* "INDUSAnalysis/protein_order_params.pyx":282
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="ma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-    goto __pyx_L5;
+    goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":246
+  /* "INDUSAnalysis/protein_order_params.pyx":285
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def plot_cma_RMSD(self, ts_RMSD):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 246, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
       if (likely(__pyx_t_2)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_2);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
       }
     }
-    __pyx_t_10 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+    __pyx_t_6 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 246, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_10);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
-  __pyx_L5:;
+  __pyx_L3:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":233
- *     Plot moving (sliding window) average of RMSD
- *     """
- *     def plot_ma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":274
+ *             plt.close()
+ * 
+ *     def plot_ma_RMSD(self, ts_RMSD, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average RMSD and saves figure to file."""
+ *         ts_RMSD_ma = ts_RMSD.moving_average(window=window)
  */
 
   /* function exit code */
@@ -7576,14 +7160,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_ma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_rmsd);
-  __Pyx_XDECREF(__pyx_v_t);
-  __Pyx_XDECREF(__pyx_v_rmsd_ma);
+  __Pyx_XDECREF(__pyx_v_ts_RMSD_ma);
   __Pyx_XDECREF(__pyx_v_fig);
   __Pyx_XDECREF(__pyx_v_ax);
   __Pyx_XGIVEREF(__pyx_r);
@@ -7591,25 +7175,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":251
- *     Plot cumulative moving (running) average of RMSD
- *     """
- *     def plot_cma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+/* "INDUSAnalysis/protein_order_params.pyx":287
+ *             plt.close()
+ * 
+ *     def plot_cma_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average RMSD and saves figure to file."""
+ *         ts_RMSD_cma = ts_RMSD.cumulative_moving_average()
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_23plot_cma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_23plot_cma_RMSD = {"plot_cma_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_23plot_cma_RMSD, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_23plot_cma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_23plot_cma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_22plot_cma_RMSD[] = "Plots cumulative moving average RMSD and saves figure to file.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_23plot_cma_RMSD = {"plot_cma_RMSD", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_23plot_cma_RMSD, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_22plot_cma_RMSD};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_23plot_cma_RMSD(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_RMSD_data = 0;
+  PyObject *__pyx_v_ts_RMSD = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plot_cma_RMSD (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_RMSD_data,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_ts_RMSD,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -7629,13 +7214,13 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_2
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_RMSD_data)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_RMSD)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_cma_RMSD", 1, 2, 2, 1); __PYX_ERR(0, 251, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_cma_RMSD", 1, 2, 2, 1); __PYX_ERR(0, 287, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_cma_RMSD") < 0)) __PYX_ERR(0, 251, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_cma_RMSD") < 0)) __PYX_ERR(0, 287, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -7644,27 +7229,25 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_2
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_self = values[0];
-    __pyx_v_RMSD_data = values[1];
+    __pyx_v_ts_RMSD = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_cma_RMSD", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 251, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_cma_RMSD", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 287, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_cma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_22plot_cma_RMSD(__pyx_self, __pyx_v_self, __pyx_v_RMSD_data);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_22plot_cma_RMSD(__pyx_self, __pyx_v_self, __pyx_v_ts_RMSD);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_22plot_cma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_RMSD_data) {
-  PyObject *__pyx_v_rmsd = NULL;
-  PyObject *__pyx_v_t = NULL;
-  PyObject *__pyx_v_rmsd_ma = NULL;
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_22plot_cma_RMSD(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_RMSD) {
+  PyObject *__pyx_v_ts_RMSD_cma = NULL;
   PyObject *__pyx_v_fig = NULL;
   PyObject *__pyx_v_ax = NULL;
   PyObject *__pyx_r = NULL;
@@ -7673,45 +7256,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
-  PyObject *(*__pyx_t_5)(PyObject *);
-  int __pyx_t_6;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  int __pyx_t_9;
+  int __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  int __pyx_t_10;
   __Pyx_RefNannySetupContext("plot_cma_RMSD", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":252
- *     """
- *     def plot_cma_RMSD(self, RMSD_data):
- *         rmsd = RMSD_data[:,1]             # <<<<<<<<<<<<<<
- *         t = RMSD_data[:,0]
- * 
+  /* "INDUSAnalysis/protein_order_params.pyx":289
+ *     def plot_cma_RMSD(self, ts_RMSD):
+ *         """Plots cumulative moving average RMSD and saves figure to file."""
+ *         ts_RMSD_cma = ts_RMSD.cumulative_moving_average()             # <<<<<<<<<<<<<<
+ *         fig = ts_RMSD_cma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_RMSD_data, __pyx_tuple__12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_rmsd = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":253
- *     def plot_cma_RMSD(self, RMSD_data):
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]             # <<<<<<<<<<<<<<
- * 
- *         rmsd_ma = self.cumulative_moving_average(rmsd)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_RMSD_data, __pyx_tuple__11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_t = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":255
- *         t = RMSD_data[:,0]
- * 
- *         rmsd_ma = self.cumulative_moving_average(rmsd)             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots()
- *         ax.plot(t, rmsd_ma)
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_cumulative_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_RMSD, __pyx_n_s_cumulative_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7723,329 +7283,297 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_rmsd) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_rmsd);
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 289, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_rmsd_ma = __pyx_t_1;
+  __pyx_v_ts_RMSD_cma = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":256
- * 
- *         rmsd_ma = self.cumulative_moving_average(rmsd)
- *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
- *         ax.plot(t, rmsd_ma)
- *         ax.set_xlabel("Time (ps)")
+  /* "INDUSAnalysis/protein_order_params.pyx":290
+ *         """Plots cumulative moving average RMSD and saves figure to file."""
+ *         ts_RMSD_cma = ts_RMSD.cumulative_moving_average()
+ *         fig = ts_RMSD_cma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))             # <<<<<<<<<<<<<<
+ *         ax = fig.gca()
+ *         ax.legend()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_RMSD_cma, __pyx_n_s_plot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
-    PyObject* sequence = __pyx_t_1;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 2)) {
-      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 256, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-    } else {
-      __pyx_t_3 = PyList_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-    }
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    #else
-    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    #endif
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
-    index = 0; __pyx_t_3 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_3);
-    index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 256, __pyx_L1_error)
-    __pyx_t_5 = NULL;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    goto __pyx_L4_unpacking_done;
-    __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_5 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 256, __pyx_L1_error)
-    __pyx_L4_unpacking_done:;
-  }
-  __pyx_v_fig = __pyx_t_3;
-  __pyx_t_3 = 0;
-  __pyx_v_ax = __pyx_t_2;
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":257
- *         rmsd_ma = self.cumulative_moving_average(rmsd)
- *         fig, ax = plt.subplots()
- *         ax.plot(t, rmsd_ma)             # <<<<<<<<<<<<<<
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  __pyx_t_6 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_RMSD_between_atoms_using_atoms_f, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_7 = NULL;
+  __pyx_t_8 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_7)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_6 = 1;
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+      __pyx_t_8 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rmsd_ma};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_t, __pyx_v_rmsd_ma};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   } else
   #endif
   {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__pyx_t_3) {
-      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    if (__pyx_t_7) {
+      __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
     }
-    __Pyx_INCREF(__pyx_v_t);
-    __Pyx_GIVEREF(__pyx_v_t);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_6, __pyx_v_t);
-    __Pyx_INCREF(__pyx_v_rmsd_ma);
-    __Pyx_GIVEREF(__pyx_v_rmsd_ma);
-    PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_v_rmsd_ma);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_8, __pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_t_6);
+    __pyx_t_5 = 0;
+    __pyx_t_6 = 0;
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_label, __pyx_t_3) < 0) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_fig = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":258
- *         fig, ax = plt.subplots()
- *         ax.plot(t, rmsd_ma)
- *         ax.set_xlabel("Time (ps)")             # <<<<<<<<<<<<<<
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig, suffix="cma_RMSD"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":291
+ *         ts_RMSD_cma = ts_RMSD.cumulative_moving_average()
+ *         fig = ts_RMSD_cma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()             # <<<<<<<<<<<<<<
+ *         ax.legend()
+ *         fig.set_dpi(300)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_gca); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
+  __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_Time_ps) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Time_ps);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_ax = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":259
- *         ax.plot(t, rmsd_ma)
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")             # <<<<<<<<<<<<<<
- *         self.save_figure(fig, suffix="cma_RMSD"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":292
+ *         fig = ts_RMSD_cma.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
+ *         ax = fig.gca()
+ *         ax.legend()             # <<<<<<<<<<<<<<
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="cma_RMSD_" + self.align + "_" + self.select)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_legend); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":293
+ *         ax = fig.gca()
+ *         ax.legend()
+ *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
+ *         self.save_figure(fig, suffix="cma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
+  __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_RMSD_AA) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_RMSD_AA);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 293, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":260
- *         ax.set_xlabel("Time (ps)")
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig, suffix="cma_RMSD"+self.align+"_"+self.select)             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":294
+ *         ax.legend()
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="cma_RMSD_" + self.align + "_" + self.select)             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = PyNumber_Add(__pyx_n_s_cma_RMSD, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_n_s__13); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyNumber_Add(__pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_t_8) < 0) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 260, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_9 = PyNumber_Add(__pyx_n_s_cma_RMSD, __pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_4 = PyNumber_Add(__pyx_t_9, __pyx_n_s__14); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_6 = PyNumber_Add(__pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_t_6) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":261
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig, suffix="cma_RMSD"+self.align+"_"+self.select)
+  /* "INDUSAnalysis/protein_order_params.pyx":295
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="cma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 261, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 261, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (__pyx_t_9) {
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  if (__pyx_t_10) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":262
- *         self.save_figure(fig, suffix="cma_RMSD"+self.align+"_"+self.select)
+    /* "INDUSAnalysis/protein_order_params.pyx":296
+ *         self.save_figure(fig, suffix="cma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 296, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_4)) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_1)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_1);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_2, function);
       }
     }
-    __pyx_t_8 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 262, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 296, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":261
- *         ax.set_ylabel(r"RMSD ($\AA$)")
- *         self.save_figure(fig, suffix="cma_RMSD"+self.align+"_"+self.select)
+    /* "INDUSAnalysis/protein_order_params.pyx":295
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="cma_RMSD_" + self.align + "_" + self.select)
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-    goto __pyx_L5;
+    goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":264
+  /* "INDUSAnalysis/protein_order_params.pyx":298
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 298, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
       if (likely(__pyx_t_2)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
         __Pyx_INCREF(__pyx_t_2);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
+        __Pyx_DECREF_SET(__pyx_t_1, function);
       }
     }
-    __pyx_t_8 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
+    __pyx_t_6 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 264, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 298, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
-  __pyx_L5:;
+  __pyx_L3:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":251
- *     Plot cumulative moving (running) average of RMSD
- *     """
- *     def plot_cma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":287
+ *             plt.close()
+ * 
+ *     def plot_cma_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average RMSD and saves figure to file."""
+ *         ts_RMSD_cma = ts_RMSD.cumulative_moving_average()
  */
 
   /* function exit code */
@@ -8056,14 +7584,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_cma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_RMSD", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_rmsd);
-  __Pyx_XDECREF(__pyx_v_t);
-  __Pyx_XDECREF(__pyx_v_rmsd_ma);
+  __Pyx_XDECREF(__pyx_v_ts_RMSD_cma);
   __Pyx_XDECREF(__pyx_v_fig);
   __Pyx_XDECREF(__pyx_v_ax);
   __Pyx_XGIVEREF(__pyx_r);
@@ -8071,18 +7599,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":269
- *     Per-atom-deviation [each heavy atom] worker and helper function
- *     """
+/* "INDUSAnalysis/protein_order_params.pyx":300
+ *             plt.close()
+ * 
  *     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *         """
+ *         Calculates deviations of coordinates from reference after aligning them using
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_25calc_deviation_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_25calc_deviation_worker = {"calc_deviation_worker", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_25calc_deviation_worker, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_25calc_deviation_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_25calc_deviation_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_24calc_deviation_worker[] = "\n        Calculates deviations of coordinates from reference after aligning them using\n        a subset of coordinates.\n\n        Aligns coords and initcoords by performing translation and rotation\n        transformations which, when applied to aligncoords and aligninitcoords,\n        minimizes the RMSD between them.\n\n        Args:\n            initcoords (np.array): Array of shape (N, 3) containing reference coordinates.\n            coords (np.array): Array of shape (N, 3) containing coordinates.\n            aligninitcoords (np.array): Array of shape (N, 3) containing alignment group of reference coordinates.\n            aligncoords (np.Array): Array of shape (N, 3) containing alignment group of coordinates.\n\n        Returns:\n            Array of deviations.\n\n        Raises:\n            ValueError if the coordinates are not 3-dimensional or are inconsistent.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_25calc_deviation_worker = {"calc_deviation_worker", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_25calc_deviation_worker, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_24calc_deviation_worker};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_25calc_deviation_worker(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_initcoords = 0;
   PyObject *__pyx_v_coords = 0;
@@ -8120,29 +7649,29 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_2
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_initcoords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 1); __PYX_ERR(0, 269, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 1); __PYX_ERR(0, 300, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_coords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 2); __PYX_ERR(0, 269, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 2); __PYX_ERR(0, 300, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_aligninitcoords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 3); __PYX_ERR(0, 269, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 3); __PYX_ERR(0, 300, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_aligncoords)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 4); __PYX_ERR(0, 269, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, 4); __PYX_ERR(0, 300, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_deviation_worker") < 0)) __PYX_ERR(0, 269, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_deviation_worker") < 0)) __PYX_ERR(0, 300, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -8161,20 +7690,20 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 269, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calc_deviation_worker", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 300, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_deviation_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviation_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_24calc_deviation_worker(__pyx_self, __pyx_v_self, __pyx_v_initcoords, __pyx_v_coords, __pyx_v_aligninitcoords, __pyx_v_aligncoords);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_24calc_deviation_worker(__pyx_self, __pyx_v_self, __pyx_v_initcoords, __pyx_v_coords, __pyx_v_aligninitcoords, __pyx_v_aligncoords);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_24calc_deviation_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_24calc_deviation_worker(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_self, PyObject *__pyx_v_initcoords, PyObject *__pyx_v_coords, PyObject *__pyx_v_aligninitcoords, PyObject *__pyx_v_aligncoords) {
   PyObject *__pyx_v_aligninitcog = NULL;
   PyObject *__pyx_v_aligncog = NULL;
   CYTHON_UNUSED PyObject *__pyx_v_aligncoods = NULL;
@@ -8198,157 +7727,173 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_INCREF(__pyx_v_coords);
   __Pyx_INCREF(__pyx_v_aligninitcoords);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":270
- *     """
- *     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \             # <<<<<<<<<<<<<<
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
- *         assert(coords.shape == initcoords.shape and \
+  /* "INDUSAnalysis/protein_order_params.pyx":321
+ *             ValueError if the coordinates are not 3-dimensional or are inconsistent.
+ *         """
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):             # <<<<<<<<<<<<<<
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
  */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L3_bool_binop_done;
-    }
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 270, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L3_bool_binop_done;
-    }
-
-    /* "INDUSAnalysis/protein_order_params.pyx":271
- *     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)             # <<<<<<<<<<<<<<
- *         assert(coords.shape == initcoords.shape and \
- *             aligncoords.shape == aligninitcoords.shape)
- */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L3_bool_binop_done;
-    }
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_1 = __pyx_t_4;
-    __pyx_L3_bool_binop_done:;
-    if (unlikely(!__pyx_t_1)) {
-      PyErr_SetNone(PyExc_AssertionError);
-      __PYX_ERR(0, 270, __pyx_L1_error)
-    }
-  }
-  #endif
-
-  /* "INDUSAnalysis/protein_order_params.pyx":272
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
- *         assert(coords.shape == initcoords.shape and \             # <<<<<<<<<<<<<<
- *             aligncoords.shape == aligninitcoords.shape)
- * 
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = PyObject_RichCompare(__pyx_t_2, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_1 = __pyx_t_4;
-      goto __pyx_L7_bool_binop_done;
-    }
-
-    /* "INDUSAnalysis/protein_order_params.pyx":273
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
- *         assert(coords.shape == initcoords.shape and \
- *             aligncoords.shape == aligninitcoords.shape)             # <<<<<<<<<<<<<<
- * 
- *         #calculate centers of geometry of alignment coordinates
- */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 273, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 273, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 273, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_1 = __pyx_t_4;
-    __pyx_L7_bool_binop_done:;
-    if (unlikely(!__pyx_t_1)) {
-      PyErr_SetNone(PyExc_AssertionError);
-      __PYX_ERR(0, 272, __pyx_L1_error)
-    }
-  }
-  #endif
-
-  /* "INDUSAnalysis/protein_order_params.pyx":276
- * 
- *         #calculate centers of geometry of alignment coordinates
- *         aligninitcog = np.mean(aligninitcoords, axis = 0)             # <<<<<<<<<<<<<<
- *         aligncog = np.mean(aligncoords, axis = 0)
- *         #center both alignment coordinates and coordinates
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_4) {
+  } else {
+    __pyx_t_1 = __pyx_t_4;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_1 = __pyx_t_4;
+  __pyx_L4_bool_binop_done:;
+  __pyx_t_4 = ((!__pyx_t_1) != 0);
+  if (unlikely(__pyx_t_4)) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":322
+ *         """
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):
+ *             raise ValueError('One or more oordinates are not 3 dimensional')             # <<<<<<<<<<<<<<
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 322, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 322, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":321
+ *             ValueError if the coordinates are not 3-dimensional or are inconsistent.
+ *         """
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):             # <<<<<<<<<<<<<<
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":323
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):             # <<<<<<<<<<<<<<
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_coords, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_initcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = PyObject_RichCompare(__pyx_t_2, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (__pyx_t_1) {
+  } else {
+    __pyx_t_4 = __pyx_t_1;
+    goto __pyx_L9_bool_binop_done;
+  }
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligncoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_aligninitcoords, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_4 = __pyx_t_1;
+  __pyx_L9_bool_binop_done:;
+  __pyx_t_1 = ((!__pyx_t_4) != 0);
+  if (unlikely(__pyx_t_1)) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":324
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')             # <<<<<<<<<<<<<<
+ * 
+ *         # Calculate centers of geometry of alignment coordinates
+ */
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __PYX_ERR(0, 324, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":323
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):             # <<<<<<<<<<<<<<
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')
+ * 
+ */
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":327
+ * 
+ *         # Calculate centers of geometry of alignment coordinates
+ *         aligninitcog = np.mean(aligninitcoords, axis=0)             # <<<<<<<<<<<<<<
+ *         aligncog = np.mean(aligncoords, axis=0)
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_mean); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_aligninitcoords);
   __Pyx_GIVEREF(__pyx_v_aligninitcoords);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_aligninitcoords);
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 327, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -8356,27 +7901,27 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __pyx_v_aligninitcog = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":277
- *         #calculate centers of geometry of alignment coordinates
- *         aligninitcog = np.mean(aligninitcoords, axis = 0)
- *         aligncog = np.mean(aligncoords, axis = 0)             # <<<<<<<<<<<<<<
- *         #center both alignment coordinates and coordinates
- *         aligninitcoords = aligninitcoords - aligninitcog
+  /* "INDUSAnalysis/protein_order_params.pyx":328
+ *         # Calculate centers of geometry of alignment coordinates
+ *         aligninitcog = np.mean(aligninitcoords, axis=0)
+ *         aligncog = np.mean(aligncoords, axis=0)             # <<<<<<<<<<<<<<
+ * 
+ *         # Center both alignment coordinates and coordinates
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_mean); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_mean); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_INCREF(__pyx_v_aligncoords);
   __Pyx_GIVEREF(__pyx_v_aligncoords);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_aligncoords);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 277, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_axis, __pyx_int_0) < 0) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -8384,70 +7929,70 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __pyx_v_aligncog = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":279
- *         aligncog = np.mean(aligncoords, axis = 0)
- *         #center both alignment coordinates and coordinates
+  /* "INDUSAnalysis/protein_order_params.pyx":331
+ * 
+ *         # Center both alignment coordinates and coordinates
  *         aligninitcoords = aligninitcoords - aligninitcog             # <<<<<<<<<<<<<<
  *         initcoords = initcoords - aligninitcog
  *         aligncoods = aligncoords - aligncog
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligninitcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligninitcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF_SET(__pyx_v_aligninitcoords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":280
- *         #center both alignment coordinates and coordinates
+  /* "INDUSAnalysis/protein_order_params.pyx":332
+ *         # Center both alignment coordinates and coordinates
  *         aligninitcoords = aligninitcoords - aligninitcog
  *         initcoords = initcoords - aligninitcog             # <<<<<<<<<<<<<<
  *         aligncoods = aligncoords - aligncog
  *         coords = coords - aligncog
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_initcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 280, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_initcoords, __pyx_v_aligninitcog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 332, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF_SET(__pyx_v_initcoords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":281
+  /* "INDUSAnalysis/protein_order_params.pyx":333
  *         aligninitcoords = aligninitcoords - aligninitcog
  *         initcoords = initcoords - aligninitcog
  *         aligncoods = aligncoords - aligncog             # <<<<<<<<<<<<<<
  *         coords = coords - aligncog
  * 
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligncoords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 281, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_aligncoords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 333, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_aligncoods = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":282
+  /* "INDUSAnalysis/protein_order_params.pyx":334
  *         initcoords = initcoords - aligninitcog
  *         aligncoods = aligncoords - aligncog
  *         coords = coords - aligncog             # <<<<<<<<<<<<<<
  * 
- *         #get rotation matrix by minimizing RMSD between centered alignment coordinates
+ *         # Get rotation matrix by minimizing RMSD between centered alignment coordinates
  */
-  __pyx_t_3 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_aligncog); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF_SET(__pyx_v_coords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":285
+  /* "INDUSAnalysis/protein_order_params.pyx":337
  * 
- *         #get rotation matrix by minimizing RMSD between centered alignment coordinates
+ *         # Get rotation matrix by minimizing RMSD between centered alignment coordinates
  *         R, min_rms = mda.analysis.align.rotation_matrix(aligncoords, aligninitcoords)             # <<<<<<<<<<<<<<
  * 
- *         #rotate coords
+ *         # Rotate coords
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_analysis); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_analysis); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_align_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_align_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_rotation_matrix); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_rotation_matrix); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -8465,7 +8010,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_aligncoords, __pyx_v_aligninitcoords};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else
@@ -8473,13 +8018,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_aligncoords, __pyx_v_aligninitcoords};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -8490,7 +8035,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
     __Pyx_INCREF(__pyx_v_aligninitcoords);
     __Pyx_GIVEREF(__pyx_v_aligninitcoords);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_7, __pyx_v_aligninitcoords);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
@@ -8501,7 +8046,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 285, __pyx_L1_error)
+      __PYX_ERR(0, 337, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -8514,51 +8059,51 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
     __Pyx_INCREF(__pyx_t_6);
     __Pyx_INCREF(__pyx_t_5);
     #else
-    __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_6 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     #endif
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_2 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_2 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_8 = Py_TYPE(__pyx_t_2)->tp_iternext;
-    index = 0; __pyx_t_6 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_6)) goto __pyx_L9_unpacking_failed;
+    index = 0; __pyx_t_6 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_6)) goto __pyx_L11_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_6);
-    index = 1; __pyx_t_5 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_5)) goto __pyx_L9_unpacking_failed;
+    index = 1; __pyx_t_5 = __pyx_t_8(__pyx_t_2); if (unlikely(!__pyx_t_5)) goto __pyx_L11_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_5);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_2), 2) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_2), 2) < 0) __PYX_ERR(0, 337, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    goto __pyx_L10_unpacking_done;
-    __pyx_L9_unpacking_failed:;
+    goto __pyx_L12_unpacking_done;
+    __pyx_L11_unpacking_failed:;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 285, __pyx_L1_error)
-    __pyx_L10_unpacking_done:;
+    __PYX_ERR(0, 337, __pyx_L1_error)
+    __pyx_L12_unpacking_done:;
   }
   __pyx_v_R = __pyx_t_6;
   __pyx_t_6 = 0;
   __pyx_v_min_rms = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":288
+  /* "INDUSAnalysis/protein_order_params.pyx":340
  * 
- *         #rotate coords
+ *         # Rotate coords
  *         coords = np.dot(coords, R.T)             # <<<<<<<<<<<<<<
  * 
- *         #calculate deviations
+ *         # Calculate deviations
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 288, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dot); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 288, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dot); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_R, __pyx_n_s_T); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 288, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_R, __pyx_n_s_T); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 340, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_2 = NULL;
   __pyx_t_7 = 0;
@@ -8575,7 +8120,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_coords, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 288, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -8584,14 +8129,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_coords, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 288, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else
   #endif
   {
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 288, __pyx_L1_error)
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 340, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -8602,7 +8147,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
     __Pyx_GIVEREF(__pyx_t_5);
     PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_7, __pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 288, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   }
@@ -8610,37 +8155,37 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_DECREF_SET(__pyx_v_coords, __pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":291
+  /* "INDUSAnalysis/protein_order_params.pyx":343
  * 
- *         #calculate deviations
+ *         # Calculate deviations
  *         deviation = np.sqrt(np.sum((coords - initcoords)**2, axis=1))             # <<<<<<<<<<<<<<
  *         return deviation
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_sum); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_sum); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_initcoords); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_6 = PyNumber_Subtract(__pyx_v_coords, __pyx_v_initcoords); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_2 = PyNumber_Power(__pyx_t_6, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Power(__pyx_t_6, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
-  __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 291, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_axis, __pyx_int_1) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -8658,30 +8203,30 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_2, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_10);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __pyx_v_deviation = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":292
- *         #calculate deviations
+  /* "INDUSAnalysis/protein_order_params.pyx":344
+ *         # Calculate deviations
  *         deviation = np.sqrt(np.sum((coords - initcoords)**2, axis=1))
  *         return deviation             # <<<<<<<<<<<<<<
  * 
- *     def calc_deviation(self, u, refu, reftstep, selection, alignment):
+ *     def calc_deviations(self, u, refu, reftstep, skip, selection, alignment):
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_deviation);
   __pyx_r = __pyx_v_deviation;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":269
- *     Per-atom-deviation [each heavy atom] worker and helper function
- *     """
+  /* "INDUSAnalysis/protein_order_params.pyx":300
+ *             plt.close()
+ * 
  *     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *         """
+ *         Calculates deviations of coordinates from reference after aligning them using
  */
 
   /* function exit code */
@@ -8692,7 +8237,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_deviation_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviation_worker", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_aligninitcog);
@@ -8709,34 +8254,38 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":294
+/* "INDUSAnalysis/protein_order_params.pyx":346
  *         return deviation
  * 
- *     def calc_deviation(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_deviations(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates deviations of `selection` AtomGroup atoms in `u` from `selection` AtomGroup atoms
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_27calc_deviation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_27calc_deviation = {"calc_deviation", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_27calc_deviation, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_27calc_deviation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_27calc_deviations(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_26calc_deviations[] = "\n        Calculates deviations of `selection` AtomGroup atoms in `u` from `selection` AtomGroup atoms\n        in `refu` at `reftstep`, using `alignment` for alignment.\n\n        Args:\n            u (mda.Universe): Universe object.\n            refu (mda.Universe): Reference Universe object.\n            reftstep (int): Reference timestep to calculate RMSD from.\n            skip (int): Resampling interval.\n            selection (mda.AtomGroup): MDAnalysis AtomGroup object containing atoms\n                to calculate RMSD for.\n            alignment (mda.AtomGroup): MDAnalysis AtomGroup object containing atoms\n                to use for alignment before calculating RMSD.\n\n        Returns:\n            2-D TimeSeries object containing deviation values along trajectory.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_27calc_deviations = {"calc_deviations", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_27calc_deviations, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_26calc_deviations};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_27calc_deviations(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_u = 0;
   PyObject *__pyx_v_refu = 0;
   PyObject *__pyx_v_reftstep = 0;
+  PyObject *__pyx_v_skip = 0;
   PyObject *__pyx_v_selection = 0;
   PyObject *__pyx_v_alignment = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("calc_deviation (wrapper)", 0);
+  __Pyx_RefNannySetupContext("calc_deviations (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_u,&__pyx_n_s_refu,&__pyx_n_s_reftstep_2,&__pyx_n_s_selection,&__pyx_n_s_alignment,0};
-    PyObject* values[6] = {0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_u,&__pyx_n_s_refu,&__pyx_n_s_reftstep_2,&__pyx_n_s_skip_2,&__pyx_n_s_selection,&__pyx_n_s_alignment,0};
+    PyObject* values[7] = {0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
         case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
         CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
@@ -8761,37 +8310,43 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_2
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation", 1, 6, 6, 1); __PYX_ERR(0, 294, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviations", 1, 7, 7, 1); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_refu)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation", 1, 6, 6, 2); __PYX_ERR(0, 294, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviations", 1, 7, 7, 2); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_reftstep_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation", 1, 6, 6, 3); __PYX_ERR(0, 294, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviations", 1, 7, 7, 3); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selection)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_skip_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation", 1, 6, 6, 4); __PYX_ERR(0, 294, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviations", 1, 7, 7, 4); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alignment)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selection)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_deviation", 1, 6, 6, 5); __PYX_ERR(0, 294, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_deviations", 1, 7, 7, 5); __PYX_ERR(0, 346, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alignment)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("calc_deviations", 1, 7, 7, 6); __PYX_ERR(0, 346, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_deviation") < 0)) __PYX_ERR(0, 294, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_deviations") < 0)) __PYX_ERR(0, 346, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 7) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -8800,38 +8355,41 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_2
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+      values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
     }
     __pyx_v_self = values[0];
     __pyx_v_u = values[1];
     __pyx_v_refu = values[2];
     __pyx_v_reftstep = values[3];
-    __pyx_v_selection = values[4];
-    __pyx_v_alignment = values[5];
+    __pyx_v_skip = values[4];
+    __pyx_v_selection = values[5];
+    __pyx_v_alignment = values[6];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_deviation", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 294, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calc_deviations", 1, 7, 7, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 346, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_deviation", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviations", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_26calc_deviation(__pyx_self, __pyx_v_self, __pyx_v_u, __pyx_v_refu, __pyx_v_reftstep, __pyx_v_selection, __pyx_v_alignment);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_26calc_deviations(__pyx_self, __pyx_v_self, __pyx_v_u, __pyx_v_refu, __pyx_v_reftstep, __pyx_v_skip, __pyx_v_selection, __pyx_v_alignment);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_26calc_deviation(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_26calc_deviations(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_refu, PyObject *__pyx_v_reftstep, PyObject *__pyx_v_skip, PyObject *__pyx_v_selection, PyObject *__pyx_v_alignment) {
   PyObject *__pyx_v_sel = NULL;
   PyObject *__pyx_v_refsel = NULL;
   PyObject *__pyx_v_align = NULL;
   PyObject *__pyx_v_refalign = NULL;
   PyObject *__pyx_v_initpos = NULL;
   PyObject *__pyx_v_aligninitpos = NULL;
+  PyObject *__pyx_v_times = NULL;
   PyObject *__pyx_v_deviations = NULL;
-  CYTHON_UNUSED PyObject *__pyx_v_ts = NULL;
+  PyObject *__pyx_v_ts = NULL;
   PyObject *__pyx_v_deviation = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -8840,22 +8398,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   PyObject *__pyx_t_3 = NULL;
   Py_ssize_t __pyx_t_4;
   PyObject *(*__pyx_t_5)(PyObject *);
-  PyObject *__pyx_t_6 = NULL;
+  int __pyx_t_6;
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
-  int __pyx_t_9;
-  PyObject *__pyx_t_10 = NULL;
-  int __pyx_t_11;
-  __Pyx_RefNannySetupContext("calc_deviation", 0);
+  PyObject *__pyx_t_9 = NULL;
+  int __pyx_t_10;
+  PyObject *__pyx_t_11 = NULL;
+  __Pyx_RefNannySetupContext("calc_deviations", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":295
- * 
- *     def calc_deviation(self, u, refu, reftstep, selection, alignment):
+  /* "INDUSAnalysis/protein_order_params.pyx":364
+ *             2-D TimeSeries object containing deviation values along trajectory.
+ *         """
  *         sel = u.select_atoms(selection)             # <<<<<<<<<<<<<<
  *         refsel = refu.select_atoms(selection)
  *         align = u.select_atoms(alignment)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 364, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8869,20 +8427,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_selection) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_selection);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 295, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_sel = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":296
- *     def calc_deviation(self, u, refu, reftstep, selection, alignment):
+  /* "INDUSAnalysis/protein_order_params.pyx":365
+ *         """
  *         sel = u.select_atoms(selection)
  *         refsel = refu.select_atoms(selection)             # <<<<<<<<<<<<<<
  *         align = u.select_atoms(alignment)
  *         refalign = refu.select_atoms(alignment)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8896,20 +8454,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_selection) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_selection);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_refsel = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":297
+  /* "INDUSAnalysis/protein_order_params.pyx":366
  *         sel = u.select_atoms(selection)
  *         refsel = refu.select_atoms(selection)
  *         align = u.select_atoms(alignment)             # <<<<<<<<<<<<<<
  *         refalign = refu.select_atoms(alignment)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 297, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8923,20 +8481,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_alignment) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_alignment);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_align = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":298
+  /* "INDUSAnalysis/protein_order_params.pyx":367
  *         refsel = refu.select_atoms(selection)
  *         align = u.select_atoms(alignment)
  *         refalign = refu.select_atoms(alignment)             # <<<<<<<<<<<<<<
  * 
  *         refu.trajectory[reftstep]
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 298, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8950,36 +8508,36 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_alignment) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_alignment);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_refalign = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":300
+  /* "INDUSAnalysis/protein_order_params.pyx":369
  *         refalign = refu.select_atoms(alignment)
  * 
  *         refu.trajectory[reftstep]             # <<<<<<<<<<<<<<
  *         initpos = refsel.positions.copy()
  *         aligninitpos = refalign.positions.copy()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refu, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_reftstep); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_reftstep); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":301
+  /* "INDUSAnalysis/protein_order_params.pyx":370
  * 
  *         refu.trajectory[reftstep]
  *         initpos = refsel.positions.copy()             # <<<<<<<<<<<<<<
  *         aligninitpos = refalign.positions.copy()
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refsel, __pyx_n_s_positions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_refsel, __pyx_n_s_positions); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -8994,22 +8552,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_initpos = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":302
+  /* "INDUSAnalysis/protein_order_params.pyx":371
  *         refu.trajectory[reftstep]
  *         initpos = refsel.positions.copy()
  *         aligninitpos = refalign.positions.copy()             # <<<<<<<<<<<<<<
  * 
- *         deviations = []
+ *         times = []
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_refalign, __pyx_n_s_positions); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_refalign, __pyx_n_s_positions); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -9024,223 +8582,284 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   }
   __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 302, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_aligninitpos = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":304
+  /* "INDUSAnalysis/protein_order_params.pyx":373
  *         aligninitpos = refalign.positions.copy()
  * 
- *         deviations = []             # <<<<<<<<<<<<<<
- *         for ts in u.trajectory[0::self.skip]:
- *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
+ *         times = []             # <<<<<<<<<<<<<<
+ *         deviations = []
+ *         for ts in u.trajectory[0::skip]:
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_v_deviations = __pyx_t_2;
+  __pyx_v_times = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":305
+  /* "INDUSAnalysis/protein_order_params.pyx":374
  * 
- *         deviations = []
- *         for ts in u.trajectory[0::self.skip]:             # <<<<<<<<<<<<<<
- *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
- *             deviations.append(deviation)
+ *         times = []
+ *         deviations = []             # <<<<<<<<<<<<<<
+ *         for ts in u.trajectory[0::skip]:
+ *             times.append(ts.time)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_v_deviations = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":375
+ *         times = []
+ *         deviations = []
+ *         for ts in u.trajectory[0::skip]:             # <<<<<<<<<<<<<<
+ *             times.append(ts.time)
+ *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = PySlice_New(__pyx_int_0, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PySlice_New(__pyx_int_0, Py_None, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
-    __pyx_t_3 = __pyx_t_1; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
+    __pyx_t_1 = __pyx_t_3; __Pyx_INCREF(__pyx_t_1); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 305, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_5 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 375, __pyx_L1_error)
   }
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   for (;;) {
     if (likely(!__pyx_t_5)) {
-      if (likely(PyList_CheckExact(__pyx_t_3))) {
-        if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
+      if (likely(PyList_CheckExact(__pyx_t_1))) {
+        if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 305, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 375, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
-        if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
+        if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 305, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 375, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
     } else {
-      __pyx_t_1 = __pyx_t_5(__pyx_t_3);
-      if (unlikely(!__pyx_t_1)) {
+      __pyx_t_3 = __pyx_t_5(__pyx_t_1);
+      if (unlikely(!__pyx_t_3)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 305, __pyx_L1_error)
+          else __PYX_ERR(0, 375, __pyx_L1_error)
         }
         break;
       }
-      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_GOTREF(__pyx_t_3);
     }
-    __Pyx_XDECREF_SET(__pyx_v_ts, __pyx_t_1);
-    __pyx_t_1 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_ts, __pyx_t_3);
+    __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":306
+    /* "INDUSAnalysis/protein_order_params.pyx":376
  *         deviations = []
- *         for ts in u.trajectory[0::self.skip]:
+ *         for ts in u.trajectory[0::skip]:
+ *             times.append(ts.time)             # <<<<<<<<<<<<<<
+ *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
+ *             deviations.append(deviation)
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 376, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_times, __pyx_t_3); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 376, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":377
+ *         for ts in u.trajectory[0::skip]:
+ *             times.append(ts.time)
  *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)             # <<<<<<<<<<<<<<
  *             deviations.append(deviation)
- *         deviations = np.array(deviations)
+ *         return timeseries.TimeSeries(np.array(times), np.array(deviations), labels=['Deviation', 'Atom index'])
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_deviation_worker); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 306, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_deviation_worker); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_positions); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 306, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_align, __pyx_n_s_positions); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 306, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel, __pyx_n_s_positions); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 377, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = NULL;
-    __pyx_t_9 = 0;
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_align, __pyx_n_s_positions); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 377, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_9 = NULL;
+    __pyx_t_10 = 0;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_8)) {
+      __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_9)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_8);
+        __Pyx_INCREF(__pyx_t_9);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_2, function);
-        __pyx_t_9 = 1;
+        __pyx_t_10 = 1;
       }
     }
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_initpos, __pyx_t_6, __pyx_v_aligninitpos, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_v_initpos, __pyx_t_7, __pyx_v_aligninitpos, __pyx_t_8};
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 377, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     } else
     #endif
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_initpos, __pyx_t_6, __pyx_v_aligninitpos, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      PyObject *__pyx_temp[5] = {__pyx_t_9, __pyx_v_initpos, __pyx_t_7, __pyx_v_aligninitpos, __pyx_t_8};
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 377, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     } else
     #endif
     {
-      __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 306, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_10);
-      if (__pyx_t_8) {
-        __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
+      __pyx_t_11 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 377, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      if (__pyx_t_9) {
+        __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
       }
       __Pyx_INCREF(__pyx_v_initpos);
       __Pyx_GIVEREF(__pyx_v_initpos);
-      PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_v_initpos);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_6);
+      PyTuple_SET_ITEM(__pyx_t_11, 0+__pyx_t_10, __pyx_v_initpos);
+      __Pyx_GIVEREF(__pyx_t_7);
+      PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_7);
       __Pyx_INCREF(__pyx_v_aligninitpos);
       __Pyx_GIVEREF(__pyx_v_aligninitpos);
-      PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_9, __pyx_v_aligninitpos);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_10, 3+__pyx_t_9, __pyx_t_7);
-      __pyx_t_6 = 0;
+      PyTuple_SET_ITEM(__pyx_t_11, 2+__pyx_t_10, __pyx_v_aligninitpos);
+      __Pyx_GIVEREF(__pyx_t_8);
+      PyTuple_SET_ITEM(__pyx_t_11, 3+__pyx_t_10, __pyx_t_8);
       __pyx_t_7 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __pyx_t_8 = 0;
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 377, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_deviation, __pyx_t_1);
-    __pyx_t_1 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_deviation, __pyx_t_3);
+    __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":307
- *         for ts in u.trajectory[0::self.skip]:
+    /* "INDUSAnalysis/protein_order_params.pyx":378
+ *             times.append(ts.time)
  *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
  *             deviations.append(deviation)             # <<<<<<<<<<<<<<
- *         deviations = np.array(deviations)
- *         return deviations
- */
-    __pyx_t_11 = __Pyx_PyObject_Append(__pyx_v_deviations, __pyx_v_deviation); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 307, __pyx_L1_error)
-
-    /* "INDUSAnalysis/protein_order_params.pyx":305
+ *         return timeseries.TimeSeries(np.array(times), np.array(deviations), labels=['Deviation', 'Atom index'])
  * 
+ */
+    __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_deviations, __pyx_v_deviation); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 378, __pyx_L1_error)
+
+    /* "INDUSAnalysis/protein_order_params.pyx":375
+ *         times = []
  *         deviations = []
- *         for ts in u.trajectory[0::self.skip]:             # <<<<<<<<<<<<<<
+ *         for ts in u.trajectory[0::skip]:             # <<<<<<<<<<<<<<
+ *             times.append(ts.time)
  *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
- *             deviations.append(deviation)
  */
   }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":308
- *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
- *             deviations.append(deviation)
- *         deviations = np.array(deviations)             # <<<<<<<<<<<<<<
- *         return deviations
- * 
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 308, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 308, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_1)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_1);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_deviations) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_deviations);
-  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 308, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF_SET(__pyx_v_deviations, __pyx_t_3);
-  __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":309
+  /* "INDUSAnalysis/protein_order_params.pyx":379
+ *             deviation = self.calc_deviation_worker(initpos, sel.positions, aligninitpos, align.positions)
  *             deviations.append(deviation)
- *         deviations = np.array(deviations)
- *         return deviations             # <<<<<<<<<<<<<<
+ *         return timeseries.TimeSeries(np.array(times), np.array(deviations), labels=['Deviation', 'Atom index'])             # <<<<<<<<<<<<<<
  * 
- *     """
+ *     def plot_deviations(self, ts_deviations):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_v_deviations);
-  __pyx_r = __pyx_v_deviations;
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_11);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_11, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_2, __pyx_v_times) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_v_times);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_8);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_8, function);
+    }
+  }
+  __pyx_t_11 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_2, __pyx_v_deviations) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_v_deviations);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_11);
+  PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_11);
+  __pyx_t_1 = 0;
+  __pyx_t_11 = 0;
+  __pyx_t_11 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_Deviation);
+  __Pyx_GIVEREF(__pyx_n_s_Deviation);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_Deviation);
+  __Pyx_INCREF(__pyx_kp_s_Atom_index);
+  __Pyx_GIVEREF(__pyx_kp_s_Atom_index);
+  PyList_SET_ITEM(__pyx_t_1, 1, __pyx_kp_s_Atom_index);
+  if (PyDict_SetItem(__pyx_t_11, __pyx_n_s_labels, __pyx_t_1) < 0) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, __pyx_t_11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":294
+  /* "INDUSAnalysis/protein_order_params.pyx":346
  *         return deviation
  * 
- *     def calc_deviation(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_deviations(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates deviations of `selection` AtomGroup atoms in `u` from `selection` AtomGroup atoms
  */
 
   /* function exit code */
@@ -9248,11 +8867,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.calc_deviation", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviations", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_sel);
@@ -9261,6 +8880,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   __Pyx_XDECREF(__pyx_v_refalign);
   __Pyx_XDECREF(__pyx_v_initpos);
   __Pyx_XDECREF(__pyx_v_aligninitpos);
+  __Pyx_XDECREF(__pyx_v_times);
   __Pyx_XDECREF(__pyx_v_deviations);
   __Pyx_XDECREF(__pyx_v_ts);
   __Pyx_XDECREF(__pyx_v_deviation);
@@ -9269,586 +8889,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_2
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":314
- *     Plot per-atom-deviation
- *     """
- *     def plot_deviations(self, times, deviations):             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots(dpi=300)
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")
+/* "INDUSAnalysis/protein_order_params.pyx":381
+ *         return timeseries.TimeSeries(np.array(times), np.array(deviations), labels=['Deviation', 'Atom index'])
+ * 
+ *     def plot_deviations(self, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """Plots deviations as a 2D heatmap."""
+ *         fig = ts_deviations.plot_2d_heatmap(cmap='hot')
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_29plot_deviations(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_29plot_deviations = {"plot_deviations", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_29plot_deviations, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_29plot_deviations(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_29plot_deviations(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_28plot_deviations[] = "Plots deviations as a 2D heatmap.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_29plot_deviations = {"plot_deviations", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_29plot_deviations, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_28plot_deviations};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_29plot_deviations(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_times = 0;
-  PyObject *__pyx_v_deviations = 0;
+  PyObject *__pyx_v_ts_deviations = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("plot_deviations (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_times,&__pyx_n_s_deviations,0};
-    PyObject* values[3] = {0,0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_times)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("plot_deviations", 1, 3, 3, 1); __PYX_ERR(0, 314, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_deviations)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("plot_deviations", 1, 3, 3, 2); __PYX_ERR(0, 314, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_deviations") < 0)) __PYX_ERR(0, 314, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-    }
-    __pyx_v_self = values[0];
-    __pyx_v_times = values[1];
-    __pyx_v_deviations = values[2];
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_deviations", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 314, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_deviations", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_28plot_deviations(__pyx_self, __pyx_v_self, __pyx_v_times, __pyx_v_deviations);
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_28plot_deviations(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_times, PyObject *__pyx_v_deviations) {
-  PyObject *__pyx_v_fig = NULL;
-  PyObject *__pyx_v_ax = NULL;
-  PyObject *__pyx_v_im = NULL;
-  PyObject *__pyx_v_ticks = NULL;
-  PyObject *__pyx_v_factor = NULL;
-  PyObject *__pyx_v_newlabels = NULL;
-  PyObject *__pyx_v_item = NULL;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *(*__pyx_t_5)(PyObject *);
-  Py_ssize_t __pyx_t_6;
-  PyObject *(*__pyx_t_7)(PyObject *);
-  int __pyx_t_8;
-  __Pyx_RefNannySetupContext("plot_deviations", 0);
-
-  /* "INDUSAnalysis/protein_order_params.pyx":315
- *     """
- *     def plot_deviations(self, times, deviations):
- *         fig, ax = plt.subplots(dpi=300)             # <<<<<<<<<<<<<<
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")
- *         fig.colorbar(im, ax=ax)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_subplots); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dpi, __pyx_int_300) < 0) __PYX_ERR(0, 315, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 315, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
-    PyObject* sequence = __pyx_t_3;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 2)) {
-      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 315, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
-    } else {
-      __pyx_t_1 = PyList_GET_ITEM(sequence, 0); 
-      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
-    }
-    __Pyx_INCREF(__pyx_t_1);
-    __Pyx_INCREF(__pyx_t_2);
-    #else
-    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    #endif
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
-    index = 0; __pyx_t_1 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_1)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_1);
-    index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 315, __pyx_L1_error)
-    __pyx_t_5 = NULL;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    goto __pyx_L4_unpacking_done;
-    __pyx_L3_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_5 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 315, __pyx_L1_error)
-    __pyx_L4_unpacking_done:;
-  }
-  __pyx_v_fig = __pyx_t_1;
-  __pyx_t_1 = 0;
-  __pyx_v_ax = __pyx_t_2;
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":316
- *     def plot_deviations(self, times, deviations):
- *         fig, ax = plt.subplots(dpi=300)
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")             # <<<<<<<<<<<<<<
- *         fig.colorbar(im, ax=ax)
- *         ax.set_xlabel('Atom')
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_imshow); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 316, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 316, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_v_deviations);
-  __Pyx_GIVEREF(__pyx_v_deviations);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_deviations);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 316, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_origin, __pyx_n_s_lower) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_aspect, __pyx_n_s_auto) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 316, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_im = __pyx_t_4;
-  __pyx_t_4 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":317
- *         fig, ax = plt.subplots(dpi=300)
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")
- *         fig.colorbar(im, ax=ax)             # <<<<<<<<<<<<<<
- *         ax.set_xlabel('Atom')
- *         ax.set_ylabel('Time (ps)')
- */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_colorbar); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 317, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 317, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_v_im);
-  __Pyx_GIVEREF(__pyx_v_im);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_im);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_ax, __pyx_v_ax) < 0) __PYX_ERR(0, 317, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 317, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":318
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")
- *         fig.colorbar(im, ax=ax)
- *         ax.set_xlabel('Atom')             # <<<<<<<<<<<<<<
- *         ax.set_ylabel('Time (ps)')
- *         #SET TICKS
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_1)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_1);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_n_s_Atom) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_Atom);
-  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":319
- *         fig.colorbar(im, ax=ax)
- *         ax.set_xlabel('Atom')
- *         ax.set_ylabel('Time (ps)')             # <<<<<<<<<<<<<<
- *         #SET TICKS
- *         ticks = ax.get_yticks().tolist()
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_1)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_1);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_kp_s_Time_ps) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_Time_ps);
-  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":321
- *         ax.set_ylabel('Time (ps)')
- *         #SET TICKS
- *         ticks = ax.get_yticks().tolist()             # <<<<<<<<<<<<<<
- *         factor = times[-1]/ticks[-2]
- *         newlabels = [factor * item for item in ticks]
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_get_yticks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tolist); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_ticks = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":322
- *         #SET TICKS
- *         ticks = ax.get_yticks().tolist()
- *         factor = times[-1]/ticks[-2]             # <<<<<<<<<<<<<<
- *         newlabels = [factor * item for item in ticks]
- *         ax.set_yticklabels(newlabels)
- */
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_times, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 322, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_ticks, -2L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 322, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 322, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_factor = __pyx_t_2;
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":323
- *         ticks = ax.get_yticks().tolist()
- *         factor = times[-1]/ticks[-2]
- *         newlabels = [factor * item for item in ticks]             # <<<<<<<<<<<<<<
- *         ax.set_yticklabels(newlabels)
- *         self.save_figure(fig, suffix="deviations")
- */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 323, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (likely(PyList_CheckExact(__pyx_v_ticks)) || PyTuple_CheckExact(__pyx_v_ticks)) {
-    __pyx_t_1 = __pyx_v_ticks; __Pyx_INCREF(__pyx_t_1); __pyx_t_6 = 0;
-    __pyx_t_7 = NULL;
-  } else {
-    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_ticks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 323, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 323, __pyx_L1_error)
-  }
-  for (;;) {
-    if (likely(!__pyx_t_7)) {
-      if (likely(PyList_CheckExact(__pyx_t_1))) {
-        if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_1)) break;
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_3); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 323, __pyx_L1_error)
-        #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 323, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        #endif
-      } else {
-        if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
-        #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_3); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 323, __pyx_L1_error)
-        #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 323, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        #endif
-      }
-    } else {
-      __pyx_t_3 = __pyx_t_7(__pyx_t_1);
-      if (unlikely(!__pyx_t_3)) {
-        PyObject* exc_type = PyErr_Occurred();
-        if (exc_type) {
-          if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 323, __pyx_L1_error)
-        }
-        break;
-      }
-      __Pyx_GOTREF(__pyx_t_3);
-    }
-    __Pyx_XDECREF_SET(__pyx_v_item, __pyx_t_3);
-    __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Multiply(__pyx_v_factor, __pyx_v_item); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 323, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 323, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_newlabels = ((PyObject*)__pyx_t_2);
-  __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":324
- *         factor = times[-1]/ticks[-2]
- *         newlabels = [factor * item for item in ticks]
- *         ax.set_yticklabels(newlabels)             # <<<<<<<<<<<<<<
- *         self.save_figure(fig, suffix="deviations")
- *         if self.show:
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_yticklabels); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 324, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_3, __pyx_v_newlabels) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_newlabels);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":325
- *         newlabels = [factor * item for item in ticks]
- *         ax.set_yticklabels(newlabels)
- *         self.save_figure(fig, suffix="deviations")             # <<<<<<<<<<<<<<
- *         if self.show:
- *             plt.show()
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_v_fig);
-  __Pyx_GIVEREF(__pyx_v_fig);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_fig);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 325, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_deviations) < 0) __PYX_ERR(0, 325, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 325, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":326
- *         ax.set_yticklabels(newlabels)
- *         self.save_figure(fig, suffix="deviations")
- *         if self.show:             # <<<<<<<<<<<<<<
- *             plt.show()
- *         else:
- */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 326, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 326, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (__pyx_t_8) {
-
-    /* "INDUSAnalysis/protein_order_params.pyx":327
- *         self.save_figure(fig, suffix="deviations")
- *         if self.show:
- *             plt.show()             # <<<<<<<<<<<<<<
- *         else:
- *             plt.close()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 327, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_show); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
-      if (likely(__pyx_t_3)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-        __Pyx_INCREF(__pyx_t_3);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_1, function);
-      }
-    }
-    __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 327, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":326
- *         ax.set_yticklabels(newlabels)
- *         self.save_figure(fig, suffix="deviations")
- *         if self.show:             # <<<<<<<<<<<<<<
- *             plt.show()
- *         else:
- */
-    goto __pyx_L7;
-  }
-
-  /* "INDUSAnalysis/protein_order_params.pyx":329
- *             plt.show()
- *         else:
- *             plt.close()             # <<<<<<<<<<<<<<
- * 
- *     """
- */
-  /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 329, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 329, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_1)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_1);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
-    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 329, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  }
-  __pyx_L7:;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":314
- *     Plot per-atom-deviation
- *     """
- *     def plot_deviations(self, times, deviations):             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots(dpi=300)
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")
- */
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.plot_deviations", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_fig);
-  __Pyx_XDECREF(__pyx_v_ax);
-  __Pyx_XDECREF(__pyx_v_im);
-  __Pyx_XDECREF(__pyx_v_ticks);
-  __Pyx_XDECREF(__pyx_v_factor);
-  __Pyx_XDECREF(__pyx_v_newlabels);
-  __Pyx_XDECREF(__pyx_v_item);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "INDUSAnalysis/protein_order_params.pyx":334
- *     Save instantaneous per-atom-deviation data to PDB
- *     """
- *     def save_pdb(self, selection):             # <<<<<<<<<<<<<<
- *         protein_subselection = self.u.select_atoms(selection)
- *         self.u.add_TopologyAttr('tempfactors')
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_31save_pdb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_31save_pdb = {"save_pdb", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_31save_pdb, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_31save_pdb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_self = 0;
-  PyObject *__pyx_v_selection = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("save_pdb (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_selection,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_ts_deviations,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -9868,13 +8928,13 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_3
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_selection)) != 0)) kw_args--;
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_deviations)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("save_pdb", 1, 2, 2, 1); __PYX_ERR(0, 334, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_deviations", 1, 2, 2, 1); __PYX_ERR(0, 381, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "save_pdb") < 0)) __PYX_ERR(0, 334, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_deviations") < 0)) __PYX_ERR(0, 381, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -9883,31 +8943,324 @@ static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_3
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_self = values[0];
-    __pyx_v_selection = values[1];
+    __pyx_v_ts_deviations = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("save_pdb", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 334, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_deviations", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 381, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.save_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_deviations", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_30save_pdb(__pyx_self, __pyx_v_self, __pyx_v_selection);
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_28plot_deviations(__pyx_self, __pyx_v_self, __pyx_v_ts_deviations);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_30save_pdb(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_selection) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_28plot_deviations(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_ts_deviations) {
+  PyObject *__pyx_v_fig = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  __Pyx_RefNannySetupContext("plot_deviations", 0);
+
+  /* "INDUSAnalysis/protein_order_params.pyx":383
+ *     def plot_deviations(self, ts_deviations):
+ *         """Plots deviations as a 2D heatmap."""
+ *         fig = ts_deviations.plot_2d_heatmap(cmap='hot')             # <<<<<<<<<<<<<<
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="deviation")
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_deviations, __pyx_n_s_plot_2d_heatmap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 383, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 383, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 383, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 383, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_fig = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":384
+ *         """Plots deviations as a 2D heatmap."""
+ *         fig = ts_deviations.plot_2d_heatmap(cmap='hot')
+ *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
+ *         self.save_figure(fig, suffix="deviation")
+ *         if self.show:
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 384, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":385
+ *         fig = ts_deviations.plot_2d_heatmap(cmap='hot')
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="deviation")             # <<<<<<<<<<<<<<
+ *         if self.show:
+ *             plt.show()
+ */
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 385, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_v_fig);
+  __Pyx_GIVEREF(__pyx_v_fig);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_n_s_deviation) < 0) __PYX_ERR(0, 385, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 385, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":386
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="deviation")
+ *         if self.show:             # <<<<<<<<<<<<<<
+ *             plt.show()
+ *         else:
+ */
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__pyx_t_5) {
+
+    /* "INDUSAnalysis/protein_order_params.pyx":387
+ *         self.save_figure(fig, suffix="deviation")
+ *         if self.show:
+ *             plt.show()             # <<<<<<<<<<<<<<
+ *         else:
+ *             plt.close()
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 387, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 387, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 387, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":386
+ *         fig.set_dpi(300)
+ *         self.save_figure(fig, suffix="deviation")
+ *         if self.show:             # <<<<<<<<<<<<<<
+ *             plt.show()
+ *         else:
+ */
+    goto __pyx_L3;
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":389
+ *             plt.show()
+ *         else:
+ *             plt.close()             # <<<<<<<<<<<<<<
+ * 
+ *     def write_deviations_pdb(self, u, select, skip, ts_deviations):
+ */
+  /*else*/ {
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_2 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
+      if (likely(__pyx_t_2)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+        __Pyx_INCREF(__pyx_t_2);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_1, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+  __pyx_L3:;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":381
+ *         return timeseries.TimeSeries(np.array(times), np.array(deviations), labels=['Deviation', 'Atom index'])
+ * 
+ *     def plot_deviations(self, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """Plots deviations as a 2D heatmap."""
+ *         fig = ts_deviations.plot_2d_heatmap(cmap='hot')
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_deviations", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_fig);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "INDUSAnalysis/protein_order_params.pyx":391
+ *             plt.close()
+ * 
+ *     def write_deviations_pdb(self, u, select, skip, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """
+ *         Writes per-atom-deviations to PDB file.
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_31write_deviations_pdb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_30write_deviations_pdb[] = "\n        Writes per-atom-deviations to PDB file.\n\n        Args:\n            u (mda.Universe): Universe containing solvated protein.\n            select (str): MDAnalysis selection string describing atoms deviations are computed for.\n            skip (int): Trajectory resampling interval.\n            ts_deviations (TimeSeries): Atom deviations timeseries data.\n\n        Raises:\n            ValueError if the time for the same index in u.trajectory[::skip]\n            and ts_deviations does not match.\n        ";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_31write_deviations_pdb = {"write_deviations_pdb", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_31write_deviations_pdb, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_30write_deviations_pdb};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_31write_deviations_pdb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_self = 0;
+  PyObject *__pyx_v_u = 0;
+  PyObject *__pyx_v_select = 0;
+  PyObject *__pyx_v_skip = 0;
+  PyObject *__pyx_v_ts_deviations = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("write_deviations_pdb (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_u,&__pyx_n_s_select_2,&__pyx_n_s_skip_2,&__pyx_n_s_ts_deviations,0};
+    PyObject* values[5] = {0,0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+        CYTHON_FALLTHROUGH;
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_self)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("write_deviations_pdb", 1, 5, 5, 1); __PYX_ERR(0, 391, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_select_2)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("write_deviations_pdb", 1, 5, 5, 2); __PYX_ERR(0, 391, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_skip_2)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("write_deviations_pdb", 1, 5, 5, 3); __PYX_ERR(0, 391, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  4:
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_deviations)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("write_deviations_pdb", 1, 5, 5, 4); __PYX_ERR(0, 391, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_deviations_pdb") < 0)) __PYX_ERR(0, 391, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
+    }
+    __pyx_v_self = values[0];
+    __pyx_v_u = values[1];
+    __pyx_v_select = values[2];
+    __pyx_v_skip = values[3];
+    __pyx_v_ts_deviations = values[4];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("write_deviations_pdb", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 391, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.write_deviations_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_30write_deviations_pdb(__pyx_self, __pyx_v_self, __pyx_v_u, __pyx_v_select, __pyx_v_skip, __pyx_v_ts_deviations);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_30write_deviations_pdb(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_u, PyObject *__pyx_v_select, PyObject *__pyx_v_skip, PyObject *__pyx_v_ts_deviations) {
   PyObject *__pyx_v_protein_subselection = NULL;
-  PyObject *__pyx_v_utraj = NULL;
   PyObject *__pyx_v_pdbtrj = NULL;
+  PyObject *__pyx_v_utraj = NULL;
   PyObject *__pyx_v_pbar = NULL;
   PyObject *__pyx_v_PDB = NULL;
   PyObject *__pyx_v_tidx = NULL;
-  CYTHON_UNUSED PyObject *__pyx_v_ts = NULL;
+  PyObject *__pyx_v_ts = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9925,50 +9278,47 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   PyObject *__pyx_t_13 = NULL;
   PyObject *__pyx_t_14 = NULL;
   int __pyx_t_15;
-  __Pyx_RefNannySetupContext("save_pdb", 0);
+  PyObject *__pyx_t_16 = NULL;
+  PyObject *__pyx_t_17 = NULL;
+  int __pyx_t_18;
+  __Pyx_RefNannySetupContext("write_deviations_pdb", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":335
- *     """
- *     def save_pdb(self, selection):
- *         protein_subselection = self.u.select_atoms(selection)             # <<<<<<<<<<<<<<
- *         self.u.add_TopologyAttr('tempfactors')
- *         utraj = self.u.trajectory[0::self.skip]
+  /* "INDUSAnalysis/protein_order_params.pyx":405
+ *             and ts_deviations does not match.
+ *         """
+ *         protein_subselection = u.select_atoms(select)             # <<<<<<<<<<<<<<
+ *         u.add_TopologyAttr('tempfactors')
+ *         pdbtrj = self.opref + "_deviations.pdb"
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 335, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 405, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 335, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_selection) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_selection);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 335, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_select) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_select);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 405, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_protein_subselection = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":336
- *     def save_pdb(self, selection):
- *         protein_subselection = self.u.select_atoms(selection)
- *         self.u.add_TopologyAttr('tempfactors')             # <<<<<<<<<<<<<<
- *         utraj = self.u.trajectory[0::self.skip]
+  /* "INDUSAnalysis/protein_order_params.pyx":406
+ *         """
+ *         protein_subselection = u.select_atoms(select)
+ *         u.add_TopologyAttr('tempfactors')             # <<<<<<<<<<<<<<
  *         pdbtrj = self.opref + "_deviations.pdb"
+ * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_TopologyAttr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_add_TopologyAttr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 406, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
     __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
@@ -9981,136 +9331,127 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_n_s_tempfactors) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_tempfactors);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 406, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":337
- *         protein_subselection = self.u.select_atoms(selection)
- *         self.u.add_TopologyAttr('tempfactors')
- *         utraj = self.u.trajectory[0::self.skip]             # <<<<<<<<<<<<<<
- *         pdbtrj = self.opref + "_deviations.pdb"
+  /* "INDUSAnalysis/protein_order_params.pyx":407
+ *         protein_subselection = u.select_atoms(select)
+ *         u.add_TopologyAttr('tempfactors')
+ *         pdbtrj = self.opref + "_deviations.pdb"             # <<<<<<<<<<<<<<
  * 
+ *         utraj = u.trajectory[::skip]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 407, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_deviations_pdb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 407, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PySlice_New(__pyx_int_0, Py_None, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_v_utraj = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_v_pdbtrj = __pyx_t_2;
+  __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":338
- *         self.u.add_TopologyAttr('tempfactors')
- *         utraj = self.u.trajectory[0::self.skip]
- *         pdbtrj = self.opref + "_deviations.pdb"             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":409
+ *         pdbtrj = self.opref + "_deviations.pdb"
+ * 
+ *         utraj = u.trajectory[::skip]             # <<<<<<<<<<<<<<
  * 
  *         if self.verbose:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 338, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 409, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = PySlice_New(Py_None, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 409, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_deviations_pdb); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 338, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 409, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_pdbtrj = __pyx_t_3;
+  __pyx_v_utraj = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":340
- *         pdbtrj = self.opref + "_deviations.pdb"
+  /* "INDUSAnalysis/protein_order_params.pyx":411
+ *         utraj = u.trajectory[::skip]
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
- *             pbar = tqdm(desc = "Writing PDB", total = len(utraj))
+ *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 411, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 340, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 411, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":341
+    /* "INDUSAnalysis/protein_order_params.pyx":412
  * 
  *         if self.verbose:
- *             pbar = tqdm(desc = "Writing PDB", total = len(utraj))             # <<<<<<<<<<<<<<
+ *             pbar = tqdm(desc="Writing PDB", total=len(utraj))             # <<<<<<<<<<<<<<
  * 
- *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 341, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 412, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 341, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 412, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_desc, __pyx_kp_s_Writing_PDB) < 0) __PYX_ERR(0, 341, __pyx_L1_error)
-    __pyx_t_5 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 341, __pyx_L1_error)
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 341, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_desc, __pyx_kp_s_Writing_PDB) < 0) __PYX_ERR(0, 412, __pyx_L1_error)
+    __pyx_t_5 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 412, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 412, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_total, __pyx_t_2) < 0) __PYX_ERR(0, 341, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_total, __pyx_t_2) < 0) __PYX_ERR(0, 412, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 341, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 412, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pbar = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":340
- *         pdbtrj = self.opref + "_deviations.pdb"
+    /* "INDUSAnalysis/protein_order_params.pyx":411
+ *         utraj = u.trajectory[::skip]
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
- *             pbar = tqdm(desc = "Writing PDB", total = len(utraj))
+ *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  */
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":343
- *             pbar = tqdm(desc = "Writing PDB", total = len(utraj))
+  /* "INDUSAnalysis/protein_order_params.pyx":414
+ *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
- *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
  *             for tidx, ts in enumerate(utraj):
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
  */
   /*with:*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Writer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Writer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_v_pdbtrj);
     __Pyx_GIVEREF(__pyx_v_pdbtrj);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_pdbtrj);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_multiframe, Py_True) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_bonds, Py_None) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 343, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_multiframe, Py_True) < 0) __PYX_ERR(0, 414, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_bonds, Py_None) < 0) __PYX_ERR(0, 414, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_atoms); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_n_atoms); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_n_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 343, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_n_atoms, __pyx_t_7) < 0) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_n_atoms, __pyx_t_6) < 0) __PYX_ERR(0, 343, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 343, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 414, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_8 = __Pyx_PyObject_LookupSpecial(__pyx_t_6, __pyx_n_s_exit); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_exit); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_6, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L4_error)
+    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 414, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -10124,12 +9465,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
     }
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 343, __pyx_L4_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 414, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = __pyx_t_3;
     __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     /*try:*/ {
       {
         __Pyx_PyThreadState_declare
@@ -10142,49 +9483,49 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
           __pyx_v_PDB = __pyx_t_2;
           __pyx_t_2 = 0;
 
-          /* "INDUSAnalysis/protein_order_params.pyx":344
+          /* "INDUSAnalysis/protein_order_params.pyx":415
  * 
- *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
- *                 PDB.write(self.u.atoms)
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]
  */
           __Pyx_INCREF(__pyx_int_0);
           __pyx_t_2 = __pyx_int_0;
           if (likely(PyList_CheckExact(__pyx_v_utraj)) || PyTuple_CheckExact(__pyx_v_utraj)) {
-            __pyx_t_6 = __pyx_v_utraj; __Pyx_INCREF(__pyx_t_6); __pyx_t_5 = 0;
+            __pyx_t_7 = __pyx_v_utraj; __Pyx_INCREF(__pyx_t_7); __pyx_t_5 = 0;
             __pyx_t_12 = NULL;
           } else {
-            __pyx_t_5 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 344, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __pyx_t_12 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 344, __pyx_L8_error)
+            __pyx_t_5 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 415, __pyx_L8_error)
+            __Pyx_GOTREF(__pyx_t_7);
+            __pyx_t_12 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 415, __pyx_L8_error)
           }
           for (;;) {
             if (likely(!__pyx_t_12)) {
-              if (likely(PyList_CheckExact(__pyx_t_6))) {
-                if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_6)) break;
+              if (likely(PyList_CheckExact(__pyx_t_7))) {
+                if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_7)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 344, __pyx_L8_error)
+                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 415, __pyx_L8_error)
                 #else
-                __pyx_t_3 = PySequence_ITEM(__pyx_t_6, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 344, __pyx_L8_error)
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 415, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_3);
                 #endif
               } else {
-                if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
+                if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_7)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 344, __pyx_L8_error)
+                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 415, __pyx_L8_error)
                 #else
-                __pyx_t_3 = PySequence_ITEM(__pyx_t_6, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 344, __pyx_L8_error)
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 415, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_3);
                 #endif
               }
             } else {
-              __pyx_t_3 = __pyx_t_12(__pyx_t_6);
+              __pyx_t_3 = __pyx_t_12(__pyx_t_7);
               if (unlikely(!__pyx_t_3)) {
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
                   if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                  else __PYX_ERR(0, 344, __pyx_L8_error)
+                  else __PYX_ERR(0, 415, __pyx_L8_error)
                 }
                 break;
               }
@@ -10194,137 +9535,232 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
             __pyx_t_3 = 0;
             __Pyx_INCREF(__pyx_t_2);
             __Pyx_XDECREF_SET(__pyx_v_tidx, __pyx_t_2);
-            __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 344, __pyx_L8_error)
+            __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 415, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_2);
             __pyx_t_2 = __pyx_t_3;
             __pyx_t_3 = 0;
 
-            /* "INDUSAnalysis/protein_order_params.pyx":345
- *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
+            /* "INDUSAnalysis/protein_order_params.pyx":416
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]             # <<<<<<<<<<<<<<
- *                 PDB.write(self.u.atoms)
- *                 if self.verbose:
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):             # <<<<<<<<<<<<<<
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]
+ *                     PDB.write(u.atoms)
  */
-            __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_deviations); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 345, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 345, __pyx_L8_error)
+            __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 416, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __Pyx_INCREF(__pyx_v_tidx);
-            __Pyx_GIVEREF(__pyx_v_tidx);
-            PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_tidx);
-            __Pyx_INCREF(__pyx_slice__10);
-            __Pyx_GIVEREF(__pyx_slice__10);
-            PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_slice__10);
-            __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 345, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_7);
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_isclose); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 416, __pyx_L8_error)
+            __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_subselection, __pyx_n_s_atoms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 345, __pyx_L8_error)
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 416, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_1);
-            if (__Pyx_PyObject_SetAttrStr(__pyx_t_1, __pyx_n_s_tempfactors, __pyx_t_7) < 0) __PYX_ERR(0, 345, __pyx_L8_error)
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-            /* "INDUSAnalysis/protein_order_params.pyx":346
- *             for tidx, ts in enumerate(utraj):
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
- *                 PDB.write(self.u.atoms)             # <<<<<<<<<<<<<<
- *                 if self.verbose:
- *                     pbar.update(1)
- */
-            __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_PDB, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 346, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 346, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_atoms); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 346, __pyx_L8_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_deviations, __pyx_n_s_time_array); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 416, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            __pyx_t_3 = NULL;
-            if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-              __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
-              if (likely(__pyx_t_3)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                __Pyx_INCREF(__pyx_t_3);
+            __pyx_t_14 = __Pyx_PyObject_GetItem(__pyx_t_13, __pyx_v_tidx); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 416, __pyx_L8_error)
+            __Pyx_GOTREF(__pyx_t_14);
+            __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+            __pyx_t_13 = NULL;
+            __pyx_t_15 = 0;
+            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_6))) {
+              __pyx_t_13 = PyMethod_GET_SELF(__pyx_t_6);
+              if (likely(__pyx_t_13)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
+                __Pyx_INCREF(__pyx_t_13);
                 __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_7, function);
+                __Pyx_DECREF_SET(__pyx_t_6, function);
+                __pyx_t_15 = 1;
               }
             }
-            __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_3, __pyx_t_13) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_13);
-            __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 346, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_1);
-            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_6)) {
+              PyObject *__pyx_temp[3] = {__pyx_t_13, __pyx_t_1, __pyx_t_14};
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 416, __pyx_L8_error)
+              __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
+              PyObject *__pyx_temp[3] = {__pyx_t_13, __pyx_t_1, __pyx_t_14};
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 416, __pyx_L8_error)
+              __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+            } else
+            #endif
+            {
+              __pyx_t_16 = PyTuple_New(2+__pyx_t_15); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 416, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_16);
+              if (__pyx_t_13) {
+                __Pyx_GIVEREF(__pyx_t_13); PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_t_13); __pyx_t_13 = NULL;
+              }
+              __Pyx_GIVEREF(__pyx_t_1);
+              PyTuple_SET_ITEM(__pyx_t_16, 0+__pyx_t_15, __pyx_t_1);
+              __Pyx_GIVEREF(__pyx_t_14);
+              PyTuple_SET_ITEM(__pyx_t_16, 1+__pyx_t_15, __pyx_t_14);
+              __pyx_t_1 = 0;
+              __pyx_t_14 = 0;
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 416, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+            }
+            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 416, __pyx_L8_error)
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            if (likely(__pyx_t_4)) {
 
-            /* "INDUSAnalysis/protein_order_params.pyx":347
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
- *                 PDB.write(self.u.atoms)
- *                 if self.verbose:             # <<<<<<<<<<<<<<
- *                     pbar.update(1)
- * 
+              /* "INDUSAnalysis/protein_order_params.pyx":417
+ *             for tidx, ts in enumerate(utraj):
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]             # <<<<<<<<<<<<<<
+ *                     PDB.write(u.atoms)
+ *                     if self.verbose:
  */
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 347, __pyx_L8_error)
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (__pyx_t_4) {
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_deviations, __pyx_n_s_data_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 417, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 417, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __Pyx_INCREF(__pyx_v_tidx);
+              __Pyx_GIVEREF(__pyx_v_tidx);
+              PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_tidx);
+              __Pyx_INCREF(__pyx_slice__15);
+              __Pyx_GIVEREF(__pyx_slice__15);
+              PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_slice__15);
+              __pyx_t_16 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 417, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_16);
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_subselection, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 417, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              if (__Pyx_PyObject_SetAttrStr(__pyx_t_6, __pyx_n_s_tempfactors, __pyx_t_16) < 0) __PYX_ERR(0, 417, __pyx_L8_error)
+              __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-              /* "INDUSAnalysis/protein_order_params.pyx":348
- *                 PDB.write(self.u.atoms)
- *                 if self.verbose:
- *                     pbar.update(1)             # <<<<<<<<<<<<<<
- * 
- *     """call"""
+              /* "INDUSAnalysis/protein_order_params.pyx":418
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]
+ *                     PDB.write(u.atoms)             # <<<<<<<<<<<<<<
+ *                     if self.verbose:
+ *                         pbar.update(1)
  */
-              if (unlikely(!__pyx_v_pbar)) { __Pyx_RaiseUnboundLocalError("pbar"); __PYX_ERR(0, 348, __pyx_L8_error) }
-              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_pbar, __pyx_n_s_update); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 348, __pyx_L8_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __pyx_t_13 = NULL;
-              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-                __pyx_t_13 = PyMethod_GET_SELF(__pyx_t_7);
-                if (likely(__pyx_t_13)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-                  __Pyx_INCREF(__pyx_t_13);
+              __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_PDB, __pyx_n_s_write); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 418, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_16);
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_14 = NULL;
+              if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+                __pyx_t_14 = PyMethod_GET_SELF(__pyx_t_16);
+                if (likely(__pyx_t_14)) {
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+                  __Pyx_INCREF(__pyx_t_14);
                   __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_7, function);
+                  __Pyx_DECREF_SET(__pyx_t_16, function);
                 }
               }
-              __pyx_t_1 = (__pyx_t_13) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_13, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_int_1);
-              __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-              if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L8_error)
-              __Pyx_GOTREF(__pyx_t_1);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_6 = (__pyx_t_14) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_14, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_3);
+              __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 418, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-              /* "INDUSAnalysis/protein_order_params.pyx":347
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
- *                 PDB.write(self.u.atoms)
- *                 if self.verbose:             # <<<<<<<<<<<<<<
- *                     pbar.update(1)
- * 
+              /* "INDUSAnalysis/protein_order_params.pyx":419
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]
+ *                     PDB.write(u.atoms)
+ *                     if self.verbose:             # <<<<<<<<<<<<<<
+ *                         pbar.update(1)
+ *                 else:
  */
+              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 419, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 419, __pyx_L8_error)
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              if (__pyx_t_4) {
+
+                /* "INDUSAnalysis/protein_order_params.pyx":420
+ *                     PDB.write(u.atoms)
+ *                     if self.verbose:
+ *                         pbar.update(1)             # <<<<<<<<<<<<<<
+ *                 else:
+ *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
+ */
+                if (unlikely(!__pyx_v_pbar)) { __Pyx_RaiseUnboundLocalError("pbar"); __PYX_ERR(0, 420, __pyx_L8_error) }
+                __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_pbar, __pyx_n_s_update); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 420, __pyx_L8_error)
+                __Pyx_GOTREF(__pyx_t_16);
+                __pyx_t_3 = NULL;
+                if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
+                  __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_16);
+                  if (likely(__pyx_t_3)) {
+                    PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_16);
+                    __Pyx_INCREF(__pyx_t_3);
+                    __Pyx_INCREF(function);
+                    __Pyx_DECREF_SET(__pyx_t_16, function);
+                  }
+                }
+                __pyx_t_6 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_3, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_int_1);
+                __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 420, __pyx_L8_error)
+                __Pyx_GOTREF(__pyx_t_6);
+                __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+                __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+                /* "INDUSAnalysis/protein_order_params.pyx":419
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]
+ *                     PDB.write(u.atoms)
+ *                     if self.verbose:             # <<<<<<<<<<<<<<
+ *                         pbar.update(1)
+ *                 else:
+ */
+              }
+
+              /* "INDUSAnalysis/protein_order_params.pyx":416
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
+ *             for tidx, ts in enumerate(utraj):
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):             # <<<<<<<<<<<<<<
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]
+ *                     PDB.write(u.atoms)
+ */
+              goto __pyx_L16;
             }
 
-            /* "INDUSAnalysis/protein_order_params.pyx":344
+            /* "INDUSAnalysis/protein_order_params.pyx":422
+ *                         pbar.update(1)
+ *                 else:
+ *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")             # <<<<<<<<<<<<<<
  * 
- *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
+ *     def __call__(self):
+ */
+            /*else*/ {
+              __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 422, __pyx_L8_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __Pyx_Raise(__pyx_t_6, 0, 0, 0);
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __PYX_ERR(0, 422, __pyx_L8_error)
+            }
+            __pyx_L16:;
+
+            /* "INDUSAnalysis/protein_order_params.pyx":415
+ * 
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
- *                 PDB.write(self.u.atoms)
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]
  */
           }
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "INDUSAnalysis/protein_order_params.pyx":343
- *             pbar = tqdm(desc = "Writing PDB", total = len(utraj))
+          /* "INDUSAnalysis/protein_order_params.pyx":414
+ *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
- *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
  *             for tidx, ts in enumerate(utraj):
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
  */
         }
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -10334,38 +9770,40 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
         __pyx_L8_error:;
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
+        __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         /*except:*/ {
-          __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.save_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_6, &__pyx_t_1) < 0) __PYX_ERR(0, 343, __pyx_L10_except_error)
+          __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.write_deviations_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
+          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_7, &__pyx_t_6) < 0) __PYX_ERR(0, 414, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __Pyx_GOTREF(__pyx_t_6);
-          __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_7 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 343, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_14 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, NULL);
+          __Pyx_GOTREF(__pyx_t_6);
+          __pyx_t_16 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 414, __pyx_L10_except_error)
+          __Pyx_GOTREF(__pyx_t_16);
+          __pyx_t_17 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_16, NULL);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 343, __pyx_L10_except_error)
-          __Pyx_GOTREF(__pyx_t_14);
-          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_14);
-          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (__pyx_t_4 < 0) __PYX_ERR(0, 343, __pyx_L10_except_error)
-          __pyx_t_15 = ((!(__pyx_t_4 != 0)) != 0);
-          if (__pyx_t_15) {
+          __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+          if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 414, __pyx_L10_except_error)
+          __Pyx_GOTREF(__pyx_t_17);
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_17);
+          __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
+          if (__pyx_t_4 < 0) __PYX_ERR(0, 414, __pyx_L10_except_error)
+          __pyx_t_18 = ((!(__pyx_t_4 != 0)) != 0);
+          if (__pyx_t_18) {
             __Pyx_GIVEREF(__pyx_t_2);
-            __Pyx_GIVEREF(__pyx_t_6);
-            __Pyx_XGIVEREF(__pyx_t_1);
-            __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_6, __pyx_t_1);
-            __pyx_t_2 = 0; __pyx_t_6 = 0; __pyx_t_1 = 0; 
-            __PYX_ERR(0, 343, __pyx_L10_except_error)
+            __Pyx_GIVEREF(__pyx_t_7);
+            __Pyx_XGIVEREF(__pyx_t_6);
+            __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_7, __pyx_t_6);
+            __pyx_t_2 = 0; __pyx_t_7 = 0; __pyx_t_6 = 0; 
+            __PYX_ERR(0, 414, __pyx_L10_except_error)
           }
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           goto __pyx_L9_exception_handled;
         }
         __pyx_L10_except_error:;
@@ -10385,9 +9823,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
     /*finally:*/ {
       /*normal exit:*/{
         if (__pyx_t_8) {
-          __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_tuple__14, NULL);
+          __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_tuple__17, NULL);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 343, __pyx_L1_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 414, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         }
@@ -10395,19 +9833,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
       }
       __pyx_L7:;
     }
-    goto __pyx_L20;
+    goto __pyx_L21;
     __pyx_L4_error:;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     goto __pyx_L1_error;
-    __pyx_L20:;
+    __pyx_L21:;
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":334
- *     Save instantaneous per-atom-deviation data to PDB
- *     """
- *     def save_pdb(self, selection):             # <<<<<<<<<<<<<<
- *         protein_subselection = self.u.select_atoms(selection)
- *         self.u.add_TopologyAttr('tempfactors')
+  /* "INDUSAnalysis/protein_order_params.pyx":391
+ *             plt.close()
+ * 
+ *     def write_deviations_pdb(self, u, select, skip, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """
+ *         Writes per-atom-deviations to PDB file.
  */
 
   /* function exit code */
@@ -10420,12 +9858,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_13);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.save_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_14);
+  __Pyx_XDECREF(__pyx_t_16);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.write_deviations_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_protein_subselection);
-  __Pyx_XDECREF(__pyx_v_utraj);
   __Pyx_XDECREF(__pyx_v_pdbtrj);
+  __Pyx_XDECREF(__pyx_v_utraj);
   __Pyx_XDECREF(__pyx_v_pbar);
   __Pyx_XDECREF(__pyx_v_PDB);
   __Pyx_XDECREF(__pyx_v_tidx);
@@ -10435,36 +9875,36 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/protein_order_params.pyx":351
+/* "INDUSAnalysis/protein_order_params.pyx":424
+ *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
  * 
- *     """call"""
  *     def __call__(self):             # <<<<<<<<<<<<<<
- *         # Retrieve value stored in parser if exists, else use as-is
- *         mda_select = self.selection_parser.get(self.select, self.select)
+ *         """Performs analysis."""
+ * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_33__call__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_33__call__ = {"__call__", (PyCFunction)__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_33__call__, METH_O, 0};
-static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_11OrderParams_33__call__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_33__call__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static char __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_32__call__[] = "Performs analysis.";
+static PyMethodDef __pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_33__call__ = {"__call__", (PyCFunction)__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_33__call__, METH_O, __pyx_doc_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_32__call__};
+static PyObject *__pyx_pw_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_33__call__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__call__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_32__call__(__pyx_self, ((PyObject *)__pyx_v_self));
+  __pyx_r = __pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_32__call__(__pyx_self, ((PyObject *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_32__call__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_32__call__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_v_mda_select = NULL;
   PyObject *__pyx_v_mda_align = NULL;
   PyObject *__pyx_v_mda_deviation_select = NULL;
-  PyObject *__pyx_v_sel_Rg = NULL;
-  PyObject *__pyx_v_sel_RMSD = NULL;
-  PyObject *__pyx_v_times = NULL;
-  PyObject *__pyx_v_deviations = NULL;
+  PyObject *__pyx_v_ts_Rg = NULL;
+  PyObject *__pyx_v_ts_RMSD = NULL;
+  PyObject *__pyx_v_ts_deviations = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -10476,23 +9916,24 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   PyObject *__pyx_t_7 = NULL;
   int __pyx_t_8;
   PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("__call__", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":353
- *     def __call__(self):
+  /* "INDUSAnalysis/protein_order_params.pyx":428
+ * 
  *         # Retrieve value stored in parser if exists, else use as-is
  *         mda_select = self.selection_parser.get(self.select, self.select)             # <<<<<<<<<<<<<<
  *         mda_align = self.selection_parser.get(self.align, self.align)
  *         mda_deviation_select = self.selection_parser.get("protein", "protein")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 428, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_get); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_get); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 428, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 428, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 428, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -10509,7 +9950,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_2, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 428, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10519,7 +9960,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_2, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 428, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10527,7 +9968,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 353, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 428, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -10538,7 +9979,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_2 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 428, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
@@ -10546,21 +9987,21 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   __pyx_v_mda_select = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":354
+  /* "INDUSAnalysis/protein_order_params.pyx":429
  *         # Retrieve value stored in parser if exists, else use as-is
  *         mda_select = self.selection_parser.get(self.select, self.select)
  *         mda_align = self.selection_parser.get(self.align, self.align)             # <<<<<<<<<<<<<<
  *         mda_deviation_select = self.selection_parser.get("protein", "protein")
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_get); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_get); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_2 = NULL;
   __pyx_t_6 = 0;
@@ -10577,7 +10018,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_7)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 429, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -10587,7 +10028,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 429, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -10595,7 +10036,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 354, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 429, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -10606,7 +10047,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_3 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 429, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
@@ -10614,247 +10055,136 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   __pyx_v_mda_align = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":355
+  /* "INDUSAnalysis/protein_order_params.pyx":430
  *         mda_select = self.selection_parser.get(self.select, self.select)
  *         mda_align = self.selection_parser.get(self.align, self.align)
  *         mda_deviation_select = self.selection_parser.get("protein", "protein")             # <<<<<<<<<<<<<<
  * 
- *         if self.replot:
+ *         """Raw data"""
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_selection_parser); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_get); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 355, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_get); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 430, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 430, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_mda_deviation_select = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":357
- *         mda_deviation_select = self.selection_parser.get("protein", "protein")
+  /* "INDUSAnalysis/protein_order_params.pyx":434
+ *         """Raw data"""
  * 
  *         if self.replot:             # <<<<<<<<<<<<<<
- *             #TODO
- *             sel_Rg = np.load(self.replotpref + "_Rg.npy")
+ *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
+ *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 357, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 434, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 357, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 434, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_8) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":359
+    /* "INDUSAnalysis/protein_order_params.pyx":435
+ * 
  *         if self.replot:
- *             #TODO
- *             sel_Rg = np.load(self.replotpref + "_Rg.npy")             # <<<<<<<<<<<<<<
- *             sel_Rg = sel_Rg.T
- *             sel_RMSD = np.load(self.replotpref + "_RMSD_"+self.align+"_"+self.select+".npy")
+ *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")             # <<<<<<<<<<<<<<
+ *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations.pkl")
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 359, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_load); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 359, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 359, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = PyNumber_Add(__pyx_t_7, __pyx_kp_s_Rg_npy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 359, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-      __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
-      if (likely(__pyx_t_7)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-        __Pyx_INCREF(__pyx_t_7);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_5, function);
-      }
-    }
-    __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_7, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_4);
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_v_sel_Rg = __pyx_t_1;
-    __pyx_t_1 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":360
- *             #TODO
- *             sel_Rg = np.load(self.replotpref + "_Rg.npy")
- *             sel_Rg = sel_Rg.T             # <<<<<<<<<<<<<<
- *             sel_RMSD = np.load(self.replotpref + "_RMSD_"+self.align+"_"+self.select+".npy")
- *             sel_RMSD = sel_RMSD.T
- */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel_Rg, __pyx_n_s_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF_SET(__pyx_v_sel_Rg, __pyx_t_1);
-    __pyx_t_1 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":361
- *             sel_Rg = np.load(self.replotpref + "_Rg.npy")
- *             sel_Rg = sel_Rg.T
- *             sel_RMSD = np.load(self.replotpref + "_RMSD_"+self.align+"_"+self.select+".npy")             # <<<<<<<<<<<<<<
- *             sel_RMSD = sel_RMSD.T
- *             self.dev_times = np.load(self.replotpref + "_dev_times.npy")
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_load); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 361, __pyx_L1_error)
+    __pyx_t_4 = PyNumber_Add(__pyx_t_5, __pyx_kp_s_Rg_pkl); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_5, __pyx_n_s_RMSD_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyNumber_Add(__pyx_t_3, __pyx_n_s__13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_kp_s_npy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_4);
-      if (likely(__pyx_t_7)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_7);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
-      }
-    }
-    __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
-    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_v_sel_RMSD = __pyx_t_1;
-    __pyx_t_1 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":362
- *             sel_Rg = sel_Rg.T
- *             sel_RMSD = np.load(self.replotpref + "_RMSD_"+self.align+"_"+self.select+".npy")
- *             sel_RMSD = sel_RMSD.T             # <<<<<<<<<<<<<<
- *             self.dev_times = np.load(self.replotpref + "_dev_times.npy")
- *             self.deviations = np.load(self.replotpref + "_deviations.npy")
- */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_sel_RMSD, __pyx_n_s_T); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF_SET(__pyx_v_sel_RMSD, __pyx_t_1);
-    __pyx_t_1 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":363
- *             sel_RMSD = np.load(self.replotpref + "_RMSD_"+self.align+"_"+self.select+".npy")
- *             sel_RMSD = sel_RMSD.T
- *             self.dev_times = np.load(self.replotpref + "_dev_times.npy")             # <<<<<<<<<<<<<<
- *             self.deviations = np.load(self.replotpref + "_deviations.npy")
- *         else:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_load); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = PyNumber_Add(__pyx_t_4, __pyx_kp_s_dev_times_npy); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_7);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dev_times, __pyx_t_1) < 0) __PYX_ERR(0, 363, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":364
- *             sel_RMSD = sel_RMSD.T
- *             self.dev_times = np.load(self.replotpref + "_dev_times.npy")
- *             self.deviations = np.load(self.replotpref + "_deviations.npy")             # <<<<<<<<<<<<<<
- *         else:
- *             sel_Rg = self.calc_Rg(self.u, mda_select)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 364, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_load); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 364, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 364, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyNumber_Add(__pyx_t_3, __pyx_kp_s_deviations_npy); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 364, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
-      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
-      if (likely(__pyx_t_3)) {
+    __pyx_t_5 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+      if (likely(__pyx_t_5)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_5);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_7, function);
       }
     }
-    __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_4);
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_4);
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 435, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_deviations, __pyx_t_1) < 0) __PYX_ERR(0, 364, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_v_ts_Rg = __pyx_t_1;
+    __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":357
- *         mda_deviation_select = self.selection_parser.get("protein", "protein")
- * 
- *         if self.replot:             # <<<<<<<<<<<<<<
- *             #TODO
- *             sel_Rg = np.load(self.replotpref + "_Rg.npy")
- */
-    goto __pyx_L3;
-  }
-
-  /* "INDUSAnalysis/protein_order_params.pyx":366
- *             self.deviations = np.load(self.replotpref + "_deviations.npy")
+    /* "INDUSAnalysis/protein_order_params.pyx":436
+ *         if self.replot:
+ *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
+ *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")             # <<<<<<<<<<<<<<
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations.pkl")
  *         else:
- *             sel_Rg = self.calc_Rg(self.u, mda_select)             # <<<<<<<<<<<<<<
- *             sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, mda_select, mda_align)
- * 
  */
-  /*else*/ {
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_Rg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 436, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 436, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_5 = PyNumber_Add(__pyx_t_4, __pyx_n_s_RMSD_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_3 = PyNumber_Add(__pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_4 = PyNumber_Add(__pyx_t_3, __pyx_n_s__14); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = PyNumber_Add(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = PyNumber_Add(__pyx_t_5, __pyx_kp_s_pkl); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+      if (likely(__pyx_t_5)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+        __Pyx_INCREF(__pyx_t_5);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_7, function);
+      }
+    }
+    __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_3);
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 436, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_v_ts_RMSD = __pyx_t_1;
+    __pyx_t_1 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":437
+ *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
+ *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations.pkl")             # <<<<<<<<<<<<<<
+ *         else:
+ *             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)
+ */
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 437, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 437, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = PyNumber_Add(__pyx_t_3, __pyx_kp_s_deviations_pkl); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 437, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
-    __pyx_t_6 = 0;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
       __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
       if (likely(__pyx_t_3)) {
@@ -10862,61 +10192,197 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
         __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_7, function);
+      }
+    }
+    __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_5);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 437, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_v_ts_deviations = __pyx_t_1;
+    __pyx_t_1 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":434
+ *         """Raw data"""
+ * 
+ *         if self.replot:             # <<<<<<<<<<<<<<
+ *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
+ *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
+ */
+    goto __pyx_L3;
+  }
+
+  /* "INDUSAnalysis/protein_order_params.pyx":439
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations.pkl")
+ *         else:
+ *             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)             # <<<<<<<<<<<<<<
+ *             ts_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)
+ *             ts_deviations = self.calc_deviations(self.u, self.refu, self.reftstep, self.skip, mda_deviation_select, mda_align)
+ */
+  /*else*/ {
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_Rg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 439, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = NULL;
+    __pyx_t_6 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_7);
+      if (likely(__pyx_t_4)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_7, function);
         __pyx_t_6 = 1;
       }
     }
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_7)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_4, __pyx_v_mda_select};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_t_5, __pyx_t_3, __pyx_v_mda_select};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 3+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_t_5, __pyx_t_3, __pyx_v_mda_select};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 3+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_2 = PyTuple_New(3+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (__pyx_t_4) {
+        __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4); __pyx_t_4 = NULL;
+      }
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_2, 0+__pyx_t_6, __pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_6, __pyx_t_3);
+      __Pyx_INCREF(__pyx_v_mda_select);
+      __Pyx_GIVEREF(__pyx_v_mda_select);
+      PyTuple_SET_ITEM(__pyx_t_2, 2+__pyx_t_6, __pyx_v_mda_select);
+      __pyx_t_5 = 0;
+      __pyx_t_3 = 0;
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 439, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_v_ts_Rg = __pyx_t_1;
+    __pyx_t_1 = 0;
+
+    /* "INDUSAnalysis/protein_order_params.pyx":440
+ *         else:
+ *             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)
+ *             ts_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)             # <<<<<<<<<<<<<<
+ *             ts_deviations = self.calc_deviations(self.u, self.refu, self.reftstep, self.skip, mda_deviation_select, mda_align)
+ * 
+ */
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_RMSD); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 440, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 440, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refu); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 440, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 440, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 440, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_9 = NULL;
+    __pyx_t_6 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+      __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_7);
+      if (likely(__pyx_t_9)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+        __Pyx_INCREF(__pyx_t_9);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_7, function);
+        __pyx_t_6 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_7)) {
+      PyObject *__pyx_temp[7] = {__pyx_t_9, __pyx_t_2, __pyx_t_3, __pyx_t_5, __pyx_t_4, __pyx_v_mda_select, __pyx_v_mda_align};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 6+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 440, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_4, __pyx_v_mda_select};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      PyObject *__pyx_temp[7] = {__pyx_t_9, __pyx_t_2, __pyx_t_3, __pyx_t_5, __pyx_t_4, __pyx_v_mda_select, __pyx_v_mda_align};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 6+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 440, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 366, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      if (__pyx_t_3) {
-        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
+      __pyx_t_10 = PyTuple_New(6+__pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 440, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      if (__pyx_t_9) {
+        __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_9); __pyx_t_9 = NULL;
       }
+      __Pyx_GIVEREF(__pyx_t_2);
+      PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_6, __pyx_t_2);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_6, __pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_6, __pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4);
-      PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_6, __pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_10, 3+__pyx_t_6, __pyx_t_4);
       __Pyx_INCREF(__pyx_v_mda_select);
       __Pyx_GIVEREF(__pyx_v_mda_select);
-      PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_v_mda_select);
+      PyTuple_SET_ITEM(__pyx_t_10, 4+__pyx_t_6, __pyx_v_mda_select);
+      __Pyx_INCREF(__pyx_v_mda_align);
+      __Pyx_GIVEREF(__pyx_v_mda_align);
+      PyTuple_SET_ITEM(__pyx_t_10, 5+__pyx_t_6, __pyx_v_mda_align);
+      __pyx_t_2 = 0;
+      __pyx_t_3 = 0;
+      __pyx_t_5 = 0;
       __pyx_t_4 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 440, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     }
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_v_sel_Rg = __pyx_t_1;
+    __pyx_v_ts_RMSD = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":367
- *         else:
- *             sel_Rg = self.calc_Rg(self.u, mda_select)
- *             sel_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, mda_select, mda_align)             # <<<<<<<<<<<<<<
+    /* "INDUSAnalysis/protein_order_params.pyx":441
+ *             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)
+ *             ts_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)
+ *             ts_deviations = self.calc_deviations(self.u, self.refu, self.reftstep, self.skip, mda_deviation_select, mda_align)             # <<<<<<<<<<<<<<
  * 
- *             """Log Rg and RMSD data"""
+ *         self.save_TimeSeries(ts_Rg, self.opref + "_Rg.pkl")
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_RMSD); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_deviations); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 367, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refu); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 441, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refu); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 441, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 441, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_2 = NULL;
     __pyx_t_6 = 0;
@@ -10932,652 +10398,613 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
     }
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_7)) {
-      PyObject *__pyx_temp[6] = {__pyx_t_2, __pyx_t_5, __pyx_t_4, __pyx_t_3, __pyx_v_mda_select, __pyx_v_mda_align};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 5+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
+      PyObject *__pyx_temp[7] = {__pyx_t_2, __pyx_t_10, __pyx_t_4, __pyx_t_5, __pyx_t_3, __pyx_v_mda_deviation_select, __pyx_v_mda_align};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 6+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 441, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-      PyObject *__pyx_temp[6] = {__pyx_t_2, __pyx_t_5, __pyx_t_4, __pyx_t_3, __pyx_v_mda_select, __pyx_v_mda_align};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 5+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
+      PyObject *__pyx_temp[7] = {__pyx_t_2, __pyx_t_10, __pyx_t_4, __pyx_t_5, __pyx_t_3, __pyx_v_mda_deviation_select, __pyx_v_mda_align};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 6+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 441, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_9 = PyTuple_New(5+__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 367, __pyx_L1_error)
+      __pyx_t_9 = PyTuple_New(6+__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 441, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       if (__pyx_t_2) {
         __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_2); __pyx_t_2 = NULL;
       }
-      __Pyx_GIVEREF(__pyx_t_5);
-      PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_6, __pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_10);
+      PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_6, __pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_6, __pyx_t_4);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_6, __pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_6, __pyx_t_3);
-      __Pyx_INCREF(__pyx_v_mda_select);
-      __Pyx_GIVEREF(__pyx_v_mda_select);
-      PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_6, __pyx_v_mda_select);
+      PyTuple_SET_ITEM(__pyx_t_9, 3+__pyx_t_6, __pyx_t_3);
+      __Pyx_INCREF(__pyx_v_mda_deviation_select);
+      __Pyx_GIVEREF(__pyx_v_mda_deviation_select);
+      PyTuple_SET_ITEM(__pyx_t_9, 4+__pyx_t_6, __pyx_v_mda_deviation_select);
       __Pyx_INCREF(__pyx_v_mda_align);
       __Pyx_GIVEREF(__pyx_v_mda_align);
-      PyTuple_SET_ITEM(__pyx_t_9, 4+__pyx_t_6, __pyx_v_mda_align);
-      __pyx_t_5 = 0;
+      PyTuple_SET_ITEM(__pyx_t_9, 5+__pyx_t_6, __pyx_v_mda_align);
+      __pyx_t_10 = 0;
       __pyx_t_4 = 0;
+      __pyx_t_5 = 0;
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 367, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 441, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     }
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_v_sel_RMSD = __pyx_t_1;
+    __pyx_v_ts_deviations = __pyx_t_1;
     __pyx_t_1 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":370
- * 
- *             """Log Rg and RMSD data"""
- *             self.save_timeseries(sel_Rg[:,0], sel_Rg[:,1], label="Rg")             # <<<<<<<<<<<<<<
- *             self.save_timeseries(sel_RMSD[:,0], sel_RMSD[:,1], label="RMSD_"+self.align+"_"+self.select)
- * 
- */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_v_sel_Rg, __pyx_tuple__11); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 370, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_sel_Rg, __pyx_tuple__12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 370, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GIVEREF(__pyx_t_7);
-    PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_7);
-    __Pyx_GIVEREF(__pyx_t_9);
-    PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_9);
-    __pyx_t_7 = 0;
-    __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 370, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_label, __pyx_n_s_Rg) < 0) __PYX_ERR(0, 370, __pyx_L1_error)
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 370, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":371
- *             """Log Rg and RMSD data"""
- *             self.save_timeseries(sel_Rg[:,0], sel_Rg[:,1], label="Rg")
- *             self.save_timeseries(sel_RMSD[:,0], sel_RMSD[:,1], label="RMSD_"+self.align+"_"+self.select)             # <<<<<<<<<<<<<<
- * 
- *             """Calculate per-atom deviations of all protein atoms"""
- */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_timeseries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_v_sel_RMSD, __pyx_tuple__11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_sel_RMSD, __pyx_tuple__12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GIVEREF(__pyx_t_9);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_9);
-    __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
-    __pyx_t_9 = 0;
-    __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_4 = PyNumber_Add(__pyx_n_s_RMSD, __pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = PyNumber_Add(__pyx_t_4, __pyx_n_s__13); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyNumber_Add(__pyx_t_9, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_label, __pyx_t_5) < 0) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 371, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":374
- * 
- *             """Calculate per-atom deviations of all protein atoms"""
- *             times = sel_RMSD[:,0]             # <<<<<<<<<<<<<<
- *             deviations = self.calc_deviation(self.u, self.refu, self.reftstep, mda_deviation_select, mda_align)
- *             self.dev_times = times
- */
-    __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_sel_RMSD, __pyx_tuple__11); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 374, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_v_times = __pyx_t_5;
-    __pyx_t_5 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":375
- *             """Calculate per-atom deviations of all protein atoms"""
- *             times = sel_RMSD[:,0]
- *             deviations = self.calc_deviation(self.u, self.refu, self.reftstep, mda_deviation_select, mda_align)             # <<<<<<<<<<<<<<
- *             self.dev_times = times
- *             self.deviations = deviations
- */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_deviation); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_refu); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 375, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_reftstep_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 375, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = NULL;
-    __pyx_t_6 = 0;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_9)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_9);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-        __pyx_t_6 = 1;
-      }
-    }
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_1, __pyx_t_7, __pyx_t_4, __pyx_v_mda_deviation_select, __pyx_v_mda_align};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 5+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 375, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_1, __pyx_t_7, __pyx_t_4, __pyx_v_mda_deviation_select, __pyx_v_mda_align};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 5+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 375, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    } else
-    #endif
-    {
-      __pyx_t_2 = PyTuple_New(5+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      if (__pyx_t_9) {
-        __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_9); __pyx_t_9 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_1);
-      PyTuple_SET_ITEM(__pyx_t_2, 0+__pyx_t_6, __pyx_t_1);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_6, __pyx_t_7);
-      __Pyx_GIVEREF(__pyx_t_4);
-      PyTuple_SET_ITEM(__pyx_t_2, 2+__pyx_t_6, __pyx_t_4);
-      __Pyx_INCREF(__pyx_v_mda_deviation_select);
-      __Pyx_GIVEREF(__pyx_v_mda_deviation_select);
-      PyTuple_SET_ITEM(__pyx_t_2, 3+__pyx_t_6, __pyx_v_mda_deviation_select);
-      __Pyx_INCREF(__pyx_v_mda_align);
-      __Pyx_GIVEREF(__pyx_v_mda_align);
-      PyTuple_SET_ITEM(__pyx_t_2, 4+__pyx_t_6, __pyx_v_mda_align);
-      __pyx_t_1 = 0;
-      __pyx_t_7 = 0;
-      __pyx_t_4 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 375, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_v_deviations = __pyx_t_5;
-    __pyx_t_5 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":376
- *             times = sel_RMSD[:,0]
- *             deviations = self.calc_deviation(self.u, self.refu, self.reftstep, mda_deviation_select, mda_align)
- *             self.dev_times = times             # <<<<<<<<<<<<<<
- *             self.deviations = deviations
- * 
- */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dev_times, __pyx_v_times) < 0) __PYX_ERR(0, 376, __pyx_L1_error)
-
-    /* "INDUSAnalysis/protein_order_params.pyx":377
- *             deviations = self.calc_deviation(self.u, self.refu, self.reftstep, mda_deviation_select, mda_align)
- *             self.dev_times = times
- *             self.deviations = deviations             # <<<<<<<<<<<<<<
- * 
- *             """Log per-atom deviations"""
- */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_deviations, __pyx_v_deviations) < 0) __PYX_ERR(0, 377, __pyx_L1_error)
-
-    /* "INDUSAnalysis/protein_order_params.pyx":380
- * 
- *             """Log per-atom deviations"""
- *             np.save(self.opref + "_dev_times", self.dev_times)             # <<<<<<<<<<<<<<
- *             np.save(self.opref + "_deviations", self.deviations)
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_save); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyNumber_Add(__pyx_t_3, __pyx_n_s_dev_times_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 380, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dev_times); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = NULL;
-    __pyx_t_6 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_7)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_7);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
-        __pyx_t_6 = 1;
-      }
-    }
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_4, __pyx_t_3};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 380, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_4, __pyx_t_3};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 380, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    } else
-    #endif
-    {
-      __pyx_t_1 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 380, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      if (__pyx_t_7) {
-        __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_7); __pyx_t_7 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_4);
-      PyTuple_SET_ITEM(__pyx_t_1, 0+__pyx_t_6, __pyx_t_4);
-      __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_6, __pyx_t_3);
-      __pyx_t_4 = 0;
-      __pyx_t_3 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 380, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-    /* "INDUSAnalysis/protein_order_params.pyx":381
- *             """Log per-atom deviations"""
- *             np.save(self.opref + "_dev_times", self.dev_times)
- *             np.save(self.opref + "_deviations", self.deviations)             # <<<<<<<<<<<<<<
- * 
- *         """Radius of gyration plots"""
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_save); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 381, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Add(__pyx_t_2, __pyx_n_s_deviations_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 381, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_deviations); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = NULL;
-    __pyx_t_6 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_1);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_1, function);
-        __pyx_t_6 = 1;
-      }
-    }
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_1)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_3, __pyx_t_2};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 381, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_3, __pyx_t_2};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 381, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    } else
-    #endif
-    {
-      __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 381, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      if (__pyx_t_4) {
-        __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4); __pyx_t_4 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_6, __pyx_t_3);
-      __Pyx_GIVEREF(__pyx_t_2);
-      PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_2);
-      __pyx_t_3 = 0;
-      __pyx_t_2 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 381, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":384
+  /* "INDUSAnalysis/protein_order_params.pyx":443
+ *             ts_deviations = self.calc_deviations(self.u, self.refu, self.reftstep, self.skip, mda_deviation_select, mda_align)
  * 
- *         """Radius of gyration plots"""
- *         self.plot_Rg(sel_Rg)             # <<<<<<<<<<<<<<
- *         self.plot_ma_Rg(sel_Rg)
- *         self.plot_cma_Rg(sel_Rg)
+ *         self.save_TimeSeries(ts_Rg, self.opref + "_Rg.pkl")             # <<<<<<<<<<<<<<
+ *         self.save_TimeSeries(ts_RMSD, self.opref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
+ *         self.save_TimeSeries(ts_deviations, self.opref + "_deviations.pkl")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_Rg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_sel_Rg) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_sel_Rg);
-  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 384, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":385
- *         """Radius of gyration plots"""
- *         self.plot_Rg(sel_Rg)
- *         self.plot_ma_Rg(sel_Rg)             # <<<<<<<<<<<<<<
- *         self.plot_cma_Rg(sel_Rg)
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_ma_Rg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_sel_Rg) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_sel_Rg);
-  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 385, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":386
- *         self.plot_Rg(sel_Rg)
- *         self.plot_ma_Rg(sel_Rg)
- *         self.plot_cma_Rg(sel_Rg)             # <<<<<<<<<<<<<<
- * 
- *         """RMSD plots"""
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_cma_Rg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_sel_Rg) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_sel_Rg);
-  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 386, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":389
- * 
- *         """RMSD plots"""
- *         self.plot_RMSD(sel_RMSD)             # <<<<<<<<<<<<<<
- *         self.plot_ma_RMSD(sel_RMSD)
- *         self.plot_cma_RMSD(sel_RMSD)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_RMSD); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_sel_RMSD) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_sel_RMSD);
-  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 389, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":390
- *         """RMSD plots"""
- *         self.plot_RMSD(sel_RMSD)
- *         self.plot_ma_RMSD(sel_RMSD)             # <<<<<<<<<<<<<<
- *         self.plot_cma_RMSD(sel_RMSD)
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_ma_RMSD); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 390, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_sel_RMSD) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_sel_RMSD);
-  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 390, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":391
- *         self.plot_RMSD(sel_RMSD)
- *         self.plot_ma_RMSD(sel_RMSD)
- *         self.plot_cma_RMSD(sel_RMSD)             # <<<<<<<<<<<<<<
- * 
- *         """Per-atom deviation plot"""
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_cma_RMSD); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 391, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_7)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_7);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_sel_RMSD) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_sel_RMSD);
-  __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 391, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":394
- * 
- *         """Per-atom deviation plot"""
- *         self.plot_deviations(self.dev_times, self.deviations)             # <<<<<<<<<<<<<<
- * 
- *         """Store per-atom deviations in PDB"""
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_deviations); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dev_times); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 394, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 443, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_deviations); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 394, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 443, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = PyNumber_Add(__pyx_t_9, __pyx_kp_s_Rg_pkl); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 443, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = NULL;
   __pyx_t_6 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_3);
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_9)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_9);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
       __pyx_t_6 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_1)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_7, __pyx_t_2};
-    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (PyFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_v_ts_Rg, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 443, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_7, __pyx_t_2};
-    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_v_ts_Rg, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 443, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (__pyx_t_3) {
-      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
-    }
-    __Pyx_GIVEREF(__pyx_t_7);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_6, __pyx_t_7);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_t_2);
-    __pyx_t_7 = 0;
-    __pyx_t_2 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (__pyx_t_9) {
+      __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_9); __pyx_t_9 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_ts_Rg);
+    __Pyx_GIVEREF(__pyx_v_ts_Rg);
+    PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_6, __pyx_v_ts_Rg);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_3);
+    __pyx_t_3 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 443, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":397
+  /* "INDUSAnalysis/protein_order_params.pyx":444
+ * 
+ *         self.save_TimeSeries(ts_Rg, self.opref + "_Rg.pkl")
+ *         self.save_TimeSeries(ts_RMSD, self.opref + "_RMSD_" + self.align + "_" + self.select + ".pkl")             # <<<<<<<<<<<<<<
+ *         self.save_TimeSeries(ts_deviations, self.opref + "_deviations.pkl")
+ * 
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = PyNumber_Add(__pyx_t_5, __pyx_n_s_RMSD_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = PyNumber_Add(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = PyNumber_Add(__pyx_t_9, __pyx_n_s__14); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_select_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = PyNumber_Add(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = PyNumber_Add(__pyx_t_3, __pyx_kp_s_pkl); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 444, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = NULL;
+  __pyx_t_6 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+      __pyx_t_6 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_ts_RMSD, __pyx_t_9};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 444, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_ts_RMSD, __pyx_t_9};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 444, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  } else
+  #endif
+  {
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 444, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    if (__pyx_t_3) {
+      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_ts_RMSD);
+    __Pyx_GIVEREF(__pyx_v_ts_RMSD);
+    PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_6, __pyx_v_ts_RMSD);
+    __Pyx_GIVEREF(__pyx_t_9);
+    PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_9);
+    __pyx_t_9 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 444, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":445
+ *         self.save_TimeSeries(ts_Rg, self.opref + "_Rg.pkl")
+ *         self.save_TimeSeries(ts_RMSD, self.opref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
+ *         self.save_TimeSeries(ts_deviations, self.opref + "_deviations.pkl")             # <<<<<<<<<<<<<<
+ * 
+ *         """Rg plots"""
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 445, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 445, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = PyNumber_Add(__pyx_t_5, __pyx_kp_s_deviations_pkl); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 445, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = NULL;
+  __pyx_t_6 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+      __pyx_t_6 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_ts_deviations, __pyx_t_9};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 445, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_ts_deviations, __pyx_t_9};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 445, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  } else
+  #endif
+  {
+    __pyx_t_3 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 445, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    if (__pyx_t_5) {
+      __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5); __pyx_t_5 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_ts_deviations);
+    __Pyx_GIVEREF(__pyx_v_ts_deviations);
+    PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_6, __pyx_v_ts_deviations);
+    __Pyx_GIVEREF(__pyx_t_9);
+    PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_6, __pyx_t_9);
+    __pyx_t_9 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 445, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":448
+ * 
+ *         """Rg plots"""
+ *         self.plot_Rg(ts_Rg)             # <<<<<<<<<<<<<<
+ *         self.plot_ma_Rg(ts_Rg, self.window)
+ *         self.plot_cma_Rg(ts_Rg)
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_Rg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 448, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_3, __pyx_v_ts_Rg) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_ts_Rg);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 448, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":449
+ *         """Rg plots"""
+ *         self.plot_Rg(ts_Rg)
+ *         self.plot_ma_Rg(ts_Rg, self.window)             # <<<<<<<<<<<<<<
+ *         self.plot_cma_Rg(ts_Rg)
+ * 
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_ma_Rg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 449, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_9 = NULL;
+  __pyx_t_6 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_9)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_9);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+      __pyx_t_6 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_v_ts_Rg, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_v_ts_Rg, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  } else
+  #endif
+  {
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 449, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    if (__pyx_t_9) {
+      __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_9); __pyx_t_9 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_ts_Rg);
+    __Pyx_GIVEREF(__pyx_v_ts_Rg);
+    PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_6, __pyx_v_ts_Rg);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_3);
+    __pyx_t_3 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 449, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":450
+ *         self.plot_Rg(ts_Rg)
+ *         self.plot_ma_Rg(ts_Rg, self.window)
+ *         self.plot_cma_Rg(ts_Rg)             # <<<<<<<<<<<<<<
+ * 
+ *         """RMSD plots"""
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_cma_Rg); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 450, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_5 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_5, __pyx_v_ts_Rg) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_ts_Rg);
+  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 450, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":453
+ * 
+ *         """RMSD plots"""
+ *         self.plot_RMSD(ts_RMSD)             # <<<<<<<<<<<<<<
+ *         self.plot_ma_RMSD(ts_RMSD, self.window)
+ *         self.plot_cma_RMSD(ts_RMSD)
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_RMSD); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 453, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_5 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_5, __pyx_v_ts_RMSD) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_ts_RMSD);
+  __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 453, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":454
+ *         """RMSD plots"""
+ *         self.plot_RMSD(ts_RMSD)
+ *         self.plot_ma_RMSD(ts_RMSD, self.window)             # <<<<<<<<<<<<<<
+ *         self.plot_cma_RMSD(ts_RMSD)
+ * 
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_ma_RMSD); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = NULL;
+  __pyx_t_6 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+      __pyx_t_6 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_ts_RMSD, __pyx_t_5};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 454, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_ts_RMSD, __pyx_t_5};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 454, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  } else
+  #endif
+  {
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 454, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    if (__pyx_t_3) {
+      __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_ts_RMSD);
+    __Pyx_GIVEREF(__pyx_v_ts_RMSD);
+    PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_6, __pyx_v_ts_RMSD);
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_6, __pyx_t_5);
+    __pyx_t_5 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 454, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":455
+ *         self.plot_RMSD(ts_RMSD)
+ *         self.plot_ma_RMSD(ts_RMSD, self.window)
+ *         self.plot_cma_RMSD(ts_RMSD)             # <<<<<<<<<<<<<<
+ * 
+ *         """Per-atom deviations heatmap plot"""
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_cma_RMSD); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 455, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_9 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_9)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_9);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_9, __pyx_v_ts_RMSD) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_ts_RMSD);
+  __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 455, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":458
+ * 
+ *         """Per-atom deviations heatmap plot"""
+ *         self.plot_deviations(ts_deviations)             # <<<<<<<<<<<<<<
+ * 
+ *         """Store per-atom deviations in PDB"""
+ */
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_deviations); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 458, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_9 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_9)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_9);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_9, __pyx_v_ts_deviations) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_ts_deviations);
+  __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 458, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":461
  * 
  *         """Store per-atom deviations in PDB"""
  *         if self.genpdb:             # <<<<<<<<<<<<<<
- *             self.save_pdb(mda_deviation_select)
+ *             self.write_deviations_pdb(self.u, mda_deviation_select, self.skip, ts_deviations)
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 397, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 397, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 461, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 461, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_8) {
 
-    /* "INDUSAnalysis/protein_order_params.pyx":398
+    /* "INDUSAnalysis/protein_order_params.pyx":462
  *         """Store per-atom deviations in PDB"""
  *         if self.genpdb:
- *             self.save_pdb(mda_deviation_select)             # <<<<<<<<<<<<<<
+ *             self.write_deviations_pdb(self.u, mda_deviation_select, self.skip, ts_deviations)             # <<<<<<<<<<<<<<
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_pdb); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 398, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_1);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-        __Pyx_INCREF(__pyx_t_4);
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_write_deviations_pdb); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 462, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 462, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 462, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_3 = NULL;
+    __pyx_t_6 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+        __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_1, function);
+        __Pyx_DECREF_SET(__pyx_t_7, function);
+        __pyx_t_6 = 1;
       }
     }
-    __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_4, __pyx_v_mda_deviation_select) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_mda_deviation_select);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 398, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_7)) {
+      PyObject *__pyx_temp[5] = {__pyx_t_3, __pyx_t_9, __pyx_v_mda_deviation_select, __pyx_t_5, __pyx_v_ts_deviations};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 462, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+      PyObject *__pyx_temp[5] = {__pyx_t_3, __pyx_t_9, __pyx_v_mda_deviation_select, __pyx_t_5, __pyx_v_ts_deviations};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 462, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_4 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 462, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      if (__pyx_t_3) {
+        __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
+      }
+      __Pyx_GIVEREF(__pyx_t_9);
+      PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_6, __pyx_t_9);
+      __Pyx_INCREF(__pyx_v_mda_deviation_select);
+      __Pyx_GIVEREF(__pyx_v_mda_deviation_select);
+      PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_v_mda_deviation_select);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_4, 2+__pyx_t_6, __pyx_t_5);
+      __Pyx_INCREF(__pyx_v_ts_deviations);
+      __Pyx_GIVEREF(__pyx_v_ts_deviations);
+      PyTuple_SET_ITEM(__pyx_t_4, 3+__pyx_t_6, __pyx_v_ts_deviations);
+      __pyx_t_9 = 0;
+      __pyx_t_5 = 0;
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 462, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/protein_order_params.pyx":397
+    /* "INDUSAnalysis/protein_order_params.pyx":461
  * 
  *         """Store per-atom deviations in PDB"""
  *         if self.genpdb:             # <<<<<<<<<<<<<<
- *             self.save_pdb(mda_deviation_select)
+ *             self.write_deviations_pdb(self.u, mda_deviation_select, self.skip, ts_deviations)
  */
   }
 
-  /* "INDUSAnalysis/protein_order_params.pyx":351
+  /* "INDUSAnalysis/protein_order_params.pyx":424
+ *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
  * 
- *     """call"""
  *     def __call__(self):             # <<<<<<<<<<<<<<
- *         # Retrieve value stored in parser if exists, else use as-is
- *         mda_select = self.selection_parser.get(self.select, self.select)
+ *         """Performs analysis."""
+ * 
  */
 
   /* function exit code */
@@ -11591,16 +11018,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_11OrderParams_3
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParams.__call__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_AddTraceback("INDUSAnalysis.protein_order_params.OrderParamsAnalysis.__call__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_mda_select);
   __Pyx_XDECREF(__pyx_v_mda_align);
   __Pyx_XDECREF(__pyx_v_mda_deviation_select);
-  __Pyx_XDECREF(__pyx_v_sel_Rg);
-  __Pyx_XDECREF(__pyx_v_sel_RMSD);
-  __Pyx_XDECREF(__pyx_v_times);
-  __Pyx_XDECREF(__pyx_v_deviations);
+  __Pyx_XDECREF(__pyx_v_ts_Rg);
+  __Pyx_XDECREF(__pyx_v_ts_RMSD);
+  __Pyx_XDECREF(__pyx_v_ts_deviations);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -11723,7 +11150,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 272, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 272, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -11779,7 +11206,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             info.buf = PyArray_DATA(self)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 276, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -12037,7 +11464,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 306, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 306, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -12917,7 +12344,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 856, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 856, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -12985,7 +12412,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 860, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 860, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -13094,7 +12521,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 880, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 880, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_Raise(__pyx_t_4, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -13722,7 +13149,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
  * 
  * cdef inline int import_umath() except -1:
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1038, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1038, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -13851,7 +13278,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
  * 
  * cdef inline int import_ufunc() except -1:
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1044, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1044, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -13977,7 +13404,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1050, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 1050, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -14042,7 +13469,7 @@ static PyModuleDef_Slot __pyx_moduledef_slots[] = {
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
     "protein_order_params",
-    __pyx_k_Calculate_time_series_Radius_of, /* m_doc */
+    __pyx_k_Defines_class_for_analysing_pro, /* m_doc */
   #if CYTHON_PEP489_MULTI_PHASE_INIT
     0, /* m_size */
   #else
@@ -14070,67 +13497,71 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
-  {&__pyx_n_s_Atom, __pyx_k_Atom, sizeof(__pyx_k_Atom), 0, 0, 1, 1},
+  {&__pyx_kp_s_Atom_index, __pyx_k_Atom_index, sizeof(__pyx_k_Atom_index), 0, 0, 1, 0},
   {&__pyx_kp_s_Atoms_groups_for_aligning_trajec, __pyx_k_Atoms_groups_for_aligning_trajec, sizeof(__pyx_k_Atoms_groups_for_aligning_trajec), 0, 0, 1, 0},
   {&__pyx_kp_s_Atoms_groups_to_track_order_para, __pyx_k_Atoms_groups_to_track_order_para, sizeof(__pyx_k_Atoms_groups_to_track_order_para), 0, 0, 1, 0},
+  {&__pyx_kp_s_Calculates_order_parameters, __pyx_k_Calculates_order_parameters, sizeof(__pyx_k_Calculates_order_parameters), 0, 0, 1, 0},
   {&__pyx_kp_s_Compressed_trajectory_file_xtc, __pyx_k_Compressed_trajectory_file_xtc, sizeof(__pyx_k_Compressed_trajectory_file_xtc), 0, 0, 1, 0},
+  {&__pyx_n_s_Deviation, __pyx_k_Deviation, sizeof(__pyx_k_Deviation), 0, 0, 1, 1},
   {&__pyx_kp_s_Display_progress, __pyx_k_Display_progress, sizeof(__pyx_k_Display_progress), 0, 0, 1, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
-  {&__pyx_n_s_INDUSAnalysis_lib_profiling, __pyx_k_INDUSAnalysis_lib_profiling, sizeof(__pyx_k_INDUSAnalysis_lib_profiling), 0, 0, 1, 1},
+  {&__pyx_n_s_INDUSAnalysis, __pyx_k_INDUSAnalysis, sizeof(__pyx_k_INDUSAnalysis), 0, 0, 1, 1},
+  {&__pyx_n_s_INDUSAnalysis_lib, __pyx_k_INDUSAnalysis_lib, sizeof(__pyx_k_INDUSAnalysis_lib), 0, 0, 1, 1},
   {&__pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_k_INDUSAnalysis_protein_order_para, sizeof(__pyx_k_INDUSAnalysis_protein_order_para), 0, 0, 1, 1},
   {&__pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_k_INDUSAnalysis_protein_order_para_2, sizeof(__pyx_k_INDUSAnalysis_protein_order_para_2), 0, 0, 1, 0},
-  {&__pyx_n_s_INDUSAnalysis_timeseries, __pyx_k_INDUSAnalysis_timeseries, sizeof(__pyx_k_INDUSAnalysis_timeseries), 0, 0, 1, 1},
   {&__pyx_n_s_ImportError, __pyx_k_ImportError, sizeof(__pyx_k_ImportError), 0, 0, 1, 1},
   {&__pyx_n_s_MDAnalysis, __pyx_k_MDAnalysis, sizeof(__pyx_k_MDAnalysis), 0, 0, 1, 1},
   {&__pyx_n_s_MDAnalysis_analysis_align, __pyx_k_MDAnalysis_analysis_align, sizeof(__pyx_k_MDAnalysis_analysis_align), 0, 0, 1, 1},
   {&__pyx_kp_u_Non_native_byte_order_not_suppor, __pyx_k_Non_native_byte_order_not_suppor, sizeof(__pyx_k_Non_native_byte_order_not_suppor), 0, 1, 0, 0},
   {&__pyx_kp_s_Number_of_frames_to_skip_between, __pyx_k_Number_of_frames_to_skip_between, sizeof(__pyx_k_Number_of_frames_to_skip_between), 0, 0, 1, 0},
-  {&__pyx_n_s_OrderParams, __pyx_k_OrderParams, sizeof(__pyx_k_OrderParams), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams___call, __pyx_k_OrderParams___call, sizeof(__pyx_k_OrderParams___call), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams___init, __pyx_k_OrderParams___init, sizeof(__pyx_k_OrderParams___init), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_calc_RMSD, __pyx_k_OrderParams_calc_RMSD, sizeof(__pyx_k_OrderParams_calc_RMSD), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_calc_RMSD_worker, __pyx_k_OrderParams_calc_RMSD_worker, sizeof(__pyx_k_OrderParams_calc_RMSD_worker), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_calc_Rg, __pyx_k_OrderParams_calc_Rg, sizeof(__pyx_k_OrderParams_calc_Rg), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_calc_Rg_worker, __pyx_k_OrderParams_calc_Rg_worker, sizeof(__pyx_k_OrderParams_calc_Rg_worker), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_calc_deviation, __pyx_k_OrderParams_calc_deviation, sizeof(__pyx_k_OrderParams_calc_deviation), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_calc_deviation_worke, __pyx_k_OrderParams_calc_deviation_worke, sizeof(__pyx_k_OrderParams_calc_deviation_worke), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_plot_RMSD, __pyx_k_OrderParams_plot_RMSD, sizeof(__pyx_k_OrderParams_plot_RMSD), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_plot_Rg, __pyx_k_OrderParams_plot_Rg, sizeof(__pyx_k_OrderParams_plot_Rg), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_plot_cma_RMSD, __pyx_k_OrderParams_plot_cma_RMSD, sizeof(__pyx_k_OrderParams_plot_cma_RMSD), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_plot_cma_Rg, __pyx_k_OrderParams_plot_cma_Rg, sizeof(__pyx_k_OrderParams_plot_cma_Rg), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_plot_deviations, __pyx_k_OrderParams_plot_deviations, sizeof(__pyx_k_OrderParams_plot_deviations), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_plot_ma_RMSD, __pyx_k_OrderParams_plot_ma_RMSD, sizeof(__pyx_k_OrderParams_plot_ma_RMSD), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_plot_ma_Rg, __pyx_k_OrderParams_plot_ma_Rg, sizeof(__pyx_k_OrderParams_plot_ma_Rg), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_read_args, __pyx_k_OrderParams_read_args, sizeof(__pyx_k_OrderParams_read_args), 0, 0, 1, 1},
-  {&__pyx_n_s_OrderParams_save_pdb, __pyx_k_OrderParams_save_pdb, sizeof(__pyx_k_OrderParams_save_pdb), 0, 0, 1, 1},
+  {&__pyx_kp_s_One_or_more_oordinates_are_not_3, __pyx_k_One_or_more_oordinates_are_not_3, sizeof(__pyx_k_One_or_more_oordinates_are_not_3), 0, 0, 1, 0},
+  {&__pyx_n_s_OrderParamsAnalysis, __pyx_k_OrderParamsAnalysis, sizeof(__pyx_k_OrderParamsAnalysis), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis___call, __pyx_k_OrderParamsAnalysis___call, sizeof(__pyx_k_OrderParamsAnalysis___call), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis___init, __pyx_k_OrderParamsAnalysis___init, sizeof(__pyx_k_OrderParamsAnalysis___init), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_calc_RMSD, __pyx_k_OrderParamsAnalysis_calc_RMSD, sizeof(__pyx_k_OrderParamsAnalysis_calc_RMSD), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_calc_RMSD_wo, __pyx_k_OrderParamsAnalysis_calc_RMSD_wo, sizeof(__pyx_k_OrderParamsAnalysis_calc_RMSD_wo), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_calc_Rg, __pyx_k_OrderParamsAnalysis_calc_Rg, sizeof(__pyx_k_OrderParamsAnalysis_calc_Rg), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_calc_Rg_work, __pyx_k_OrderParamsAnalysis_calc_Rg_work, sizeof(__pyx_k_OrderParamsAnalysis_calc_Rg_work), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_calc_deviati, __pyx_k_OrderParamsAnalysis_calc_deviati, sizeof(__pyx_k_OrderParamsAnalysis_calc_deviati), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_calc_deviati_2, __pyx_k_OrderParamsAnalysis_calc_deviati_2, sizeof(__pyx_k_OrderParamsAnalysis_calc_deviati_2), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_plot_RMSD, __pyx_k_OrderParamsAnalysis_plot_RMSD, sizeof(__pyx_k_OrderParamsAnalysis_plot_RMSD), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_plot_Rg, __pyx_k_OrderParamsAnalysis_plot_Rg, sizeof(__pyx_k_OrderParamsAnalysis_plot_Rg), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_plot_cma_RMS, __pyx_k_OrderParamsAnalysis_plot_cma_RMS, sizeof(__pyx_k_OrderParamsAnalysis_plot_cma_RMS), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_plot_cma_Rg, __pyx_k_OrderParamsAnalysis_plot_cma_Rg, sizeof(__pyx_k_OrderParamsAnalysis_plot_cma_Rg), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_plot_deviati, __pyx_k_OrderParamsAnalysis_plot_deviati, sizeof(__pyx_k_OrderParamsAnalysis_plot_deviati), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_plot_ma_RMSD, __pyx_k_OrderParamsAnalysis_plot_ma_RMSD, sizeof(__pyx_k_OrderParamsAnalysis_plot_ma_RMSD), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_plot_ma_Rg, __pyx_k_OrderParamsAnalysis_plot_ma_Rg, sizeof(__pyx_k_OrderParamsAnalysis_plot_ma_Rg), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_read_args, __pyx_k_OrderParamsAnalysis_read_args, sizeof(__pyx_k_OrderParamsAnalysis_read_args), 0, 0, 1, 1},
+  {&__pyx_n_s_OrderParamsAnalysis_write_deviat, __pyx_k_OrderParamsAnalysis_write_deviat, sizeof(__pyx_k_OrderParamsAnalysis_write_deviat), 0, 0, 1, 1},
   {&__pyx_n_s_PDB, __pyx_k_PDB, sizeof(__pyx_k_PDB), 0, 0, 1, 1},
   {&__pyx_n_s_R, __pyx_k_R, sizeof(__pyx_k_R), 0, 0, 1, 1},
   {&__pyx_n_s_RMSD, __pyx_k_RMSD, sizeof(__pyx_k_RMSD), 0, 0, 1, 1},
   {&__pyx_n_s_RMSD_2, __pyx_k_RMSD_2, sizeof(__pyx_k_RMSD_2), 0, 0, 1, 1},
   {&__pyx_n_s_RMSD_3, __pyx_k_RMSD_3, sizeof(__pyx_k_RMSD_3), 0, 0, 1, 1},
-  {&__pyx_kp_s_RMSD_AA, __pyx_k_RMSD_AA, sizeof(__pyx_k_RMSD_AA), 0, 0, 1, 0},
-  {&__pyx_n_s_RMSD_data, __pyx_k_RMSD_data, sizeof(__pyx_k_RMSD_data), 0, 0, 1, 1},
+  {&__pyx_kp_s_RMSD_between_atoms_using_atoms_f, __pyx_k_RMSD_between_atoms_using_atoms_f, sizeof(__pyx_k_RMSD_between_atoms_using_atoms_f), 0, 0, 1, 0},
+  {&__pyx_n_s_RMSDs, __pyx_k_RMSDs, sizeof(__pyx_k_RMSDs), 0, 0, 1, 1},
   {&__pyx_n_s_RMSDval, __pyx_k_RMSDval, sizeof(__pyx_k_RMSDval), 0, 0, 1, 1},
-  {&__pyx_kp_s_Radius_of_gyration_AA, __pyx_k_Radius_of_gyration_AA, sizeof(__pyx_k_Radius_of_gyration_AA), 0, 0, 1, 0},
   {&__pyx_kp_s_Reference_trajectory_file_xtc_fo, __pyx_k_Reference_trajectory_file_xtc_fo, sizeof(__pyx_k_Reference_trajectory_file_xtc_fo), 0, 0, 1, 0},
   {&__pyx_n_s_Rg, __pyx_k_Rg, sizeof(__pyx_k_Rg), 0, 0, 1, 1},
-  {&__pyx_n_s_Rg_data, __pyx_k_Rg_data, sizeof(__pyx_k_Rg_data), 0, 0, 1, 1},
-  {&__pyx_kp_s_Rg_npy, __pyx_k_Rg_npy, sizeof(__pyx_k_Rg_npy), 0, 0, 1, 0},
+  {&__pyx_kp_s_Rg_pkl, __pyx_k_Rg_pkl, sizeof(__pyx_k_Rg_pkl), 0, 0, 1, 0},
+  {&__pyx_n_s_Rgs, __pyx_k_Rgs, sizeof(__pyx_k_Rgs), 0, 0, 1, 1},
   {&__pyx_n_s_Rgval, __pyx_k_Rgval, sizeof(__pyx_k_Rgval), 0, 0, 1, 1},
   {&__pyx_n_s_RuntimeError, __pyx_k_RuntimeError, sizeof(__pyx_k_RuntimeError), 0, 0, 1, 1},
+  {&__pyx_kp_s_Set_of_coordinates_and_reference, __pyx_k_Set_of_coordinates_and_reference, sizeof(__pyx_k_Set_of_coordinates_and_reference), 0, 0, 1, 0},
   {&__pyx_kp_s_Structure_file_gro, __pyx_k_Structure_file_gro, sizeof(__pyx_k_Structure_file_gro), 0, 0, 1, 0},
   {&__pyx_n_s_T, __pyx_k_T, sizeof(__pyx_k_T), 0, 0, 1, 1},
   {&__pyx_n_s_TimeSeries, __pyx_k_TimeSeries, sizeof(__pyx_k_TimeSeries), 0, 0, 1, 1},
-  {&__pyx_kp_s_Time_ps, __pyx_k_Time_ps, sizeof(__pyx_k_Time_ps), 0, 0, 1, 0},
+  {&__pyx_n_s_TimeSeriesAnalysis, __pyx_k_TimeSeriesAnalysis, sizeof(__pyx_k_TimeSeriesAnalysis), 0, 0, 1, 1},
   {&__pyx_kp_s_Timestep_to_extract_reference_co, __pyx_k_Timestep_to_extract_reference_co, sizeof(__pyx_k_Timestep_to_extract_reference_co), 0, 0, 1, 0},
+  {&__pyx_kp_s_Trajectory_and_TimeSeries_times, __pyx_k_Trajectory_and_TimeSeries_times, sizeof(__pyx_k_Trajectory_and_TimeSeries_times), 0, 0, 1, 0},
   {&__pyx_n_s_Universe, __pyx_k_Universe, sizeof(__pyx_k_Universe), 0, 0, 1, 1},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_kp_s_Write_atoms_per_probe_volume_dat, __pyx_k_Write_atoms_per_probe_volume_dat, sizeof(__pyx_k_Write_atoms_per_probe_volume_dat), 0, 0, 1, 0},
   {&__pyx_n_s_Writer, __pyx_k_Writer, sizeof(__pyx_k_Writer), 0, 0, 1, 1},
   {&__pyx_kp_s_Writing_PDB, __pyx_k_Writing_PDB, sizeof(__pyx_k_Writing_PDB), 0, 0, 1, 0},
-  {&__pyx_n_s__13, __pyx_k__13, sizeof(__pyx_k__13), 0, 0, 1, 1},
-  {&__pyx_n_s__23, __pyx_k__23, sizeof(__pyx_k__23), 0, 0, 1, 1},
+  {&__pyx_n_s__14, __pyx_k__14, sizeof(__pyx_k__14), 0, 0, 1, 1},
+  {&__pyx_n_s__26, __pyx_k__26, sizeof(__pyx_k__26), 0, 0, 1, 1},
   {&__pyx_n_s_action, __pyx_k_action, sizeof(__pyx_k_action), 0, 0, 1, 1},
   {&__pyx_n_s_add_TopologyAttr, __pyx_k_add_TopologyAttr, sizeof(__pyx_k_add_TopologyAttr), 0, 0, 1, 1},
   {&__pyx_n_s_add_argument, __pyx_k_add_argument, sizeof(__pyx_k_add_argument), 0, 0, 1, 1},
@@ -14144,12 +13575,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_aligninitpos, __pyx_k_aligninitpos, sizeof(__pyx_k_aligninitpos), 0, 0, 1, 1},
   {&__pyx_n_s_alignment, __pyx_k_alignment, sizeof(__pyx_k_alignment), 0, 0, 1, 1},
   {&__pyx_n_s_analysis, __pyx_k_analysis, sizeof(__pyx_k_analysis), 0, 0, 1, 1},
-  {&__pyx_n_s_append, __pyx_k_append, sizeof(__pyx_k_append), 0, 0, 1, 1},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
   {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
-  {&__pyx_n_s_aspect, __pyx_k_aspect, sizeof(__pyx_k_aspect), 0, 0, 1, 1},
   {&__pyx_n_s_atoms, __pyx_k_atoms, sizeof(__pyx_k_atoms), 0, 0, 1, 1},
-  {&__pyx_n_s_auto, __pyx_k_auto, sizeof(__pyx_k_auto), 0, 0, 1, 1},
   {&__pyx_n_s_average, __pyx_k_average, sizeof(__pyx_k_average), 0, 0, 1, 1},
   {&__pyx_n_s_ax, __pyx_k_ax, sizeof(__pyx_k_ax), 0, 0, 1, 1},
   {&__pyx_n_s_axis, __pyx_k_axis, sizeof(__pyx_k_axis), 0, 0, 1, 1},
@@ -14159,53 +13587,50 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_calc_RMSD_worker, __pyx_k_calc_RMSD_worker, sizeof(__pyx_k_calc_RMSD_worker), 0, 0, 1, 1},
   {&__pyx_n_s_calc_Rg, __pyx_k_calc_Rg, sizeof(__pyx_k_calc_Rg), 0, 0, 1, 1},
   {&__pyx_n_s_calc_Rg_worker, __pyx_k_calc_Rg_worker, sizeof(__pyx_k_calc_Rg_worker), 0, 0, 1, 1},
-  {&__pyx_n_s_calc_deviation, __pyx_k_calc_deviation, sizeof(__pyx_k_calc_deviation), 0, 0, 1, 1},
+  {&__pyx_n_s_calc_args, __pyx_k_calc_args, sizeof(__pyx_k_calc_args), 0, 0, 1, 1},
   {&__pyx_n_s_calc_deviation_worker, __pyx_k_calc_deviation_worker, sizeof(__pyx_k_calc_deviation_worker), 0, 0, 1, 1},
+  {&__pyx_n_s_calc_deviations, __pyx_k_calc_deviations, sizeof(__pyx_k_calc_deviations), 0, 0, 1, 1},
   {&__pyx_n_s_call, __pyx_k_call, sizeof(__pyx_k_call), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_close, __pyx_k_close, sizeof(__pyx_k_close), 0, 0, 1, 1},
   {&__pyx_n_s_cma_RMSD, __pyx_k_cma_RMSD, sizeof(__pyx_k_cma_RMSD), 0, 0, 1, 1},
   {&__pyx_n_s_cma_Rg, __pyx_k_cma_Rg, sizeof(__pyx_k_cma_Rg), 0, 0, 1, 1},
   {&__pyx_n_s_cmap, __pyx_k_cmap, sizeof(__pyx_k_cmap), 0, 0, 1, 1},
-  {&__pyx_n_s_colorbar, __pyx_k_colorbar, sizeof(__pyx_k_colorbar), 0, 0, 1, 1},
   {&__pyx_n_s_com, __pyx_k_com, sizeof(__pyx_k_com), 0, 0, 1, 1},
   {&__pyx_n_s_coords, __pyx_k_coords, sizeof(__pyx_k_coords), 0, 0, 1, 1},
+  {&__pyx_kp_s_coords_and_masses_not_of_same_le, __pyx_k_coords_and_masses_not_of_same_le, sizeof(__pyx_k_coords_and_masses_not_of_same_le), 0, 0, 1, 0},
+  {&__pyx_kp_s_coords_not_3_dimensional, __pyx_k_coords_not_3_dimensional, sizeof(__pyx_k_coords_not_3_dimensional), 0, 0, 1, 0},
   {&__pyx_n_s_copy, __pyx_k_copy, sizeof(__pyx_k_copy), 0, 0, 1, 1},
   {&__pyx_n_s_cumulative_moving_average, __pyx_k_cumulative_moving_average, sizeof(__pyx_k_cumulative_moving_average), 0, 0, 1, 1},
+  {&__pyx_n_s_data_array, __pyx_k_data_array, sizeof(__pyx_k_data_array), 0, 0, 1, 1},
   {&__pyx_n_s_desc, __pyx_k_desc, sizeof(__pyx_k_desc), 0, 0, 1, 1},
-  {&__pyx_n_s_dev_times, __pyx_k_dev_times, sizeof(__pyx_k_dev_times), 0, 0, 1, 1},
-  {&__pyx_n_s_dev_times_2, __pyx_k_dev_times_2, sizeof(__pyx_k_dev_times_2), 0, 0, 1, 1},
-  {&__pyx_kp_s_dev_times_npy, __pyx_k_dev_times_npy, sizeof(__pyx_k_dev_times_npy), 0, 0, 1, 0},
   {&__pyx_n_s_deviation, __pyx_k_deviation, sizeof(__pyx_k_deviation), 0, 0, 1, 1},
   {&__pyx_n_s_deviations, __pyx_k_deviations, sizeof(__pyx_k_deviations), 0, 0, 1, 1},
-  {&__pyx_n_s_deviations_2, __pyx_k_deviations_2, sizeof(__pyx_k_deviations_2), 0, 0, 1, 1},
-  {&__pyx_kp_s_deviations_npy, __pyx_k_deviations_npy, sizeof(__pyx_k_deviations_npy), 0, 0, 1, 0},
   {&__pyx_kp_s_deviations_pdb, __pyx_k_deviations_pdb, sizeof(__pyx_k_deviations_pdb), 0, 0, 1, 0},
+  {&__pyx_kp_s_deviations_pkl, __pyx_k_deviations_pkl, sizeof(__pyx_k_deviations_pkl), 0, 0, 1, 0},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_dot, __pyx_k_dot, sizeof(__pyx_k_dot), 0, 0, 1, 1},
-  {&__pyx_n_s_dpi, __pyx_k_dpi, sizeof(__pyx_k_dpi), 0, 0, 1, 1},
   {&__pyx_n_s_enter, __pyx_k_enter, sizeof(__pyx_k_enter), 0, 0, 1, 1},
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
   {&__pyx_n_s_exit, __pyx_k_exit, sizeof(__pyx_k_exit), 0, 0, 1, 1},
-  {&__pyx_n_s_factor, __pyx_k_factor, sizeof(__pyx_k_factor), 0, 0, 1, 1},
   {&__pyx_n_s_fig, __pyx_k_fig, sizeof(__pyx_k_fig), 0, 0, 1, 1},
+  {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
+  {&__pyx_n_s_gca, __pyx_k_gca, sizeof(__pyx_k_gca), 0, 0, 1, 1},
   {&__pyx_kp_s_genpdb, __pyx_k_genpdb, sizeof(__pyx_k_genpdb), 0, 0, 1, 0},
   {&__pyx_n_s_genpdb_2, __pyx_k_genpdb_2, sizeof(__pyx_k_genpdb_2), 0, 0, 1, 1},
   {&__pyx_n_s_get, __pyx_k_get, sizeof(__pyx_k_get), 0, 0, 1, 1},
-  {&__pyx_n_s_get_yticks, __pyx_k_get_yticks, sizeof(__pyx_k_get_yticks), 0, 0, 1, 1},
   {&__pyx_n_s_heavy, __pyx_k_heavy, sizeof(__pyx_k_heavy), 0, 0, 1, 1},
   {&__pyx_n_s_help, __pyx_k_help, sizeof(__pyx_k_help), 0, 0, 1, 1},
   {&__pyx_n_s_hot, __pyx_k_hot, sizeof(__pyx_k_hot), 0, 0, 1, 1},
-  {&__pyx_n_s_im, __pyx_k_im, sizeof(__pyx_k_im), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
-  {&__pyx_n_s_imshow, __pyx_k_imshow, sizeof(__pyx_k_imshow), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
   {&__pyx_n_s_initcoords, __pyx_k_initcoords, sizeof(__pyx_k_initcoords), 0, 0, 1, 1},
   {&__pyx_n_s_initpos, __pyx_k_initpos, sizeof(__pyx_k_initpos), 0, 0, 1, 1},
-  {&__pyx_n_s_item, __pyx_k_item, sizeof(__pyx_k_item), 0, 0, 1, 1},
+  {&__pyx_n_s_isclose, __pyx_k_isclose, sizeof(__pyx_k_isclose), 0, 0, 1, 1},
   {&__pyx_n_s_label, __pyx_k_label, sizeof(__pyx_k_label), 0, 0, 1, 1},
-  {&__pyx_n_s_load, __pyx_k_load, sizeof(__pyx_k_load), 0, 0, 1, 1},
-  {&__pyx_n_s_lower, __pyx_k_lower, sizeof(__pyx_k_lower), 0, 0, 1, 1},
+  {&__pyx_n_s_labels, __pyx_k_labels, sizeof(__pyx_k_labels), 0, 0, 1, 1},
+  {&__pyx_n_s_legend, __pyx_k_legend, sizeof(__pyx_k_legend), 0, 0, 1, 1},
+  {&__pyx_n_s_load_TimeSeries, __pyx_k_load_TimeSeries, sizeof(__pyx_k_load_TimeSeries), 0, 0, 1, 1},
   {&__pyx_n_s_ma_RMSD, __pyx_k_ma_RMSD, sizeof(__pyx_k_ma_RMSD), 0, 0, 1, 1},
   {&__pyx_n_s_ma_Rg, __pyx_k_ma_Rg, sizeof(__pyx_k_ma_Rg), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
@@ -14218,6 +13643,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_mean, __pyx_k_mean, sizeof(__pyx_k_mean), 0, 0, 1, 1},
   {&__pyx_n_s_metaclass, __pyx_k_metaclass, sizeof(__pyx_k_metaclass), 0, 0, 1, 1},
   {&__pyx_n_s_min_rms, __pyx_k_min_rms, sizeof(__pyx_k_min_rms), 0, 0, 1, 1},
+  {&__pyx_n_s_misc_args, __pyx_k_misc_args, sizeof(__pyx_k_misc_args), 0, 0, 1, 1},
   {&__pyx_n_s_module, __pyx_k_module, sizeof(__pyx_k_module), 0, 0, 1, 1},
   {&__pyx_n_s_moving_average, __pyx_k_moving_average, sizeof(__pyx_k_moving_average), 0, 0, 1, 1},
   {&__pyx_n_s_multiframe, __pyx_k_multiframe, sizeof(__pyx_k_multiframe), 0, 0, 1, 1},
@@ -14226,18 +13652,18 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_name_CA_or_name_C_or_name_N, __pyx_k_name_CA_or_name_C_or_name_N, sizeof(__pyx_k_name_CA_or_name_C_or_name_N), 0, 0, 1, 0},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
-  {&__pyx_n_s_newlabels, __pyx_k_newlabels, sizeof(__pyx_k_newlabels), 0, 0, 1, 1},
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
-  {&__pyx_kp_s_npy, __pyx_k_npy, sizeof(__pyx_k_npy), 0, 0, 1, 0},
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_kp_s_numpy_core_multiarray_failed_to, __pyx_k_numpy_core_multiarray_failed_to, sizeof(__pyx_k_numpy_core_multiarray_failed_to), 0, 0, 1, 0},
   {&__pyx_kp_s_numpy_core_umath_failed_to_impor, __pyx_k_numpy_core_umath_failed_to_impor, sizeof(__pyx_k_numpy_core_umath_failed_to_impor), 0, 0, 1, 0},
   {&__pyx_n_s_opref, __pyx_k_opref, sizeof(__pyx_k_opref), 0, 0, 1, 1},
-  {&__pyx_n_s_origin, __pyx_k_origin, sizeof(__pyx_k_origin), 0, 0, 1, 1},
-  {&__pyx_n_s_parser, __pyx_k_parser, sizeof(__pyx_k_parser), 0, 0, 1, 1},
+  {&__pyx_n_s_opt_file_args, __pyx_k_opt_file_args, sizeof(__pyx_k_opt_file_args), 0, 0, 1, 1},
+  {&__pyx_n_s_out_args, __pyx_k_out_args, sizeof(__pyx_k_out_args), 0, 0, 1, 1},
   {&__pyx_n_s_pbar, __pyx_k_pbar, sizeof(__pyx_k_pbar), 0, 0, 1, 1},
   {&__pyx_n_s_pdbtrj, __pyx_k_pdbtrj, sizeof(__pyx_k_pdbtrj), 0, 0, 1, 1},
+  {&__pyx_kp_s_pkl, __pyx_k_pkl, sizeof(__pyx_k_pkl), 0, 0, 1, 0},
   {&__pyx_n_s_plot, __pyx_k_plot, sizeof(__pyx_k_plot), 0, 0, 1, 1},
+  {&__pyx_n_s_plot_2d_heatmap, __pyx_k_plot_2d_heatmap, sizeof(__pyx_k_plot_2d_heatmap), 0, 0, 1, 1},
   {&__pyx_n_s_plot_RMSD, __pyx_k_plot_RMSD, sizeof(__pyx_k_plot_RMSD), 0, 0, 1, 1},
   {&__pyx_n_s_plot_Rg, __pyx_k_plot_Rg, sizeof(__pyx_k_plot_Rg), 0, 0, 1, 1},
   {&__pyx_n_s_plot_cma_RMSD, __pyx_k_plot_cma_RMSD, sizeof(__pyx_k_plot_cma_RMSD), 0, 0, 1, 1},
@@ -14248,6 +13674,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_plt, __pyx_k_plt, sizeof(__pyx_k_plt), 0, 0, 1, 1},
   {&__pyx_n_s_positions, __pyx_k_positions, sizeof(__pyx_k_positions), 0, 0, 1, 1},
   {&__pyx_n_s_prepare, __pyx_k_prepare, sizeof(__pyx_k_prepare), 0, 0, 1, 1},
+  {&__pyx_n_s_profiling, __pyx_k_profiling, sizeof(__pyx_k_profiling), 0, 0, 1, 1},
   {&__pyx_n_s_protein, __pyx_k_protein, sizeof(__pyx_k_protein), 0, 0, 1, 1},
   {&__pyx_kp_s_protein_and_not_name_H, __pyx_k_protein_and_not_name_H, sizeof(__pyx_k_protein_and_not_name_H), 0, 0, 1, 0},
   {&__pyx_kp_s_protein_and_not_name_N_or_name_C, __pyx_k_protein_and_not_name_N_or_name_C, sizeof(__pyx_k_protein_and_not_name_N_or_name_C), 0, 0, 1, 0},
@@ -14265,28 +13692,18 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_refu, __pyx_k_refu, sizeof(__pyx_k_refu), 0, 0, 1, 1},
   {&__pyx_n_s_replot, __pyx_k_replot, sizeof(__pyx_k_replot), 0, 0, 1, 1},
   {&__pyx_n_s_replotpref, __pyx_k_replotpref, sizeof(__pyx_k_replotpref), 0, 0, 1, 1},
-  {&__pyx_n_s_rg, __pyx_k_rg, sizeof(__pyx_k_rg), 0, 0, 1, 1},
-  {&__pyx_n_s_rg_cma, __pyx_k_rg_cma, sizeof(__pyx_k_rg_cma), 0, 0, 1, 1},
-  {&__pyx_n_s_rg_ma, __pyx_k_rg_ma, sizeof(__pyx_k_rg_ma), 0, 0, 1, 1},
-  {&__pyx_n_s_rmsd, __pyx_k_rmsd, sizeof(__pyx_k_rmsd), 0, 0, 1, 1},
-  {&__pyx_n_s_rmsd_ma, __pyx_k_rmsd_ma, sizeof(__pyx_k_rmsd_ma), 0, 0, 1, 1},
+  {&__pyx_n_s_req_file_args, __pyx_k_req_file_args, sizeof(__pyx_k_req_file_args), 0, 0, 1, 1},
   {&__pyx_n_s_rotation_matrix, __pyx_k_rotation_matrix, sizeof(__pyx_k_rotation_matrix), 0, 0, 1, 1},
-  {&__pyx_n_s_save, __pyx_k_save, sizeof(__pyx_k_save), 0, 0, 1, 1},
+  {&__pyx_n_s_save_TimeSeries, __pyx_k_save_TimeSeries, sizeof(__pyx_k_save_TimeSeries), 0, 0, 1, 1},
   {&__pyx_n_s_save_figure, __pyx_k_save_figure, sizeof(__pyx_k_save_figure), 0, 0, 1, 1},
-  {&__pyx_n_s_save_pdb, __pyx_k_save_pdb, sizeof(__pyx_k_save_pdb), 0, 0, 1, 1},
-  {&__pyx_n_s_save_timeseries, __pyx_k_save_timeseries, sizeof(__pyx_k_save_timeseries), 0, 0, 1, 1},
   {&__pyx_n_s_sel, __pyx_k_sel, sizeof(__pyx_k_sel), 0, 0, 1, 1},
-  {&__pyx_n_s_sel_RMSD, __pyx_k_sel_RMSD, sizeof(__pyx_k_sel_RMSD), 0, 0, 1, 1},
-  {&__pyx_n_s_sel_Rg, __pyx_k_sel_Rg, sizeof(__pyx_k_sel_Rg), 0, 0, 1, 1},
   {&__pyx_kp_s_select, __pyx_k_select, sizeof(__pyx_k_select), 0, 0, 1, 0},
   {&__pyx_n_s_select_2, __pyx_k_select_2, sizeof(__pyx_k_select_2), 0, 0, 1, 1},
   {&__pyx_n_s_select_atoms, __pyx_k_select_atoms, sizeof(__pyx_k_select_atoms), 0, 0, 1, 1},
   {&__pyx_n_s_selection, __pyx_k_selection, sizeof(__pyx_k_selection), 0, 0, 1, 1},
   {&__pyx_n_s_selection_parser, __pyx_k_selection_parser, sizeof(__pyx_k_selection_parser), 0, 0, 1, 1},
   {&__pyx_n_s_self, __pyx_k_self, sizeof(__pyx_k_self), 0, 0, 1, 1},
-  {&__pyx_n_s_set_xlabel, __pyx_k_set_xlabel, sizeof(__pyx_k_set_xlabel), 0, 0, 1, 1},
-  {&__pyx_n_s_set_ylabel, __pyx_k_set_ylabel, sizeof(__pyx_k_set_ylabel), 0, 0, 1, 1},
-  {&__pyx_n_s_set_yticklabels, __pyx_k_set_yticklabels, sizeof(__pyx_k_set_yticklabels), 0, 0, 1, 1},
+  {&__pyx_n_s_set_dpi, __pyx_k_set_dpi, sizeof(__pyx_k_set_dpi), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_show, __pyx_k_show, sizeof(__pyx_k_show), 0, 0, 1, 1},
   {&__pyx_n_s_side_chain, __pyx_k_side_chain, sizeof(__pyx_k_side_chain), 0, 0, 1, 1},
@@ -14297,24 +13714,26 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_sqrt, __pyx_k_sqrt, sizeof(__pyx_k_sqrt), 0, 0, 1, 1},
   {&__pyx_n_s_store_true, __pyx_k_store_true, sizeof(__pyx_k_store_true), 0, 0, 1, 1},
   {&__pyx_n_s_structf, __pyx_k_structf, sizeof(__pyx_k_structf), 0, 0, 1, 1},
-  {&__pyx_n_s_subplots, __pyx_k_subplots, sizeof(__pyx_k_subplots), 0, 0, 1, 1},
   {&__pyx_n_s_suffix, __pyx_k_suffix, sizeof(__pyx_k_suffix), 0, 0, 1, 1},
   {&__pyx_n_s_sum, __pyx_k_sum, sizeof(__pyx_k_sum), 0, 0, 1, 1},
   {&__pyx_n_s_super, __pyx_k_super, sizeof(__pyx_k_super), 0, 0, 1, 1},
-  {&__pyx_n_s_t, __pyx_k_t, sizeof(__pyx_k_t), 0, 0, 1, 1},
   {&__pyx_n_s_tempfactors, __pyx_k_tempfactors, sizeof(__pyx_k_tempfactors), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
-  {&__pyx_n_s_ticks, __pyx_k_ticks, sizeof(__pyx_k_ticks), 0, 0, 1, 1},
   {&__pyx_n_s_tidx, __pyx_k_tidx, sizeof(__pyx_k_tidx), 0, 0, 1, 1},
   {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
-  {&__pyx_n_s_timefunc, __pyx_k_timefunc, sizeof(__pyx_k_timefunc), 0, 0, 1, 1},
+  {&__pyx_n_s_time_array, __pyx_k_time_array, sizeof(__pyx_k_time_array), 0, 0, 1, 1},
   {&__pyx_n_s_times, __pyx_k_times, sizeof(__pyx_k_times), 0, 0, 1, 1},
-  {&__pyx_n_s_tolist, __pyx_k_tolist, sizeof(__pyx_k_tolist), 0, 0, 1, 1},
+  {&__pyx_n_s_timeseries, __pyx_k_timeseries, sizeof(__pyx_k_timeseries), 0, 0, 1, 1},
   {&__pyx_n_s_total, __pyx_k_total, sizeof(__pyx_k_total), 0, 0, 1, 1},
   {&__pyx_n_s_tqdm, __pyx_k_tqdm, sizeof(__pyx_k_tqdm), 0, 0, 1, 1},
   {&__pyx_n_s_trajectory, __pyx_k_trajectory, sizeof(__pyx_k_trajectory), 0, 0, 1, 1},
   {&__pyx_n_s_trajf, __pyx_k_trajf, sizeof(__pyx_k_trajf), 0, 0, 1, 1},
   {&__pyx_n_s_ts, __pyx_k_ts, sizeof(__pyx_k_ts), 0, 0, 1, 1},
+  {&__pyx_n_s_ts_RMSD, __pyx_k_ts_RMSD, sizeof(__pyx_k_ts_RMSD), 0, 0, 1, 1},
+  {&__pyx_n_s_ts_RMSD_cma, __pyx_k_ts_RMSD_cma, sizeof(__pyx_k_ts_RMSD_cma), 0, 0, 1, 1},
+  {&__pyx_n_s_ts_RMSD_ma, __pyx_k_ts_RMSD_ma, sizeof(__pyx_k_ts_RMSD_ma), 0, 0, 1, 1},
+  {&__pyx_n_s_ts_Rg, __pyx_k_ts_Rg, sizeof(__pyx_k_ts_Rg), 0, 0, 1, 1},
+  {&__pyx_n_s_ts_deviations, __pyx_k_ts_deviations, sizeof(__pyx_k_ts_deviations), 0, 0, 1, 1},
   {&__pyx_n_s_u, __pyx_k_u, sizeof(__pyx_k_u), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
@@ -14324,12 +13743,13 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_weights, __pyx_k_weights, sizeof(__pyx_k_weights), 0, 0, 1, 1},
   {&__pyx_n_s_window, __pyx_k_window, sizeof(__pyx_k_window), 0, 0, 1, 1},
   {&__pyx_n_s_write, __pyx_k_write, sizeof(__pyx_k_write), 0, 0, 1, 1},
+  {&__pyx_n_s_write_deviations_pdb, __pyx_k_write_deviations_pdb, sizeof(__pyx_k_write_deviations_pdb), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 30, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 344, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 272, __pyx_L1_error)
+  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 117, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 415, __pyx_L1_error)
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(1, 285, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 856, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 1038, __pyx_L1_error)
@@ -14342,151 +13762,192 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":31
+  /* "INDUSAnalysis/protein_order_params.pyx":27
  *     def __init__(self):
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")             # <<<<<<<<<<<<<<
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+ * 
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_n_s_structf); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_n_s_structf); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":32
+  /* "INDUSAnalysis/protein_order_params.pyx":28
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")             # <<<<<<<<<<<<<<
+ * 
+ *         self.opt_file_args.add_argument("-reftrajf",
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_n_s_trajf); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_n_s_trajf); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":33
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
+  /* "INDUSAnalysis/protein_order_params.pyx":30
+ *         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+ * 
+ *         self.opt_file_args.add_argument("-reftrajf",             # <<<<<<<<<<<<<<
+ *                                         help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")
+ * 
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_reftrajf); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_reftrajf); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":34
- *         self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+  /* "INDUSAnalysis/protein_order_params.pyx":33
+ *                                         help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")
+ * 
+ *         self.calc_args.add_argument("-select",             # <<<<<<<<<<<<<<
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")
+ *         self.calc_args.add_argument("-align",
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_reftstep); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_select); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
   /* "INDUSAnalysis/protein_order_params.pyx":35
- *         self.parser.add_argument("-reftrajf", help="Reference trajectory file (.xtc) for RMSD")
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
- *         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
+ *         self.calc_args.add_argument("-select",
+ *                                     help="Atoms/groups to track order parameters for (MDA selection string)")
+ *         self.calc_args.add_argument("-align",             # <<<<<<<<<<<<<<
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ *         self.calc_args.add_argument("-skip",
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_select); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_align); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":36
- *         self.parser.add_argument("-reftstep", help="Timestep to extract reference coordinates from reference trajectory file for RMSD")
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
- * 
+  /* "INDUSAnalysis/protein_order_params.pyx":37
+ *         self.calc_args.add_argument("-align",
+ *                                     help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
+ *         self.calc_args.add_argument("-skip",             # <<<<<<<<<<<<<<
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ *         self.calc_args.add_argument("-reftstep",
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_align); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 36, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_skip); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":37
- *         self.parser.add_argument("-select", help="Atoms/groups to track order parameters for (MDA selection string)")
- *         self.parser.add_argument("-align", help="Atoms/groups for aligning trajectories across timesteps (MDA selection string)")
- *         self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":39
+ *         self.calc_args.add_argument("-skip",
+ *                                     help="Number of frames to skip between analyses (default = None)")
+ *         self.calc_args.add_argument("-reftstep",             # <<<<<<<<<<<<<<
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
  * 
- *         #Output control
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_skip); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_reftstep); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":40
+  /* "INDUSAnalysis/protein_order_params.pyx":42
+ *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
  * 
- *         #Output control
- *         self.parser.add_argument("--genpdb", action="store_true", help="Write atoms per probe volume data to pdb file")             # <<<<<<<<<<<<<<
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")
- * 
+ *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
+ *                                    action="store_true",
+ *                                    help="Write atoms per probe volume data to pdb file")
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_genpdb); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_genpdb); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":41
- *         #Output control
- *         self.parser.add_argument("--genpdb", action="store_true", help="Write atoms per probe volume data to pdb file")
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")             # <<<<<<<<<<<<<<
+  /* "INDUSAnalysis/protein_order_params.pyx":46
+ *                                    help="Write atoms per probe volume data to pdb file")
  * 
- *     def read_args(self):
+ *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
+ *                                     action="store_true",
+ *                                     help="Display progress")
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_verbose); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_verbose); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":116
- *     """
- *     def plot_Rg(self, Rg_data):
- *         t = Rg_data[:,0]             # <<<<<<<<<<<<<<
- *         rg = Rg_data[:,1]
+  /* "INDUSAnalysis/protein_order_params.pyx":117
+ *         """
+ *         if coords.shape[1] != 3:
+ *             raise ValueError("coords not 3 dimensional")             # <<<<<<<<<<<<<<
  * 
+ *         if coords.shape[0] != masses.shape[0]:
  */
-  __pyx_slice__10 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__10)) __PYX_ERR(0, 116, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_slice__10);
-  __Pyx_GIVEREF(__pyx_slice__10);
-  __pyx_tuple__11 = PyTuple_Pack(2, __pyx_slice__10, __pyx_int_0); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_s_coords_not_3_dimensional); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 117, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
+
+  /* "INDUSAnalysis/protein_order_params.pyx":120
+ * 
+ *         if coords.shape[0] != masses.shape[0]:
+ *             raise ValueError("coords and masses not of same length")             # <<<<<<<<<<<<<<
+ * 
+ *         com = np.average(coords, weights=masses, axis=0)
+ */
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_coords_and_masses_not_of_same_le); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 120, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":117
- *     def plot_Rg(self, Rg_data):
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]             # <<<<<<<<<<<<<<
- * 
- *         fig, ax = plt.subplots()
+  /* "INDUSAnalysis/protein_order_params.pyx":202
+ *         """
+ *         if not (coords.shape[1] == 3 and initcoords.shape[1] == 3 and aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3):
+ *             raise ValueError('One or more oordinates are not 3 dimensional')             # <<<<<<<<<<<<<<
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')
  */
-  __pyx_tuple__12 = PyTuple_Pack(2, __pyx_slice__10, __pyx_int_1); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 117, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_One_or_more_oordinates_are_not_3); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":343
- *             pbar = tqdm(desc = "Writing PDB", total = len(utraj))
+  /* "INDUSAnalysis/protein_order_params.pyx":204
+ *             raise ValueError('One or more oordinates are not 3 dimensional')
+ *         if not (coords.shape == initcoords.shape and aligncoords.shape == aligninitcoords.shape):
+ *             raise ValueError('Set of coordinates and reference set coordinates do not have same shape')             # <<<<<<<<<<<<<<
  * 
- *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
- *             for tidx, ts in enumerate(utraj):
- *                 protein_subselection.atoms.tempfactors = self.deviations[tidx,:]
+ *         # Calculate centers of geometry of alignment coordinates
  */
-  __pyx_tuple__14 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 343, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__14);
-  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_s_Set_of_coordinates_and_reference); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":355
+  /* "INDUSAnalysis/protein_order_params.pyx":417
+ *             for tidx, ts in enumerate(utraj):
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
+ *                     protein_subselection.atoms.tempfactors = ts_deviations.data_array[tidx, :]             # <<<<<<<<<<<<<<
+ *                     PDB.write(u.atoms)
+ *                     if self.verbose:
+ */
+  __pyx_slice__15 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__15)) __PYX_ERR(0, 417, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_slice__15);
+  __Pyx_GIVEREF(__pyx_slice__15);
+
+  /* "INDUSAnalysis/protein_order_params.pyx":422
+ *                         pbar.update(1)
+ *                 else:
+ *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")             # <<<<<<<<<<<<<<
+ * 
+ *     def __call__(self):
+ */
+  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_Trajectory_and_TimeSeries_times); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 422, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
+
+  /* "INDUSAnalysis/protein_order_params.pyx":414
+ *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
+ * 
+ *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
+ *             for tidx, ts in enumerate(utraj):
+ *                 if np.isclose(ts.time, ts_deviations.time_array[tidx]):
+ */
+  __pyx_tuple__17 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 414, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
+
+  /* "INDUSAnalysis/protein_order_params.pyx":430
  *         mda_select = self.selection_parser.get(self.select, self.select)
  *         mda_align = self.selection_parser.get(self.align, self.align)
  *         mda_deviation_select = self.selection_parser.get("protein", "protein")             # <<<<<<<<<<<<<<
  * 
- *         if self.replot:
+ *         """Raw data"""
  */
-  __pyx_tuple__15 = PyTuple_Pack(2, __pyx_n_s_protein, __pyx_n_s_protein); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 355, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__15);
-  __Pyx_GIVEREF(__pyx_tuple__15);
+  __pyx_tuple__18 = PyTuple_Pack(2, __pyx_n_s_protein, __pyx_n_s_protein); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 430, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
@@ -14495,9 +13956,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(1, 272, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(1, 272, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
@@ -14506,9 +13967,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  *             info.buf = PyArray_DATA(self)
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(1, 276, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__17);
-  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 276, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
  *                 if ((descr.byteorder == c'>' and little_endian) or
@@ -14517,9 +13978,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(1, 306, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__18);
-  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(1, 306, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
  * 
@@ -14528,9 +13989,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(1, 856, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__19);
-  __Pyx_GIVEREF(__pyx_tuple__19);
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 856, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
  *             t = child.type_num
@@ -14539,9 +14000,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 880, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__20);
-  __Pyx_GIVEREF(__pyx_tuple__20);
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(1, 880, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
  *         _import_array()
@@ -14550,9 +14011,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * cdef inline int import_umath() except -1:
  */
-  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_multiarray_failed_to); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(1, 1038, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__21);
-  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_multiarray_failed_to); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(1, 1038, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
  *         _import_umath()
@@ -14561,213 +14022,213 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * cdef inline int import_ufunc() except -1:
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 1044, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
+  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(1, 1044, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":29
- * 
- * class OrderParams(TimeSeries):
+  /* "INDUSAnalysis/protein_order_params.pyx":25
+ *     Calculates order parameters.
+ *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
  */
-  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 29, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_init, 29, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__27);
+  __Pyx_GIVEREF(__pyx_tuple__27);
+  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_init, 25, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(0, 25, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":43
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")
+  /* "INDUSAnalysis/protein_order_params.pyx":50
+ *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
- *         #POPULATE AS REQUIRED
- *         self.selection_parser = {
+ *         """
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
-  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 43, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_read_args, 43, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__29);
+  __Pyx_GIVEREF(__pyx_tuple__29);
+  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_read_args, 50, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) __PYX_ERR(0, 50, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":94
- *     Tests in tests/test_orderparams.py
- *     """
+  /* "INDUSAnalysis/protein_order_params.pyx":100
+ *         self.verbose = self.args.verbose
+ * 
  *     def calc_Rg_worker(self, coords, masses):             # <<<<<<<<<<<<<<
- *         #quick test
- *         assert(coords.shape[1] == 3)
+ *         """
+ *         Calculates radius of gyration of atoms with given coordinates and
  */
-  __pyx_tuple__28 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_coords, __pyx_n_s_masses, __pyx_n_s_com, __pyx_n_s_sq_distances, __pyx_n_s_Rg); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 94, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__28);
-  __Pyx_GIVEREF(__pyx_tuple__28);
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_Rg_worker, 94, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_tuple__31 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_coords, __pyx_n_s_masses, __pyx_n_s_com, __pyx_n_s_sq_distances, __pyx_n_s_Rg); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__31);
+  __Pyx_GIVEREF(__pyx_tuple__31);
+  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_Rg_worker, 100, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 100, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":103
+  /* "INDUSAnalysis/protein_order_params.pyx":127
  *         return Rg
  * 
- *     def calc_Rg(self, u, selection):             # <<<<<<<<<<<<<<
- *         Rg = []
- *         sel = u.select_atoms(selection)
+ *     def calc_Rg(self, u, skip, selection):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates radius of gyration of selection along trajectory.
  */
-  __pyx_tuple__30 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_selection, __pyx_n_s_Rg, __pyx_n_s_sel, __pyx_n_s_ts, __pyx_n_s_Rgval); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 103, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__30);
-  __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(3, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_Rg, 103, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 103, __pyx_L1_error)
-
-  /* "INDUSAnalysis/protein_order_params.pyx":115
- *     Plot radius of gyration
- *     """
- *     def plot_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
- */
-  __pyx_tuple__32 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_Rg_data, __pyx_n_s_t, __pyx_n_s_rg, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 115, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__32);
-  __Pyx_GIVEREF(__pyx_tuple__32);
-  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_Rg, 115, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 115, __pyx_L1_error)
-
-  /* "INDUSAnalysis/protein_order_params.pyx":132
- *     Plot moving (sliding window) average of radius of gyration
- *     """
- *     def plot_ma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
- */
-  __pyx_tuple__34 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_Rg_data, __pyx_n_s_t, __pyx_n_s_rg, __pyx_n_s_rg_ma, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 132, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__34);
-  __Pyx_GIVEREF(__pyx_tuple__34);
-  __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_ma_Rg, 132, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_tuple__33 = PyTuple_Pack(10, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_skip_2, __pyx_n_s_selection, __pyx_n_s_times, __pyx_n_s_Rgs, __pyx_n_s_sel, __pyx_n_s_ts, __pyx_n_s_Rgval, __pyx_n_s_ts_Rg); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__33);
+  __Pyx_GIVEREF(__pyx_tuple__33);
+  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(4, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_Rg, 127, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 127, __pyx_L1_error)
 
   /* "INDUSAnalysis/protein_order_params.pyx":150
- *     Plot cumulative moving (running) average of radius of gyration
- *     """
- *     def plot_cma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
+ *         return ts_Rg
+ * 
+ *     def plot_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots Rg and saves figure to file."""
+ *         fig = ts_Rg.plot()
  */
-  __pyx_tuple__36 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_Rg_data, __pyx_n_s_t, __pyx_n_s_rg, __pyx_n_s_rg_cma, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 150, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__36);
-  __Pyx_GIVEREF(__pyx_tuple__36);
-  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__36, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_cma_Rg, 150, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_tuple__35 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Rg, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__35);
+  __Pyx_GIVEREF(__pyx_tuple__35);
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_Rg, 150, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 150, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":160
+ *             plt.close()
+ * 
+ *     def plot_ma_Rg(self, ts_Rg, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.moving_average(window=window).plot()
+ */
+  __pyx_tuple__37 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_ts_Rg, __pyx_n_s_window, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__37);
+  __Pyx_GIVEREF(__pyx_tuple__37);
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_ma_Rg, 160, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 160, __pyx_L1_error)
 
   /* "INDUSAnalysis/protein_order_params.pyx":170
- *     Tests in tests/test_orderparams.py
- *     """
- *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *             plt.close()
+ * 
+ *     def plot_cma_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.cumulative_moving_average().plot()
  */
-  __pyx_tuple__38 = PyTuple_Pack(12, __pyx_n_s_self, __pyx_n_s_initcoords, __pyx_n_s_coords, __pyx_n_s_aligninitcoords, __pyx_n_s_aligncoords, __pyx_n_s_aligninitcog, __pyx_n_s_aligncog, __pyx_n_s_aligncoods, __pyx_n_s_R, __pyx_n_s_min_rms, __pyx_n_s_sq_distances, __pyx_n_s_RMSD_3); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 170, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__38);
-  __Pyx_GIVEREF(__pyx_tuple__38);
-  __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(5, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_RMSD_worker, 170, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_tuple__39 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Rg, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__39);
+  __Pyx_GIVEREF(__pyx_tuple__39);
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_cma_Rg, 170, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 170, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":196
+  /* "INDUSAnalysis/protein_order_params.pyx":180
+ *             plt.close()
+ * 
+ *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates RMSD of coordinates from reference after aligning them using
+ */
+  __pyx_tuple__41 = PyTuple_Pack(12, __pyx_n_s_self, __pyx_n_s_initcoords, __pyx_n_s_coords, __pyx_n_s_aligninitcoords, __pyx_n_s_aligncoords, __pyx_n_s_aligninitcog, __pyx_n_s_aligncog, __pyx_n_s_aligncoods, __pyx_n_s_R, __pyx_n_s_min_rms, __pyx_n_s_sq_distances, __pyx_n_s_RMSD); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__41);
+  __Pyx_GIVEREF(__pyx_tuple__41);
+  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(5, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_RMSD_worker, 180, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 180, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":227
  *         return RMSD
  * 
- *     def calc_RMSD(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_RMSD(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates RMSD of `selection` atom group in `u` from `selection` atom group
  */
-  __pyx_tuple__40 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_refu, __pyx_n_s_reftstep_2, __pyx_n_s_selection, __pyx_n_s_alignment, __pyx_n_s_sel, __pyx_n_s_refsel, __pyx_n_s_align_2, __pyx_n_s_refalign, __pyx_n_s_initpos, __pyx_n_s_aligninitpos, __pyx_n_s_RMSD_3, __pyx_n_s_ts, __pyx_n_s_RMSDval); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 196, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__40);
-  __Pyx_GIVEREF(__pyx_tuple__40);
-  __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(6, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_RMSD, 196, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_tuple__43 = PyTuple_Pack(17, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_refu, __pyx_n_s_reftstep_2, __pyx_n_s_skip_2, __pyx_n_s_selection, __pyx_n_s_alignment, __pyx_n_s_sel, __pyx_n_s_refsel, __pyx_n_s_align_2, __pyx_n_s_refalign, __pyx_n_s_initpos, __pyx_n_s_aligninitpos, __pyx_n_s_times, __pyx_n_s_RMSDs, __pyx_n_s_ts, __pyx_n_s_RMSDval); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__43);
+  __Pyx_GIVEREF(__pyx_tuple__43);
+  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(7, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_RMSD, 227, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 227, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":216
- *     Plot RMSD
- *     """
- *     def plot_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":262
+ *         return timeseries.TimeSeries(np.array(times), np.array(RMSDs), labels=['RMSD'])
+ * 
+ *     def plot_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots RMSD and saves figure to file."""
+ *         fig = ts_RMSD.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
  */
-  __pyx_tuple__42 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_RMSD_data, __pyx_n_s_rmsd, __pyx_n_s_t, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 216, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__42);
-  __Pyx_GIVEREF(__pyx_tuple__42);
-  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_RMSD, 216, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 216, __pyx_L1_error)
+  __pyx_tuple__45 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_ts_RMSD, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__45);
+  __Pyx_GIVEREF(__pyx_tuple__45);
+  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__45, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_RMSD, 262, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) __PYX_ERR(0, 262, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":233
- *     Plot moving (sliding window) average of RMSD
- *     """
- *     def plot_ma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":274
+ *             plt.close()
+ * 
+ *     def plot_ma_RMSD(self, ts_RMSD, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average RMSD and saves figure to file."""
+ *         ts_RMSD_ma = ts_RMSD.moving_average(window=window)
  */
-  __pyx_tuple__44 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_RMSD_data, __pyx_n_s_rmsd, __pyx_n_s_t, __pyx_n_s_rmsd_ma, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(0, 233, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__44);
-  __Pyx_GIVEREF(__pyx_tuple__44);
-  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_ma_RMSD, 233, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_tuple__47 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_ts_RMSD, __pyx_n_s_window, __pyx_n_s_ts_RMSD_ma, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__47);
+  __Pyx_GIVEREF(__pyx_tuple__47);
+  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_ma_RMSD, 274, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) __PYX_ERR(0, 274, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":251
- *     Plot cumulative moving (running) average of RMSD
- *     """
- *     def plot_cma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":287
+ *             plt.close()
+ * 
+ *     def plot_cma_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average RMSD and saves figure to file."""
+ *         ts_RMSD_cma = ts_RMSD.cumulative_moving_average()
  */
-  __pyx_tuple__46 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_RMSD_data, __pyx_n_s_rmsd, __pyx_n_s_t, __pyx_n_s_rmsd_ma, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(0, 251, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__46);
-  __Pyx_GIVEREF(__pyx_tuple__46);
-  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_cma_RMSD, 251, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(0, 251, __pyx_L1_error)
+  __pyx_tuple__49 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ts_RMSD, __pyx_n_s_ts_RMSD_cma, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__49)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__49);
+  __Pyx_GIVEREF(__pyx_tuple__49);
+  __pyx_codeobj__50 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__49, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_cma_RMSD, 287, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__50)) __PYX_ERR(0, 287, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":269
- *     Per-atom-deviation [each heavy atom] worker and helper function
- *     """
+  /* "INDUSAnalysis/protein_order_params.pyx":300
+ *             plt.close()
+ * 
  *     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *         """
+ *         Calculates deviations of coordinates from reference after aligning them using
  */
-  __pyx_tuple__48 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_initcoords, __pyx_n_s_coords, __pyx_n_s_aligninitcoords, __pyx_n_s_aligncoords, __pyx_n_s_aligninitcog, __pyx_n_s_aligncog, __pyx_n_s_aligncoods, __pyx_n_s_R, __pyx_n_s_min_rms, __pyx_n_s_deviation); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(0, 269, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__48);
-  __Pyx_GIVEREF(__pyx_tuple__48);
-  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(5, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_deviation_worker, 269, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_tuple__51 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_initcoords, __pyx_n_s_coords, __pyx_n_s_aligninitcoords, __pyx_n_s_aligncoords, __pyx_n_s_aligninitcog, __pyx_n_s_aligncog, __pyx_n_s_aligncoods, __pyx_n_s_R, __pyx_n_s_min_rms, __pyx_n_s_deviation); if (unlikely(!__pyx_tuple__51)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__51);
+  __Pyx_GIVEREF(__pyx_tuple__51);
+  __pyx_codeobj__52 = (PyObject*)__Pyx_PyCode_New(5, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__51, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_deviation_worker, 300, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__52)) __PYX_ERR(0, 300, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":294
+  /* "INDUSAnalysis/protein_order_params.pyx":346
  *         return deviation
  * 
- *     def calc_deviation(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_deviations(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates deviations of `selection` AtomGroup atoms in `u` from `selection` AtomGroup atoms
  */
-  __pyx_tuple__50 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_refu, __pyx_n_s_reftstep_2, __pyx_n_s_selection, __pyx_n_s_alignment, __pyx_n_s_sel, __pyx_n_s_refsel, __pyx_n_s_align_2, __pyx_n_s_refalign, __pyx_n_s_initpos, __pyx_n_s_aligninitpos, __pyx_n_s_deviations, __pyx_n_s_ts, __pyx_n_s_deviation); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 294, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__50);
-  __Pyx_GIVEREF(__pyx_tuple__50);
-  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(6, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_deviation, 294, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_tuple__53 = PyTuple_Pack(17, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_refu, __pyx_n_s_reftstep_2, __pyx_n_s_skip_2, __pyx_n_s_selection, __pyx_n_s_alignment, __pyx_n_s_sel, __pyx_n_s_refsel, __pyx_n_s_align_2, __pyx_n_s_refalign, __pyx_n_s_initpos, __pyx_n_s_aligninitpos, __pyx_n_s_times, __pyx_n_s_deviations, __pyx_n_s_ts, __pyx_n_s_deviation); if (unlikely(!__pyx_tuple__53)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__53);
+  __Pyx_GIVEREF(__pyx_tuple__53);
+  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(7, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_deviations, 346, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) __PYX_ERR(0, 346, __pyx_L1_error)
 
-  /* "INDUSAnalysis/protein_order_params.pyx":314
- *     Plot per-atom-deviation
- *     """
- *     def plot_deviations(self, times, deviations):             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots(dpi=300)
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")
- */
-  __pyx_tuple__52 = PyTuple_Pack(10, __pyx_n_s_self, __pyx_n_s_times, __pyx_n_s_deviations, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_im, __pyx_n_s_ticks, __pyx_n_s_factor, __pyx_n_s_newlabels, __pyx_n_s_item); if (unlikely(!__pyx_tuple__52)) __PYX_ERR(0, 314, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__52);
-  __Pyx_GIVEREF(__pyx_tuple__52);
-  __pyx_codeobj__53 = (PyObject*)__Pyx_PyCode_New(3, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__52, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_deviations, 314, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__53)) __PYX_ERR(0, 314, __pyx_L1_error)
-
-  /* "INDUSAnalysis/protein_order_params.pyx":334
- *     Save instantaneous per-atom-deviation data to PDB
- *     """
- *     def save_pdb(self, selection):             # <<<<<<<<<<<<<<
- *         protein_subselection = self.u.select_atoms(selection)
- *         self.u.add_TopologyAttr('tempfactors')
- */
-  __pyx_tuple__54 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_selection, __pyx_n_s_protein_subselection, __pyx_n_s_utraj, __pyx_n_s_pdbtrj, __pyx_n_s_pbar, __pyx_n_s_PDB, __pyx_n_s_tidx, __pyx_n_s_ts); if (unlikely(!__pyx_tuple__54)) __PYX_ERR(0, 334, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__54);
-  __Pyx_GIVEREF(__pyx_tuple__54);
-  __pyx_codeobj__55 = (PyObject*)__Pyx_PyCode_New(2, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__54, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_save_pdb, 334, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__55)) __PYX_ERR(0, 334, __pyx_L1_error)
-
-  /* "INDUSAnalysis/protein_order_params.pyx":351
+  /* "INDUSAnalysis/protein_order_params.pyx":381
+ *         return timeseries.TimeSeries(np.array(times), np.array(deviations), labels=['Deviation', 'Atom index'])
  * 
- *     """call"""
- *     def __call__(self):             # <<<<<<<<<<<<<<
- *         # Retrieve value stored in parser if exists, else use as-is
- *         mda_select = self.selection_parser.get(self.select, self.select)
+ *     def plot_deviations(self, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """Plots deviations as a 2D heatmap."""
+ *         fig = ts_deviations.plot_2d_heatmap(cmap='hot')
  */
-  __pyx_tuple__56 = PyTuple_Pack(8, __pyx_n_s_self, __pyx_n_s_mda_select, __pyx_n_s_mda_align, __pyx_n_s_mda_deviation_select, __pyx_n_s_sel_Rg, __pyx_n_s_sel_RMSD, __pyx_n_s_times, __pyx_n_s_deviations); if (unlikely(!__pyx_tuple__56)) __PYX_ERR(0, 351, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__56);
-  __Pyx_GIVEREF(__pyx_tuple__56);
-  __pyx_codeobj__57 = (PyObject*)__Pyx_PyCode_New(1, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__56, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_call, 351, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__57)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_tuple__55 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_deviations, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__55)) __PYX_ERR(0, 381, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__55);
+  __Pyx_GIVEREF(__pyx_tuple__55);
+  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_plot_deviations, 381, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) __PYX_ERR(0, 381, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":391
+ *             plt.close()
+ * 
+ *     def write_deviations_pdb(self, u, select, skip, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """
+ *         Writes per-atom-deviations to PDB file.
+ */
+  __pyx_tuple__57 = PyTuple_Pack(12, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_select_2, __pyx_n_s_skip_2, __pyx_n_s_ts_deviations, __pyx_n_s_protein_subselection, __pyx_n_s_pdbtrj, __pyx_n_s_utraj, __pyx_n_s_pbar, __pyx_n_s_PDB, __pyx_n_s_tidx, __pyx_n_s_ts); if (unlikely(!__pyx_tuple__57)) __PYX_ERR(0, 391, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__57);
+  __Pyx_GIVEREF(__pyx_tuple__57);
+  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(5, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_write_deviations_pdb, 391, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) __PYX_ERR(0, 391, __pyx_L1_error)
+
+  /* "INDUSAnalysis/protein_order_params.pyx":424
+ *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
+ * 
+ *     def __call__(self):             # <<<<<<<<<<<<<<
+ *         """Performs analysis."""
+ * 
+ */
+  __pyx_tuple__59 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_mda_select, __pyx_n_s_mda_align, __pyx_n_s_mda_deviation_select, __pyx_n_s_ts_Rg, __pyx_n_s_ts_RMSD, __pyx_n_s_ts_deviations); if (unlikely(!__pyx_tuple__59)) __PYX_ERR(0, 424, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__59);
+  __Pyx_GIVEREF(__pyx_tuple__59);
+  __pyx_codeobj__60 = (PyObject*)__Pyx_PyCode_New(1, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__59, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_call, 424, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__60)) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -15035,7 +14496,7 @@ if (!__Pyx_RefNanny) {
   Py_INCREF(__pyx_m);
   #else
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4("protein_order_params", __pyx_methods, __pyx_k_Calculate_time_series_Radius_of, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
+  __pyx_m = Py_InitModule4("protein_order_params", __pyx_methods, __pyx_k_Defines_class_for_analysing_pro, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
@@ -15081,380 +14542,383 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "INDUSAnalysis/protein_order_params.pyx":15
+  /* "INDUSAnalysis/protein_order_params.pyx":6
  * """
  * 
- * from INDUSAnalysis.timeseries import TimeSeries             # <<<<<<<<<<<<<<
- * from INDUSAnalysis.lib.profiling import timefunc
- * 
- */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s_TimeSeries);
-  __Pyx_GIVEREF(__pyx_n_s_TimeSeries);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_TimeSeries);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_INDUSAnalysis_timeseries, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_TimeSeries, __pyx_t_1) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":16
- * 
- * from INDUSAnalysis.timeseries import TimeSeries
- * from INDUSAnalysis.lib.profiling import timefunc             # <<<<<<<<<<<<<<
- * 
- * import numpy as np
- */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_n_s_timefunc);
-  __Pyx_GIVEREF(__pyx_n_s_timefunc);
-  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_timefunc);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_INDUSAnalysis_lib_profiling, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_timefunc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timefunc, __pyx_t_2) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":18
- * from INDUSAnalysis.lib.profiling import timefunc
- * 
  * import numpy as np             # <<<<<<<<<<<<<<
- * 
  * import matplotlib.pyplot as plt
+ * 
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":20
- * import numpy as np
+  /* "INDUSAnalysis/protein_order_params.pyx":7
  * 
+ * import numpy as np
  * import matplotlib.pyplot as plt             # <<<<<<<<<<<<<<
+ * 
  * import MDAnalysis as mda
- * import MDAnalysis.analysis.align
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s__23);
-  __Pyx_GIVEREF(__pyx_n_s__23);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s__23);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_matplotlib_pyplot, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
+  __Pyx_INCREF(__pyx_n_s__26);
+  __Pyx_GIVEREF(__pyx_n_s__26);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s__26);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_matplotlib_pyplot, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_plt, __pyx_t_2) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_plt, __pyx_t_2) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":21
- * 
+  /* "INDUSAnalysis/protein_order_params.pyx":9
  * import matplotlib.pyplot as plt
+ * 
  * import MDAnalysis as mda             # <<<<<<<<<<<<<<
  * import MDAnalysis.analysis.align
- * from tqdm import tqdm
+ * 
  */
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MDAnalysis, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MDAnalysis, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mda, __pyx_t_2) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mda, __pyx_t_2) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":22
- * import matplotlib.pyplot as plt
+  /* "INDUSAnalysis/protein_order_params.pyx":10
+ * 
  * import MDAnalysis as mda
  * import MDAnalysis.analysis.align             # <<<<<<<<<<<<<<
- * from tqdm import tqdm
  * 
+ * from tqdm import tqdm
  */
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MDAnalysis_analysis_align, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MDAnalysis_analysis_align, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MDAnalysis, __pyx_t_2) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MDAnalysis, __pyx_t_2) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":23
- * import MDAnalysis as mda
+  /* "INDUSAnalysis/protein_order_params.pyx":12
  * import MDAnalysis.analysis.align
+ * 
  * from tqdm import tqdm             # <<<<<<<<<<<<<<
  * 
- * """Cython"""
+ * from INDUSAnalysis import timeseries
  */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_tqdm);
   __Pyx_GIVEREF(__pyx_n_s_tqdm);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_tqdm);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_tqdm, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_tqdm, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_tqdm, __pyx_t_2) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_tqdm, __pyx_t_2) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":28
- * cimport numpy as np
+  /* "INDUSAnalysis/protein_order_params.pyx":14
+ * from tqdm import tqdm
  * 
- * class OrderParams(TimeSeries):             # <<<<<<<<<<<<<<
- *     def __init__(self):
- *         super().__init__()
+ * from INDUSAnalysis import timeseries             # <<<<<<<<<<<<<<
+ * from INDUSAnalysis.lib import profiling
+ * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __Pyx_INCREF(__pyx_n_s_timeseries);
+  __Pyx_GIVEREF(__pyx_n_s_timeseries);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_timeseries);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_INDUSAnalysis, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
-  __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_OrderParams, __pyx_n_s_OrderParams, (PyObject *) NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, (PyObject *) NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timeseries, __pyx_t_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":15
+ * 
+ * from INDUSAnalysis import timeseries
+ * from INDUSAnalysis.lib import profiling             # <<<<<<<<<<<<<<
+ * 
+ * """Cython"""
+ */
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_n_s_profiling);
+  __Pyx_GIVEREF(__pyx_n_s_profiling);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_profiling);
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_INDUSAnalysis_lib, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_profiling, __pyx_t_2) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":21
+ * 
+ * 
+ * class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):             # <<<<<<<<<<<<<<
+ *     """
+ *     Calculates order parameters.
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_TimeSeriesAnalysis); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_OrderParamsAnalysis, __pyx_n_s_OrderParamsAnalysis, (PyObject *) NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_kp_s_Calculates_order_parameters); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
 
-  /* "INDUSAnalysis/protein_order_params.pyx":29
- * 
- * class OrderParams(TimeSeries):
+  /* "INDUSAnalysis/protein_order_params.pyx":25
+ *     Calculates order parameters.
+ *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super().__init__()
- *         self.parser.add_argument("structf", help="Structure file (.gro)")
+ *         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_1__init__, 0, __pyx_n_s_OrderParams___init, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__25)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_1__init__, 0, __pyx_n_s_OrderParamsAnalysis___init, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__28)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_t_5);
   PyList_Append(__pyx_t_4, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_init, __pyx_t_5) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_init, __pyx_t_5) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":43
- *         self.parser.add_argument("--verbose", help="Display progress", action="store_true")
+  /* "INDUSAnalysis/protein_order_params.pyx":50
+ *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
- *         #POPULATE AS REQUIRED
- *         self.selection_parser = {
+ *         """
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_3read_args, 0, __pyx_n_s_OrderParams_read_args, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__27)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_3read_args, 0, __pyx_n_s_OrderParamsAnalysis_read_args, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__30)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_t_5);
   PyList_Append(__pyx_t_4, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_read_args, __pyx_t_5) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_read_args, __pyx_t_5) < 0) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":94
- *     Tests in tests/test_orderparams.py
- *     """
+  /* "INDUSAnalysis/protein_order_params.pyx":100
+ *         self.verbose = self.args.verbose
+ * 
  *     def calc_Rg_worker(self, coords, masses):             # <<<<<<<<<<<<<<
- *         #quick test
- *         assert(coords.shape[1] == 3)
+ *         """
+ *         Calculates radius of gyration of atoms with given coordinates and
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_5calc_Rg_worker, 0, __pyx_n_s_OrderParams_calc_Rg_worker, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__29)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_5calc_Rg_worker, 0, __pyx_n_s_OrderParamsAnalysis_calc_Rg_work, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__32)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_Rg_worker, __pyx_t_5) < 0) __PYX_ERR(0, 94, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_Rg_worker, __pyx_t_5) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":103
+  /* "INDUSAnalysis/protein_order_params.pyx":127
  *         return Rg
  * 
- *     def calc_Rg(self, u, selection):             # <<<<<<<<<<<<<<
- *         Rg = []
- *         sel = u.select_atoms(selection)
+ *     def calc_Rg(self, u, skip, selection):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates radius of gyration of selection along trajectory.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_7calc_Rg, 0, __pyx_n_s_OrderParams_calc_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__31)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_7calc_Rg, 0, __pyx_n_s_OrderParamsAnalysis_calc_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__34)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 103, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":115
- *     Plot radius of gyration
- *     """
- *     def plot_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
- */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_9plot_Rg, 0, __pyx_n_s_OrderParams_plot_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__33)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 115, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":132
- *     Plot moving (sliding window) average of radius of gyration
- *     """
- *     def plot_ma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
- */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_11plot_ma_Rg, 0, __pyx_n_s_OrderParams_plot_ma_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__35)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 132, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_ma_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 132, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":150
- *     Plot cumulative moving (running) average of radius of gyration
- *     """
- *     def plot_cma_Rg(self, Rg_data):             # <<<<<<<<<<<<<<
- *         t = Rg_data[:,0]
- *         rg = Rg_data[:,1]
+ *         return ts_Rg
+ * 
+ *     def plot_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots Rg and saves figure to file."""
+ *         fig = ts_Rg.plot()
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_13plot_cma_Rg, 0, __pyx_n_s_OrderParams_plot_cma_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__37)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_9plot_Rg, 0, __pyx_n_s_OrderParamsAnalysis_plot_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__36)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_cma_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 150, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":160
+ *             plt.close()
+ * 
+ *     def plot_ma_Rg(self, ts_Rg, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.moving_average(window=window).plot()
+ */
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_11plot_ma_Rg, 0, __pyx_n_s_OrderParamsAnalysis_plot_ma_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__38)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_ma_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 160, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":170
- *     Tests in tests/test_orderparams.py
- *     """
- *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *             plt.close()
+ * 
+ *     def plot_cma_Rg(self, ts_Rg):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average Rg and saves figure to file."""
+ *         fig = ts_Rg.cumulative_moving_average().plot()
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_15calc_RMSD_worker, 0, __pyx_n_s_OrderParams_calc_RMSD_worker, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__39)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_13plot_cma_Rg, 0, __pyx_n_s_OrderParamsAnalysis_plot_cma_Rg, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__40)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_RMSD_worker, __pyx_t_5) < 0) __PYX_ERR(0, 170, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_cma_Rg, __pyx_t_5) < 0) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":196
+  /* "INDUSAnalysis/protein_order_params.pyx":180
+ *             plt.close()
+ * 
+ *     def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates RMSD of coordinates from reference after aligning them using
+ */
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_15calc_RMSD_worker, 0, __pyx_n_s_OrderParamsAnalysis_calc_RMSD_wo, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__42)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_RMSD_worker, __pyx_t_5) < 0) __PYX_ERR(0, 180, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":227
  *         return RMSD
  * 
- *     def calc_RMSD(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_RMSD(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates RMSD of `selection` atom group in `u` from `selection` atom group
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_17calc_RMSD, 0, __pyx_n_s_OrderParams_calc_RMSD, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__41)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 196, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_17calc_RMSD, 0, __pyx_n_s_OrderParamsAnalysis_calc_RMSD, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__44)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 196, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 227, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":216
- *     Plot RMSD
- *     """
- *     def plot_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":262
+ *         return timeseries.TimeSeries(np.array(times), np.array(RMSDs), labels=['RMSD'])
+ * 
+ *     def plot_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots RMSD and saves figure to file."""
+ *         fig = ts_RMSD.plot(label="RMSD between {} atoms, using {} atoms for alignment".format(self.select, self.align))
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_19plot_RMSD, 0, __pyx_n_s_OrderParams_plot_RMSD, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__43)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 216, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_19plot_RMSD, 0, __pyx_n_s_OrderParamsAnalysis_plot_RMSD, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__46)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 216, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":233
- *     Plot moving (sliding window) average of RMSD
- *     """
- *     def plot_ma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":274
+ *             plt.close()
+ * 
+ *     def plot_ma_RMSD(self, ts_RMSD, window):             # <<<<<<<<<<<<<<
+ *         """Plots moving average RMSD and saves figure to file."""
+ *         ts_RMSD_ma = ts_RMSD.moving_average(window=window)
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_21plot_ma_RMSD, 0, __pyx_n_s_OrderParams_plot_ma_RMSD, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__45)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_21plot_ma_RMSD, 0, __pyx_n_s_OrderParamsAnalysis_plot_ma_RMSD, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__48)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_ma_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 233, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_ma_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":251
- *     Plot cumulative moving (running) average of RMSD
- *     """
- *     def plot_cma_RMSD(self, RMSD_data):             # <<<<<<<<<<<<<<
- *         rmsd = RMSD_data[:,1]
- *         t = RMSD_data[:,0]
+  /* "INDUSAnalysis/protein_order_params.pyx":287
+ *             plt.close()
+ * 
+ *     def plot_cma_RMSD(self, ts_RMSD):             # <<<<<<<<<<<<<<
+ *         """Plots cumulative moving average RMSD and saves figure to file."""
+ *         ts_RMSD_cma = ts_RMSD.cumulative_moving_average()
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_23plot_cma_RMSD, 0, __pyx_n_s_OrderParams_plot_cma_RMSD, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__47)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 251, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_23plot_cma_RMSD, 0, __pyx_n_s_OrderParamsAnalysis_plot_cma_RMS, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__50)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_cma_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 251, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_cma_RMSD, __pyx_t_5) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":269
- *     Per-atom-deviation [each heavy atom] worker and helper function
- *     """
+  /* "INDUSAnalysis/protein_order_params.pyx":300
+ *             plt.close()
+ * 
  *     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):             # <<<<<<<<<<<<<<
- *         assert(coords.shape[1] == 3 and initcoords.shape[1] == 3 and \
- *             aligncoords.shape[1] == 3 and aligninitcoords.shape[1] == 3)
+ *         """
+ *         Calculates deviations of coordinates from reference after aligning them using
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_25calc_deviation_worker, 0, __pyx_n_s_OrderParams_calc_deviation_worke, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__49)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_25calc_deviation_worker, 0, __pyx_n_s_OrderParamsAnalysis_calc_deviati, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__52)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_deviation_worker, __pyx_t_5) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_deviation_worker, __pyx_t_5) < 0) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":294
+  /* "INDUSAnalysis/protein_order_params.pyx":346
  *         return deviation
  * 
- *     def calc_deviation(self, u, refu, reftstep, selection, alignment):             # <<<<<<<<<<<<<<
- *         sel = u.select_atoms(selection)
- *         refsel = refu.select_atoms(selection)
+ *     def calc_deviations(self, u, refu, reftstep, skip, selection, alignment):             # <<<<<<<<<<<<<<
+ *         """
+ *         Calculates deviations of `selection` AtomGroup atoms in `u` from `selection` AtomGroup atoms
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_27calc_deviation, 0, __pyx_n_s_OrderParams_calc_deviation, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__51)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_27calc_deviations, 0, __pyx_n_s_OrderParamsAnalysis_calc_deviati_2, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__54)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_deviation, __pyx_t_5) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_deviations, __pyx_t_5) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":314
- *     Plot per-atom-deviation
- *     """
- *     def plot_deviations(self, times, deviations):             # <<<<<<<<<<<<<<
- *         fig, ax = plt.subplots(dpi=300)
- *         im = ax.imshow(deviations, origin="lower", cmap="hot", aspect="auto")
- */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_29plot_deviations, 0, __pyx_n_s_OrderParams_plot_deviations, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__53)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 314, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_deviations, __pyx_t_5) < 0) __PYX_ERR(0, 314, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":334
- *     Save instantaneous per-atom-deviation data to PDB
- *     """
- *     def save_pdb(self, selection):             # <<<<<<<<<<<<<<
- *         protein_subselection = self.u.select_atoms(selection)
- *         self.u.add_TopologyAttr('tempfactors')
- */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_31save_pdb, 0, __pyx_n_s_OrderParams_save_pdb, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__55)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 334, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_save_pdb, __pyx_t_5) < 0) __PYX_ERR(0, 334, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "INDUSAnalysis/protein_order_params.pyx":351
+  /* "INDUSAnalysis/protein_order_params.pyx":381
+ *         return timeseries.TimeSeries(np.array(times), np.array(deviations), labels=['Deviation', 'Atom index'])
  * 
- *     """call"""
+ *     def plot_deviations(self, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """Plots deviations as a 2D heatmap."""
+ *         fig = ts_deviations.plot_2d_heatmap(cmap='hot')
+ */
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_29plot_deviations, 0, __pyx_n_s_OrderParamsAnalysis_plot_deviati, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__56)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 381, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_deviations, __pyx_t_5) < 0) __PYX_ERR(0, 381, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":391
+ *             plt.close()
+ * 
+ *     def write_deviations_pdb(self, u, select, skip, ts_deviations):             # <<<<<<<<<<<<<<
+ *         """
+ *         Writes per-atom-deviations to PDB file.
+ */
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_31write_deviations_pdb, 0, __pyx_n_s_OrderParamsAnalysis_write_deviat, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__58)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 391, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_write_deviations_pdb, __pyx_t_5) < 0) __PYX_ERR(0, 391, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "INDUSAnalysis/protein_order_params.pyx":424
+ *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
+ * 
  *     def __call__(self):             # <<<<<<<<<<<<<<
- *         # Retrieve value stored in parser if exists, else use as-is
- *         mda_select = self.selection_parser.get(self.select, self.select)
+ *         """Performs analysis."""
+ * 
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_11OrderParams_33__call__, 0, __pyx_n_s_OrderParams___call, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__57)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_20protein_order_params_19OrderParamsAnalysis_33__call__, 0, __pyx_n_s_OrderParamsAnalysis___call, NULL, __pyx_n_s_INDUSAnalysis_protein_order_para, __pyx_d, ((PyObject *)__pyx_codeobj__60)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_call, __pyx_t_5) < 0) __PYX_ERR(0, 351, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_call, __pyx_t_5) < 0) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/protein_order_params.pyx":28
- * cimport numpy as np
+  /* "INDUSAnalysis/protein_order_params.pyx":21
  * 
- * class OrderParams(TimeSeries):             # <<<<<<<<<<<<<<
- *     def __init__(self):
- *         super().__init__()
+ * 
+ * class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):             # <<<<<<<<<<<<<<
+ *     """
+ *     Calculates order parameters.
  */
-  __pyx_t_5 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_OrderParams, __pyx_t_2, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_OrderParamsAnalysis, __pyx_t_1, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_CyFunction_InitClassCell(__pyx_t_4, __pyx_t_5) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
+  if (__Pyx_CyFunction_InitClassCell(__pyx_t_4, __pyx_t_5) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_OrderParams, __pyx_t_5) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_OrderParamsAnalysis, __pyx_t_5) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":1
  * """             # <<<<<<<<<<<<<<
- * Calculate time series
- * - Radius of gyration
+ * Defines class for analysing protein order parameters along GROMACS
+ * simulation trajectory.
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "../opt/anaconda3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
  *         raise ImportError("numpy.core.umath failed to import")
@@ -16000,15 +15464,15 @@ bad:
 }
 
 /* PyIntCompare */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, CYTHON_UNUSED long inplace) {
+static CYTHON_INLINE PyObject* __Pyx_PyInt_NeObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, CYTHON_UNUSED long inplace) {
     if (op1 == op2) {
-        Py_RETURN_TRUE;
+        Py_RETURN_FALSE;
     }
     #if PY_MAJOR_VERSION < 3
     if (likely(PyInt_CheckExact(op1))) {
         const long b = intval;
         long a = PyInt_AS_LONG(op1);
-        if (a == b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
+        if (a != b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
     }
     #endif
     #if CYTHON_USE_PYLONG_INTERNALS
@@ -16018,15 +15482,15 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, 
         Py_ssize_t size = Py_SIZE(op1);
         const digit* digits = ((PyLongObject*)op1)->ob_digit;
         if (intval == 0) {
-            if (size == 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
+            if (size != 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
         } else if (intval < 0) {
             if (size >= 0)
-                Py_RETURN_FALSE;
+                Py_RETURN_TRUE;
             intval = -intval;
             size = -size;
         } else {
             if (size <= 0)
-                Py_RETURN_FALSE;
+                Py_RETURN_TRUE;
         }
         uintval = (unsigned long) intval;
 #if PyLong_SHIFT * 4 < SIZEOF_LONG*8
@@ -16054,16 +15518,16 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, 
         } else
 #endif
             unequal = (size != 1) || (((unsigned long) digits[0]) != (uintval & (unsigned long) PyLong_MASK));
-        if (unequal == 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
+        if (unequal != 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
     }
     #endif
     if (PyFloat_CheckExact(op1)) {
         const long b = intval;
         double a = PyFloat_AS_DOUBLE(op1);
-        if ((double)a == (double)b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
+        if ((double)a != (double)b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
     }
     return (
-        PyObject_RichCompare(op1, op2, Py_EQ));
+        PyObject_RichCompare(op1, op2, Py_NE));
 }
 
 /* GetItemInt */
@@ -16153,6 +15617,189 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, 
     return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
 }
 
+/* PyErrFetchRestore */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    tmp_type = tstate->curexc_type;
+    tmp_value = tstate->curexc_value;
+    tmp_tb = tstate->curexc_traceback;
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    *type = tstate->curexc_type;
+    *value = tstate->curexc_value;
+    *tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+}
+#endif
+
+/* RaiseException */
+#if PY_MAJOR_VERSION < 3
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb,
+                        CYTHON_UNUSED PyObject *cause) {
+    __Pyx_PyThreadState_declare
+    Py_XINCREF(type);
+    if (!value || value == Py_None)
+        value = NULL;
+    else
+        Py_INCREF(value);
+    if (!tb || tb == Py_None)
+        tb = NULL;
+    else {
+        Py_INCREF(tb);
+        if (!PyTraceBack_Check(tb)) {
+            PyErr_SetString(PyExc_TypeError,
+                "raise: arg 3 must be a traceback or None");
+            goto raise_error;
+        }
+    }
+    if (PyType_Check(type)) {
+#if CYTHON_COMPILING_IN_PYPY
+        if (!value) {
+            Py_INCREF(Py_None);
+            value = Py_None;
+        }
+#endif
+        PyErr_NormalizeException(&type, &value, &tb);
+    } else {
+        if (value) {
+            PyErr_SetString(PyExc_TypeError,
+                "instance exception may not have a separate value");
+            goto raise_error;
+        }
+        value = type;
+        type = (PyObject*) Py_TYPE(type);
+        Py_INCREF(type);
+        if (!PyType_IsSubtype((PyTypeObject *)type, (PyTypeObject *)PyExc_BaseException)) {
+            PyErr_SetString(PyExc_TypeError,
+                "raise: exception class must be a subclass of BaseException");
+            goto raise_error;
+        }
+    }
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrRestore(type, value, tb);
+    return;
+raise_error:
+    Py_XDECREF(value);
+    Py_XDECREF(type);
+    Py_XDECREF(tb);
+    return;
+}
+#else
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause) {
+    PyObject* owned_instance = NULL;
+    if (tb == Py_None) {
+        tb = 0;
+    } else if (tb && !PyTraceBack_Check(tb)) {
+        PyErr_SetString(PyExc_TypeError,
+            "raise: arg 3 must be a traceback or None");
+        goto bad;
+    }
+    if (value == Py_None)
+        value = 0;
+    if (PyExceptionInstance_Check(type)) {
+        if (value) {
+            PyErr_SetString(PyExc_TypeError,
+                "instance exception may not have a separate value");
+            goto bad;
+        }
+        value = type;
+        type = (PyObject*) Py_TYPE(value);
+    } else if (PyExceptionClass_Check(type)) {
+        PyObject *instance_class = NULL;
+        if (value && PyExceptionInstance_Check(value)) {
+            instance_class = (PyObject*) Py_TYPE(value);
+            if (instance_class != type) {
+                int is_subclass = PyObject_IsSubclass(instance_class, type);
+                if (!is_subclass) {
+                    instance_class = NULL;
+                } else if (unlikely(is_subclass == -1)) {
+                    goto bad;
+                } else {
+                    type = instance_class;
+                }
+            }
+        }
+        if (!instance_class) {
+            PyObject *args;
+            if (!value)
+                args = PyTuple_New(0);
+            else if (PyTuple_Check(value)) {
+                Py_INCREF(value);
+                args = value;
+            } else
+                args = PyTuple_Pack(1, value);
+            if (!args)
+                goto bad;
+            owned_instance = PyObject_Call(type, args, NULL);
+            Py_DECREF(args);
+            if (!owned_instance)
+                goto bad;
+            value = owned_instance;
+            if (!PyExceptionInstance_Check(value)) {
+                PyErr_Format(PyExc_TypeError,
+                             "calling %R should have returned an instance of "
+                             "BaseException, not %R",
+                             type, Py_TYPE(value));
+                goto bad;
+            }
+        }
+    } else {
+        PyErr_SetString(PyExc_TypeError,
+            "raise: exception class must be a subclass of BaseException");
+        goto bad;
+    }
+    if (cause) {
+        PyObject *fixed_cause;
+        if (cause == Py_None) {
+            fixed_cause = NULL;
+        } else if (PyExceptionClass_Check(cause)) {
+            fixed_cause = PyObject_CallObject(cause, NULL);
+            if (fixed_cause == NULL)
+                goto bad;
+        } else if (PyExceptionInstance_Check(cause)) {
+            fixed_cause = cause;
+            Py_INCREF(fixed_cause);
+        } else {
+            PyErr_SetString(PyExc_TypeError,
+                            "exception causes must derive from "
+                            "BaseException");
+            goto bad;
+        }
+        PyException_SetCause(value, fixed_cause);
+    }
+    PyErr_SetObject(type, value);
+    if (tb) {
+#if CYTHON_COMPILING_IN_PYPY
+        PyObject *tmp_type, *tmp_value, *tmp_tb;
+        PyErr_Fetch(&tmp_type, &tmp_value, &tmp_tb);
+        Py_INCREF(tb);
+        PyErr_Restore(tmp_type, tmp_value, tb);
+        Py_XDECREF(tmp_tb);
+#else
+        PyThreadState *tstate = __Pyx_PyThreadState_Current;
+        PyObject* tmp_tb = tstate->curexc_traceback;
+        if (tb != tmp_tb) {
+            Py_INCREF(tb);
+            tstate->curexc_traceback = tb;
+            Py_XDECREF(tmp_tb);
+        }
+#endif
+    }
+bad:
+    Py_XDECREF(owned_instance);
+    return;
+}
+#endif
+
 /* PyObjectCall2Args */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
     PyObject *args, *result = NULL;
@@ -16211,131 +15858,71 @@ static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key) {
 }
 #endif
 
-/* PyObjectGetMethod */
-static int __Pyx_PyObject_GetMethod(PyObject *obj, PyObject *name, PyObject **method) {
-    PyObject *attr;
-#if CYTHON_UNPACK_METHODS && CYTHON_COMPILING_IN_CPYTHON && CYTHON_USE_PYTYPE_LOOKUP
-    PyTypeObject *tp = Py_TYPE(obj);
-    PyObject *descr;
-    descrgetfunc f = NULL;
-    PyObject **dictptr, *dict;
-    int meth_found = 0;
-    assert (*method == NULL);
-    if (unlikely(tp->tp_getattro != PyObject_GenericGetAttr)) {
-        attr = __Pyx_PyObject_GetAttrStr(obj, name);
-        goto try_unpack;
+/* PyIntCompare */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, CYTHON_UNUSED long intval, CYTHON_UNUSED long inplace) {
+    if (op1 == op2) {
+        Py_RETURN_TRUE;
     }
-    if (unlikely(tp->tp_dict == NULL) && unlikely(PyType_Ready(tp) < 0)) {
-        return 0;
+    #if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_CheckExact(op1))) {
+        const long b = intval;
+        long a = PyInt_AS_LONG(op1);
+        if (a == b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
     }
-    descr = _PyType_Lookup(tp, name);
-    if (likely(descr != NULL)) {
-        Py_INCREF(descr);
-#if PY_MAJOR_VERSION >= 3
-        #ifdef __Pyx_CyFunction_USED
-        if (likely(PyFunction_Check(descr) || (Py_TYPE(descr) == &PyMethodDescr_Type) || __Pyx_CyFunction_Check(descr)))
-        #else
-        if (likely(PyFunction_Check(descr) || (Py_TYPE(descr) == &PyMethodDescr_Type)))
-        #endif
-#else
-        #ifdef __Pyx_CyFunction_USED
-        if (likely(PyFunction_Check(descr) || __Pyx_CyFunction_Check(descr)))
-        #else
-        if (likely(PyFunction_Check(descr)))
-        #endif
-#endif
-        {
-            meth_found = 1;
+    #endif
+    #if CYTHON_USE_PYLONG_INTERNALS
+    if (likely(PyLong_CheckExact(op1))) {
+        int unequal;
+        unsigned long uintval;
+        Py_ssize_t size = Py_SIZE(op1);
+        const digit* digits = ((PyLongObject*)op1)->ob_digit;
+        if (intval == 0) {
+            if (size == 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
+        } else if (intval < 0) {
+            if (size >= 0)
+                Py_RETURN_FALSE;
+            intval = -intval;
+            size = -size;
         } else {
-            f = Py_TYPE(descr)->tp_descr_get;
-            if (f != NULL && PyDescr_IsData(descr)) {
-                attr = f(descr, obj, (PyObject *)Py_TYPE(obj));
-                Py_DECREF(descr);
-                goto try_unpack;
-            }
+            if (size <= 0)
+                Py_RETURN_FALSE;
         }
-    }
-    dictptr = _PyObject_GetDictPtr(obj);
-    if (dictptr != NULL && (dict = *dictptr) != NULL) {
-        Py_INCREF(dict);
-        attr = __Pyx_PyDict_GetItemStr(dict, name);
-        if (attr != NULL) {
-            Py_INCREF(attr);
-            Py_DECREF(dict);
-            Py_XDECREF(descr);
-            goto try_unpack;
-        }
-        Py_DECREF(dict);
-    }
-    if (meth_found) {
-        *method = descr;
-        return 1;
-    }
-    if (f != NULL) {
-        attr = f(descr, obj, (PyObject *)Py_TYPE(obj));
-        Py_DECREF(descr);
-        goto try_unpack;
-    }
-    if (descr != NULL) {
-        *method = descr;
-        return 0;
-    }
-    PyErr_Format(PyExc_AttributeError,
-#if PY_MAJOR_VERSION >= 3
-                 "'%.50s' object has no attribute '%U'",
-                 tp->tp_name, name);
-#else
-                 "'%.50s' object has no attribute '%.400s'",
-                 tp->tp_name, PyString_AS_STRING(name));
+        uintval = (unsigned long) intval;
+#if PyLong_SHIFT * 4 < SIZEOF_LONG*8
+        if (uintval >> (PyLong_SHIFT * 4)) {
+            unequal = (size != 5) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
+                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[3] != ((uintval >> (3 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[4] != ((uintval >> (4 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
+        } else
 #endif
-    return 0;
-#else
-    attr = __Pyx_PyObject_GetAttrStr(obj, name);
-    goto try_unpack;
+#if PyLong_SHIFT * 3 < SIZEOF_LONG*8
+        if (uintval >> (PyLong_SHIFT * 3)) {
+            unequal = (size != 4) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
+                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[3] != ((uintval >> (3 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
+        } else
 #endif
-try_unpack:
-#if CYTHON_UNPACK_METHODS
-    if (likely(attr) && PyMethod_Check(attr) && likely(PyMethod_GET_SELF(attr) == obj)) {
-        PyObject *function = PyMethod_GET_FUNCTION(attr);
-        Py_INCREF(function);
-        Py_DECREF(attr);
-        *method = function;
-        return 1;
-    }
+#if PyLong_SHIFT * 2 < SIZEOF_LONG*8
+        if (uintval >> (PyLong_SHIFT * 2)) {
+            unequal = (size != 3) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
+                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK)) | (digits[2] != ((uintval >> (2 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
+        } else
 #endif
-    *method = attr;
-    return 0;
-}
-
-/* PyObjectCallMethod1 */
-static PyObject* __Pyx__PyObject_CallMethod1(PyObject* method, PyObject* arg) {
-    PyObject *result = __Pyx_PyObject_CallOneArg(method, arg);
-    Py_DECREF(method);
-    return result;
-}
-static PyObject* __Pyx_PyObject_CallMethod1(PyObject* obj, PyObject* method_name, PyObject* arg) {
-    PyObject *method = NULL, *result;
-    int is_method = __Pyx_PyObject_GetMethod(obj, method_name, &method);
-    if (likely(is_method)) {
-        result = __Pyx_PyObject_Call2Args(method, obj, arg);
-        Py_DECREF(method);
-        return result;
+#if PyLong_SHIFT * 1 < SIZEOF_LONG*8
+        if (uintval >> (PyLong_SHIFT * 1)) {
+            unequal = (size != 2) || (digits[0] != (uintval & (unsigned long) PyLong_MASK))
+                 | (digits[1] != ((uintval >> (1 * PyLong_SHIFT)) & (unsigned long) PyLong_MASK));
+        } else
+#endif
+            unequal = (size != 1) || (((unsigned long) digits[0]) != (uintval & (unsigned long) PyLong_MASK));
+        if (unequal == 0) Py_RETURN_TRUE; else Py_RETURN_FALSE;
     }
-    if (unlikely(!method)) return NULL;
-    return __Pyx__PyObject_CallMethod1(method, arg);
-}
-
-/* append */
-static CYTHON_INLINE int __Pyx_PyObject_Append(PyObject* L, PyObject* x) {
-    if (likely(PyList_CheckExact(L))) {
-        if (unlikely(__Pyx_PyList_Append(L, x) < 0)) return -1;
-    } else {
-        PyObject* retval = __Pyx_PyObject_CallMethod1(L, __pyx_n_s_append, x);
-        if (unlikely(!retval))
-            return -1;
-        Py_DECREF(retval);
+    #endif
+    if (PyFloat_CheckExact(op1)) {
+        const long b = intval;
+        double a = PyFloat_AS_DOUBLE(op1);
+        if ((double)a == (double)b) Py_RETURN_TRUE; else Py_RETURN_FALSE;
     }
-    return 0;
+    return (
+        PyObject_RichCompare(op1, op2, Py_EQ));
 }
 
 /* RaiseTooManyValuesToUnpack */
@@ -16396,103 +15983,6 @@ static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected) {
         return __Pyx_IterFinish();
     }
     return 0;
-}
-
-/* SliceObject */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(PyObject* obj,
-        Py_ssize_t cstart, Py_ssize_t cstop,
-        PyObject** _py_start, PyObject** _py_stop, PyObject** _py_slice,
-        int has_cstart, int has_cstop, CYTHON_UNUSED int wraparound) {
-#if CYTHON_USE_TYPE_SLOTS
-    PyMappingMethods* mp;
-#if PY_MAJOR_VERSION < 3
-    PySequenceMethods* ms = Py_TYPE(obj)->tp_as_sequence;
-    if (likely(ms && ms->sq_slice)) {
-        if (!has_cstart) {
-            if (_py_start && (*_py_start != Py_None)) {
-                cstart = __Pyx_PyIndex_AsSsize_t(*_py_start);
-                if ((cstart == (Py_ssize_t)-1) && PyErr_Occurred()) goto bad;
-            } else
-                cstart = 0;
-        }
-        if (!has_cstop) {
-            if (_py_stop && (*_py_stop != Py_None)) {
-                cstop = __Pyx_PyIndex_AsSsize_t(*_py_stop);
-                if ((cstop == (Py_ssize_t)-1) && PyErr_Occurred()) goto bad;
-            } else
-                cstop = PY_SSIZE_T_MAX;
-        }
-        if (wraparound && unlikely((cstart < 0) | (cstop < 0)) && likely(ms->sq_length)) {
-            Py_ssize_t l = ms->sq_length(obj);
-            if (likely(l >= 0)) {
-                if (cstop < 0) {
-                    cstop += l;
-                    if (cstop < 0) cstop = 0;
-                }
-                if (cstart < 0) {
-                    cstart += l;
-                    if (cstart < 0) cstart = 0;
-                }
-            } else {
-                if (!PyErr_ExceptionMatches(PyExc_OverflowError))
-                    goto bad;
-                PyErr_Clear();
-            }
-        }
-        return ms->sq_slice(obj, cstart, cstop);
-    }
-#endif
-    mp = Py_TYPE(obj)->tp_as_mapping;
-    if (likely(mp && mp->mp_subscript))
-#endif
-    {
-        PyObject* result;
-        PyObject *py_slice, *py_start, *py_stop;
-        if (_py_slice) {
-            py_slice = *_py_slice;
-        } else {
-            PyObject* owned_start = NULL;
-            PyObject* owned_stop = NULL;
-            if (_py_start) {
-                py_start = *_py_start;
-            } else {
-                if (has_cstart) {
-                    owned_start = py_start = PyInt_FromSsize_t(cstart);
-                    if (unlikely(!py_start)) goto bad;
-                } else
-                    py_start = Py_None;
-            }
-            if (_py_stop) {
-                py_stop = *_py_stop;
-            } else {
-                if (has_cstop) {
-                    owned_stop = py_stop = PyInt_FromSsize_t(cstop);
-                    if (unlikely(!py_stop)) {
-                        Py_XDECREF(owned_start);
-                        goto bad;
-                    }
-                } else
-                    py_stop = Py_None;
-            }
-            py_slice = PySlice_New(py_start, py_stop, Py_None);
-            Py_XDECREF(owned_start);
-            Py_XDECREF(owned_stop);
-            if (unlikely(!py_slice)) goto bad;
-        }
-#if CYTHON_USE_TYPE_SLOTS
-        result = mp->mp_subscript(obj, py_slice);
-#else
-        result = PyObject_GetItem(obj, py_slice);
-#endif
-        if (!_py_slice) {
-            Py_DECREF(py_slice);
-        }
-        return result;
-    }
-    PyErr_Format(PyExc_TypeError,
-        "'%.200s' object is unsliceable", Py_TYPE(obj)->tp_name);
-bad:
-    return NULL;
 }
 
 /* PyIntBinop */
@@ -16753,189 +16243,6 @@ bad:
     Py_XDECREF(local_tb);
     return -1;
 }
-
-/* PyErrFetchRestore */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    tmp_type = tstate->curexc_type;
-    tmp_value = tstate->curexc_value;
-    tmp_tb = tstate->curexc_traceback;
-    tstate->curexc_type = type;
-    tstate->curexc_value = value;
-    tstate->curexc_traceback = tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-}
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    *type = tstate->curexc_type;
-    *value = tstate->curexc_value;
-    *tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-}
-#endif
-
-/* RaiseException */
-#if PY_MAJOR_VERSION < 3
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb,
-                        CYTHON_UNUSED PyObject *cause) {
-    __Pyx_PyThreadState_declare
-    Py_XINCREF(type);
-    if (!value || value == Py_None)
-        value = NULL;
-    else
-        Py_INCREF(value);
-    if (!tb || tb == Py_None)
-        tb = NULL;
-    else {
-        Py_INCREF(tb);
-        if (!PyTraceBack_Check(tb)) {
-            PyErr_SetString(PyExc_TypeError,
-                "raise: arg 3 must be a traceback or None");
-            goto raise_error;
-        }
-    }
-    if (PyType_Check(type)) {
-#if CYTHON_COMPILING_IN_PYPY
-        if (!value) {
-            Py_INCREF(Py_None);
-            value = Py_None;
-        }
-#endif
-        PyErr_NormalizeException(&type, &value, &tb);
-    } else {
-        if (value) {
-            PyErr_SetString(PyExc_TypeError,
-                "instance exception may not have a separate value");
-            goto raise_error;
-        }
-        value = type;
-        type = (PyObject*) Py_TYPE(type);
-        Py_INCREF(type);
-        if (!PyType_IsSubtype((PyTypeObject *)type, (PyTypeObject *)PyExc_BaseException)) {
-            PyErr_SetString(PyExc_TypeError,
-                "raise: exception class must be a subclass of BaseException");
-            goto raise_error;
-        }
-    }
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrRestore(type, value, tb);
-    return;
-raise_error:
-    Py_XDECREF(value);
-    Py_XDECREF(type);
-    Py_XDECREF(tb);
-    return;
-}
-#else
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause) {
-    PyObject* owned_instance = NULL;
-    if (tb == Py_None) {
-        tb = 0;
-    } else if (tb && !PyTraceBack_Check(tb)) {
-        PyErr_SetString(PyExc_TypeError,
-            "raise: arg 3 must be a traceback or None");
-        goto bad;
-    }
-    if (value == Py_None)
-        value = 0;
-    if (PyExceptionInstance_Check(type)) {
-        if (value) {
-            PyErr_SetString(PyExc_TypeError,
-                "instance exception may not have a separate value");
-            goto bad;
-        }
-        value = type;
-        type = (PyObject*) Py_TYPE(value);
-    } else if (PyExceptionClass_Check(type)) {
-        PyObject *instance_class = NULL;
-        if (value && PyExceptionInstance_Check(value)) {
-            instance_class = (PyObject*) Py_TYPE(value);
-            if (instance_class != type) {
-                int is_subclass = PyObject_IsSubclass(instance_class, type);
-                if (!is_subclass) {
-                    instance_class = NULL;
-                } else if (unlikely(is_subclass == -1)) {
-                    goto bad;
-                } else {
-                    type = instance_class;
-                }
-            }
-        }
-        if (!instance_class) {
-            PyObject *args;
-            if (!value)
-                args = PyTuple_New(0);
-            else if (PyTuple_Check(value)) {
-                Py_INCREF(value);
-                args = value;
-            } else
-                args = PyTuple_Pack(1, value);
-            if (!args)
-                goto bad;
-            owned_instance = PyObject_Call(type, args, NULL);
-            Py_DECREF(args);
-            if (!owned_instance)
-                goto bad;
-            value = owned_instance;
-            if (!PyExceptionInstance_Check(value)) {
-                PyErr_Format(PyExc_TypeError,
-                             "calling %R should have returned an instance of "
-                             "BaseException, not %R",
-                             type, Py_TYPE(value));
-                goto bad;
-            }
-        }
-    } else {
-        PyErr_SetString(PyExc_TypeError,
-            "raise: exception class must be a subclass of BaseException");
-        goto bad;
-    }
-    if (cause) {
-        PyObject *fixed_cause;
-        if (cause == Py_None) {
-            fixed_cause = NULL;
-        } else if (PyExceptionClass_Check(cause)) {
-            fixed_cause = PyObject_CallObject(cause, NULL);
-            if (fixed_cause == NULL)
-                goto bad;
-        } else if (PyExceptionInstance_Check(cause)) {
-            fixed_cause = cause;
-            Py_INCREF(fixed_cause);
-        } else {
-            PyErr_SetString(PyExc_TypeError,
-                            "exception causes must derive from "
-                            "BaseException");
-            goto bad;
-        }
-        PyException_SetCause(value, fixed_cause);
-    }
-    PyErr_SetObject(type, value);
-    if (tb) {
-#if CYTHON_COMPILING_IN_PYPY
-        PyObject *tmp_type, *tmp_value, *tmp_tb;
-        PyErr_Fetch(&tmp_type, &tmp_value, &tmp_tb);
-        Py_INCREF(tb);
-        PyErr_Restore(tmp_type, tmp_value, tb);
-        Py_XDECREF(tmp_tb);
-#else
-        PyThreadState *tstate = __Pyx_PyThreadState_Current;
-        PyObject* tmp_tb = tstate->curexc_traceback;
-        if (tb != tmp_tb) {
-            Py_INCREF(tb);
-            tstate->curexc_traceback = tb;
-            Py_XDECREF(tmp_tb);
-        }
-#endif
-    }
-bad:
-    Py_XDECREF(owned_instance);
-    return;
-}
-#endif
 
 /* DictGetItem */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY

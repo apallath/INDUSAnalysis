@@ -1,15 +1,16 @@
 """
-Defines class for analysing waters in INDUS probe volumes
+Defines class for analysing waters in INDUS probe volumes.
 """
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+import MDAnalysis as mda
+
+from tqdm import tqdm
 
 from INDUSAnalysis import timeseries
 from INDUSAnalysis.lib import profiling
-
-import numpy as np
-
-import matplotlib.pyplot as plt
-import MDAnalysis as mda
-from tqdm import tqdm
 
 """Cython"""
 cimport numpy as np
@@ -44,7 +45,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
 
     def read_args(self):
         """
-        Stores arguments from TimeSeries `args` parameter in class variables
+        Stores arguments from TimeSeries `args` parameter in class variables.
         """
         super().read_args()
         self.file = self.args.file
@@ -116,15 +117,15 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
 
     def calc_probe_waters(self, u, skip, radius):
         """
-        Calculates waters in individual probe volumes
+        Calculates waters in individual probe volumes.
 
         Args:
-            u (mda.Universe): Universe containing solvated protein
-            skip (int): Trajectory resampling interval
-            radius (float): Radius of probe waters
+            u (mda.Universe): Universe containing solvated protein.
+            skip (int): Trajectory resampling interval.
+            radius (float): Radius of probe waters.
 
         Returns:
-            TimeSeries object containing probe waters
+            TimeSeries object containing probe waters.
         """
         # Probes placed on protein-heavy atoms
         protein = u.select_atoms("protein")
@@ -147,10 +148,10 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
                 bar.update(1)
 
         return timeseries.TimeSeries(times, probe_waters,
-                                     labels=['Number of waters', 'Heavy atom index'])
+                                     labels=['Number of waters', 'Atom index'])
 
     def plot_waters(self, ts_Ntw):
-        """Plots waters and saves figure to file"""
+        """Plots waters and saves figure to file."""
         fig = ts_Ntw.plot()
         fig.set_dpi(300)
         self.save_figure(fig, suffix="waters")
@@ -160,7 +161,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
             plt.close()
 
     def plot_ma_waters(self, ts_Ntw):
-        """Plots moving average waters and saves figure to file"""
+        """Plots moving average waters and saves figure to file."""
         fig = ts_Ntw.moving_average(window=self.window).plot()
         fig.set_dpi(300)
         self.save_figure(fig, suffix="ma_waters")
@@ -170,7 +171,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
             plt.close()
 
     def plot_cma_waters(self, ts_Ntw):
-        """Plots cumulative moving average waters and saves figure to file"""
+        """Plots cumulative moving average waters and saves figure to file."""
         fig = ts_Ntw.cumulative_moving_average().plot()
         fig.set_dpi(300)
         self.save_figure(fig, suffix="cma_waters")
@@ -180,7 +181,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
             plt.close()
 
     def plot_probe_waters(self, ts_probe_waters):
-        """Plots waters in each individual probe as a 2D heatmap"""
+        """Plots waters in each individual probe as a 2D heatmap."""
         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
         fig.set_dpi(300)
         self.save_figure(fig, suffix="probe_waters")
@@ -190,7 +191,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
             plt.close()
 
     def write_mean_std_waters(self, mu, ts_Ntw):
-        """Appends mean and std waters to text file"""
+        """Appends mean and std waters to text file."""
         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
         with open(self.obspref + "_mean.txt", 'a+') as meanf:
             meanf.write(meanstr)
@@ -204,8 +205,8 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
         Writes instantaneous probe waters to PDB file.
 
         Args:
-            u (mda.Universe): Universe containing solvated protein
-            skip (int): Trajectory resampling interval
+            u (mda.Universe): Universe containing solvated protein.
+            skip (int): Trajectory resampling interval.
             ts_probe_waters (TimeSeries): Probe waters timeseries data.
 
         Raises:
@@ -232,7 +233,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
 
     def __call__(self):
-        """Performs analysis"""
+        """Performs analysis."""
 
         """Raw data"""
         # Overall probe waters
@@ -241,12 +242,10 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
         self.save_TimeSeries(ts_Ntw, self.opref + "_Ntw.pkl")
 
         # Individual probe waters
-        u = mda.Universe(self.structf, self.trajf)
-        ts_probe_waters = None
         if self.replot:
             ts_probe_waters = self.load_TimeSeries(self.replotpref + "_probe_waters.pkl")
         else:
-            ts_probe_waters = self.calc_probe_waters(u, self.skip, self.radius)
+            ts_probe_waters = self.calc_probe_waters(self.u, self.skip, self.radius)
 
         self.save_TimeSeries(ts_probe_waters, self.opref + "_probe_waters.pkl")
 
@@ -263,8 +262,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
         """Trajectories"""
         # Write waters in individual probe volumes to PDB
         if self.genpdb:
-            u = mda.Universe(self.structf, self.trajf)
-            self.write_probe_waters_pdb(u, self.skip, ts_probe_waters)
+            self.write_probe_waters_pdb(self.u, self.skip, ts_probe_waters)
 
         """Observables"""
         # Write mean and std of waters to text files

@@ -1915,6 +1915,7 @@ static const char __pyx_k_misc_args[] = "misc_args";
 static const char __pyx_k_profiling[] = "profiling";
 static const char __pyx_k_read_args[] = "read_args";
 static const char __pyx_k_verbose_2[] = "verbose";
+static const char __pyx_k_Atom_index[] = "Atom index";
 static const char __pyx_k_MDAnalysis[] = "MDAnalysis";
 static const char __pyx_k_TimeSeries[] = "TimeSeries";
 static const char __pyx_k_ValueError[] = "ValueError";
@@ -1949,7 +1950,6 @@ static const char __pyx_k_plot_cma_waters[] = "plot_cma_waters";
 static const char __pyx_k_save_TimeSeries[] = "save_TimeSeries";
 static const char __pyx_k_ts_probe_waters[] = "ts_probe_waters";
 static const char __pyx_k_Display_progress[] = "Display progress";
-static const char __pyx_k_Heavy_atom_index[] = "Heavy atom index";
 static const char __pyx_k_Number_of_waters[] = "Number of waters";
 static const char __pyx_k_add_TopologyAttr[] = "add_TopologyAttr";
 static const char __pyx_k_probe_waters_pkl[] = "_probe_waters.pkl";
@@ -1978,7 +1978,7 @@ static const char __pyx_k_Compressed_trajectory_file_xtc[] = "Compressed traject
 static const char __pyx_k_GROMACS_INDUS_waters_data_file[] = "GROMACS-INDUS waters data file";
 static const char __pyx_k_INDUSAnalysis_indus_waters_pyx[] = "INDUSAnalysis/indus_waters.pyx";
 static const char __pyx_k_WatersAnalysis_plot_cma_waters[] = "WatersAnalysis.plot_cma_waters";
-static const char __pyx_k_Defines_class_for_analysing_wat[] = "\nDefines class for analysing waters in INDUS probe volumes\n";
+static const char __pyx_k_Defines_class_for_analysing_wat[] = "\nDefines class for analysing waters in INDUS probe volumes.\n";
 static const char __pyx_k_Trajectory_and_TimeSeries_times[] = "Trajectory and TimeSeries times do not match at same index.";
 static const char __pyx_k_numpy_core_multiarray_failed_to[] = "numpy.core.multiarray failed to import";
 static const char __pyx_k_per_probe_waters_Write_atoms_pe[] = "[per-probe waters] Write atoms per probe volume data to pdb file";
@@ -1996,6 +1996,7 @@ static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath
 static const char __pyx_k_per_probe_waters_ignored_during_2[] = "[per-probe waters, ignored during replot] Sampling interval (default = 1)";
 static const char __pyx_k_Format_string_allocated_too_shor_2[] = "Format string allocated too short.";
 static PyObject *__pyx_kp_s_2f_2f;
+static PyObject *__pyx_kp_s_Atom_index;
 static PyObject *__pyx_kp_s_Calculates_number_of_waters_in;
 static PyObject *__pyx_kp_s_Calculating_waters;
 static PyObject *__pyx_kp_s_Compressed_trajectory_file_xtc;
@@ -2003,7 +2004,6 @@ static PyObject *__pyx_kp_s_Display_progress;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor;
 static PyObject *__pyx_kp_u_Format_string_allocated_too_shor_2;
 static PyObject *__pyx_kp_s_GROMACS_INDUS_waters_data_file;
-static PyObject *__pyx_kp_s_Heavy_atom_index;
 static PyObject *__pyx_n_s_INDUSAnalysis;
 static PyObject *__pyx_n_s_INDUSAnalysis_indus_waters;
 static PyObject *__pyx_kp_s_INDUSAnalysis_indus_waters_pyx;
@@ -2255,7 +2255,7 @@ static PyObject *__pyx_codeobj__40;
 static PyObject *__pyx_codeobj__42;
 /* Late includes */
 
-/* "INDUSAnalysis/indus_waters.pyx":23
+/* "INDUSAnalysis/indus_waters.pyx":24
  *     plots and PDB files.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -2285,7 +2285,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis___init
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":24
+  /* "INDUSAnalysis/indus_waters.pyx":25
  *     """
  *     def __init__(self):
  *         super().__init__()             # <<<<<<<<<<<<<<
@@ -2293,9 +2293,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis___init
  *                                         help="GROMACS-INDUS waters data file")
  */
   __pyx_t_2 = __Pyx_CyFunction_GetClassObj(__pyx_self);
-  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 24, __pyx_L1_error) }
+  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 25, __pyx_L1_error) }
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -2303,10 +2303,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis___init
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_self);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_init); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_init); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2321,273 +2321,273 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis___init
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":25
+  /* "INDUSAnalysis/indus_waters.pyx":26
  *     def __init__(self):
  *         super().__init__()
  *         self.req_file_args.add_argument("file",             # <<<<<<<<<<<<<<
  *                                         help="GROMACS-INDUS waters data file")
  *         self.req_file_args.add_argument("structf",
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":26
+  /* "INDUSAnalysis/indus_waters.pyx":27
  *         super().__init__()
  *         self.req_file_args.add_argument("file",
  *                                         help="GROMACS-INDUS waters data file")             # <<<<<<<<<<<<<<
  *         self.req_file_args.add_argument("structf",
  *                                         help="Topology or structure file (.tpr, .gro)")
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_GROMACS_INDUS_waters_data_file) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_GROMACS_INDUS_waters_data_file) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":25
+  /* "INDUSAnalysis/indus_waters.pyx":26
  *     def __init__(self):
  *         super().__init__()
  *         self.req_file_args.add_argument("file",             # <<<<<<<<<<<<<<
  *                                         help="GROMACS-INDUS waters data file")
  *         self.req_file_args.add_argument("structf",
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple_, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple_, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":27
+  /* "INDUSAnalysis/indus_waters.pyx":28
  *         self.req_file_args.add_argument("file",
  *                                         help="GROMACS-INDUS waters data file")
  *         self.req_file_args.add_argument("structf",             # <<<<<<<<<<<<<<
  *                                         help="Topology or structure file (.tpr, .gro)")
  *         self.req_file_args.add_argument("trajf",
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":28
+  /* "INDUSAnalysis/indus_waters.pyx":29
  *                                         help="GROMACS-INDUS waters data file")
  *         self.req_file_args.add_argument("structf",
  *                                         help="Topology or structure file (.tpr, .gro)")             # <<<<<<<<<<<<<<
  *         self.req_file_args.add_argument("trajf",
  *                                         help="Compressed trajectory file (.xtc)")
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Topology_or_structure_file_tpr_g) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Topology_or_structure_file_tpr_g) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":27
+  /* "INDUSAnalysis/indus_waters.pyx":28
  *         self.req_file_args.add_argument("file",
  *                                         help="GROMACS-INDUS waters data file")
  *         self.req_file_args.add_argument("structf",             # <<<<<<<<<<<<<<
  *                                         help="Topology or structure file (.tpr, .gro)")
  *         self.req_file_args.add_argument("trajf",
  */
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":29
+  /* "INDUSAnalysis/indus_waters.pyx":30
  *         self.req_file_args.add_argument("structf",
  *                                         help="Topology or structure file (.tpr, .gro)")
  *         self.req_file_args.add_argument("trajf",             # <<<<<<<<<<<<<<
  *                                         help="Compressed trajectory file (.xtc)")
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":30
+  /* "INDUSAnalysis/indus_waters.pyx":31
  *                                         help="Topology or structure file (.tpr, .gro)")
  *         self.req_file_args.add_argument("trajf",
  *                                         help="Compressed trajectory file (.xtc)")             # <<<<<<<<<<<<<<
  * 
  *         self.calc_args.add_argument("-radius",
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Compressed_trajectory_file_xtc) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Compressed_trajectory_file_xtc) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":29
+  /* "INDUSAnalysis/indus_waters.pyx":30
  *         self.req_file_args.add_argument("structf",
  *                                         help="Topology or structure file (.tpr, .gro)")
  *         self.req_file_args.add_argument("trajf",             # <<<<<<<<<<<<<<
  *                                         help="Compressed trajectory file (.xtc)")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__3, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__3, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":32
+  /* "INDUSAnalysis/indus_waters.pyx":33
  *                                         help="Compressed trajectory file (.xtc)")
  * 
  *         self.calc_args.add_argument("-radius",             # <<<<<<<<<<<<<<
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
  *         self.calc_args.add_argument("-skip",
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":33
+  /* "INDUSAnalysis/indus_waters.pyx":34
  * 
  *         self.calc_args.add_argument("-radius",
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")             # <<<<<<<<<<<<<<
  *         self.calc_args.add_argument("-skip",
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_per_probe_waters_ignored_during) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_per_probe_waters_ignored_during) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":32
+  /* "INDUSAnalysis/indus_waters.pyx":33
  *                                         help="Compressed trajectory file (.xtc)")
  * 
  *         self.calc_args.add_argument("-radius",             # <<<<<<<<<<<<<<
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
  *         self.calc_args.add_argument("-skip",
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":34
+  /* "INDUSAnalysis/indus_waters.pyx":35
  *         self.calc_args.add_argument("-radius",
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
  *         self.calc_args.add_argument("-skip",             # <<<<<<<<<<<<<<
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":35
+  /* "INDUSAnalysis/indus_waters.pyx":36
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
  *         self.calc_args.add_argument("-skip",
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")             # <<<<<<<<<<<<<<
  * 
  *         self.out_args.add_argument("--genpdb",
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_per_probe_waters_ignored_during_2) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_per_probe_waters_ignored_during_2) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":34
+  /* "INDUSAnalysis/indus_waters.pyx":35
  *         self.calc_args.add_argument("-radius",
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
  *         self.calc_args.add_argument("-skip",             # <<<<<<<<<<<<<<
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":37
+  /* "INDUSAnalysis/indus_waters.pyx":38
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
  * 
  *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
  *                                    action="store_true",
  *                                    help="[per-probe waters] Write atoms per probe volume data to pdb file")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":38
+  /* "INDUSAnalysis/indus_waters.pyx":39
  * 
  *         self.out_args.add_argument("--genpdb",
  *                                    action="store_true",             # <<<<<<<<<<<<<<
  *                                    help="[per-probe waters] Write atoms per probe volume data to pdb file")
  * 
  */
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_per_probe_waters_Write_atoms_pe) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 39, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_per_probe_waters_Write_atoms_pe) < 0) __PYX_ERR(0, 39, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":37
+  /* "INDUSAnalysis/indus_waters.pyx":38
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
  * 
  *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
  *                                    action="store_true",
  *                                    help="[per-probe waters] Write atoms per probe volume data to pdb file")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":41
+  /* "INDUSAnalysis/indus_waters.pyx":42
  *                                    help="[per-probe waters] Write atoms per probe volume data to pdb file")
  * 
  *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
  *                                     action="store_true",
  *                                     help="Display progress")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_misc_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_misc_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":42
+  /* "INDUSAnalysis/indus_waters.pyx":43
  * 
  *         self.misc_args.add_argument("--verbose",
  *                                     action="store_true",             # <<<<<<<<<<<<<<
  *                                     help="Display progress")
  * 
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Display_progress) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Display_progress) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":41
+  /* "INDUSAnalysis/indus_waters.pyx":42
  *                                    help="[per-probe waters] Write atoms per probe volume data to pdb file")
  * 
  *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
  *                                     action="store_true",
  *                                     help="Display progress")
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__7, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__7, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":23
+  /* "INDUSAnalysis/indus_waters.pyx":24
  *     plots and PDB files.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -2610,17 +2610,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis___init
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":45
+/* "INDUSAnalysis/indus_waters.pyx":46
  *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
  *         """
- *         Stores arguments from TimeSeries `args` parameter in class variables
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_3read_args(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_args[] = "\n        Stores arguments from TimeSeries `args` parameter in class variables\n        ";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_args[] = "\n        Stores arguments from TimeSeries `args` parameter in class variables.\n        ";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_3read_args = {"read_args", (PyCFunction)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_3read_args, METH_O, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_args};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_3read_args(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
@@ -2647,17 +2647,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
   int __pyx_t_9;
   __Pyx_RefNannySetupContext("read_args", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":49
- *         Stores arguments from TimeSeries `args` parameter in class variables
+  /* "INDUSAnalysis/indus_waters.pyx":50
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  *         """
  *         super().read_args()             # <<<<<<<<<<<<<<
  *         self.file = self.args.file
  *         self.structf = self.args.structf
  */
   __pyx_t_2 = __Pyx_CyFunction_GetClassObj(__pyx_self);
-  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 49, __pyx_L1_error) }
+  if (!__pyx_t_2) { PyErr_SetString(PyExc_SystemError, "super(): empty __class__ cell"); __PYX_ERR(0, 50, __pyx_L1_error) }
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -2665,10 +2665,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_self);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_read_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_read_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2683,71 +2683,71 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":50
+  /* "INDUSAnalysis/indus_waters.pyx":51
  *         """
  *         super().read_args()
  *         self.file = self.args.file             # <<<<<<<<<<<<<<
  *         self.structf = self.args.structf
  *         self.trajf = self.args.trajf
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_file, __pyx_t_3) < 0) __PYX_ERR(0, 50, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_file, __pyx_t_3) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":51
+  /* "INDUSAnalysis/indus_waters.pyx":52
  *         super().read_args()
  *         self.file = self.args.file
  *         self.structf = self.args.structf             # <<<<<<<<<<<<<<
  *         self.trajf = self.args.trajf
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_structf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_structf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_structf, __pyx_t_1) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_structf, __pyx_t_1) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":52
+  /* "INDUSAnalysis/indus_waters.pyx":53
  *         self.file = self.args.file
  *         self.structf = self.args.structf
  *         self.trajf = self.args.trajf             # <<<<<<<<<<<<<<
  * 
  *         self.u = mda.Universe(self.structf, self.trajf)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_trajf); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_trajf); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_trajf, __pyx_t_3) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_trajf, __pyx_t_3) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":54
+  /* "INDUSAnalysis/indus_waters.pyx":55
  *         self.trajf = self.args.trajf
  * 
  *         self.u = mda.Universe(self.structf, self.trajf)             # <<<<<<<<<<<<<<
  * 
  *         self.radius = self.args.radius
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_mda); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_mda); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Universe); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_Universe); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -2764,7 +2764,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_1, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -2774,7 +2774,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_1, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -2782,7 +2782,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 55, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -2793,59 +2793,59 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_1 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_u, __pyx_t_3) < 0) __PYX_ERR(0, 54, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_u, __pyx_t_3) < 0) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":56
+  /* "INDUSAnalysis/indus_waters.pyx":57
  *         self.u = mda.Universe(self.structf, self.trajf)
  * 
  *         self.radius = self.args.radius             # <<<<<<<<<<<<<<
  *         if self.radius is not None:
  *             self.radius = float(self.radius)
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_radius_2, __pyx_t_2) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_radius_2, __pyx_t_2) < 0) __PYX_ERR(0, 57, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":57
+  /* "INDUSAnalysis/indus_waters.pyx":58
  * 
  *         self.radius = self.args.radius
  *         if self.radius is not None:             # <<<<<<<<<<<<<<
  *             self.radius = float(self.radius)
  *         else:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 57, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_8 = (__pyx_t_2 != Py_None);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_9 = (__pyx_t_8 != 0);
   if (__pyx_t_9) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":58
+    /* "INDUSAnalysis/indus_waters.pyx":59
  *         self.radius = self.args.radius
  *         if self.radius is not None:
  *             self.radius = float(self.radius)             # <<<<<<<<<<<<<<
  *         else:
  *             self.radius = 6.0
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyNumber_Float(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyNumber_Float(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_radius_2, __pyx_t_3) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_radius_2, __pyx_t_3) < 0) __PYX_ERR(0, 59, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":57
+    /* "INDUSAnalysis/indus_waters.pyx":58
  * 
  *         self.radius = self.args.radius
  *         if self.radius is not None:             # <<<<<<<<<<<<<<
@@ -2855,7 +2855,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":60
+  /* "INDUSAnalysis/indus_waters.pyx":61
  *             self.radius = float(self.radius)
  *         else:
  *             self.radius = 6.0             # <<<<<<<<<<<<<<
@@ -2863,55 +2863,55 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
  *         self.skip = self.args.skip
  */
   /*else*/ {
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_radius_2, __pyx_float_6_0) < 0) __PYX_ERR(0, 60, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_radius_2, __pyx_float_6_0) < 0) __PYX_ERR(0, 61, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/indus_waters.pyx":62
+  /* "INDUSAnalysis/indus_waters.pyx":63
  *             self.radius = 6.0
  * 
  *         self.skip = self.args.skip             # <<<<<<<<<<<<<<
  *         if self.skip is not None:
  *             self.skip = int(self.skip)
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_2) < 0) __PYX_ERR(0, 62, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":63
+  /* "INDUSAnalysis/indus_waters.pyx":64
  * 
  *         self.skip = self.args.skip
  *         if self.skip is not None:             # <<<<<<<<<<<<<<
  *             self.skip = int(self.skip)
  *         else:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_9 = (__pyx_t_2 != Py_None);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_8 = (__pyx_t_9 != 0);
   if (__pyx_t_8) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":64
+    /* "INDUSAnalysis/indus_waters.pyx":65
  *         self.skip = self.args.skip
  *         if self.skip is not None:
  *             self.skip = int(self.skip)             # <<<<<<<<<<<<<<
  *         else:
  *             self.skip = 1
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_3) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_t_3) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":63
+    /* "INDUSAnalysis/indus_waters.pyx":64
  * 
  *         self.skip = self.args.skip
  *         if self.skip is not None:             # <<<<<<<<<<<<<<
@@ -2921,7 +2921,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
     goto __pyx_L4;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":66
+  /* "INDUSAnalysis/indus_waters.pyx":67
  *             self.skip = int(self.skip)
  *         else:
  *             self.skip = 1             # <<<<<<<<<<<<<<
@@ -2929,46 +2929,46 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
  *         self.genpdb = self.args.genpdb
  */
   /*else*/ {
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_int_1) < 0) __PYX_ERR(0, 66, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_skip_2, __pyx_int_1) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
   }
   __pyx_L4:;
 
-  /* "INDUSAnalysis/indus_waters.pyx":68
+  /* "INDUSAnalysis/indus_waters.pyx":69
  *             self.skip = 1
  * 
  *         self.genpdb = self.args.genpdb             # <<<<<<<<<<<<<<
  *         self.verbose = self.args.verbose
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2, __pyx_t_2) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2, __pyx_t_2) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":69
+  /* "INDUSAnalysis/indus_waters.pyx":70
  * 
  *         self.genpdb = self.args.genpdb
  *         self.verbose = self.args.verbose             # <<<<<<<<<<<<<<
  * 
  *     # Data calculation methods
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2, __pyx_t_3) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2, __pyx_t_3) < 0) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":45
+  /* "INDUSAnalysis/indus_waters.pyx":46
  *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
  *         """
- *         Stores arguments from TimeSeries `args` parameter in class variables
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
 
   /* function exit code */
@@ -2989,7 +2989,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_2read_
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":73
+/* "INDUSAnalysis/indus_waters.pyx":74
  *     # Data calculation methods
  * 
  *     def read_waters(self, filename):             # <<<<<<<<<<<<<<
@@ -3030,11 +3030,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_5read_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_filename)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("read_waters", 1, 2, 2, 1); __PYX_ERR(0, 73, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("read_waters", 1, 2, 2, 1); __PYX_ERR(0, 74, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "read_waters") < 0)) __PYX_ERR(0, 73, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "read_waters") < 0)) __PYX_ERR(0, 74, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -3047,7 +3047,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_5read_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("read_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 73, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("read_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 74, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.read_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3095,43 +3095,43 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   int __pyx_t_17;
   __Pyx_RefNannySetupContext("read_waters", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":87
+  /* "INDUSAnalysis/indus_waters.pyx":88
  *             }.
  *         """
  *         t = []             # <<<<<<<<<<<<<<
  *         N = []
  *         Ntw = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_t = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":88
+  /* "INDUSAnalysis/indus_waters.pyx":89
  *         """
  *         t = []
  *         N = []             # <<<<<<<<<<<<<<
  *         Ntw = []
  *         mu = 0
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_N = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":89
+  /* "INDUSAnalysis/indus_waters.pyx":90
  *         t = []
  *         N = []
  *         Ntw = []             # <<<<<<<<<<<<<<
  *         mu = 0
  *         with open(filename) as f:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_Ntw = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":90
+  /* "INDUSAnalysis/indus_waters.pyx":91
  *         N = []
  *         Ntw = []
  *         mu = 0             # <<<<<<<<<<<<<<
@@ -3141,7 +3141,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_mu = __pyx_int_0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":91
+  /* "INDUSAnalysis/indus_waters.pyx":92
  *         Ntw = []
  *         mu = 0
  *         with open(filename) as f:             # <<<<<<<<<<<<<<
@@ -3149,11 +3149,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
  *             for l in f:
  */
   /*with:*/ {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_open, __pyx_v_filename); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_open, __pyx_v_filename); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_1, __pyx_n_s_exit); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 91, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_1, __pyx_n_s_exit); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 92, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_1, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 91, __pyx_L3_error)
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_1, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 92, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -3167,7 +3167,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
     }
     __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 91, __pyx_L3_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 92, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = __pyx_t_3;
@@ -3185,7 +3185,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
           __pyx_v_f = __pyx_t_4;
           __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":93
+          /* "INDUSAnalysis/indus_waters.pyx":94
  *         with open(filename) as f:
  *             # Read data file
  *             for l in f:             # <<<<<<<<<<<<<<
@@ -3196,26 +3196,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
             __pyx_t_4 = __pyx_v_f; __Pyx_INCREF(__pyx_t_4); __pyx_t_9 = 0;
             __pyx_t_10 = NULL;
           } else {
-            __pyx_t_9 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 93, __pyx_L7_error)
+            __pyx_t_9 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 94, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_4);
-            __pyx_t_10 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 93, __pyx_L7_error)
+            __pyx_t_10 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 94, __pyx_L7_error)
           }
           for (;;) {
             if (likely(!__pyx_t_10)) {
               if (likely(PyList_CheckExact(__pyx_t_4))) {
                 if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_4)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_1 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 93, __pyx_L7_error)
+                __pyx_t_1 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 94, __pyx_L7_error)
                 #else
-                __pyx_t_1 = PySequence_ITEM(__pyx_t_4, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L7_error)
+                __pyx_t_1 = PySequence_ITEM(__pyx_t_4, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_1);
                 #endif
               } else {
                 if (__pyx_t_9 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 93, __pyx_L7_error)
+                __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 94, __pyx_L7_error)
                 #else
-                __pyx_t_1 = PySequence_ITEM(__pyx_t_4, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L7_error)
+                __pyx_t_1 = PySequence_ITEM(__pyx_t_4, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_1);
                 #endif
               }
@@ -3225,7 +3225,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
                   if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                  else __PYX_ERR(0, 93, __pyx_L7_error)
+                  else __PYX_ERR(0, 94, __pyx_L7_error)
                 }
                 break;
               }
@@ -3234,14 +3234,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
             __Pyx_XDECREF_SET(__pyx_v_l, __pyx_t_1);
             __pyx_t_1 = 0;
 
-            /* "INDUSAnalysis/indus_waters.pyx":94
+            /* "INDUSAnalysis/indus_waters.pyx":95
  *             # Read data file
  *             for l in f:
  *                 lstrip = l.strip()             # <<<<<<<<<<<<<<
  *                 # Parse comments
  *                 if lstrip[0] == '#':
  */
-            __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_l, __pyx_n_s_strip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 94, __pyx_L7_error)
+            __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_l, __pyx_n_s_strip); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 95, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_3);
             __pyx_t_5 = NULL;
             if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -3255,35 +3255,35 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
             }
             __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
             __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L7_error)
+            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __Pyx_XDECREF_SET(__pyx_v_lstrip, __pyx_t_1);
             __pyx_t_1 = 0;
 
-            /* "INDUSAnalysis/indus_waters.pyx":96
+            /* "INDUSAnalysis/indus_waters.pyx":97
  *                 lstrip = l.strip()
  *                 # Parse comments
  *                 if lstrip[0] == '#':             # <<<<<<<<<<<<<<
  *                     comment = lstrip[1:].split()
  *                     if comment[0] == 'mu':
  */
-            __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_lstrip, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L7_error)
+            __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_lstrip, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_11 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_kp_s__8, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 96, __pyx_L7_error)
+            __pyx_t_11 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_kp_s__8, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 97, __pyx_L7_error)
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             if (__pyx_t_11) {
 
-              /* "INDUSAnalysis/indus_waters.pyx":97
+              /* "INDUSAnalysis/indus_waters.pyx":98
  *                 # Parse comments
  *                 if lstrip[0] == '#':
  *                     comment = lstrip[1:].split()             # <<<<<<<<<<<<<<
  *                     if comment[0] == 'mu':
  *                         mu = comment[2]
  */
-              __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_v_lstrip, 1, 0, NULL, NULL, &__pyx_slice__9, 1, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L7_error)
+              __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_v_lstrip, 1, 0, NULL, NULL, &__pyx_slice__9, 1, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 98, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_split); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L7_error)
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_split); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 98, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __pyx_t_3 = NULL;
@@ -3298,38 +3298,38 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
               }
               __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
               __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L7_error)
+              if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_1);
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
               __Pyx_XDECREF_SET(__pyx_v_comment, __pyx_t_1);
               __pyx_t_1 = 0;
 
-              /* "INDUSAnalysis/indus_waters.pyx":98
+              /* "INDUSAnalysis/indus_waters.pyx":99
  *                 if lstrip[0] == '#':
  *                     comment = lstrip[1:].split()
  *                     if comment[0] == 'mu':             # <<<<<<<<<<<<<<
  *                         mu = comment[2]
  *                 # Parse data
  */
-              __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_comment, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L7_error)
+              __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_comment, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_11 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_mu, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 98, __pyx_L7_error)
+              __pyx_t_11 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_mu, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 99, __pyx_L7_error)
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
               if (__pyx_t_11) {
 
-                /* "INDUSAnalysis/indus_waters.pyx":99
+                /* "INDUSAnalysis/indus_waters.pyx":100
  *                     comment = lstrip[1:].split()
  *                     if comment[0] == 'mu':
  *                         mu = comment[2]             # <<<<<<<<<<<<<<
  *                 # Parse data
  *                 if lstrip[0] != '#':
  */
-                __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_comment, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L7_error)
+                __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_comment, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_1);
                 __Pyx_DECREF_SET(__pyx_v_mu, __pyx_t_1);
                 __pyx_t_1 = 0;
 
-                /* "INDUSAnalysis/indus_waters.pyx":98
+                /* "INDUSAnalysis/indus_waters.pyx":99
  *                 if lstrip[0] == '#':
  *                     comment = lstrip[1:].split()
  *                     if comment[0] == 'mu':             # <<<<<<<<<<<<<<
@@ -3338,7 +3338,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
  */
               }
 
-              /* "INDUSAnalysis/indus_waters.pyx":96
+              /* "INDUSAnalysis/indus_waters.pyx":97
  *                 lstrip = l.strip()
  *                 # Parse comments
  *                 if lstrip[0] == '#':             # <<<<<<<<<<<<<<
@@ -3347,27 +3347,27 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
  */
             }
 
-            /* "INDUSAnalysis/indus_waters.pyx":101
+            /* "INDUSAnalysis/indus_waters.pyx":102
  *                         mu = comment[2]
  *                 # Parse data
  *                 if lstrip[0] != '#':             # <<<<<<<<<<<<<<
  *                     (tcur, Ncur, Ntwcur) = map(float, lstrip.split())
  *                     t.append(tcur)
  */
-            __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_lstrip, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L7_error)
+            __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_lstrip, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_11 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_kp_s__8, Py_NE)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 101, __pyx_L7_error)
+            __pyx_t_11 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_kp_s__8, Py_NE)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 102, __pyx_L7_error)
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             if (__pyx_t_11) {
 
-              /* "INDUSAnalysis/indus_waters.pyx":102
+              /* "INDUSAnalysis/indus_waters.pyx":103
  *                 # Parse data
  *                 if lstrip[0] != '#':
  *                     (tcur, Ncur, Ntwcur) = map(float, lstrip.split())             # <<<<<<<<<<<<<<
  *                     t.append(tcur)
  *                     N.append(Ncur)
  */
-              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_lstrip, __pyx_n_s_split); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 102, __pyx_L7_error)
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_lstrip, __pyx_n_s_split); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_5);
               __pyx_t_3 = NULL;
               if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -3381,10 +3381,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
               }
               __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
               __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L7_error)
+              if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_1);
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-              __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 102, __pyx_L7_error)
+              __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_INCREF(((PyObject *)(&PyFloat_Type)));
               __Pyx_GIVEREF(((PyObject *)(&PyFloat_Type)));
@@ -3392,7 +3392,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
               __Pyx_GIVEREF(__pyx_t_1);
               PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_1);
               __pyx_t_1 = 0;
-              __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L7_error)
+              __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L7_error)
               __Pyx_GOTREF(__pyx_t_1);
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
               if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
@@ -3401,7 +3401,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
                 if (unlikely(size != 3)) {
                   if (size > 3) __Pyx_RaiseTooManyValuesError(3);
                   else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-                  __PYX_ERR(0, 102, __pyx_L7_error)
+                  __PYX_ERR(0, 103, __pyx_L7_error)
                 }
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
                 if (likely(PyTuple_CheckExact(sequence))) {
@@ -3417,17 +3417,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
                 __Pyx_INCREF(__pyx_t_3);
                 __Pyx_INCREF(__pyx_t_12);
                 #else
-                __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 102, __pyx_L7_error)
+                __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_5);
-                __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L7_error)
+                __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_3);
-                __pyx_t_12 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 102, __pyx_L7_error)
+                __pyx_t_12 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 103, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_12);
                 #endif
                 __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
               } else {
                 Py_ssize_t index = -1;
-                __pyx_t_13 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 102, __pyx_L7_error)
+                __pyx_t_13 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 103, __pyx_L7_error)
                 __Pyx_GOTREF(__pyx_t_13);
                 __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
                 __pyx_t_14 = Py_TYPE(__pyx_t_13)->tp_iternext;
@@ -3437,7 +3437,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
                 __Pyx_GOTREF(__pyx_t_3);
                 index = 2; __pyx_t_12 = __pyx_t_14(__pyx_t_13); if (unlikely(!__pyx_t_12)) goto __pyx_L18_unpacking_failed;
                 __Pyx_GOTREF(__pyx_t_12);
-                if (__Pyx_IternextUnpackEndCheck(__pyx_t_14(__pyx_t_13), 3) < 0) __PYX_ERR(0, 102, __pyx_L7_error)
+                if (__Pyx_IternextUnpackEndCheck(__pyx_t_14(__pyx_t_13), 3) < 0) __PYX_ERR(0, 103, __pyx_L7_error)
                 __pyx_t_14 = NULL;
                 __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
                 goto __pyx_L19_unpacking_done;
@@ -3445,7 +3445,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
                 __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
                 __pyx_t_14 = NULL;
                 if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-                __PYX_ERR(0, 102, __pyx_L7_error)
+                __PYX_ERR(0, 103, __pyx_L7_error)
                 __pyx_L19_unpacking_done:;
               }
               __Pyx_XDECREF_SET(__pyx_v_tcur, __pyx_t_5);
@@ -3455,34 +3455,34 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
               __Pyx_XDECREF_SET(__pyx_v_Ntwcur, __pyx_t_12);
               __pyx_t_12 = 0;
 
-              /* "INDUSAnalysis/indus_waters.pyx":103
+              /* "INDUSAnalysis/indus_waters.pyx":104
  *                 if lstrip[0] != '#':
  *                     (tcur, Ncur, Ntwcur) = map(float, lstrip.split())
  *                     t.append(tcur)             # <<<<<<<<<<<<<<
  *                     N.append(Ncur)
  *                     Ntw.append(Ntwcur)
  */
-              __pyx_t_15 = __Pyx_PyObject_Append(__pyx_v_t, __pyx_v_tcur); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 103, __pyx_L7_error)
+              __pyx_t_15 = __Pyx_PyObject_Append(__pyx_v_t, __pyx_v_tcur); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 104, __pyx_L7_error)
 
-              /* "INDUSAnalysis/indus_waters.pyx":104
+              /* "INDUSAnalysis/indus_waters.pyx":105
  *                     (tcur, Ncur, Ntwcur) = map(float, lstrip.split())
  *                     t.append(tcur)
  *                     N.append(Ncur)             # <<<<<<<<<<<<<<
  *                     Ntw.append(Ntwcur)
  * 
  */
-              __pyx_t_15 = __Pyx_PyObject_Append(__pyx_v_N, __pyx_v_Ncur); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 104, __pyx_L7_error)
+              __pyx_t_15 = __Pyx_PyObject_Append(__pyx_v_N, __pyx_v_Ncur); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 105, __pyx_L7_error)
 
-              /* "INDUSAnalysis/indus_waters.pyx":105
+              /* "INDUSAnalysis/indus_waters.pyx":106
  *                     t.append(tcur)
  *                     N.append(Ncur)
  *                     Ntw.append(Ntwcur)             # <<<<<<<<<<<<<<
  * 
  *         t = np.array(t)
  */
-              __pyx_t_15 = __Pyx_PyObject_Append(__pyx_v_Ntw, __pyx_v_Ntwcur); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 105, __pyx_L7_error)
+              __pyx_t_15 = __Pyx_PyObject_Append(__pyx_v_Ntw, __pyx_v_Ntwcur); if (unlikely(__pyx_t_15 == ((int)-1))) __PYX_ERR(0, 106, __pyx_L7_error)
 
-              /* "INDUSAnalysis/indus_waters.pyx":101
+              /* "INDUSAnalysis/indus_waters.pyx":102
  *                         mu = comment[2]
  *                 # Parse data
  *                 if lstrip[0] != '#':             # <<<<<<<<<<<<<<
@@ -3491,7 +3491,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
  */
             }
 
-            /* "INDUSAnalysis/indus_waters.pyx":93
+            /* "INDUSAnalysis/indus_waters.pyx":94
  *         with open(filename) as f:
  *             # Read data file
  *             for l in f:             # <<<<<<<<<<<<<<
@@ -3501,7 +3501,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
           }
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":91
+          /* "INDUSAnalysis/indus_waters.pyx":92
  *         Ntw = []
  *         mu = 0
  *         with open(filename) as f:             # <<<<<<<<<<<<<<
@@ -3522,20 +3522,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.read_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_12) < 0) __PYX_ERR(0, 91, __pyx_L9_except_error)
+          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_12) < 0) __PYX_ERR(0, 92, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_GOTREF(__pyx_t_12);
-          __pyx_t_3 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 91, __pyx_L9_except_error)
+          __pyx_t_3 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 92, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_3);
           __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 91, __pyx_L9_except_error)
+          if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 92, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_16);
           __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_16);
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-          if (__pyx_t_11 < 0) __PYX_ERR(0, 91, __pyx_L9_except_error)
+          if (__pyx_t_11 < 0) __PYX_ERR(0, 92, __pyx_L9_except_error)
           __pyx_t_17 = ((!(__pyx_t_11 != 0)) != 0);
           if (__pyx_t_17) {
             __Pyx_GIVEREF(__pyx_t_4);
@@ -3543,7 +3543,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
             __Pyx_XGIVEREF(__pyx_t_12);
             __Pyx_ErrRestoreWithState(__pyx_t_4, __pyx_t_1, __pyx_t_12);
             __pyx_t_4 = 0; __pyx_t_1 = 0; __pyx_t_12 = 0; 
-            __PYX_ERR(0, 91, __pyx_L9_except_error)
+            __PYX_ERR(0, 92, __pyx_L9_except_error)
           }
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3569,7 +3569,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
         if (__pyx_t_2) {
           __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__10, NULL);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 91, __pyx_L1_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 92, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
@@ -3584,16 +3584,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
     __pyx_L23:;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":107
+  /* "INDUSAnalysis/indus_waters.pyx":108
  *                     Ntw.append(Ntwcur)
  * 
  *         t = np.array(t)             # <<<<<<<<<<<<<<
  *         N = np.array(N)
  *         Ntw = np.array(Ntw)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 108, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -3608,22 +3608,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   }
   __pyx_t_12 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_v_t) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_t);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 107, __pyx_L1_error)
+  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 108, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF_SET(__pyx_v_t, __pyx_t_12);
   __pyx_t_12 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":108
+  /* "INDUSAnalysis/indus_waters.pyx":109
  * 
  *         t = np.array(t)
  *         N = np.array(N)             # <<<<<<<<<<<<<<
  *         Ntw = np.array(Ntw)
  *         mu = np.float(mu)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -3638,22 +3638,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   }
   __pyx_t_12 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_4, __pyx_v_N) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_N);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 108, __pyx_L1_error)
+  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 109, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF_SET(__pyx_v_N, __pyx_t_12);
   __pyx_t_12 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":109
+  /* "INDUSAnalysis/indus_waters.pyx":110
  *         t = np.array(t)
  *         N = np.array(N)
  *         Ntw = np.array(Ntw)             # <<<<<<<<<<<<<<
  *         mu = np.float(mu)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -3668,22 +3668,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   }
   __pyx_t_12 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_v_Ntw) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_Ntw);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 109, __pyx_L1_error)
+  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF_SET(__pyx_v_Ntw, __pyx_t_12);
   __pyx_t_12 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":110
+  /* "INDUSAnalysis/indus_waters.pyx":111
  *         N = np.array(N)
  *         Ntw = np.array(Ntw)
  *         mu = np.float(mu)             # <<<<<<<<<<<<<<
  * 
  *         ts_N = timeseries.TimeSeries(t, N, labels=["N"])
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_float); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -3698,25 +3698,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   }
   __pyx_t_12 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_4, __pyx_v_mu) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_mu);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 110, __pyx_L1_error)
+  if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF_SET(__pyx_v_mu, __pyx_t_12);
   __pyx_t_12 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":112
+  /* "INDUSAnalysis/indus_waters.pyx":113
  *         mu = np.float(mu)
  * 
  *         ts_N = timeseries.TimeSeries(t, N, labels=["N"])             # <<<<<<<<<<<<<<
  *         ts_Ntw = timeseries.TimeSeries(t, Ntw, labels=[r"N~"])
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_12 = PyTuple_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_INCREF(__pyx_v_t);
   __Pyx_GIVEREF(__pyx_v_t);
@@ -3724,16 +3724,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   __Pyx_INCREF(__pyx_v_N);
   __Pyx_GIVEREF(__pyx_v_N);
   PyTuple_SET_ITEM(__pyx_t_12, 1, __pyx_v_N);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_n_s_N);
   __Pyx_GIVEREF(__pyx_n_s_N);
   PyList_SET_ITEM(__pyx_t_3, 0, __pyx_n_s_N);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_labels, __pyx_t_3) < 0) __PYX_ERR(0, 112, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_labels, __pyx_t_3) < 0) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_12, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_12, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -3741,19 +3741,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   __pyx_v_ts_N = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":113
+  /* "INDUSAnalysis/indus_waters.pyx":114
  * 
  *         ts_N = timeseries.TimeSeries(t, N, labels=["N"])
  *         ts_Ntw = timeseries.TimeSeries(t, Ntw, labels=[r"N~"])             # <<<<<<<<<<<<<<
  * 
  *         return ts_N, ts_Ntw, mu
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_t);
   __Pyx_GIVEREF(__pyx_v_t);
@@ -3761,16 +3761,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   __Pyx_INCREF(__pyx_v_Ntw);
   __Pyx_GIVEREF(__pyx_v_Ntw);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_Ntw);
-  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_kp_s_N_2);
   __Pyx_GIVEREF(__pyx_kp_s_N_2);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_kp_s_N_2);
-  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_labels, __pyx_t_1) < 0) __PYX_ERR(0, 113, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_12, __pyx_n_s_labels, __pyx_t_1) < 0) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3778,7 +3778,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   __pyx_v_ts_Ntw = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":115
+  /* "INDUSAnalysis/indus_waters.pyx":116
  *         ts_Ntw = timeseries.TimeSeries(t, Ntw, labels=[r"N~"])
  * 
  *         return ts_N, ts_Ntw, mu             # <<<<<<<<<<<<<<
@@ -3786,7 +3786,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
  *     def calc_probe_waters(self, u, skip, radius):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_ts_N);
   __Pyx_GIVEREF(__pyx_v_ts_N);
@@ -3801,7 +3801,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":73
+  /* "INDUSAnalysis/indus_waters.pyx":74
  *     # Data calculation methods
  * 
  *     def read_waters(self, filename):             # <<<<<<<<<<<<<<
@@ -3838,17 +3838,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_4read_
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":117
+/* "INDUSAnalysis/indus_waters.pyx":118
  *         return ts_N, ts_Ntw, mu
  * 
  *     def calc_probe_waters(self, u, skip, radius):             # <<<<<<<<<<<<<<
  *         """
- *         Calculates waters in individual probe volumes
+ *         Calculates waters in individual probe volumes.
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_probe_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_probe_waters[] = "\n        Calculates waters in individual probe volumes\n\n        Args:\n            u (mda.Universe): Universe containing solvated protein\n            skip (int): Trajectory resampling interval\n            radius (float): Radius of probe waters\n\n        Returns:\n            TimeSeries object containing probe waters\n        ";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_probe_waters[] = "\n        Calculates waters in individual probe volumes.\n\n        Args:\n            u (mda.Universe): Universe containing solvated protein.\n            skip (int): Trajectory resampling interval.\n            radius (float): Radius of probe waters.\n\n        Returns:\n            TimeSeries object containing probe waters.\n        ";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_probe_waters = {"calc_probe_waters", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_probe_waters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_probe_waters};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_probe_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
@@ -3885,23 +3885,23 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, 1); __PYX_ERR(0, 117, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, 1); __PYX_ERR(0, 118, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_skip_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, 2); __PYX_ERR(0, 117, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, 2); __PYX_ERR(0, 118, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_radius_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, 3); __PYX_ERR(0, 117, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, 3); __PYX_ERR(0, 118, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_probe_waters") < 0)) __PYX_ERR(0, 117, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calc_probe_waters") < 0)) __PYX_ERR(0, 118, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3918,7 +3918,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 117, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calc_probe_waters", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 118, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.calc_probe_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3965,39 +3965,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
   Py_ssize_t __pyx_t_19;
   __Pyx_RefNannySetupContext("calc_probe_waters", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":130
+  /* "INDUSAnalysis/indus_waters.pyx":131
  *         """
  *         # Probes placed on protein-heavy atoms
  *         protein = u.select_atoms("protein")             # <<<<<<<<<<<<<<
  *         protein_heavy = u.select_atoms("protein and not name H*")
  * 
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_n_s_protein) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_protein);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_protein = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/indus_waters.pyx":131
- *         # Probes placed on protein-heavy atoms
- *         protein = u.select_atoms("protein")
- *         protein_heavy = u.select_atoms("protein and not name H*")             # <<<<<<<<<<<<<<
- * 
- *         utraj = u.trajectory[::skip]
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -4011,46 +3984,73 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       __Pyx_DECREF_SET(__pyx_t_2, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_protein_and_not_name_H) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_protein_and_not_name_H);
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_n_s_protein) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_protein);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_protein = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/indus_waters.pyx":132
+ *         # Probes placed on protein-heavy atoms
+ *         protein = u.select_atoms("protein")
+ *         protein_heavy = u.select_atoms("protein and not name H*")             # <<<<<<<<<<<<<<
+ * 
+ *         utraj = u.trajectory[::skip]
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 132, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_protein_and_not_name_H) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_protein_and_not_name_H);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_protein_heavy = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":133
+  /* "INDUSAnalysis/indus_waters.pyx":134
  *         protein_heavy = u.select_atoms("protein and not name H*")
  * 
  *         utraj = u.trajectory[::skip]             # <<<<<<<<<<<<<<
  *         times = np.zeros(len(utraj))
  *         probe_waters = np.zeros((len(utraj), len(protein)))
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PySlice_New(Py_None, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_2 = PySlice_New(Py_None, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_utraj = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":134
+  /* "INDUSAnalysis/indus_waters.pyx":135
  * 
  *         utraj = u.trajectory[::skip]
  *         times = np.zeros(len(utraj))             # <<<<<<<<<<<<<<
  *         probe_waters = np.zeros((len(utraj), len(protein)))
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 134, __pyx_L1_error)
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_4 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -4065,31 +4065,31 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
   __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 134, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_times = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":135
+  /* "INDUSAnalysis/indus_waters.pyx":136
  *         utraj = u.trajectory[::skip]
  *         times = np.zeros(len(utraj))
  *         probe_waters = np.zeros((len(utraj), len(protein)))             # <<<<<<<<<<<<<<
  * 
  *         if self.verbose:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 135, __pyx_L1_error)
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_4 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyObject_Length(__pyx_v_protein); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 135, __pyx_L1_error)
-  __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_4 = PyObject_Length(__pyx_v_protein); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
@@ -4110,50 +4110,50 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
   __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_5, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_probe_waters = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":137
+  /* "INDUSAnalysis/indus_waters.pyx":138
  *         probe_waters = np.zeros((len(utraj), len(protein)))
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
  *             bar = tqdm(desc="Calculating waters", total=len(utraj))
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_7) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":138
+    /* "INDUSAnalysis/indus_waters.pyx":139
  * 
  *         if self.verbose:
  *             bar = tqdm(desc="Calculating waters", total=len(utraj))             # <<<<<<<<<<<<<<
  * 
  *         for tidx, ts in enumerate(utraj):
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 138, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_desc, __pyx_kp_s_Calculating_waters) < 0) __PYX_ERR(0, 138, __pyx_L1_error)
-    __pyx_t_4 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 138, __pyx_L1_error)
-    __pyx_t_6 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 138, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_desc, __pyx_kp_s_Calculating_waters) < 0) __PYX_ERR(0, 139, __pyx_L1_error)
+    __pyx_t_4 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 139, __pyx_L1_error)
+    __pyx_t_6 = PyInt_FromSsize_t(__pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_total, __pyx_t_6) < 0) __PYX_ERR(0, 138, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_total, __pyx_t_6) < 0) __PYX_ERR(0, 139, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 138, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_bar = __pyx_t_6;
     __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":137
+    /* "INDUSAnalysis/indus_waters.pyx":138
  *         probe_waters = np.zeros((len(utraj), len(protein)))
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
@@ -4162,7 +4162,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
  */
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":140
+  /* "INDUSAnalysis/indus_waters.pyx":141
  *             bar = tqdm(desc="Calculating waters", total=len(utraj))
  * 
  *         for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
@@ -4175,26 +4175,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
     __pyx_t_2 = __pyx_v_utraj; __Pyx_INCREF(__pyx_t_2); __pyx_t_4 = 0;
     __pyx_t_8 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __pyx_t_8 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 141, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_8)) {
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 140, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 140, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -4204,7 +4204,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 140, __pyx_L1_error)
+          else __PYX_ERR(0, 141, __pyx_L1_error)
         }
         break;
       }
@@ -4214,40 +4214,40 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
     __pyx_t_3 = 0;
     __Pyx_INCREF(__pyx_t_6);
     __Pyx_XDECREF_SET(__pyx_v_tidx, __pyx_t_6);
-    __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_6, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_6, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6);
     __pyx_t_6 = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":141
+    /* "INDUSAnalysis/indus_waters.pyx":142
  * 
  *         for tidx, ts in enumerate(utraj):
  *             times[tidx] = ts.time             # <<<<<<<<<<<<<<
  *             for atom in protein_heavy.atoms:
  *                 waters = u.select_atoms("name OW and (around {} (atom {} {} {}))".format(
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (unlikely(PyObject_SetItem(__pyx_v_times, __pyx_v_tidx, __pyx_t_3) < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(__pyx_v_times, __pyx_v_tidx, __pyx_t_3) < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":142
+    /* "INDUSAnalysis/indus_waters.pyx":143
  *         for tidx, ts in enumerate(utraj):
  *             times[tidx] = ts.time
  *             for atom in protein_heavy.atoms:             # <<<<<<<<<<<<<<
  *                 waters = u.select_atoms("name OW and (around {} (atom {} {} {}))".format(
  *                                         radius, atom.segid, atom.resid, atom.name))
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_atoms); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein_heavy, __pyx_n_s_atoms); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
       __pyx_t_5 = __pyx_t_3; __Pyx_INCREF(__pyx_t_5); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
     } else {
-      __pyx_t_9 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error)
+      __pyx_t_9 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_10 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 142, __pyx_L1_error)
+      __pyx_t_10 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 143, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     for (;;) {
@@ -4255,17 +4255,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
         if (likely(PyList_CheckExact(__pyx_t_5))) {
           if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_5)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_3 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_9); __Pyx_INCREF(__pyx_t_3); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
+          __pyx_t_3 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_9); __Pyx_INCREF(__pyx_t_3); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 143, __pyx_L1_error)
           #else
-          __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+          __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           #endif
         } else {
           if (__pyx_t_9 >= PyTuple_GET_SIZE(__pyx_t_5)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_9); __Pyx_INCREF(__pyx_t_3); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
+          __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_9); __Pyx_INCREF(__pyx_t_3); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 143, __pyx_L1_error)
           #else
-          __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+          __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           #endif
         }
@@ -4275,7 +4275,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 142, __pyx_L1_error)
+            else __PYX_ERR(0, 143, __pyx_L1_error)
           }
           break;
         }
@@ -4284,30 +4284,30 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       __Pyx_XDECREF_SET(__pyx_v_atom, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "INDUSAnalysis/indus_waters.pyx":143
+      /* "INDUSAnalysis/indus_waters.pyx":144
  *             times[tidx] = ts.time
  *             for atom in protein_heavy.atoms:
  *                 waters = u.select_atoms("name OW and (around {} (atom {} {} {}))".format(             # <<<<<<<<<<<<<<
  *                                         radius, atom.segid, atom.resid, atom.name))
  *                 probe_waters[tidx, atom.index] = len(waters)
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_name_OW_and_around_atom, __pyx_n_s_format); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_name_OW_and_around_atom, __pyx_n_s_format); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 144, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
 
-      /* "INDUSAnalysis/indus_waters.pyx":144
+      /* "INDUSAnalysis/indus_waters.pyx":145
  *             for atom in protein_heavy.atoms:
  *                 waters = u.select_atoms("name OW and (around {} (atom {} {} {}))".format(
  *                                         radius, atom.segid, atom.resid, atom.name))             # <<<<<<<<<<<<<<
  *                 probe_waters[tidx, atom.index] = len(waters)
  *             if self.verbose:
  */
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_segid); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_segid); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 145, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
-      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_resid); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_resid); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 145, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_name); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_name); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 145, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __pyx_t_16 = NULL;
       __pyx_t_17 = 0;
@@ -4324,7 +4324,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_12)) {
         PyObject *__pyx_temp[5] = {__pyx_t_16, __pyx_v_radius, __pyx_t_13, __pyx_t_14, __pyx_t_15};
-        __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 143, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 144, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -4335,7 +4335,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_12)) {
         PyObject *__pyx_temp[5] = {__pyx_t_16, __pyx_v_radius, __pyx_t_13, __pyx_t_14, __pyx_t_15};
-        __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 143, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_12, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 144, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -4344,7 +4344,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       } else
       #endif
       {
-        __pyx_t_18 = PyTuple_New(4+__pyx_t_17); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 143, __pyx_L1_error)
+        __pyx_t_18 = PyTuple_New(4+__pyx_t_17); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 144, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_18);
         if (__pyx_t_16) {
           __Pyx_GIVEREF(__pyx_t_16); PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_16); __pyx_t_16 = NULL;
@@ -4361,7 +4361,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
         __pyx_t_13 = 0;
         __pyx_t_14 = 0;
         __pyx_t_15 = 0;
-        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_18, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 143, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_18, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 144, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
       }
@@ -4379,25 +4379,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       __pyx_t_3 = (__pyx_t_12) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_12, __pyx_t_11) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_11);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_XDECREF_SET(__pyx_v_waters, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "INDUSAnalysis/indus_waters.pyx":145
+      /* "INDUSAnalysis/indus_waters.pyx":146
  *                 waters = u.select_atoms("name OW and (around {} (atom {} {} {}))".format(
  *                                         radius, atom.segid, atom.resid, atom.name))
  *                 probe_waters[tidx, atom.index] = len(waters)             # <<<<<<<<<<<<<<
  *             if self.verbose:
  *                 bar.update(1)
  */
-      __pyx_t_19 = PyObject_Length(__pyx_v_waters); if (unlikely(__pyx_t_19 == ((Py_ssize_t)-1))) __PYX_ERR(0, 145, __pyx_L1_error)
-      __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_19); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L1_error)
+      __pyx_t_19 = PyObject_Length(__pyx_v_waters); if (unlikely(__pyx_t_19 == ((Py_ssize_t)-1))) __PYX_ERR(0, 146, __pyx_L1_error)
+      __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_19); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 146, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_atom, __pyx_n_s_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 145, __pyx_L1_error)
+      __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_INCREF(__pyx_v_tidx);
       __Pyx_GIVEREF(__pyx_v_tidx);
@@ -4405,11 +4405,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_1);
       __pyx_t_1 = 0;
-      if (unlikely(PyObject_SetItem(__pyx_v_probe_waters, __pyx_t_11, __pyx_t_3) < 0)) __PYX_ERR(0, 145, __pyx_L1_error)
+      if (unlikely(PyObject_SetItem(__pyx_v_probe_waters, __pyx_t_11, __pyx_t_3) < 0)) __PYX_ERR(0, 146, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "INDUSAnalysis/indus_waters.pyx":142
+      /* "INDUSAnalysis/indus_waters.pyx":143
  *         for tidx, ts in enumerate(utraj):
  *             times[tidx] = ts.time
  *             for atom in protein_heavy.atoms:             # <<<<<<<<<<<<<<
@@ -4419,28 +4419,28 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":146
+    /* "INDUSAnalysis/indus_waters.pyx":147
  *                                         radius, atom.segid, atom.resid, atom.name))
  *                 probe_waters[tidx, atom.index] = len(waters)
  *             if self.verbose:             # <<<<<<<<<<<<<<
  *                 bar.update(1)
  * 
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 147, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 147, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (__pyx_t_7) {
 
-      /* "INDUSAnalysis/indus_waters.pyx":147
+      /* "INDUSAnalysis/indus_waters.pyx":148
  *                 probe_waters[tidx, atom.index] = len(waters)
  *             if self.verbose:
  *                 bar.update(1)             # <<<<<<<<<<<<<<
  * 
  *         return timeseries.TimeSeries(times, probe_waters,
  */
-      if (unlikely(!__pyx_v_bar)) { __Pyx_RaiseUnboundLocalError("bar"); __PYX_ERR(0, 147, __pyx_L1_error) }
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bar, __pyx_n_s_update); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
+      if (unlikely(!__pyx_v_bar)) { __Pyx_RaiseUnboundLocalError("bar"); __PYX_ERR(0, 148, __pyx_L1_error) }
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bar, __pyx_n_s_update); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 148, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_11 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -4454,12 +4454,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
       }
       __pyx_t_5 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_11, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_int_1);
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 147, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 148, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "INDUSAnalysis/indus_waters.pyx":146
+      /* "INDUSAnalysis/indus_waters.pyx":147
  *                                         radius, atom.segid, atom.resid, atom.name))
  *                 probe_waters[tidx, atom.index] = len(waters)
  *             if self.verbose:             # <<<<<<<<<<<<<<
@@ -4468,7 +4468,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
  */
     }
 
-    /* "INDUSAnalysis/indus_waters.pyx":140
+    /* "INDUSAnalysis/indus_waters.pyx":141
  *             bar = tqdm(desc="Calculating waters", total=len(utraj))
  * 
  *         for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
@@ -4479,20 +4479,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":149
+  /* "INDUSAnalysis/indus_waters.pyx":150
  *                 bar.update(1)
  * 
  *         return timeseries.TimeSeries(times, probe_waters,             # <<<<<<<<<<<<<<
- *                                      labels=['Number of waters', 'Heavy atom index'])
+ *                                      labels=['Number of waters', 'Atom index'])
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_INCREF(__pyx_v_times);
   __Pyx_GIVEREF(__pyx_v_times);
@@ -4501,34 +4501,34 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
   __Pyx_GIVEREF(__pyx_v_probe_waters);
   PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_v_probe_waters);
 
-  /* "INDUSAnalysis/indus_waters.pyx":150
+  /* "INDUSAnalysis/indus_waters.pyx":151
  * 
  *         return timeseries.TimeSeries(times, probe_waters,
- *                                      labels=['Number of waters', 'Heavy atom index'])             # <<<<<<<<<<<<<<
+ *                                      labels=['Number of waters', 'Atom index'])             # <<<<<<<<<<<<<<
  * 
  *     def plot_waters(self, ts_Ntw):
  */
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_kp_s_Number_of_waters);
   __Pyx_GIVEREF(__pyx_kp_s_Number_of_waters);
   PyList_SET_ITEM(__pyx_t_3, 0, __pyx_kp_s_Number_of_waters);
-  __Pyx_INCREF(__pyx_kp_s_Heavy_atom_index);
-  __Pyx_GIVEREF(__pyx_kp_s_Heavy_atom_index);
-  PyList_SET_ITEM(__pyx_t_3, 1, __pyx_kp_s_Heavy_atom_index);
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_labels, __pyx_t_3) < 0) __PYX_ERR(0, 150, __pyx_L1_error)
+  __Pyx_INCREF(__pyx_kp_s_Atom_index);
+  __Pyx_GIVEREF(__pyx_kp_s_Atom_index);
+  PyList_SET_ITEM(__pyx_t_3, 1, __pyx_kp_s_Atom_index);
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_labels, __pyx_t_3) < 0) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":149
+  /* "INDUSAnalysis/indus_waters.pyx":150
  *                 bar.update(1)
  * 
  *         return timeseries.TimeSeries(times, probe_waters,             # <<<<<<<<<<<<<<
- *                                      labels=['Number of waters', 'Heavy atom index'])
+ *                                      labels=['Number of waters', 'Atom index'])
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4537,12 +4537,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":117
+  /* "INDUSAnalysis/indus_waters.pyx":118
  *         return ts_N, ts_Ntw, mu
  * 
  *     def calc_probe_waters(self, u, skip, radius):             # <<<<<<<<<<<<<<
  *         """
- *         Calculates waters in individual probe volumes
+ *         Calculates waters in individual probe volumes.
  */
 
   /* function exit code */
@@ -4577,17 +4577,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_6calc_
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":152
- *                                      labels=['Number of waters', 'Heavy atom index'])
+/* "INDUSAnalysis/indus_waters.pyx":153
+ *                                      labels=['Number of waters', 'Atom index'])
  * 
  *     def plot_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots waters and saves figure to file"""
+ *         """Plots waters and saves figure to file."""
  *         fig = ts_Ntw.plot()
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_waters[] = "Plots waters and saves figure to file";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_waters[] = "Plots waters and saves figure to file.";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_waters = {"plot_waters", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_waters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_waters};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
@@ -4618,11 +4618,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_Ntw)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_waters", 1, 2, 2, 1); __PYX_ERR(0, 152, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_waters", 1, 2, 2, 1); __PYX_ERR(0, 153, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_waters") < 0)) __PYX_ERR(0, 152, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_waters") < 0)) __PYX_ERR(0, 153, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4635,7 +4635,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 152, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 153, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.plot_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4659,14 +4659,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("plot_waters", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":154
+  /* "INDUSAnalysis/indus_waters.pyx":155
  *     def plot_waters(self, ts_Ntw):
- *         """Plots waters and saves figure to file"""
+ *         """Plots waters and saves figure to file."""
  *         fig = ts_Ntw.plot()             # <<<<<<<<<<<<<<
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="waters")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_plot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4680,20 +4680,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_fig = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":155
- *         """Plots waters and saves figure to file"""
+  /* "INDUSAnalysis/indus_waters.pyx":156
+ *         """Plots waters and saves figure to file."""
  *         fig = ts_Ntw.plot()
  *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="waters")
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4707,58 +4707,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 155, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":156
+  /* "INDUSAnalysis/indus_waters.pyx":157
  *         fig = ts_Ntw.plot()
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="waters")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_waters) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_suffix, __pyx_n_s_waters) < 0) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":157
+  /* "INDUSAnalysis/indus_waters.pyx":158
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="waters")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 158, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":158
+    /* "INDUSAnalysis/indus_waters.pyx":159
  *         self.save_figure(fig, suffix="waters")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -4773,12 +4773,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
     }
     __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":157
+    /* "INDUSAnalysis/indus_waters.pyx":158
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="waters")
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -4788,7 +4788,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":160
+  /* "INDUSAnalysis/indus_waters.pyx":161
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -4796,9 +4796,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
  *     def plot_ma_waters(self, ts_Ntw):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -4813,18 +4813,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
     }
     __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 160, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/indus_waters.pyx":152
- *                                      labels=['Number of waters', 'Heavy atom index'])
+  /* "INDUSAnalysis/indus_waters.pyx":153
+ *                                      labels=['Number of waters', 'Atom index'])
  * 
  *     def plot_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots waters and saves figure to file"""
+ *         """Plots waters and saves figure to file."""
  *         fig = ts_Ntw.plot()
  */
 
@@ -4845,17 +4845,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_8plot_
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":162
+/* "INDUSAnalysis/indus_waters.pyx":163
  *             plt.close()
  * 
  *     def plot_ma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots moving average waters and saves figure to file"""
+ *         """Plots moving average waters and saves figure to file."""
  *         fig = ts_Ntw.moving_average(window=self.window).plot()
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot_ma_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot_ma_waters[] = "Plots moving average waters and saves figure to file";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot_ma_waters[] = "Plots moving average waters and saves figure to file.";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot_ma_waters = {"plot_ma_waters", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot_ma_waters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot_ma_waters};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot_ma_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
@@ -4886,11 +4886,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_Ntw)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_ma_waters", 1, 2, 2, 1); __PYX_ERR(0, 162, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_ma_waters", 1, 2, 2, 1); __PYX_ERR(0, 163, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_ma_waters") < 0)) __PYX_ERR(0, 162, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_ma_waters") < 0)) __PYX_ERR(0, 163, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4903,7 +4903,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_ma_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 162, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_ma_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 163, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.plot_ma_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4927,26 +4927,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("plot_ma_waters", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":164
+  /* "INDUSAnalysis/indus_waters.pyx":165
  *     def plot_ma_waters(self, ts_Ntw):
- *         """Plots moving average waters and saves figure to file"""
+ *         """Plots moving average waters and saves figure to file."""
  *         fig = ts_Ntw.moving_average(window=self.window).plot()             # <<<<<<<<<<<<<<
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_waters")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_moving_average); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_window, __pyx_t_4) < 0) __PYX_ERR(0, 164, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_window, __pyx_t_4) < 0) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_plot); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_plot); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -4961,20 +4961,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
   }
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_fig = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":165
- *         """Plots moving average waters and saves figure to file"""
+  /* "INDUSAnalysis/indus_waters.pyx":166
+ *         """Plots moving average waters and saves figure to file."""
  *         fig = ts_Ntw.moving_average(window=self.window).plot()
  *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="ma_waters")
  *         if self.show:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -4988,58 +4988,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
   }
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":166
+  /* "INDUSAnalysis/indus_waters.pyx":167
  *         fig = ts_Ntw.moving_average(window=self.window).plot()
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_waters")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_fig);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_n_s_ma_waters) < 0) __PYX_ERR(0, 166, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_suffix, __pyx_n_s_ma_waters) < 0) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":167
+  /* "INDUSAnalysis/indus_waters.pyx":168
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_waters")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":168
+    /* "INDUSAnalysis/indus_waters.pyx":169
  *         self.save_figure(fig, suffix="ma_waters")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_plt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 169, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 169, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -5054,12 +5054,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 168, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 169, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":167
+    /* "INDUSAnalysis/indus_waters.pyx":168
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="ma_waters")
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -5069,7 +5069,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":170
+  /* "INDUSAnalysis/indus_waters.pyx":171
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -5077,9 +5077,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
  *     def plot_cma_waters(self, ts_Ntw):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_close); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 171, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -5094,18 +5094,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
     }
     __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/indus_waters.pyx":162
+  /* "INDUSAnalysis/indus_waters.pyx":163
  *             plt.close()
  * 
  *     def plot_ma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots moving average waters and saves figure to file"""
+ *         """Plots moving average waters and saves figure to file."""
  *         fig = ts_Ntw.moving_average(window=self.window).plot()
  */
 
@@ -5126,17 +5126,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_10plot
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":172
+/* "INDUSAnalysis/indus_waters.pyx":173
  *             plt.close()
  * 
  *     def plot_cma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots cumulative moving average waters and saves figure to file"""
+ *         """Plots cumulative moving average waters and saves figure to file."""
  *         fig = ts_Ntw.cumulative_moving_average().plot()
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot_cma_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot_cma_waters[] = "Plots cumulative moving average waters and saves figure to file";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot_cma_waters[] = "Plots cumulative moving average waters and saves figure to file.";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot_cma_waters = {"plot_cma_waters", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot_cma_waters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot_cma_waters};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot_cma_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
@@ -5167,11 +5167,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_Ntw)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_cma_waters", 1, 2, 2, 1); __PYX_ERR(0, 172, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_cma_waters", 1, 2, 2, 1); __PYX_ERR(0, 173, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_cma_waters") < 0)) __PYX_ERR(0, 172, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_cma_waters") < 0)) __PYX_ERR(0, 173, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5184,7 +5184,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_cma_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 172, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_cma_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 173, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.plot_cma_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5208,14 +5208,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("plot_cma_waters", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":174
+  /* "INDUSAnalysis/indus_waters.pyx":175
  *     def plot_cma_waters(self, ts_Ntw):
- *         """Plots cumulative moving average waters and saves figure to file"""
+ *         """Plots cumulative moving average waters and saves figure to file."""
  *         fig = ts_Ntw.cumulative_moving_average().plot()             # <<<<<<<<<<<<<<
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="cma_waters")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_cumulative_moving_average); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_cumulative_moving_average); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -5229,10 +5229,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
   }
   __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_plot); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_plot); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -5247,20 +5247,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_fig = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":175
- *         """Plots cumulative moving average waters and saves figure to file"""
+  /* "INDUSAnalysis/indus_waters.pyx":176
+ *         """Plots cumulative moving average waters and saves figure to file."""
  *         fig = ts_Ntw.cumulative_moving_average().plot()
  *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="cma_waters")
  *         if self.show:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -5274,58 +5274,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":176
+  /* "INDUSAnalysis/indus_waters.pyx":177
  *         fig = ts_Ntw.cumulative_moving_average().plot()
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="cma_waters")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_fig);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_suffix, __pyx_n_s_cma_waters) < 0) __PYX_ERR(0, 176, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 176, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_suffix, __pyx_n_s_cma_waters) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":177
+  /* "INDUSAnalysis/indus_waters.pyx":178
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="cma_waters")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 178, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 178, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":178
+    /* "INDUSAnalysis/indus_waters.pyx":179
  *         self.save_figure(fig, suffix="cma_waters")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_show); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -5340,12 +5340,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
     }
     __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 178, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":177
+    /* "INDUSAnalysis/indus_waters.pyx":178
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="cma_waters")
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -5355,7 +5355,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":180
+  /* "INDUSAnalysis/indus_waters.pyx":181
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -5363,9 +5363,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
  *     def plot_probe_waters(self, ts_probe_waters):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_plt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_close); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_close); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -5380,18 +5380,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
     }
     __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/indus_waters.pyx":172
+  /* "INDUSAnalysis/indus_waters.pyx":173
  *             plt.close()
  * 
  *     def plot_cma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots cumulative moving average waters and saves figure to file"""
+ *         """Plots cumulative moving average waters and saves figure to file."""
  *         fig = ts_Ntw.cumulative_moving_average().plot()
  */
 
@@ -5412,17 +5412,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_12plot
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":182
+/* "INDUSAnalysis/indus_waters.pyx":183
  *             plt.close()
  * 
  *     def plot_probe_waters(self, ts_probe_waters):             # <<<<<<<<<<<<<<
- *         """Plots waters in each individual probe as a 2D heatmap"""
+ *         """Plots waters in each individual probe as a 2D heatmap."""
  *         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot_probe_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot_probe_waters[] = "Plots waters in each individual probe as a 2D heatmap";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot_probe_waters[] = "Plots waters in each individual probe as a 2D heatmap.";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot_probe_waters = {"plot_probe_waters", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot_probe_waters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot_probe_waters};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot_probe_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
@@ -5453,11 +5453,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_probe_waters)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("plot_probe_waters", 1, 2, 2, 1); __PYX_ERR(0, 182, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("plot_probe_waters", 1, 2, 2, 1); __PYX_ERR(0, 183, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_probe_waters") < 0)) __PYX_ERR(0, 182, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "plot_probe_waters") < 0)) __PYX_ERR(0, 183, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5470,7 +5470,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_probe_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 182, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_probe_waters", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 183, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.plot_probe_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5494,33 +5494,33 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("plot_probe_waters", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":184
+  /* "INDUSAnalysis/indus_waters.pyx":185
  *     def plot_probe_waters(self, ts_probe_waters):
- *         """Plots waters in each individual probe as a 2D heatmap"""
+ *         """Plots waters in each individual probe as a 2D heatmap."""
  *         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')             # <<<<<<<<<<<<<<
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="probe_waters")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_probe_waters, __pyx_n_s_plot_2d_heatmap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_probe_waters, __pyx_n_s_plot_2d_heatmap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 184, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 184, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cmap, __pyx_n_s_hot) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_fig = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":185
- *         """Plots waters in each individual probe as a 2D heatmap"""
+  /* "INDUSAnalysis/indus_waters.pyx":186
+ *         """Plots waters in each individual probe as a 2D heatmap."""
  *         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
  *         fig.set_dpi(300)             # <<<<<<<<<<<<<<
  *         self.save_figure(fig, suffix="probe_waters")
  *         if self.show:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_set_dpi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5534,58 +5534,58 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_int_300) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_int_300);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":186
+  /* "INDUSAnalysis/indus_waters.pyx":187
  *         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="probe_waters")             # <<<<<<<<<<<<<<
  *         if self.show:
  *             plt.show()
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_figure); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 187, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_fig);
   __Pyx_GIVEREF(__pyx_v_fig);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_fig);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_n_s_probe_waters) < 0) __PYX_ERR(0, 186, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 186, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_suffix, __pyx_n_s_probe_waters) < 0) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":187
+  /* "INDUSAnalysis/indus_waters.pyx":188
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="probe_waters")
  *         if self.show:             # <<<<<<<<<<<<<<
  *             plt.show()
  *         else:
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_show); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":188
+    /* "INDUSAnalysis/indus_waters.pyx":189
  *         self.save_figure(fig, suffix="probe_waters")
  *         if self.show:
  *             plt.show()             # <<<<<<<<<<<<<<
  *         else:
  *             plt.close()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_plt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 188, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_show); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -5600,12 +5600,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot
     }
     __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":187
+    /* "INDUSAnalysis/indus_waters.pyx":188
  *         fig.set_dpi(300)
  *         self.save_figure(fig, suffix="probe_waters")
  *         if self.show:             # <<<<<<<<<<<<<<
@@ -5615,7 +5615,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":190
+  /* "INDUSAnalysis/indus_waters.pyx":191
  *             plt.show()
  *         else:
  *             plt.close()             # <<<<<<<<<<<<<<
@@ -5623,9 +5623,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot
  *     def write_mean_std_waters(self, mu, ts_Ntw):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_close); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -5640,18 +5640,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot
     }
     __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/indus_waters.pyx":182
+  /* "INDUSAnalysis/indus_waters.pyx":183
  *             plt.close()
  * 
  *     def plot_probe_waters(self, ts_probe_waters):             # <<<<<<<<<<<<<<
- *         """Plots waters in each individual probe as a 2D heatmap"""
+ *         """Plots waters in each individual probe as a 2D heatmap."""
  *         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
  */
 
@@ -5672,17 +5672,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_14plot
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":192
+/* "INDUSAnalysis/indus_waters.pyx":193
  *             plt.close()
  * 
  *     def write_mean_std_waters(self, mu, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Appends mean and std waters to text file"""
+ *         """Appends mean and std waters to text file."""
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17write_mean_std_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16write_mean_std_waters[] = "Appends mean and std waters to text file";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16write_mean_std_waters[] = "Appends mean and std waters to text file.";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17write_mean_std_waters = {"write_mean_std_waters", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17write_mean_std_waters, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16write_mean_std_waters};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17write_mean_std_waters(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
@@ -5716,17 +5716,17 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17writ
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_mu)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_mean_std_waters", 1, 3, 3, 1); __PYX_ERR(0, 192, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_mean_std_waters", 1, 3, 3, 1); __PYX_ERR(0, 193, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_Ntw)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_mean_std_waters", 1, 3, 3, 2); __PYX_ERR(0, 192, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_mean_std_waters", 1, 3, 3, 2); __PYX_ERR(0, 193, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_mean_std_waters") < 0)) __PYX_ERR(0, 192, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_mean_std_waters") < 0)) __PYX_ERR(0, 193, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -5741,7 +5741,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17writ
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_mean_std_waters", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 192, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_mean_std_waters", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 193, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.write_mean_std_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5776,16 +5776,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   int __pyx_t_13;
   __Pyx_RefNannySetupContext("write_mean_std_waters", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":194
+  /* "INDUSAnalysis/indus_waters.pyx":195
  *     def write_mean_std_waters(self, mu, ts_Ntw):
- *         """Appends mean and std waters to text file"""
+ *         """Appends mean and std waters to text file."""
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())             # <<<<<<<<<<<<<<
  *         with open(self.obspref + "_mean.txt", 'a+') as meanf:
  *             meanf.write(meanstr)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_2f_2f, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_2f_2f, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_mean); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_mean); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -5799,7 +5799,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   }
   __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 194, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -5817,7 +5817,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_mu, __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -5826,14 +5826,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_mu, __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 194, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_4) {
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -5844,7 +5844,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
@@ -5852,20 +5852,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   __pyx_v_meanstr = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":195
- *         """Appends mean and std waters to text file"""
+  /* "INDUSAnalysis/indus_waters.pyx":196
+ *         """Appends mean and std waters to text file."""
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
  *         with open(self.obspref + "_mean.txt", 'a+') as meanf:             # <<<<<<<<<<<<<<
  *             meanf.write(meanstr)
  * 
  */
   /*with:*/ {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obspref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obspref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_mean_txt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_mean_txt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 196, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -5873,12 +5873,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     __Pyx_GIVEREF(__pyx_kp_s_a);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_kp_s_a);
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 196, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_7 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 195, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 196, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L3_error)
+    __pyx_t_5 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 196, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_3 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -5892,7 +5892,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     }
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L3_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = __pyx_t_1;
@@ -5910,14 +5910,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
           __pyx_v_meanf = __pyx_t_5;
           __pyx_t_5 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":196
+          /* "INDUSAnalysis/indus_waters.pyx":197
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
  *         with open(self.obspref + "_mean.txt", 'a+') as meanf:
  *             meanf.write(meanstr)             # <<<<<<<<<<<<<<
  * 
  *         stdstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.std())
  */
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_meanf, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 196, __pyx_L7_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_meanf, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
           __pyx_t_1 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5931,13 +5931,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
           }
           __pyx_t_5 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_meanstr) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_meanstr);
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 196, __pyx_L7_error)
+          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":195
- *         """Appends mean and std waters to text file"""
+          /* "INDUSAnalysis/indus_waters.pyx":196
+ *         """Appends mean and std waters to text file."""
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
  *         with open(self.obspref + "_mean.txt", 'a+') as meanf:             # <<<<<<<<<<<<<<
  *             meanf.write(meanstr)
@@ -5956,20 +5956,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.write_mean_std_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_2, &__pyx_t_1) < 0) __PYX_ERR(0, 195, __pyx_L9_except_error)
+          if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_2, &__pyx_t_1) < 0) __PYX_ERR(0, 196, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_3 = PyTuple_Pack(3, __pyx_t_5, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 195, __pyx_L9_except_error)
+          __pyx_t_3 = PyTuple_Pack(3, __pyx_t_5, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 196, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_3);
           __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_3, NULL);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 195, __pyx_L9_except_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 196, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_11);
           __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (__pyx_t_12 < 0) __PYX_ERR(0, 195, __pyx_L9_except_error)
+          if (__pyx_t_12 < 0) __PYX_ERR(0, 196, __pyx_L9_except_error)
           __pyx_t_13 = ((!(__pyx_t_12 != 0)) != 0);
           if (__pyx_t_13) {
             __Pyx_GIVEREF(__pyx_t_5);
@@ -5977,7 +5977,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
             __Pyx_XGIVEREF(__pyx_t_1);
             __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_2, __pyx_t_1);
             __pyx_t_5 = 0; __pyx_t_2 = 0; __pyx_t_1 = 0; 
-            __PYX_ERR(0, 195, __pyx_L9_except_error)
+            __PYX_ERR(0, 196, __pyx_L9_except_error)
           }
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -6003,7 +6003,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
         if (__pyx_t_7) {
           __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__10, NULL);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 195, __pyx_L1_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 196, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
         }
@@ -6018,16 +6018,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     __pyx_L16:;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":198
+  /* "INDUSAnalysis/indus_waters.pyx":199
  *             meanf.write(meanstr)
  * 
  *         stdstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.std())             # <<<<<<<<<<<<<<
  *         with open(self.obspref + "_std.txt", 'a+') as stdf:
  *             stdf.write(stdstr)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_2f_2f, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_2f_2f, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_std); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_Ntw, __pyx_n_s_std); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -6041,7 +6041,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   }
   __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 198, __pyx_L1_error)
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -6059,7 +6059,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_mu, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -6068,14 +6068,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_mu, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else
   #endif
   {
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 198, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -6086,7 +6086,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     __Pyx_GIVEREF(__pyx_t_5);
     PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -6094,7 +6094,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   __pyx_v_stdstr = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":199
+  /* "INDUSAnalysis/indus_waters.pyx":200
  * 
  *         stdstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.std())
  *         with open(self.obspref + "_std.txt", 'a+') as stdf:             # <<<<<<<<<<<<<<
@@ -6102,12 +6102,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
  * 
  */
   /*with:*/ {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obspref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obspref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_std_txt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_std_txt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -6115,12 +6115,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     __Pyx_GIVEREF(__pyx_kp_s_a);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_kp_s_a);
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_7 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 199, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 200, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L17_error)
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L17_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6134,7 +6134,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     }
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L17_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L17_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = __pyx_t_1;
@@ -6152,14 +6152,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
           __pyx_v_stdf = __pyx_t_4;
           __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":200
+          /* "INDUSAnalysis/indus_waters.pyx":201
  *         stdstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.std())
  *         with open(self.obspref + "_std.txt", 'a+') as stdf:
  *             stdf.write(stdstr)             # <<<<<<<<<<<<<<
  * 
  *     def write_probe_waters_pdb(self, u, skip, ts_probe_waters):
  */
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_stdf, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L21_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_stdf, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L21_error)
           __Pyx_GOTREF(__pyx_t_2);
           __pyx_t_1 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6173,12 +6173,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
           }
           __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_stdstr) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_stdstr);
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L21_error)
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L21_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":199
+          /* "INDUSAnalysis/indus_waters.pyx":200
  * 
  *         stdstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.std())
  *         with open(self.obspref + "_std.txt", 'a+') as stdf:             # <<<<<<<<<<<<<<
@@ -6198,20 +6198,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.write_mean_std_waters", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_2, &__pyx_t_1) < 0) __PYX_ERR(0, 199, __pyx_L23_except_error)
+          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_2, &__pyx_t_1) < 0) __PYX_ERR(0, 200, __pyx_L23_except_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_5 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L23_except_error)
+          __pyx_t_5 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 200, __pyx_L23_except_error)
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, NULL);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 199, __pyx_L23_except_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 200, __pyx_L23_except_error)
           __Pyx_GOTREF(__pyx_t_11);
           __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (__pyx_t_13 < 0) __PYX_ERR(0, 199, __pyx_L23_except_error)
+          if (__pyx_t_13 < 0) __PYX_ERR(0, 200, __pyx_L23_except_error)
           __pyx_t_12 = ((!(__pyx_t_13 != 0)) != 0);
           if (__pyx_t_12) {
             __Pyx_GIVEREF(__pyx_t_4);
@@ -6219,7 +6219,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
             __Pyx_XGIVEREF(__pyx_t_1);
             __Pyx_ErrRestoreWithState(__pyx_t_4, __pyx_t_2, __pyx_t_1);
             __pyx_t_4 = 0; __pyx_t_2 = 0; __pyx_t_1 = 0; 
-            __PYX_ERR(0, 199, __pyx_L23_except_error)
+            __PYX_ERR(0, 200, __pyx_L23_except_error)
           }
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -6245,7 +6245,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
         if (__pyx_t_7) {
           __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__10, NULL);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 199, __pyx_L1_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 200, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
@@ -6260,11 +6260,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
     __pyx_L30:;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":192
+  /* "INDUSAnalysis/indus_waters.pyx":193
  *             plt.close()
  * 
  *     def write_mean_std_waters(self, mu, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Appends mean and std waters to text file"""
+ *         """Appends mean and std waters to text file."""
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
  */
 
@@ -6289,7 +6289,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":202
+/* "INDUSAnalysis/indus_waters.pyx":203
  *             stdf.write(stdstr)
  * 
  *     def write_probe_waters_pdb(self, u, skip, ts_probe_waters):             # <<<<<<<<<<<<<<
@@ -6299,7 +6299,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_16writ
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19write_probe_waters_pdb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18write_probe_waters_pdb[] = "\n        Writes instantaneous probe waters to PDB file.\n\n        Args:\n            u (mda.Universe): Universe containing solvated protein\n            skip (int): Trajectory resampling interval\n            ts_probe_waters (TimeSeries): Probe waters timeseries data.\n\n        Raises:\n            ValueError if the time for the same index in u.trajectory[::skip]\n            and ts_probe_waters does not match.\n        ";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18write_probe_waters_pdb[] = "\n        Writes instantaneous probe waters to PDB file.\n\n        Args:\n            u (mda.Universe): Universe containing solvated protein.\n            skip (int): Trajectory resampling interval.\n            ts_probe_waters (TimeSeries): Probe waters timeseries data.\n\n        Raises:\n            ValueError if the time for the same index in u.trajectory[::skip]\n            and ts_probe_waters does not match.\n        ";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19write_probe_waters_pdb = {"write_probe_waters_pdb", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19write_probe_waters_pdb, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18write_probe_waters_pdb};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19write_probe_waters_pdb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
@@ -6336,23 +6336,23 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19writ
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_u)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, 1); __PYX_ERR(0, 202, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, 1); __PYX_ERR(0, 203, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_skip_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, 2); __PYX_ERR(0, 202, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, 2); __PYX_ERR(0, 203, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ts_probe_waters)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, 3); __PYX_ERR(0, 202, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, 3); __PYX_ERR(0, 203, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_probe_waters_pdb") < 0)) __PYX_ERR(0, 202, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_probe_waters_pdb") < 0)) __PYX_ERR(0, 203, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -6369,7 +6369,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19writ
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 202, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_probe_waters_pdb", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 203, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6412,14 +6412,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
   int __pyx_t_18;
   __Pyx_RefNannySetupContext("write_probe_waters_pdb", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":215
+  /* "INDUSAnalysis/indus_waters.pyx":216
  *             and ts_probe_waters does not match.
  *         """
  *         protein = u.select_atoms("protein")             # <<<<<<<<<<<<<<
  *         u.add_TopologyAttr('tempfactors')
  *         pdbtrj = self.opref + "_waters.pdb"
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_select_atoms); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6433,20 +6433,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_n_s_protein) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_protein);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_protein = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":216
+  /* "INDUSAnalysis/indus_waters.pyx":217
  *         """
  *         protein = u.select_atoms("protein")
  *         u.add_TopologyAttr('tempfactors')             # <<<<<<<<<<<<<<
  *         pdbtrj = self.opref + "_waters.pdb"
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_add_TopologyAttr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 216, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_add_TopologyAttr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6460,82 +6460,82 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_n_s_tempfactors) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_n_s_tempfactors);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":217
+  /* "INDUSAnalysis/indus_waters.pyx":218
  *         protein = u.select_atoms("protein")
  *         u.add_TopologyAttr('tempfactors')
  *         pdbtrj = self.opref + "_waters.pdb"             # <<<<<<<<<<<<<<
  * 
  *         utraj = u.trajectory[::skip]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_waters_pdb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s_waters_pdb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_pdbtrj = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":219
+  /* "INDUSAnalysis/indus_waters.pyx":220
  *         pdbtrj = self.opref + "_waters.pdb"
  * 
  *         utraj = u.trajectory[::skip]             # <<<<<<<<<<<<<<
  * 
  *         if self.verbose:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_trajectory); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PySlice_New(Py_None, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_1 = PySlice_New(Py_None, Py_None, __pyx_v_skip); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_utraj = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":221
+  /* "INDUSAnalysis/indus_waters.pyx":222
  *         utraj = u.trajectory[::skip]
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 221, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 221, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":222
+    /* "INDUSAnalysis/indus_waters.pyx":223
  * 
  *         if self.verbose:
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))             # <<<<<<<<<<<<<<
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 223, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 223, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_desc, __pyx_kp_s_Writing_PDB) < 0) __PYX_ERR(0, 222, __pyx_L1_error)
-    __pyx_t_5 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 222, __pyx_L1_error)
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_desc, __pyx_kp_s_Writing_PDB) < 0) __PYX_ERR(0, 223, __pyx_L1_error)
+    __pyx_t_5 = PyObject_Length(__pyx_v_utraj); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 223, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 223, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_total, __pyx_t_2) < 0) __PYX_ERR(0, 222, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_total, __pyx_t_2) < 0) __PYX_ERR(0, 223, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 223, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pbar = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":221
+    /* "INDUSAnalysis/indus_waters.pyx":222
  *         utraj = u.trajectory[::skip]
  * 
  *         if self.verbose:             # <<<<<<<<<<<<<<
@@ -6544,7 +6544,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
  */
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":224
+  /* "INDUSAnalysis/indus_waters.pyx":225
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
@@ -6552,35 +6552,35 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
  *                 if np.isclose(ts.time, ts_probe_waters.time_array[tidx]):
  */
   /*with:*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_mda); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Writer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Writer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_v_pdbtrj);
     __Pyx_GIVEREF(__pyx_v_pdbtrj);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_pdbtrj);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_multiframe, Py_True) < 0) __PYX_ERR(0, 224, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_bonds, Py_None) < 0) __PYX_ERR(0, 224, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 224, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_multiframe, Py_True) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_bonds, Py_None) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_n_atoms); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_n_atoms); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_n_atoms, __pyx_t_7) < 0) __PYX_ERR(0, 224, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_n_atoms, __pyx_t_7) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_8 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_exit); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_exit); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L4_error)
+    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_7, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6594,7 +6594,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
     }
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L4_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = __pyx_t_3;
@@ -6612,7 +6612,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
           __pyx_v_PDB = __pyx_t_2;
           __pyx_t_2 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":225
+          /* "INDUSAnalysis/indus_waters.pyx":226
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
@@ -6625,26 +6625,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
             __pyx_t_7 = __pyx_v_utraj; __Pyx_INCREF(__pyx_t_7); __pyx_t_5 = 0;
             __pyx_t_12 = NULL;
           } else {
-            __pyx_t_5 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 225, __pyx_L8_error)
+            __pyx_t_5 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_v_utraj); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 226, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_12 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 225, __pyx_L8_error)
+            __pyx_t_12 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 226, __pyx_L8_error)
           }
           for (;;) {
             if (likely(!__pyx_t_12)) {
               if (likely(PyList_CheckExact(__pyx_t_7))) {
                 if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_7)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 225, __pyx_L8_error)
+                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 226, __pyx_L8_error)
                 #else
-                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L8_error)
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_3);
                 #endif
               } else {
                 if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_7)) break;
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 225, __pyx_L8_error)
+                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 226, __pyx_L8_error)
                 #else
-                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L8_error)
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_7, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_3);
                 #endif
               }
@@ -6654,7 +6654,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
                   if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                  else __PYX_ERR(0, 225, __pyx_L8_error)
+                  else __PYX_ERR(0, 226, __pyx_L8_error)
                 }
                 break;
               }
@@ -6664,29 +6664,29 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
             __pyx_t_3 = 0;
             __Pyx_INCREF(__pyx_t_2);
             __Pyx_XDECREF_SET(__pyx_v_tidx, __pyx_t_2);
-            __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L8_error)
+            __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_2);
             __pyx_t_2 = __pyx_t_3;
             __pyx_t_3 = 0;
 
-            /* "INDUSAnalysis/indus_waters.pyx":226
+            /* "INDUSAnalysis/indus_waters.pyx":227
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_probe_waters.time_array[tidx]):             # <<<<<<<<<<<<<<
  *                     protein.atoms.tempfactors = ts_probe_waters.data_array[tidx, :]
  *                     PDB.write(u.atoms)
  */
-            __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 226, __pyx_L8_error)
+            __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_isclose); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 226, __pyx_L8_error)
+            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_isclose); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 227, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 226, __pyx_L8_error)
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_probe_waters, __pyx_n_s_time_array); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 226, __pyx_L8_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_probe_waters, __pyx_n_s_time_array); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 227, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_14 = __Pyx_PyObject_GetItem(__pyx_t_13, __pyx_v_tidx); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 226, __pyx_L8_error)
+            __pyx_t_14 = __Pyx_PyObject_GetItem(__pyx_t_13, __pyx_v_tidx); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 227, __pyx_L8_error)
             __Pyx_GOTREF(__pyx_t_14);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __pyx_t_13 = NULL;
@@ -6704,7 +6704,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_6)) {
               PyObject *__pyx_temp[3] = {__pyx_t_13, __pyx_t_1, __pyx_t_14};
-              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L8_error)
               __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6714,7 +6714,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
               PyObject *__pyx_temp[3] = {__pyx_t_13, __pyx_t_1, __pyx_t_14};
-              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_15, 2+__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L8_error)
               __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6722,7 +6722,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
             } else
             #endif
             {
-              __pyx_t_16 = PyTuple_New(2+__pyx_t_15); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 226, __pyx_L8_error)
+              __pyx_t_16 = PyTuple_New(2+__pyx_t_15); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 227, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_16);
               if (__pyx_t_13) {
                 __Pyx_GIVEREF(__pyx_t_13); PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_t_13); __pyx_t_13 = NULL;
@@ -6733,25 +6733,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
               PyTuple_SET_ITEM(__pyx_t_16, 1+__pyx_t_15, __pyx_t_14);
               __pyx_t_1 = 0;
               __pyx_t_14 = 0;
-              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
             }
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 226, __pyx_L8_error)
+            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 227, __pyx_L8_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             if (likely(__pyx_t_4)) {
 
-              /* "INDUSAnalysis/indus_waters.pyx":227
+              /* "INDUSAnalysis/indus_waters.pyx":228
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_probe_waters.time_array[tidx]):
  *                     protein.atoms.tempfactors = ts_probe_waters.data_array[tidx, :]             # <<<<<<<<<<<<<<
  *                     PDB.write(u.atoms)
  *                     if self.verbose:
  */
-              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_probe_waters, __pyx_n_s_data_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ts_probe_waters, __pyx_n_s_data_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 227, __pyx_L8_error)
+              __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 228, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
               __Pyx_INCREF(__pyx_v_tidx);
               __Pyx_GIVEREF(__pyx_v_tidx);
@@ -6759,26 +6759,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
               __Pyx_INCREF(__pyx_slice__11);
               __Pyx_GIVEREF(__pyx_slice__11);
               PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_slice__11);
-              __pyx_t_16 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 227, __pyx_L8_error)
+              __pyx_t_16 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 228, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_16);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 227, __pyx_L8_error)
+              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_protein, __pyx_n_s_atoms); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 228, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
-              if (__Pyx_PyObject_SetAttrStr(__pyx_t_6, __pyx_n_s_tempfactors, __pyx_t_16) < 0) __PYX_ERR(0, 227, __pyx_L8_error)
+              if (__Pyx_PyObject_SetAttrStr(__pyx_t_6, __pyx_n_s_tempfactors, __pyx_t_16) < 0) __PYX_ERR(0, 228, __pyx_L8_error)
               __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-              /* "INDUSAnalysis/indus_waters.pyx":228
+              /* "INDUSAnalysis/indus_waters.pyx":229
  *                 if np.isclose(ts.time, ts_probe_waters.time_array[tidx]):
  *                     protein.atoms.tempfactors = ts_probe_waters.data_array[tidx, :]
  *                     PDB.write(u.atoms)             # <<<<<<<<<<<<<<
  *                     if self.verbose:
  *                         pbar.update(1)
  */
-              __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_PDB, __pyx_n_s_write); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 228, __pyx_L8_error)
+              __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_PDB, __pyx_n_s_write); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 229, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_16);
-              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L8_error)
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_u, __pyx_n_s_atoms); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_3);
               __pyx_t_14 = NULL;
               if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
@@ -6793,33 +6793,33 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
               __pyx_t_6 = (__pyx_t_14) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_14, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_t_3);
               __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 228, __pyx_L8_error)
+              if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 229, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
               __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-              /* "INDUSAnalysis/indus_waters.pyx":229
+              /* "INDUSAnalysis/indus_waters.pyx":230
  *                     protein.atoms.tempfactors = ts_probe_waters.data_array[tidx, :]
  *                     PDB.write(u.atoms)
  *                     if self.verbose:             # <<<<<<<<<<<<<<
  *                         pbar.update(1)
  *                 else:
  */
-              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 229, __pyx_L8_error)
+              __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_verbose_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 230, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 229, __pyx_L8_error)
+              __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 230, __pyx_L8_error)
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
               if (__pyx_t_4) {
 
-                /* "INDUSAnalysis/indus_waters.pyx":230
+                /* "INDUSAnalysis/indus_waters.pyx":231
  *                     PDB.write(u.atoms)
  *                     if self.verbose:
  *                         pbar.update(1)             # <<<<<<<<<<<<<<
  *                 else:
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
  */
-                if (unlikely(!__pyx_v_pbar)) { __Pyx_RaiseUnboundLocalError("pbar"); __PYX_ERR(0, 230, __pyx_L8_error) }
-                __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_pbar, __pyx_n_s_update); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 230, __pyx_L8_error)
+                if (unlikely(!__pyx_v_pbar)) { __Pyx_RaiseUnboundLocalError("pbar"); __PYX_ERR(0, 231, __pyx_L8_error) }
+                __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_v_pbar, __pyx_n_s_update); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 231, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_16);
                 __pyx_t_3 = NULL;
                 if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_16))) {
@@ -6833,12 +6833,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
                 }
                 __pyx_t_6 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_16, __pyx_t_3, __pyx_int_1) : __Pyx_PyObject_CallOneArg(__pyx_t_16, __pyx_int_1);
                 __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 230, __pyx_L8_error)
+                if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 231, __pyx_L8_error)
                 __Pyx_GOTREF(__pyx_t_6);
                 __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
                 __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-                /* "INDUSAnalysis/indus_waters.pyx":229
+                /* "INDUSAnalysis/indus_waters.pyx":230
  *                     protein.atoms.tempfactors = ts_probe_waters.data_array[tidx, :]
  *                     PDB.write(u.atoms)
  *                     if self.verbose:             # <<<<<<<<<<<<<<
@@ -6847,7 +6847,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
  */
               }
 
-              /* "INDUSAnalysis/indus_waters.pyx":226
+              /* "INDUSAnalysis/indus_waters.pyx":227
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_probe_waters.time_array[tidx]):             # <<<<<<<<<<<<<<
@@ -6857,7 +6857,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
               goto __pyx_L16;
             }
 
-            /* "INDUSAnalysis/indus_waters.pyx":232
+            /* "INDUSAnalysis/indus_waters.pyx":233
  *                         pbar.update(1)
  *                 else:
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")             # <<<<<<<<<<<<<<
@@ -6865,15 +6865,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
  *     def __call__(self):
  */
             /*else*/ {
-              __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 232, __pyx_L8_error)
+              __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 233, __pyx_L8_error)
               __Pyx_GOTREF(__pyx_t_6);
               __Pyx_Raise(__pyx_t_6, 0, 0, 0);
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __PYX_ERR(0, 232, __pyx_L8_error)
+              __PYX_ERR(0, 233, __pyx_L8_error)
             }
             __pyx_L16:;
 
-            /* "INDUSAnalysis/indus_waters.pyx":225
+            /* "INDUSAnalysis/indus_waters.pyx":226
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
  *             for tidx, ts in enumerate(utraj):             # <<<<<<<<<<<<<<
@@ -6884,7 +6884,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "INDUSAnalysis/indus_waters.pyx":224
+          /* "INDUSAnalysis/indus_waters.pyx":225
  *             pbar = tqdm(desc="Writing PDB", total=len(utraj))
  * 
  *         with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:             # <<<<<<<<<<<<<<
@@ -6907,20 +6907,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_7, &__pyx_t_6) < 0) __PYX_ERR(0, 224, __pyx_L10_except_error)
+          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_7, &__pyx_t_6) < 0) __PYX_ERR(0, 225, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_16 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 224, __pyx_L10_except_error)
+          __pyx_t_16 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 225, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_16);
           __pyx_t_17 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_16, NULL);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-          if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 224, __pyx_L10_except_error)
+          if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 225, __pyx_L10_except_error)
           __Pyx_GOTREF(__pyx_t_17);
           __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_17);
           __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-          if (__pyx_t_4 < 0) __PYX_ERR(0, 224, __pyx_L10_except_error)
+          if (__pyx_t_4 < 0) __PYX_ERR(0, 225, __pyx_L10_except_error)
           __pyx_t_18 = ((!(__pyx_t_4 != 0)) != 0);
           if (__pyx_t_18) {
             __Pyx_GIVEREF(__pyx_t_2);
@@ -6928,7 +6928,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
             __Pyx_XGIVEREF(__pyx_t_6);
             __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_7, __pyx_t_6);
             __pyx_t_2 = 0; __pyx_t_7 = 0; __pyx_t_6 = 0; 
-            __PYX_ERR(0, 224, __pyx_L10_except_error)
+            __PYX_ERR(0, 225, __pyx_L10_except_error)
           }
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -6954,7 +6954,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
         if (__pyx_t_8) {
           __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_tuple__10, NULL);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 224, __pyx_L1_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         }
@@ -6969,7 +6969,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
     __pyx_L21:;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":202
+  /* "INDUSAnalysis/indus_waters.pyx":203
  *             stdf.write(stdstr)
  * 
  *     def write_probe_waters_pdb(self, u, skip, ts_probe_waters):             # <<<<<<<<<<<<<<
@@ -7004,17 +7004,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_18writ
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/indus_waters.pyx":234
+/* "INDUSAnalysis/indus_waters.pyx":235
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
  * 
  *     def __call__(self):             # <<<<<<<<<<<<<<
- *         """Performs analysis"""
+ *         """Performs analysis."""
  * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_21__call__(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__call__[] = "Performs analysis";
+static char __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__call__[] = "Performs analysis.";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_21__call__ = {"__call__", (PyCFunction)__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_21__call__, METH_O, __pyx_doc_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__call__};
 static PyObject *__pyx_pw_13INDUSAnalysis_12indus_waters_14WatersAnalysis_21__call__(PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = 0;
@@ -7031,7 +7031,6 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   PyObject *__pyx_v_ts_N = NULL;
   PyObject *__pyx_v_ts_Ntw = NULL;
   PyObject *__pyx_v_mu = NULL;
-  PyObject *__pyx_v_u = NULL;
   PyObject *__pyx_v_ts_probe_waters = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -7042,20 +7041,21 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   PyObject *__pyx_t_5 = NULL;
   PyObject *(*__pyx_t_6)(PyObject *);
   int __pyx_t_7;
-  PyObject *__pyx_t_8 = NULL;
-  int __pyx_t_9;
+  int __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("__call__", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":239
+  /* "INDUSAnalysis/indus_waters.pyx":240
  *         """Raw data"""
  *         # Overall probe waters
  *         ts_N, ts_Ntw, mu = self.read_waters(self.file)             # <<<<<<<<<<<<<<
  *         self.save_TimeSeries(ts_N, self.opref + "_N.pkl")
  *         self.save_TimeSeries(ts_Ntw, self.opref + "_Ntw.pkl")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_read_waters); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_read_waters); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -7070,7 +7070,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
@@ -7079,7 +7079,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
     if (unlikely(size != 3)) {
       if (size > 3) __Pyx_RaiseTooManyValuesError(3);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 239, __pyx_L1_error)
+      __PYX_ERR(0, 240, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -7095,17 +7095,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
     __Pyx_INCREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_t_4);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 240, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 240, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_4 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 240, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     #endif
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_5 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_5 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 240, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_6 = Py_TYPE(__pyx_t_5)->tp_iternext;
@@ -7115,7 +7115,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
     __Pyx_GOTREF(__pyx_t_3);
     index = 2; __pyx_t_4 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_4)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 3) < 0) __PYX_ERR(0, 239, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 3) < 0) __PYX_ERR(0, 240, __pyx_L1_error)
     __pyx_t_6 = NULL;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     goto __pyx_L4_unpacking_done;
@@ -7123,7 +7123,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_6 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 239, __pyx_L1_error)
+    __PYX_ERR(0, 240, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_ts_N = __pyx_t_2;
@@ -7133,18 +7133,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   __pyx_v_mu = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":240
+  /* "INDUSAnalysis/indus_waters.pyx":241
  *         # Overall probe waters
  *         ts_N, ts_Ntw, mu = self.read_waters(self.file)
  *         self.save_TimeSeries(ts_N, self.opref + "_N.pkl")             # <<<<<<<<<<<<<<
  *         self.save_TimeSeries(ts_Ntw, self.opref + "_Ntw.pkl")
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_kp_s_N_pkl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_kp_s_N_pkl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -7162,7 +7162,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_ts_N, __pyx_t_2};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -7171,14 +7171,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_ts_N, __pyx_t_2};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 240, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -7189,25 +7189,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_7, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":241
+  /* "INDUSAnalysis/indus_waters.pyx":242
  *         ts_N, ts_Ntw, mu = self.read_waters(self.file)
  *         self.save_TimeSeries(ts_N, self.opref + "_N.pkl")
  *         self.save_TimeSeries(ts_Ntw, self.opref + "_Ntw.pkl")             # <<<<<<<<<<<<<<
  * 
  *         # Individual probe waters
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = PyNumber_Add(__pyx_t_5, __pyx_kp_s_Ntw_pkl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_5, __pyx_kp_s_Ntw_pkl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
@@ -7225,7 +7225,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_ts_Ntw, __pyx_t_2};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -7234,14 +7234,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_ts_Ntw, __pyx_t_2};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else
   #endif
   {
-    __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -7252,140 +7252,62 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_7, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":244
+  /* "INDUSAnalysis/indus_waters.pyx":245
  * 
  *         # Individual probe waters
- *         u = mda.Universe(self.structf, self.trajf)             # <<<<<<<<<<<<<<
- *         ts_probe_waters = None
- *         if self.replot:
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_mda); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 244, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_Universe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 244, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = NULL;
-  __pyx_t_7 = 0;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_5)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_5);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_7 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_4, __pyx_t_2};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_4, __pyx_t_2};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  } else
-  #endif
-  {
-    __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 244, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    if (__pyx_t_5) {
-      __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_5); __pyx_t_5 = NULL;
-    }
-    __Pyx_GIVEREF(__pyx_t_4);
-    PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_7, __pyx_t_4);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_t_2);
-    __pyx_t_4 = 0;
-    __pyx_t_2 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_v_u = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/indus_waters.pyx":245
- *         # Individual probe waters
- *         u = mda.Universe(self.structf, self.trajf)
- *         ts_probe_waters = None             # <<<<<<<<<<<<<<
- *         if self.replot:
- *             ts_probe_waters = self.load_TimeSeries(self.replotpref + "_probe_waters.pkl")
- */
-  __Pyx_INCREF(Py_None);
-  __pyx_v_ts_probe_waters = Py_None;
-
-  /* "INDUSAnalysis/indus_waters.pyx":246
- *         u = mda.Universe(self.structf, self.trajf)
- *         ts_probe_waters = None
  *         if self.replot:             # <<<<<<<<<<<<<<
  *             ts_probe_waters = self.load_TimeSeries(self.replotpref + "_probe_waters.pkl")
  *         else:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__pyx_t_9) {
+  if (__pyx_t_8) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":247
- *         ts_probe_waters = None
+    /* "INDUSAnalysis/indus_waters.pyx":246
+ *         # Individual probe waters
  *         if self.replot:
  *             ts_probe_waters = self.load_TimeSeries(self.replotpref + "_probe_waters.pkl")             # <<<<<<<<<<<<<<
  *         else:
- *             ts_probe_waters = self.calc_probe_waters(u, self.skip, self.radius)
+ *             ts_probe_waters = self.calc_probe_waters(self.u, self.skip, self.radius)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 247, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 246, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 247, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = PyNumber_Add(__pyx_t_8, __pyx_kp_s_probe_waters_pkl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_kp_s_probe_waters_pkl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = NULL;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_8)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_8);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
       }
     }
-    __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF_SET(__pyx_v_ts_probe_waters, __pyx_t_1);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_v_ts_probe_waters = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":246
- *         u = mda.Universe(self.structf, self.trajf)
- *         ts_probe_waters = None
+    /* "INDUSAnalysis/indus_waters.pyx":245
+ * 
+ *         # Individual probe waters
  *         if self.replot:             # <<<<<<<<<<<<<<
  *             ts_probe_waters = self.load_TimeSeries(self.replotpref + "_probe_waters.pkl")
  *         else:
@@ -7393,466 +7315,406 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
     goto __pyx_L5;
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":249
+  /* "INDUSAnalysis/indus_waters.pyx":248
  *             ts_probe_waters = self.load_TimeSeries(self.replotpref + "_probe_waters.pkl")
  *         else:
- *             ts_probe_waters = self.calc_probe_waters(u, self.skip, self.radius)             # <<<<<<<<<<<<<<
+ *             ts_probe_waters = self.calc_probe_waters(self.u, self.skip, self.radius)             # <<<<<<<<<<<<<<
  * 
  *         self.save_TimeSeries(ts_probe_waters, self.opref + "_probe_waters.pkl")
  */
   /*else*/ {
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_probe_waters); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_calc_probe_waters); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 249, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_4 = NULL;
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_radius_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_9 = NULL;
     __pyx_t_7 = 0;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_9)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_9);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
         __pyx_t_7 = 1;
       }
     }
     #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_u, __pyx_t_2, __pyx_t_8};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (PyFunction_Check(__pyx_t_4)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_9, __pyx_t_2, __pyx_t_3, __pyx_t_5};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_u, __pyx_t_2, __pyx_t_8};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_9, __pyx_t_2, __pyx_t_3, __pyx_t_5};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 249, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      if (__pyx_t_4) {
-        __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
+      __pyx_t_10 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 248, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      if (__pyx_t_9) {
+        __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_9); __pyx_t_9 = NULL;
       }
-      __Pyx_INCREF(__pyx_v_u);
-      __Pyx_GIVEREF(__pyx_v_u);
-      PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_7, __pyx_v_u);
       __Pyx_GIVEREF(__pyx_t_2);
-      PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_7, __pyx_t_2);
-      __Pyx_GIVEREF(__pyx_t_8);
-      PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_7, __pyx_t_8);
+      PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_7, __pyx_t_2);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_7, __pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_7, __pyx_t_5);
       __pyx_t_2 = 0;
-      __pyx_t_8 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
+      __pyx_t_3 = 0;
+      __pyx_t_5 = 0;
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     }
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF_SET(__pyx_v_ts_probe_waters, __pyx_t_1);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_v_ts_probe_waters = __pyx_t_1;
     __pyx_t_1 = 0;
   }
   __pyx_L5:;
 
-  /* "INDUSAnalysis/indus_waters.pyx":251
- *             ts_probe_waters = self.calc_probe_waters(u, self.skip, self.radius)
+  /* "INDUSAnalysis/indus_waters.pyx":250
+ *             ts_probe_waters = self.calc_probe_waters(self.u, self.skip, self.radius)
  * 
  *         self.save_TimeSeries(ts_probe_waters, self.opref + "_probe_waters.pkl")             # <<<<<<<<<<<<<<
  * 
  *         """Plots and averages"""
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 251, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 251, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_save_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 250, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 250, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_5 = PyNumber_Add(__pyx_t_10, __pyx_kp_s_probe_waters_pkl); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_8 = PyNumber_Add(__pyx_t_5, __pyx_kp_s_probe_waters_pkl); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 251, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = NULL;
+  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+  __pyx_t_10 = NULL;
   __pyx_t_7 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_5)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_5);
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_10)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_10);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
       __pyx_t_7 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_ts_probe_waters, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_ts_probe_waters, __pyx_t_5};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_ts_probe_waters, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_ts_probe_waters, __pyx_t_5};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else
   #endif
   {
-    __pyx_t_2 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 251, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    if (__pyx_t_5) {
-      __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5); __pyx_t_5 = NULL;
+    __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    if (__pyx_t_10) {
+      __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_10); __pyx_t_10 = NULL;
     }
     __Pyx_INCREF(__pyx_v_ts_probe_waters);
     __Pyx_GIVEREF(__pyx_v_ts_probe_waters);
-    PyTuple_SET_ITEM(__pyx_t_2, 0+__pyx_t_7, __pyx_v_ts_probe_waters);
-    __Pyx_GIVEREF(__pyx_t_8);
-    PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_7, __pyx_t_8);
-    __pyx_t_8 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
+    PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_7, __pyx_v_ts_probe_waters);
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_7, __pyx_t_5);
+    __pyx_t_5 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":256
+  /* "INDUSAnalysis/indus_waters.pyx":255
  *         # Plot waters, moving average waters, cumulative moving average waters,
  *         # and save figures
  *         self.plot_waters(ts_Ntw)             # <<<<<<<<<<<<<<
  *         self.plot_ma_waters(ts_Ntw)
  *         self.plot_cma_waters(ts_Ntw)
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_waters); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_waters); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_ts_Ntw) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ts_Ntw);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_v_ts_Ntw) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_ts_Ntw);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":257
+  /* "INDUSAnalysis/indus_waters.pyx":256
  *         # and save figures
  *         self.plot_waters(ts_Ntw)
  *         self.plot_ma_waters(ts_Ntw)             # <<<<<<<<<<<<<<
  *         self.plot_cma_waters(ts_Ntw)
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_ma_waters); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_ma_waters); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_ts_Ntw) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ts_Ntw);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_v_ts_Ntw) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_ts_Ntw);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":258
+  /* "INDUSAnalysis/indus_waters.pyx":257
  *         self.plot_waters(ts_Ntw)
  *         self.plot_ma_waters(ts_Ntw)
  *         self.plot_cma_waters(ts_Ntw)             # <<<<<<<<<<<<<<
  * 
  *         # Plot heatmap of waters in individual probe volumes, and save figure
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_cma_waters); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 258, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_cma_waters); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_ts_Ntw) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ts_Ntw);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_v_ts_Ntw) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_ts_Ntw);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":261
+  /* "INDUSAnalysis/indus_waters.pyx":260
  * 
  *         # Plot heatmap of waters in individual probe volumes, and save figure
  *         self.plot_probe_waters(ts_probe_waters)             # <<<<<<<<<<<<<<
  * 
  *         """Trajectories"""
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_probe_waters); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 261, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_plot_probe_waters); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
     }
   }
-  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_ts_probe_waters) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ts_probe_waters);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_v_ts_probe_waters) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_ts_probe_waters);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":265
+  /* "INDUSAnalysis/indus_waters.pyx":264
  *         """Trajectories"""
  *         # Write waters in individual probe volumes to PDB
  *         if self.genpdb:             # <<<<<<<<<<<<<<
- *             u = mda.Universe(self.structf, self.trajf)
- *             self.write_probe_waters_pdb(u, self.skip, ts_probe_waters)
- */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 265, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__pyx_t_9) {
-
-    /* "INDUSAnalysis/indus_waters.pyx":266
- *         # Write waters in individual probe volumes to PDB
- *         if self.genpdb:
- *             u = mda.Universe(self.structf, self.trajf)             # <<<<<<<<<<<<<<
- *             self.write_probe_waters_pdb(u, self.skip, ts_probe_waters)
+ *             self.write_probe_waters_pdb(self.u, self.skip, ts_probe_waters)
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_mda); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 266, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_Universe); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 266, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_structf); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 266, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_trajf); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 266, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_5 = NULL;
-    __pyx_t_7 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_5)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_5);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
-        __pyx_t_7 = 1;
-      }
-    }
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_t_8};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_t_8};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    } else
-    #endif
-    {
-      __pyx_t_4 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 266, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      if (__pyx_t_5) {
-        __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
-      }
-      __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_7, __pyx_t_3);
-      __Pyx_GIVEREF(__pyx_t_8);
-      PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_7, __pyx_t_8);
-      __pyx_t_3 = 0;
-      __pyx_t_8 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF_SET(__pyx_v_u, __pyx_t_1);
-    __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_genpdb_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_8) {
 
-    /* "INDUSAnalysis/indus_waters.pyx":267
+    /* "INDUSAnalysis/indus_waters.pyx":265
+ *         # Write waters in individual probe volumes to PDB
  *         if self.genpdb:
- *             u = mda.Universe(self.structf, self.trajf)
- *             self.write_probe_waters_pdb(u, self.skip, ts_probe_waters)             # <<<<<<<<<<<<<<
+ *             self.write_probe_waters_pdb(self.u, self.skip, ts_probe_waters)             # <<<<<<<<<<<<<<
  * 
  *         """Observables"""
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_write_probe_waters_pdb); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_write_probe_waters_pdb); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_8 = NULL;
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_u); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_skip_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 265, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_10 = NULL;
     __pyx_t_7 = 0;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_8)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_8);
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_10)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_10);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
         __pyx_t_7 = 1;
       }
     }
     #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_v_u, __pyx_t_4, __pyx_v_ts_probe_waters};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    if (PyFunction_Check(__pyx_t_4)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_10, __pyx_t_3, __pyx_t_5, __pyx_v_ts_probe_waters};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_v_u, __pyx_t_4, __pyx_v_ts_probe_waters};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_10, __pyx_t_3, __pyx_t_5, __pyx_v_ts_probe_waters};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     {
-      __pyx_t_3 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      if (__pyx_t_8) {
-        __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_8); __pyx_t_8 = NULL;
+      __pyx_t_2 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (__pyx_t_10) {
+        __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_10); __pyx_t_10 = NULL;
       }
-      __Pyx_INCREF(__pyx_v_u);
-      __Pyx_GIVEREF(__pyx_v_u);
-      PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_7, __pyx_v_u);
-      __Pyx_GIVEREF(__pyx_t_4);
-      PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_7, __pyx_t_4);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_2, 0+__pyx_t_7, __pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_7, __pyx_t_5);
       __Pyx_INCREF(__pyx_v_ts_probe_waters);
       __Pyx_GIVEREF(__pyx_v_ts_probe_waters);
-      PyTuple_SET_ITEM(__pyx_t_3, 2+__pyx_t_7, __pyx_v_ts_probe_waters);
-      __pyx_t_4 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+      PyTuple_SET_ITEM(__pyx_t_2, 2+__pyx_t_7, __pyx_v_ts_probe_waters);
+      __pyx_t_3 = 0;
+      __pyx_t_5 = 0;
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "INDUSAnalysis/indus_waters.pyx":265
+    /* "INDUSAnalysis/indus_waters.pyx":264
  *         """Trajectories"""
  *         # Write waters in individual probe volumes to PDB
  *         if self.genpdb:             # <<<<<<<<<<<<<<
- *             u = mda.Universe(self.structf, self.trajf)
- *             self.write_probe_waters_pdb(u, self.skip, ts_probe_waters)
+ *             self.write_probe_waters_pdb(self.u, self.skip, ts_probe_waters)
+ * 
  */
   }
 
-  /* "INDUSAnalysis/indus_waters.pyx":271
+  /* "INDUSAnalysis/indus_waters.pyx":269
  *         """Observables"""
  *         # Write mean and std of waters to text files
  *         self.write_mean_std_waters(mu, ts_Ntw[self.obsstart:self.obsend])             # <<<<<<<<<<<<<<
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_write_mean_std_waters); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_write_mean_std_waters); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 269, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_8 = __Pyx_PyObject_GetSlice(__pyx_v_ts_Ntw, 0, 0, &__pyx_t_3, &__pyx_t_4, NULL, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 271, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = NULL;
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = __Pyx_PyObject_GetSlice(__pyx_v_ts_Ntw, 0, 0, &__pyx_t_2, &__pyx_t_5, NULL, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = NULL;
   __pyx_t_7 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_5)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
       __pyx_t_7 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_mu, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_mu, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_mu, __pyx_t_8};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_mu, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   {
-    __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    if (__pyx_t_4) {
-      __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
+    __pyx_t_2 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    if (__pyx_t_5) {
+      __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5); __pyx_t_5 = NULL;
     }
     __Pyx_INCREF(__pyx_v_mu);
     __Pyx_GIVEREF(__pyx_v_mu);
-    PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_7, __pyx_v_mu);
-    __Pyx_GIVEREF(__pyx_t_8);
-    PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_7, __pyx_t_8);
-    __pyx_t_8 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+    PyTuple_SET_ITEM(__pyx_t_2, 0+__pyx_t_7, __pyx_v_mu);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_2, 1+__pyx_t_7, __pyx_t_3);
+    __pyx_t_3 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":234
+  /* "INDUSAnalysis/indus_waters.pyx":235
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
  * 
  *     def __call__(self):             # <<<<<<<<<<<<<<
- *         """Performs analysis"""
+ *         """Performs analysis."""
  * 
  */
 
@@ -7865,14 +7727,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_12indus_waters_14WatersAnalysis_20__ca
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_AddTraceback("INDUSAnalysis.indus_waters.WatersAnalysis.__call__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_ts_N);
   __Pyx_XDECREF(__pyx_v_ts_Ntw);
   __Pyx_XDECREF(__pyx_v_mu);
-  __Pyx_XDECREF(__pyx_v_u);
   __Pyx_XDECREF(__pyx_v_ts_probe_waters);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -10344,6 +10206,7 @@ static struct PyModuleDef __pyx_moduledef = {
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_2f_2f, __pyx_k_2f_2f, sizeof(__pyx_k_2f_2f), 0, 0, 1, 0},
+  {&__pyx_kp_s_Atom_index, __pyx_k_Atom_index, sizeof(__pyx_k_Atom_index), 0, 0, 1, 0},
   {&__pyx_kp_s_Calculates_number_of_waters_in, __pyx_k_Calculates_number_of_waters_in, sizeof(__pyx_k_Calculates_number_of_waters_in), 0, 0, 1, 0},
   {&__pyx_kp_s_Calculating_waters, __pyx_k_Calculating_waters, sizeof(__pyx_k_Calculating_waters), 0, 0, 1, 0},
   {&__pyx_kp_s_Compressed_trajectory_file_xtc, __pyx_k_Compressed_trajectory_file_xtc, sizeof(__pyx_k_Compressed_trajectory_file_xtc), 0, 0, 1, 0},
@@ -10351,7 +10214,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_Format_string_allocated_too_shor, __pyx_k_Format_string_allocated_too_shor, sizeof(__pyx_k_Format_string_allocated_too_shor), 0, 1, 0, 0},
   {&__pyx_kp_u_Format_string_allocated_too_shor_2, __pyx_k_Format_string_allocated_too_shor_2, sizeof(__pyx_k_Format_string_allocated_too_shor_2), 0, 1, 0, 0},
   {&__pyx_kp_s_GROMACS_INDUS_waters_data_file, __pyx_k_GROMACS_INDUS_waters_data_file, sizeof(__pyx_k_GROMACS_INDUS_waters_data_file), 0, 0, 1, 0},
-  {&__pyx_kp_s_Heavy_atom_index, __pyx_k_Heavy_atom_index, sizeof(__pyx_k_Heavy_atom_index), 0, 0, 1, 0},
   {&__pyx_n_s_INDUSAnalysis, __pyx_k_INDUSAnalysis, sizeof(__pyx_k_INDUSAnalysis), 0, 0, 1, 1},
   {&__pyx_n_s_INDUSAnalysis_indus_waters, __pyx_k_INDUSAnalysis_indus_waters, sizeof(__pyx_k_INDUSAnalysis_indus_waters), 0, 0, 1, 1},
   {&__pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_k_INDUSAnalysis_indus_waters_pyx, sizeof(__pyx_k_INDUSAnalysis_indus_waters_pyx), 0, 0, 1, 0},
@@ -10547,11 +10409,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 24, __pyx_L1_error)
-  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 91, __pyx_L1_error)
-  __pyx_builtin_map = __Pyx_GetBuiltinName(__pyx_n_s_map); if (!__pyx_builtin_map) __PYX_ERR(0, 102, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 140, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 92, __pyx_L1_error)
+  __pyx_builtin_map = __Pyx_GetBuiltinName(__pyx_n_s_map); if (!__pyx_builtin_map) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 233, __pyx_L1_error)
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(1, 285, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 856, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 1038, __pyx_L1_error)
@@ -10564,124 +10426,124 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "INDUSAnalysis/indus_waters.pyx":25
+  /* "INDUSAnalysis/indus_waters.pyx":26
  *     def __init__(self):
  *         super().__init__()
  *         self.req_file_args.add_argument("file",             # <<<<<<<<<<<<<<
  *                                         help="GROMACS-INDUS waters data file")
  *         self.req_file_args.add_argument("structf",
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_n_s_file); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_n_s_file); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "INDUSAnalysis/indus_waters.pyx":27
+  /* "INDUSAnalysis/indus_waters.pyx":28
  *         self.req_file_args.add_argument("file",
  *                                         help="GROMACS-INDUS waters data file")
  *         self.req_file_args.add_argument("structf",             # <<<<<<<<<<<<<<
  *                                         help="Topology or structure file (.tpr, .gro)")
  *         self.req_file_args.add_argument("trajf",
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_n_s_structf); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_n_s_structf); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "INDUSAnalysis/indus_waters.pyx":29
+  /* "INDUSAnalysis/indus_waters.pyx":30
  *         self.req_file_args.add_argument("structf",
  *                                         help="Topology or structure file (.tpr, .gro)")
  *         self.req_file_args.add_argument("trajf",             # <<<<<<<<<<<<<<
  *                                         help="Compressed trajectory file (.xtc)")
  * 
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_n_s_trajf); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_n_s_trajf); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "INDUSAnalysis/indus_waters.pyx":32
+  /* "INDUSAnalysis/indus_waters.pyx":33
  *                                         help="Compressed trajectory file (.xtc)")
  * 
  *         self.calc_args.add_argument("-radius",             # <<<<<<<<<<<<<<
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
  *         self.calc_args.add_argument("-skip",
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_radius); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_radius); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "INDUSAnalysis/indus_waters.pyx":34
+  /* "INDUSAnalysis/indus_waters.pyx":35
  *         self.calc_args.add_argument("-radius",
  *                                     help="[per-probe waters, ignored during replot] Probe volume radius (in A) (default = 6 A)")
  *         self.calc_args.add_argument("-skip",             # <<<<<<<<<<<<<<
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
  * 
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_skip); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_skip); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "INDUSAnalysis/indus_waters.pyx":37
+  /* "INDUSAnalysis/indus_waters.pyx":38
  *                                     help="[per-probe waters, ignored during replot] Sampling interval (default = 1)")
  * 
  *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
  *                                    action="store_true",
  *                                    help="[per-probe waters] Write atoms per probe volume data to pdb file")
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_genpdb); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_genpdb); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 38, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "INDUSAnalysis/indus_waters.pyx":41
+  /* "INDUSAnalysis/indus_waters.pyx":42
  *                                    help="[per-probe waters] Write atoms per probe volume data to pdb file")
  * 
  *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
  *                                     action="store_true",
  *                                     help="Display progress")
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_verbose); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_verbose); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "INDUSAnalysis/indus_waters.pyx":97
+  /* "INDUSAnalysis/indus_waters.pyx":98
  *                 # Parse comments
  *                 if lstrip[0] == '#':
  *                     comment = lstrip[1:].split()             # <<<<<<<<<<<<<<
  *                     if comment[0] == 'mu':
  *                         mu = comment[2]
  */
-  __pyx_slice__9 = PySlice_New(__pyx_int_1, Py_None, Py_None); if (unlikely(!__pyx_slice__9)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_slice__9 = PySlice_New(__pyx_int_1, Py_None, Py_None); if (unlikely(!__pyx_slice__9)) __PYX_ERR(0, 98, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_slice__9);
   __Pyx_GIVEREF(__pyx_slice__9);
 
-  /* "INDUSAnalysis/indus_waters.pyx":91
+  /* "INDUSAnalysis/indus_waters.pyx":92
  *         Ntw = []
  *         mu = 0
  *         with open(filename) as f:             # <<<<<<<<<<<<<<
  *             # Read data file
  *             for l in f:
  */
-  __pyx_tuple__10 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
-  /* "INDUSAnalysis/indus_waters.pyx":227
+  /* "INDUSAnalysis/indus_waters.pyx":228
  *             for tidx, ts in enumerate(utraj):
  *                 if np.isclose(ts.time, ts_probe_waters.time_array[tidx]):
  *                     protein.atoms.tempfactors = ts_probe_waters.data_array[tidx, :]             # <<<<<<<<<<<<<<
  *                     PDB.write(u.atoms)
  *                     if self.verbose:
  */
-  __pyx_slice__11 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__11)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_slice__11 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__11)) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_slice__11);
   __Pyx_GIVEREF(__pyx_slice__11);
 
-  /* "INDUSAnalysis/indus_waters.pyx":232
+  /* "INDUSAnalysis/indus_waters.pyx":233
  *                         pbar.update(1)
  *                 else:
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")             # <<<<<<<<<<<<<<
  * 
  *     def __call__(self):
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_Trajectory_and_TimeSeries_times); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_Trajectory_and_TimeSeries_times); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
 
@@ -10762,137 +10624,137 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "INDUSAnalysis/indus_waters.pyx":23
+  /* "INDUSAnalysis/indus_waters.pyx":24
  *     plots and PDB files.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super().__init__()
  *         self.req_file_args.add_argument("file",
  */
-  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_init, 23, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_init, 24, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 24, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":45
+  /* "INDUSAnalysis/indus_waters.pyx":46
  *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
  *         """
- *         Stores arguments from TimeSeries `args` parameter in class variables
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
-  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__23);
   __Pyx_GIVEREF(__pyx_tuple__23);
-  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_read_args, 45, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_read_args, 46, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 46, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":73
+  /* "INDUSAnalysis/indus_waters.pyx":74
  *     # Data calculation methods
  * 
  *     def read_waters(self, filename):             # <<<<<<<<<<<<<<
  *         """
  *         Reads data from GROMACS-INDUS phi/probe waters output file.
  */
-  __pyx_tuple__25 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_filename, __pyx_n_s_t, __pyx_n_s_N, __pyx_n_s_Ntw, __pyx_n_s_mu, __pyx_n_s_f, __pyx_n_s_l, __pyx_n_s_lstrip, __pyx_n_s_comment, __pyx_n_s_tcur, __pyx_n_s_Ncur, __pyx_n_s_Ntwcur, __pyx_n_s_ts_N, __pyx_n_s_ts_Ntw); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_tuple__25 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_filename, __pyx_n_s_t, __pyx_n_s_N, __pyx_n_s_Ntw, __pyx_n_s_mu, __pyx_n_s_f, __pyx_n_s_l, __pyx_n_s_lstrip, __pyx_n_s_comment, __pyx_n_s_tcur, __pyx_n_s_Ncur, __pyx_n_s_Ntwcur, __pyx_n_s_ts_N, __pyx_n_s_ts_Ntw); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__25);
   __Pyx_GIVEREF(__pyx_tuple__25);
-  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(2, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_read_waters, 73, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(2, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_read_waters, 74, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 74, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":117
+  /* "INDUSAnalysis/indus_waters.pyx":118
  *         return ts_N, ts_Ntw, mu
  * 
  *     def calc_probe_waters(self, u, skip, radius):             # <<<<<<<<<<<<<<
  *         """
- *         Calculates waters in individual probe volumes
+ *         Calculates waters in individual probe volumes.
  */
-  __pyx_tuple__27 = PyTuple_Pack(14, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_skip_2, __pyx_n_s_radius_2, __pyx_n_s_protein, __pyx_n_s_protein_heavy, __pyx_n_s_utraj, __pyx_n_s_times, __pyx_n_s_probe_waters, __pyx_n_s_bar, __pyx_n_s_tidx, __pyx_n_s_ts, __pyx_n_s_atom, __pyx_n_s_waters); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 117, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(14, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_skip_2, __pyx_n_s_radius_2, __pyx_n_s_protein, __pyx_n_s_protein_heavy, __pyx_n_s_utraj, __pyx_n_s_times, __pyx_n_s_probe_waters, __pyx_n_s_bar, __pyx_n_s_tidx, __pyx_n_s_ts, __pyx_n_s_atom, __pyx_n_s_waters); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
-  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(4, 0, 14, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_calc_probe_waters, 117, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(0, 117, __pyx_L1_error)
+  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(4, 0, 14, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_calc_probe_waters, 118, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(0, 118, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":152
- *                                      labels=['Number of waters', 'Heavy atom index'])
+  /* "INDUSAnalysis/indus_waters.pyx":153
+ *                                      labels=['Number of waters', 'Atom index'])
  * 
  *     def plot_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots waters and saves figure to file"""
+ *         """Plots waters and saves figure to file."""
  *         fig = ts_Ntw.plot()
  */
-  __pyx_tuple__29 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Ntw, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_tuple__29 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Ntw, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__29);
   __Pyx_GIVEREF(__pyx_tuple__29);
-  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_waters, 152, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_waters, 153, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) __PYX_ERR(0, 153, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":162
+  /* "INDUSAnalysis/indus_waters.pyx":163
  *             plt.close()
  * 
  *     def plot_ma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots moving average waters and saves figure to file"""
+ *         """Plots moving average waters and saves figure to file."""
  *         fig = ts_Ntw.moving_average(window=self.window).plot()
  */
-  __pyx_tuple__31 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Ntw, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_tuple__31 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Ntw, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__31);
   __Pyx_GIVEREF(__pyx_tuple__31);
-  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_ma_waters, 162, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_ma_waters, 163, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 163, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":172
+  /* "INDUSAnalysis/indus_waters.pyx":173
  *             plt.close()
  * 
  *     def plot_cma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots cumulative moving average waters and saves figure to file"""
+ *         """Plots cumulative moving average waters and saves figure to file."""
  *         fig = ts_Ntw.cumulative_moving_average().plot()
  */
-  __pyx_tuple__33 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Ntw, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __pyx_tuple__33 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_Ntw, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__33);
   __Pyx_GIVEREF(__pyx_tuple__33);
-  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_cma_waters, 172, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_cma_waters, 173, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 173, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":182
+  /* "INDUSAnalysis/indus_waters.pyx":183
  *             plt.close()
  * 
  *     def plot_probe_waters(self, ts_probe_waters):             # <<<<<<<<<<<<<<
- *         """Plots waters in each individual probe as a 2D heatmap"""
+ *         """Plots waters in each individual probe as a 2D heatmap."""
  *         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
  */
-  __pyx_tuple__35 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_probe_waters, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_tuple__35 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_ts_probe_waters, __pyx_n_s_fig); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 183, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__35);
   __Pyx_GIVEREF(__pyx_tuple__35);
-  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_probe_waters, 182, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_plot_probe_waters, 183, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 183, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":192
+  /* "INDUSAnalysis/indus_waters.pyx":193
  *             plt.close()
  * 
  *     def write_mean_std_waters(self, mu, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Appends mean and std waters to text file"""
+ *         """Appends mean and std waters to text file."""
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
  */
-  __pyx_tuple__37 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_mu, __pyx_n_s_ts_Ntw, __pyx_n_s_meanstr, __pyx_n_s_meanf, __pyx_n_s_stdstr, __pyx_n_s_stdf); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_tuple__37 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_mu, __pyx_n_s_ts_Ntw, __pyx_n_s_meanstr, __pyx_n_s_meanf, __pyx_n_s_stdstr, __pyx_n_s_stdf); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__37);
   __Pyx_GIVEREF(__pyx_tuple__37);
-  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(3, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_write_mean_std_waters, 192, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(3, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_write_mean_std_waters, 193, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 193, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":202
+  /* "INDUSAnalysis/indus_waters.pyx":203
  *             stdf.write(stdstr)
  * 
  *     def write_probe_waters_pdb(self, u, skip, ts_probe_waters):             # <<<<<<<<<<<<<<
  *         """
  *         Writes instantaneous probe waters to PDB file.
  */
-  __pyx_tuple__39 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_skip_2, __pyx_n_s_ts_probe_waters, __pyx_n_s_protein, __pyx_n_s_pdbtrj, __pyx_n_s_utraj, __pyx_n_s_pbar, __pyx_n_s_PDB, __pyx_n_s_tidx, __pyx_n_s_ts); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_tuple__39 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_skip_2, __pyx_n_s_ts_probe_waters, __pyx_n_s_protein, __pyx_n_s_pdbtrj, __pyx_n_s_utraj, __pyx_n_s_pbar, __pyx_n_s_PDB, __pyx_n_s_tidx, __pyx_n_s_ts); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__39);
   __Pyx_GIVEREF(__pyx_tuple__39);
-  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(4, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_write_probe_waters_pdb, 202, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(4, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_write_probe_waters_pdb, 203, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 203, __pyx_L1_error)
 
-  /* "INDUSAnalysis/indus_waters.pyx":234
+  /* "INDUSAnalysis/indus_waters.pyx":235
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
  * 
  *     def __call__(self):             # <<<<<<<<<<<<<<
- *         """Performs analysis"""
+ *         """Performs analysis."""
  * 
  */
-  __pyx_tuple__41 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_ts_N, __pyx_n_s_ts_Ntw, __pyx_n_s_mu, __pyx_n_s_u, __pyx_n_s_ts_probe_waters); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_tuple__41 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_ts_N, __pyx_n_s_ts_Ntw, __pyx_n_s_mu, __pyx_n_s_ts_probe_waters); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__41);
   __Pyx_GIVEREF(__pyx_tuple__41);
-  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_call, 234, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_indus_waters_pyx, __pyx_n_s_call, 235, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -11208,282 +11070,282 @@ if (!__Pyx_RefNanny) {
   /* "INDUSAnalysis/indus_waters.pyx":5
  * """
  * 
- * from INDUSAnalysis import timeseries             # <<<<<<<<<<<<<<
- * from INDUSAnalysis.lib import profiling
+ * import numpy as np             # <<<<<<<<<<<<<<
+ * import matplotlib.pyplot as plt
  * 
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_n_s_timeseries);
-  __Pyx_GIVEREF(__pyx_n_s_timeseries);
-  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_timeseries);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_INDUSAnalysis, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 5, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timeseries, __pyx_t_1) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "INDUSAnalysis/indus_waters.pyx":6
  * 
- * from INDUSAnalysis import timeseries
- * from INDUSAnalysis.lib import profiling             # <<<<<<<<<<<<<<
- * 
  * import numpy as np
- */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_n_s_profiling);
-  __Pyx_GIVEREF(__pyx_n_s_profiling);
-  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_profiling);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_INDUSAnalysis_lib, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_profiling, __pyx_t_2) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/indus_waters.pyx":8
- * from INDUSAnalysis.lib import profiling
- * 
- * import numpy as np             # <<<<<<<<<<<<<<
- * 
- * import matplotlib.pyplot as plt
- */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "INDUSAnalysis/indus_waters.pyx":10
- * import numpy as np
- * 
  * import matplotlib.pyplot as plt             # <<<<<<<<<<<<<<
+ * 
  * import MDAnalysis as mda
- * from tqdm import tqdm
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s__20);
   __Pyx_GIVEREF(__pyx_n_s__20);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s__20);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_matplotlib_pyplot, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_matplotlib_pyplot, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_plt, __pyx_t_2) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_plt, __pyx_t_2) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":11
- * 
+  /* "INDUSAnalysis/indus_waters.pyx":8
  * import matplotlib.pyplot as plt
+ * 
  * import MDAnalysis as mda             # <<<<<<<<<<<<<<
- * from tqdm import tqdm
  * 
+ * from tqdm import tqdm
  */
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MDAnalysis, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MDAnalysis, 0, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mda, __pyx_t_2) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_mda, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":12
- * import matplotlib.pyplot as plt
+  /* "INDUSAnalysis/indus_waters.pyx":10
  * import MDAnalysis as mda
+ * 
  * from tqdm import tqdm             # <<<<<<<<<<<<<<
  * 
- * """Cython"""
+ * from INDUSAnalysis import timeseries
  */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_tqdm);
   __Pyx_GIVEREF(__pyx_n_s_tqdm);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_tqdm);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_tqdm, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_tqdm, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_tqdm, __pyx_t_2) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_tqdm, __pyx_t_2) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":18
+  /* "INDUSAnalysis/indus_waters.pyx":12
+ * from tqdm import tqdm
+ * 
+ * from INDUSAnalysis import timeseries             # <<<<<<<<<<<<<<
+ * from INDUSAnalysis.lib import profiling
+ * 
+ */
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_timeseries);
+  __Pyx_GIVEREF(__pyx_n_s_timeseries);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_timeseries);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_INDUSAnalysis, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_timeseries, __pyx_t_1) < 0) __PYX_ERR(0, 12, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "INDUSAnalysis/indus_waters.pyx":13
+ * 
+ * from INDUSAnalysis import timeseries
+ * from INDUSAnalysis.lib import profiling             # <<<<<<<<<<<<<<
+ * 
+ * """Cython"""
+ */
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_INCREF(__pyx_n_s_profiling);
+  __Pyx_GIVEREF(__pyx_n_s_profiling);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_profiling);
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_INDUSAnalysis_lib, __pyx_t_2, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_profiling); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_profiling, __pyx_t_2) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "INDUSAnalysis/indus_waters.pyx":19
  * 
  * 
  * class WatersAnalysis(timeseries.TimeSeriesAnalysis):             # <<<<<<<<<<<<<<
  *     """
  *     Calculates number of waters in individual and union probe volumes. Generates
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_timeseries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_TimeSeriesAnalysis); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_TimeSeriesAnalysis); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_WatersAnalysis, __pyx_n_s_WatersAnalysis, (PyObject *) NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_kp_s_Calculates_number_of_waters_in); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_WatersAnalysis, __pyx_n_s_WatersAnalysis, (PyObject *) NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_kp_s_Calculates_number_of_waters_in); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
 
-  /* "INDUSAnalysis/indus_waters.pyx":23
+  /* "INDUSAnalysis/indus_waters.pyx":24
  *     plots and PDB files.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super().__init__()
  *         self.req_file_args.add_argument("file",
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_1__init__, 0, __pyx_n_s_WatersAnalysis___init, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_1__init__, 0, __pyx_n_s_WatersAnalysis___init, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__22)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_t_5);
   PyList_Append(__pyx_t_4, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_init, __pyx_t_5) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_init, __pyx_t_5) < 0) __PYX_ERR(0, 24, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":45
+  /* "INDUSAnalysis/indus_waters.pyx":46
  *                                     help="Display progress")
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
  *         """
- *         Stores arguments from TimeSeries `args` parameter in class variables
+ *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_3read_args, 0, __pyx_n_s_WatersAnalysis_read_args, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_3read_args, 0, __pyx_n_s_WatersAnalysis_read_args, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_t_5);
   PyList_Append(__pyx_t_4, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_read_args, __pyx_t_5) < 0) __PYX_ERR(0, 45, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_read_args, __pyx_t_5) < 0) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":73
+  /* "INDUSAnalysis/indus_waters.pyx":74
  *     # Data calculation methods
  * 
  *     def read_waters(self, filename):             # <<<<<<<<<<<<<<
  *         """
  *         Reads data from GROMACS-INDUS phi/probe waters output file.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_5read_waters, 0, __pyx_n_s_WatersAnalysis_read_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_5read_waters, 0, __pyx_n_s_WatersAnalysis_read_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_read_waters, __pyx_t_5) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_read_waters, __pyx_t_5) < 0) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":117
+  /* "INDUSAnalysis/indus_waters.pyx":118
  *         return ts_N, ts_Ntw, mu
  * 
  *     def calc_probe_waters(self, u, skip, radius):             # <<<<<<<<<<<<<<
  *         """
- *         Calculates waters in individual probe volumes
+ *         Calculates waters in individual probe volumes.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_probe_waters, 0, __pyx_n_s_WatersAnalysis_calc_probe_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__28)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 117, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_7calc_probe_waters, 0, __pyx_n_s_WatersAnalysis_calc_probe_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__28)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_probe_waters, __pyx_t_5) < 0) __PYX_ERR(0, 117, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_calc_probe_waters, __pyx_t_5) < 0) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":152
- *                                      labels=['Number of waters', 'Heavy atom index'])
+  /* "INDUSAnalysis/indus_waters.pyx":153
+ *                                      labels=['Number of waters', 'Atom index'])
  * 
  *     def plot_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots waters and saves figure to file"""
+ *         """Plots waters and saves figure to file."""
  *         fig = ts_Ntw.plot()
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_waters, 0, __pyx_n_s_WatersAnalysis_plot_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__30)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_9plot_waters, 0, __pyx_n_s_WatersAnalysis_plot_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__30)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_waters, __pyx_t_5) < 0) __PYX_ERR(0, 152, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_waters, __pyx_t_5) < 0) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":162
+  /* "INDUSAnalysis/indus_waters.pyx":163
  *             plt.close()
  * 
  *     def plot_ma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots moving average waters and saves figure to file"""
+ *         """Plots moving average waters and saves figure to file."""
  *         fig = ts_Ntw.moving_average(window=self.window).plot()
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot_ma_waters, 0, __pyx_n_s_WatersAnalysis_plot_ma_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__32)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_11plot_ma_waters, 0, __pyx_n_s_WatersAnalysis_plot_ma_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__32)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_ma_waters, __pyx_t_5) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_ma_waters, __pyx_t_5) < 0) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":172
+  /* "INDUSAnalysis/indus_waters.pyx":173
  *             plt.close()
  * 
  *     def plot_cma_waters(self, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Plots cumulative moving average waters and saves figure to file"""
+ *         """Plots cumulative moving average waters and saves figure to file."""
  *         fig = ts_Ntw.cumulative_moving_average().plot()
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot_cma_waters, 0, __pyx_n_s_WatersAnalysis_plot_cma_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__34)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_13plot_cma_waters, 0, __pyx_n_s_WatersAnalysis_plot_cma_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__34)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_cma_waters, __pyx_t_5) < 0) __PYX_ERR(0, 172, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_cma_waters, __pyx_t_5) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":182
+  /* "INDUSAnalysis/indus_waters.pyx":183
  *             plt.close()
  * 
  *     def plot_probe_waters(self, ts_probe_waters):             # <<<<<<<<<<<<<<
- *         """Plots waters in each individual probe as a 2D heatmap"""
+ *         """Plots waters in each individual probe as a 2D heatmap."""
  *         fig = ts_probe_waters.plot_2d_heatmap(cmap='hot')
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot_probe_waters, 0, __pyx_n_s_WatersAnalysis_plot_probe_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__36)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_15plot_probe_waters, 0, __pyx_n_s_WatersAnalysis_plot_probe_waters, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__36)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 183, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_probe_waters, __pyx_t_5) < 0) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_plot_probe_waters, __pyx_t_5) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":192
+  /* "INDUSAnalysis/indus_waters.pyx":193
  *             plt.close()
  * 
  *     def write_mean_std_waters(self, mu, ts_Ntw):             # <<<<<<<<<<<<<<
- *         """Appends mean and std waters to text file"""
+ *         """Appends mean and std waters to text file."""
  *         meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17write_mean_std_waters, 0, __pyx_n_s_WatersAnalysis_write_mean_std_wa, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__38)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_17write_mean_std_waters, 0, __pyx_n_s_WatersAnalysis_write_mean_std_wa, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__38)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_write_mean_std_waters, __pyx_t_5) < 0) __PYX_ERR(0, 192, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_write_mean_std_waters, __pyx_t_5) < 0) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":202
+  /* "INDUSAnalysis/indus_waters.pyx":203
  *             stdf.write(stdstr)
  * 
  *     def write_probe_waters_pdb(self, u, skip, ts_probe_waters):             # <<<<<<<<<<<<<<
  *         """
  *         Writes instantaneous probe waters to PDB file.
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19write_probe_waters_pdb, 0, __pyx_n_s_WatersAnalysis_write_probe_water, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__40)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_19write_probe_waters_pdb, 0, __pyx_n_s_WatersAnalysis_write_probe_water, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__40)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_write_probe_waters_pdb, __pyx_t_5) < 0) __PYX_ERR(0, 202, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_write_probe_waters_pdb, __pyx_t_5) < 0) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":234
+  /* "INDUSAnalysis/indus_waters.pyx":235
  *                     raise ValueError("Trajectory and TimeSeries times do not match at same index.")
  * 
  *     def __call__(self):             # <<<<<<<<<<<<<<
- *         """Performs analysis"""
+ *         """Performs analysis."""
  * 
  */
-  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_21__call__, 0, __pyx_n_s_WatersAnalysis___call, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__42)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_12indus_waters_14WatersAnalysis_21__call__, 0, __pyx_n_s_WatersAnalysis___call, NULL, __pyx_n_s_INDUSAnalysis_indus_waters, __pyx_d, ((PyObject *)__pyx_codeobj__42)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_call, __pyx_t_5) < 0) __PYX_ERR(0, 234, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_call, __pyx_t_5) < 0) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/indus_waters.pyx":18
+  /* "INDUSAnalysis/indus_waters.pyx":19
  * 
  * 
  * class WatersAnalysis(timeseries.TimeSeriesAnalysis):             # <<<<<<<<<<<<<<
  *     """
  *     Calculates number of waters in individual and union probe volumes. Generates
  */
-  __pyx_t_5 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_WatersAnalysis, __pyx_t_1, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_WatersAnalysis, __pyx_t_1, __pyx_t_3, NULL, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (__Pyx_CyFunction_InitClassCell(__pyx_t_4, __pyx_t_5) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
+  if (__Pyx_CyFunction_InitClassCell(__pyx_t_4, __pyx_t_5) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_WatersAnalysis, __pyx_t_5) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_WatersAnalysis, __pyx_t_5) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -11491,7 +11353,7 @@ if (!__Pyx_RefNanny) {
 
   /* "INDUSAnalysis/indus_waters.pyx":1
  * """             # <<<<<<<<<<<<<<
- * Defines class for analysing waters in INDUS probe volumes
+ * Defines class for analysing waters in INDUS probe volumes.
  * """
  */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)

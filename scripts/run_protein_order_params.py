@@ -1,12 +1,15 @@
-from INDUSAnalysis.protein_order_params import OrderParams
-from INDUSAnalysis.lib.profiling import timefunc
+"""Runs protein order parameters analysis by creating, processing, and calling an
+OrderParamsAnalysis object. Arguments are read from the command line."""
+
+from INDUSAnalysis import protein_order_params
+from INDUSAnalysis.lib import profiling
 import matplotlib.pyplot as plt
 
 
-@timefunc
+@profiling.timefunc
 def main():
     warnings = "Proceed with caution: this script requires PBC-corrected protein structures!"
-    prot = OrderParams()
+    prot = protein_order_params.OrderParamsAnalysis()
     prot.parse_args()
     prot.read_args()
     startup_string = "#### Order Parameter Analysis ####\n" + warnings + "\n"

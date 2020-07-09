@@ -1,53 +1,53 @@
 """
-Time series contacts analysis (# of contacts and fraction of native contacts)
-
-Supports PDB generation from saved data using the replot option with genpdb
-
-Units:
-- length: A
-- time: ps
-
-@Author: Akash Pallath
+Defines class for analysing contacts along GROMACS simulation trajectory.
 """
 
-from INDUSAnalysis.timeseries import TimeSeries
-from INDUSAnalysis.lib.profiling import timefunc
-
 import numpy as np
-
 import matplotlib.pyplot as plt
+
 import MDAnalysis as mda
-import MDAnalysis.lib.distances  # for fast distance matrix calculation
-from tqdm import tqdm  # for progress bars
+import MDAnalysis.analysis.align
+
 from itertools import combinations
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import floyd_warshall
+
+from tqdm import tqdm
+
+from INDUSAnalysis import timeseries
+from INDUSAnalysis.lib import profiling
 
 """Cython"""
 cimport numpy as np
 
 
-class Contacts(TimeSeries):
+class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
     def __init__(self):
         super().__init__()
-        self.parser.add_argument("structf", help="Topology or structure file (.tpr, .gro; .gro required for atomic-sh)")
-        self.parser.add_argument("trajf", help="Compressed trajectory file (.xtc)")
+        self.req_file_args.add_argument("structf", help="Topology or structure file (.tpr, .gro; .gro required for atomic-sh)")
+        self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
 
-        # Calculation options
-        self.parser.add_argument("-method", help="Method for calculating contacts (atomic-sh, 3res-sh; default=atomic-sh)")
-        self.parser.add_argument("-distcutoff", help="Distance cutoff for contacts, in A")
-        self.parser.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
-        self.parser.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
-        self.parser.add_argument("-bins", help="Number of bins for histogram (default = 20)")
+        self.calc_args.add_argument("-method", help="Method for calculating contacts (atomic-sh, 3res-sh; default=atomic-sh)")
+        self.calc_args.add_argument("-distcutoff", help="Distance cutoff for contacts, in A")
+        self.calc_args.add_argument("-connthreshold", help="Connectivity threshold for contacts (definition varies by method)")
+        self.calc_args.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
+        self.calc_args.add_argument("-bins", help="Number of bins for histogram (default = 20)")
+        self.calc_args.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
 
-        # Output control
-        self.parser.add_argument("--genpdb", action="store_true", help="Write contacts density per atom to pdb file")
-        self.parser.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
+        self.out_args.add_argument("--genpdb", action="store_true", help="Write contacts density per atom to pdb file")
+
+        self.misc_args.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
 
     def read_args(self):
+        """
+        Stores arguments from TimeSeries `args` parameter in class variables.
+        """
         super().read_args()
         self.structf = self.args.structf
         self.trajf = self.args.trajf
 
-        # Calculation options
+        self.u = mda.Universe(self.structf, self.trajf)
+
         self.method = self.args.method
         if self.method is None:
             self.method = "atomic-sh"
@@ -61,10 +61,13 @@ class Contacts(TimeSeries):
         else:
             if self.method == "atomic-sh":
                 self.distcutoff = 6.0
-            elif self.method == "3res-sh":
-                self.distcutoff = 4.5
-            else:
-                pass
+
+        self.connthreshold = self.args.connthreshold
+        if self.connthreshold is not None:
+            self.connthreshold = int(self.connthreshold)
+        else:
+            if self.method == "atomic-sh":
+                self.connthreshold = 0  # TODO: Update
 
         self.refcontacts = self.args.refcontacts
         if self.refcontacts is not None:
@@ -82,314 +85,284 @@ class Contacts(TimeSeries):
         else:
             self.bins = 20
 
-        # Output control
         self.genpdb = self.args.genpdb
         self.verbose = self.args.verbose
 
-        # Prepare system from args
-        self.u = mda.Universe(self.structf, self.trajf)
+    def calc_trajcontacts(self, u, method, distcutoff, connthreshold, skip):
+        """
+        Calculates contacts along a trajectory.
 
-    """
-    BEGIN
-    Main analysis worker/helpers to analyse contacts along trajectory
-    """
+        Args:
+            u (MDAnalysis.Universe): Trajectory.
+            method (str): Calculation method to use to compute contacts.
+            distcutoff (float): Distance cutoff (in A).
+            connthreshold (int): Connectivity threshold.
+            skip (int): Resampling interval.
 
-    def calc_trajcontacts(self):
-        if self.method == "atomic-sh":
-            return self.calc_trajcontacts_atomic_sh()
-        elif self.method == "3res-sh":
-            return self.calc_trajcontacts_3res_sh()
+        Returns:
+            TimeSeries object of contact matrices.
+
+        Raises:
+            ValueError if calculation method is not recognized.
+        """
+        if method == "atomic-sh":
+            return self.calc_trajcontacts_atomic_sh(u, distcutoff, connthreshold, skip)
         else:
-            raise Exception("Method not recognized")
-            return None
+            raise ValueError("Method not recognized")
 
-    """
-    Method: atomic-sh
-    Contacts between side-chain heavy atoms
-    """
-    @timefunc
-    def calc_trajcontacts_atomic_sh(self):
+    @profiling.timefunc
+    def calc_trajcontacts_atomic_sh(self, u, distcutoff, connthreshold, skip):
+        """
+        Calculates contacts between side-chain heavy atoms along trajectory.
+
+        The connectivity threshold is the number of bonds side chain heavy atoms
+        have to be separated by on the shortest bond network path between them
+        for the pair to be a candidate for contact formation. The distance cutoff
+        is the distance between a candidate atomic pair within which it is
+        considered to be a valid contact.
+
+        Side chain heavy atoms i and j form a contact if
+        N(i,j) > connthreshold and r(i,j) < distcutoff.
+        """
+        # MDAnalysis selection strings
         not_side_heavy_sel = "protein and (name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
 
-        # Calculate distances between all atoms using fast MDA function
-        protein = self.u.select_atoms("protein")
+        # Calculate distances between all atoms using fast MDAnalysis function
+        protein = u.select_atoms("protein")
         natoms = len(protein.atoms)
 
-        utraj = self.u.trajectory[::self.skip]
+        utraj = u.trajectory[::skip]
 
         dmatrices = np.zeros((len(utraj), natoms, natoms))
 
         if self.verbose:
-            pbar = tqdm(desc = "Calculating distances", total = len(utraj))
+            pbar = tqdm(desc="Calculating distances", total=len(utraj))
 
         for tidx, ts in enumerate(utraj):
             dmatrix = mda.lib.distances.distance_array(protein.positions, protein.positions)
-            dmatrices[tidx,:,:] = dmatrix
+            dmatrices[tidx, :, :] = dmatrix
             if self.verbose:
                 pbar.update(1)
-
-        if self.verbose:
-            print("Processing distance matrices")
-
-        # Process distance matrices
-        for i in range(dmatrices.shape[1]):
-            dmatrices[:,i,i] = np.Inf
 
         # Remove atoms that are not side chain heavy atoms
         for i in self.u.select_atoms(not_side_heavy_sel).indices:
-            dmatrices[:,i,:] = np.Inf
-            dmatrices[:,:,i] = np.Inf
+            dmatrices[:, i, :] = np.Inf
+            dmatrices[:, :, i] = np.Inf
 
-        if self.verbose:
-            print("Calculating contacts from distance matrices")
+        """Impose connectivity threshold"""
+        if connthreshold < 0:
+            raise ValueError("Connectivity threshold must be an integer value 0 or greater.")
 
-        self.contactmatrices = np.array(dmatrices < self.distcutoff)
+        # Calculate connectivity graph using Floyd-Warshall algorithm
+        apsp, idx_map = self.protein_heavy_APSP(u)
 
-        # Contacts per atom along trajectory
-        if self.verbose:
-            print("Calculating contacts per atom")
-        self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
+        # Exclude i-j interactions below threshold from distance matrix
+        for i in range(apsp.shape[0]):
+            for j in range(apsp.shape[1]):
+                if i == j and apsp[i, j] > 0:
+                    raise ValueError("Distance matrix is inconsistent: shortest path between same atom should be 0.")
+                if apsp[i, j] <= connthreshold:
+                    dmatrices[:, idx_map[i], idx_map[j]] = np.Inf
 
-        # Total number of contacts along trajectory
-        contacts = np.sum(self.contacts_per_atom, axis=1)
+        """Impose distance cutoff"""
+        contactmatrices = np.array(dmatrices < self.distcutoff)
+
         times = []
         for ts in utraj:
             times.append(ts.time)
         times = np.array(times)
-        self.contacts = np.zeros((len(utraj), 2))
-        self.contacts[:,0] = times
-        self.contacts[:,1] = contacts
 
-        # Normalized mean contactmatrix
-        self.contactmatrix = np.mean(self.contactmatrices, axis=0)
+        return timeseries.TimeSeries(times, contactmatrices, labels=['Contact duration', 'Atom i', 'Atom j'])
 
-    """
-    Method: 3res-sh
-    Contacts between side-chain heavy atoms belonging to residues that are at least 3 residues apart
-    """
-    @timefunc
-    def calc_trajcontacts_3res_sh(self):
-        side_heavy_sel = "protein and not(name N or name CA or name C or name O or name OC1 or name OC2 or name H*)"
+    def protein_heavy_APSP(self, u):
+        """
+        Constructs graph of protein-heavy atoms and calculates all-pairs-shortest-path
+        distances using the Floyd-Warshall algorithm, assigning each bond an
+        equal weight (of 1).
 
-        protein = self.u.select_atoms("protein")
-        nres = len(protein.residues)
-        natoms = len(protein.atoms)
+        Args:
+            u (mda.Universe): Universe object containing all atoms with bond definitions.
 
-        contactmatrices = []
+        Returns:
+            {
+                D (np.array): Array of shape (nheavy, nheavy), where D[i,j] is the shortest
+                    path distance between heavy atom i and heavy atom j.
+                index_map (dict): Dictionary mapping heavy atom i to its atom
+                    index in the Universe.
+            }
+        """
+        # Connectivity graph
+        protein_heavy = u.select_atoms("protein and not name H*")
+        nheavy = len(protein_heavy)
 
-        utraj = self.u.trajectory[::self.skip]
+        heavy_indices = protein_heavy.atoms.indices
+        heavy_idx_map = {}
+        idx_heavy_map = {}
+        for heavyidx, idx in enumerate(protein_heavy.atoms.indices):
+            heavy_idx_map[idx] = heavyidx
+            idx_heavy_map[heavyidx] = idx
 
-        if self.verbose:
-            pbar = tqdm(desc = "Calculating contacts", total = len(utraj))
+        adj_matrix = np.zeros((nheavy, nheavy))
 
-        for ts in utraj:
-            box = ts.dimensions
-            local_contactmatrix = np.zeros((natoms, natoms))
+        for bond in protein_heavy.bonds:
+            ati = bond.indices[0]
+            atj = bond.indices[1]
+            if ati in heavy_indices and atj in heavy_indices:
+                heavyi = heavy_idx_map[ati]
+                heavyj = heavy_idx_map[atj]
+                adj_matrix[heavyi, heavyj] = 1
+                adj_matrix[heavyj, heavyi] = 1
 
-            for i in range(nres):
-                heavy_side_i = protein.residues[i].atoms.select_atoms(side_heavy_sel)
-                heavy_side_j = protein.residues[i+4:].atoms.select_atoms(side_heavy_sel)
-                dmatrix = mda.lib.distances.distance_array(heavy_side_i.positions, heavy_side_j.positions, box)
-                res_contactmatrix = np.array(dmatrix < self.distcutoff)
-                iidx = heavy_side_i.indices
-                jidx = heavy_side_j.indices
+        # All pairs shortest paths between protein-heavy atoms
+        csr_graph = csr_matrix(adj_matrix)  # Store data in compressed sparse matrix form
+        dist_matrix = floyd_warshall(csgraph=csr_graph, directed=False)  # Floyd-Warshall
 
-                for i in range(dmatrix.shape[0]):
-                    for j in range(dmatrix.shape[1]):
-                        local_contactmatrix[iidx[i], jidx[j]] += res_contactmatrix[i,j]
+        return dist_matrix, idx_heavy_map
 
-            #make matrix symmetric
-            local_contactmatrix = np.maximum(local_contactmatrix[:,:], local_contactmatrix[:,:].transpose())
-            contactmatrices.append(local_contactmatrix)
+    def plot_mean_contactmatrix(self, mean_contactmatrix):
+        """
+        Plots mean contact matrix.
 
-            # Print progress
-            if self.verbose:
-                pbar.update(1)
-
-        # Contact matrices along trajectory
-        self.contactmatrices = np.array(contactmatrices)
-
-        # Contacts per atom along trajectory
-        self.contacts_per_atom = np.sum(self.contactmatrices, axis = 2)
-
-        # Total number of contacts along trajectory
-        contacts = np.sum(self.contacts_per_atom, axis=1)
-        times = []
-        for ts in utraj:
-            times.append(ts.time)
-        times = np.array(times)
-        self.contacts = np.zeros((len(utraj), 2))
-        self.contacts[:,0] = times
-        self.contacts[:,1] = contacts
-
-        # Normalized mean contactmatrix
-        self.contactmatrix = np.mean(self.contactmatrices, axis=0)
-
-    """
-    END
-    Main analysis worker/helpers to analyse contacts along trajectory
-    """
-
-    """
-    Save
-    - Contact matrix along trajectory
-    - Contacts per atom along trajectory
-    - Averaged contact matrix
-    """
-    def save_rawcontactsdata(self):
-        np.save(self.opref + "_contactmatrices", self.contactmatrices)
-        np.save(self.opref + "_contacts_per_atom", self.contacts_per_atom)
-        np.save(self.opref + "_contactmatrix", self.contactmatrix)
-
-    """
-    Save instantaneous contacts density data to pdb
-    """
-    def save_pdb(self):
-        protein = self.u.select_atoms("protein")
-        self.u.add_TopologyAttr('tempfactors')
-        utraj = self.u.trajectory[0::self.skip]
-        pdbtrj = self.opref + "_contacts.pdb"
-
-        if self.verbose:
-            pbar = tqdm(desc = "Writing PDB", total = len(utraj))
-
-        with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=self.u.atoms.n_atoms) as PDB:
-            for tidx, ts in enumerate(utraj):
-                protein.atoms.tempfactors = self.contacts_per_atom[tidx,:]
-                PDB.write(self.u.atoms)
-                if self.verbose:
-                    pbar.update(1)
-
-    """
-    Plot number of contacts
-    """
-    def plot_contacts(self, t, contacts):
+        Args:
+            mean_contactmatrix (np.array): Mean contactmatrix.
+        """
         fig, ax = plt.subplots()
-        ax.plot(t, contacts)
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Number of contacts")
-        self.save_figure(fig,suffix="contacts")
-        if self.show:
-            plt.show()
-        else:
-            plt.close()
-
-    """
-    Plot fraction of contacts
-    """
-    def plot_fraction_contacts(self, t, contacts, refcontacts):
-        fig, ax = plt.subplots()
-        ax.plot(t, contacts/self.refcontacts)
-        ax.set_ylim(bottom = 0)
-        ax.axhline(y=1.0, color='r', linestyle='--')
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel("Fraction of contacts")
-        self.save_figure(fig, suffix="frac_contacts")
-        if self.show:
-            plt.show()
-        else:
-            plt.close()
-
-    """
-    Plot histogram of contacts (as density)
-    Notes:
-    - Also stores histogram of contacts
-    """
-    def plot_histogram_contacts(self, contacts, bins):
-        hist, bin_edges = np.histogram(contacts, bins=bins, density=True)
-        bin_centers = 0.5*(bin_edges[1:]+bin_edges[:-1])
-        #use timeseries function even though not timeseries
-        self.save_timeseries(bin_centers, hist, label="hist_contacts")
-
-        fig, ax = plt.subplots()
-        ax.plot(bin_centers, hist)
-        ax.set_xlabel('Number of contacts')
-        ax.set_ylabel('Frequency')
-        self.save_figure(fig, suffix="hist_contacts")
-        if self.show:
-            plt.show()
-        else:
-            plt.close()
-
-    """
-    Plot contact matrix
-    """
-    def plot_matrix_contacts(self, contactmatrix):
-        fig, ax = plt.subplots()
-        im = ax.imshow(contactmatrix.T, origin="lower", cmap="hot")
+        im = ax.imshow(mean_contactmatrix.T, origin="lower", cmap="hot")
         fig.colorbar(im)
         ax.set_xlabel('Atom $i$')
         ax.set_ylabel('Atom $j$')
-        self.save_figure(fig, suffix="contactmatrix")
+        fig.set_dpi(300)
+        self.save_figure(fig, suffix="mean_contactmatrix")
         if self.show:
             plt.show()
         else:
             plt.close()
 
-    """
-    Plot contacts per atom
-    """
-    def plot_contacts_per_atom(self, times, contacts_per_atom):
-        fig, ax = plt.subplots(dpi=300)
-        im = ax.imshow(contacts_per_atom, origin="lower", cmap="hot", aspect="auto")
-        fig.colorbar(im, ax=ax)
-        ax.set_xlabel('Atom')
-        ax.set_ylabel('Time (ps)')
-        #SET TICKS
-        ticks = ax.get_yticks().tolist()
-        factor = times[-1]/ticks[-2]
-        newlabels = [factor * item for item in ticks]
-        ax.set_yticklabels(newlabels)
+    def plot_contacts_per_atom(self, ts_contacts_per_atom):
+        """
+        Plots timeseries contacts per atom.
+        """
+        fig = ts_contacts_per_atom.plot_2d_heatmap(cmap='hot')
+        fig.set_dpi(300)
         self.save_figure(fig, suffix="contacts_per_atom")
         if self.show:
             plt.show()
         else:
             plt.close()
 
+    def plot_total_fraction_contacts(self, ts_contacts, refcontacts):
+        """
+        Plots timeseries number of contacts and fraction of contacts.
+        """
+        fig1 = ts_contacts.plot()
+        fig1.set_dpi(300)
+        self.save_figure(fig1, suffix="contacts")
+
+        ts_contacts.data_array /= refcontacts
+        fig2 = ts_contacts.plot()
+        fig2.set_dpi(300)
+        self.save_figure(fig2, suffix="frac_contacts")
+
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+    def calc_plot_histogram_contacts(self, ts_contacts, bins):
+        """
+        Calculates and plots histogram of contacts, and saves histogram of
+        contacts to file.
+        """
+        hist, bin_edges = np.histogram(ts_contacts.data_array, bins=bins)
+        bin_centers = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+
+        histogram = np.zeros((2, len(hist)))
+        histogram[0, :] = bin_centers
+        histogram[1, :] = hist
+
+        np.save(self.opref + "_hist.npy", histogram)
+
+        fig, ax = plt.subplots()
+        ax.plot(bin_centers, hist)
+        ax.set_xlabel('Number of contacts')
+        ax.set_ylabel('Frequency')
+        fig.set_dpi(300)
+        self.save_figure(fig, suffix="hist_contacts")
+        if self.show:
+            plt.show()
+        else:
+            plt.close()
+
+    def write_contacts_per_atom_pdb(self, u, skip, ts_contacts_per_atom):
+        """
+        Writes per-atom-contacts to PDB file.
+
+        Args:
+            u (mda.Universe): Universe containing solvated protein.
+            skip (int): Trajectory resampling interval.
+            ts_contacts_per_atom (TimeSeries): Per-atom contacts timeseries data.
+
+        Raises:
+            ValueError if the time for the same index in u.trajectory[::skip]
+            and ts_contacts_per_atom does not match.
+        """
+        protein = u.select_atoms("protein")
+        u.add_TopologyAttr('tempfactors')
+        pdbtrj = self.opref + "_contacts.pdb"
+
+        utraj = u.trajectory[0::skip]
+
+        if self.verbose:
+            pbar = tqdm(desc="Writing PDB", total=len(utraj))
+
+        with mda.Writer(pdbtrj, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
+            for tidx, ts in enumerate(utraj):
+                if np.isclose(ts.time, ts_contacts_per_atom.time_array[tidx]):
+                    protein.atoms.tempfactors = ts_contacts_per_atom.data_array[tidx, :]
+                    PDB.write(self.u.atoms)
+                    if self.verbose:
+                        pbar.update(1)
+
+                else:
+                    raise ValueError("Trajectory and TimeSeries times do not match at same index.")
+
     """call"""
     def __call__(self):
-        """Get contacts along trajectory"""
+        """Performs analysis."""
+
+        """Raw data"""
         if self.replot:
-            replotcontactmatrices = np.load(self.replotpref + "_contactmatrices.npy")
-            self.contactmatrices = replotcontactmatrices
-
-            replotcontacts_per_atom = np.load(self.replotpref + "_contacts_per_atom.npy")
-            self.contacts_per_atom = replotcontacts_per_atom
-
-            replotcontactmatrix = np.load(self.replotpref + "_contactmatrix.npy")
-            self.contactmatrix = replotcontactmatrix
-
-            replotcontacts = np.load(self.replotpref + "_contacts.npy")
-            self.contacts = np.transpose(replotcontacts)
+            ts_contactmatrices = self.load_TimeSeries(self.opref + "_contactmatrices")
+            ts_contacts_per_atom = self.load_TimeSeries(self.opref + "_contacts_per_atom")
+            ts_contacts = self.load_TimeSeries(self.opref + "_contacts")
         else:
             # Calculate contacts along trajectory
-            self.calc_trajcontacts()
+            ts_contactmatrices = self.calc_trajcontacts(self.u, self.method, self.distcutoff,
+                                                        self.connthreshold, self.skip)
+            # Compute reductions
+            ts_contacts_per_atom = ts_contactmatrices.mean(axis=2)
+            ts_contacts = ts_contacts_per_atom.mean(axis=1)
 
-        t = self.contacts[:,0]
-        contacts = self.contacts[:,1]
+        self.save_TimeSeries(ts_contactmatrices, self.opref + "_contactmatrices")
+        self.save_TimeSeries(ts_contacts_per_atom, self.opref + "_contacts_per_atom")
+        self.save_TimeSeries(ts_contacts, self.opref + "_contacts")
 
-        """If no reference is set, use mean number of contacts along trajectory
-           as reference (sensible choice for native state run)"""
-        mean = self.ts_mean(t, contacts, self.obsstart, self.obsend)
+        # Calculate mean contactmatrix
+        mean_contactmatrix = ts_contactmatrices[self.obsstart:self.obsend].mean(axis=0)
 
+        # Calculate mean number of contacts along trajectory
+        mean_contacts = ts_contacts[self.obsstart:self.obsend].mean()
+        # If no reference is set, use this as the reference value for fraction of contacts
         if self.refcontacts is None:
-            self.refcontacts = mean
-
-        """Log data"""
-        # Matrices
-        self.save_rawcontactsdata()
-
-        # Timeseries
-        self.save_timeseries(t, contacts, label="contacts")
-        self.save_timeseries(t, contacts/self.refcontacts, label="frac_contacts")
-
-        # PDB
-        if self.genpdb:
-            self.save_pdb()
+            self.refcontacts = mean_contacts
 
         """Plots"""
-        self.plot_contacts(t, contacts)
-        self.plot_fraction_contacts(t, contacts, self.refcontacts)
-        self.plot_histogram_contacts(contacts, bins=self.bins)
-        self.plot_matrix_contacts(self.contactmatrix)
-        self.plot_contacts_per_atom(t, self.contacts_per_atom)
+        self.plot_mean_contactmatrix(mean_contactmatrix)
+        self.plot_contacts_per_atom(ts_contacts_per_atom)
+        self.plot_total_fraction_contacts(ts_contacts, self.refcontacts)
+
+        self.calc_plot_histogram_contacts(ts_contacts, self.bins)
+
+        """Store per-atom contacts in PDB"""
+        if self.genpdb:
+            self.write_contacts_per_atom_pdb(self.u, self.skip, ts_contacts_per_atom)

@@ -78,17 +78,36 @@ class TimeSeries:
         return "<{} object, {} with shape {}, {} time frames>".format(
             self.__class__.__name__, self._labels, self._x.shape, len(self._t))
 
+    # TODO: Add unit tests for setters
     @property
     def time_array(self):
         return self._t
+
+    @time_array.setter
+    def time_array(self, t):
+        self._t = t
 
     @property
     def data_array(self):
         return self._x
 
+    @data_array.setter
+    def data_array(self, x):
+        if x.shape[0] != len(self._t):
+            raise ValueError("Time and data do not match along axis 0.")
+        self._x = x
+
     @property
     def labels(self):
         return self._labels
+
+    @labels.setter
+    def labels(self, labels):
+        if len(labels) < self._x.ndim:
+            raise ValueError("Too few labels for data dimensions")
+        if len(labels) > self._x.ndim:
+            raise ValueError("Too many labels for data dimensions")
+        self._labels = labels
 
     def moving_average(self, window):
         """
@@ -127,12 +146,12 @@ class TimeSeries:
         Computes mean of timeseries data.
 
         Args:
-            axis (int): Optional
+            axis (int): Optional.
 
         Returns:
-            np.float if mean is computed for flattened data (axis = None)
-            np.array if mean is computed along axis 0
-            TimeSeries object if mean is computed along axis > 0
+            np.float if mean is computed for flattened data (axis = None).
+            np.array if mean is computed along axis 0.
+            TimeSeries object if mean is computed along axis > 0.
         """
         if axis is None or axis == 0:
             return np.mean(self._x, axis=axis)
@@ -146,12 +165,12 @@ class TimeSeries:
         Computes std of timeseries data.
 
         Args:
-            axis (int): Optional
+            axis (int): Optional.
 
         Returns:
-            np.float if mean is computed for flattened data (axis = None)
-            np.array if mean is computed along axis 0
-            TimeSeries object if mean is computed along axis > 0
+            np.float if mean is computed for flattened data (axis = None).
+            np.array if mean is computed along axis 0.
+            TimeSeries object if mean is computed along axis > 0.
         """
         if axis is None or axis == 0:
             return np.std(self._x, axis=axis)
@@ -176,8 +195,8 @@ class TimeSeries:
         """Plots 1-d timeseries data.
 
         Args:
-            *plotargs: Arguments for Matplotlib's plot function
-            **plotkwargs: Keyword arguments for Matplotlib's plot function
+            *plotargs: Arguments for Matplotlib's plot function.
+            **plotkwargs: Keyword arguments for Matplotlib's plot function.
 
         Returns:
             Matplotlib figure object containing plotted data.
@@ -195,7 +214,7 @@ class TimeSeries:
         """Plots 2-d timeseries data as a heatmap.
 
         Args:
-            *imshowkwargs: Keyword arguments for Matplotlib's imshow function
+            *imshowkwargs: Keyword arguments for Matplotlib's imshow function.
 
         Returns:
             Matplotlib figure object containing plotted data.
@@ -260,10 +279,10 @@ class TimeSeriesAnalysis:
 
     def parse_args(self, args=None):
         """
-        Parses arguments
+        Parses arguments.
 
         Args:
-            args (list): Arguments to parse, optional
+            args (list): Arguments to parse, optional.
         """
         if args is None:
             self.args = self.parser.parse_args()
@@ -272,7 +291,7 @@ class TimeSeriesAnalysis:
 
     def read_args(self):
         """
-        Stores arguments from TimeSeries `args` parameter in class variables
+        Stores arguments from TimeSeries `args` parameter in class variables.
         """
         self.obsstart = self.args.obsstart
         if self.obsstart is not None:
