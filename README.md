@@ -1,9 +1,11 @@
 # INDUSAnalysis
 
 Package to analyze simulation data generated using
-[INDUS](https://link.springer.com/article/10.1007/s10955-011-0269-9).
+[INDUS](https://link.springer.com/article/10.1007/s10955-011-0269-9). 
 
 At present, the focus of this package is on analysis of solvated protein systems.
+
+[Documentation](https://apallath.github.io/INDUSAnalysis) hosted on GitHub pages.
 
 ## Status
 
