@@ -38,8 +38,8 @@ def test_TimeSeries_1d_ma_cma():
     ts = timeseries.TimeSeries(t, x, ['RMSD'])
 
     # Test moving average
-    assert(np.allclose(ts.moving_average(window=2).data_array,
-                       np.array([1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5])))
+    assert(np.allclose(ts.moving_average(window=2).data_array, np.array(7 * [1.5])))
+    assert(np.allclose(ts.moving_average(window=4).data_array, np.array(5 * [3 / 2])))
     # Test cumulative moving average
     assert(np.allclose(ts.cumulative_moving_average().data_array,
                        np.array([2, 3 / 2, 5 / 3, 6 / 4, 8 / 5, 9 / 6, 11 / 7, 12 / 8])))

@@ -122,8 +122,8 @@ class TimeSeries:
             raise ValueError("Data is not 1-dimensional")
 
         w = np.repeat(1.0, window) / window
-        ma = np.convolve(self._x, w, 'same')
-        return TimeSeries(self._t, ma, labels=self._labels)
+        ma = np.convolve(self._x, w, 'valid')
+        return TimeSeries(self._t[window - 1:], ma, labels=self._labels)
 
     def cumulative_moving_average(self):
         """
@@ -188,7 +188,7 @@ class TimeSeries:
         Args:
             axis (int)
         """
-        raise NotImplementedError
+        pass
 
     def plot(self, *plotargs, **plotkwargs):
         """Plots 1-d timeseries data.
@@ -304,7 +304,7 @@ class TimeSeriesAnalysis:
 
         self.window = self.args.window
         if self.window is not None:
-            self.window = np.float(self.window)
+            self.window = np.int(self.window)
 
         self.opref = self.args.opref
         if self.opref is None:

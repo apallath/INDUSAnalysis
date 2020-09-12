@@ -41,7 +41,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
 
         self.out_args.add_argument("--genpdb",
                                    action="store_true",
-                                   help="Write atoms per probe volume data to pdb file")
+                                   help="Write per-atom deviations data to pdb file")
 
         self.misc_args.add_argument("--verbose",
                                     action="store_true",

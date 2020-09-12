@@ -2005,7 +2005,7 @@ static const char __pyx_k_RMSD_between_atoms_using_atoms_f[] = "RMSD between {} 
 static const char __pyx_k_Reference_trajectory_file_xtc_fo[] = "Reference trajectory file (.xtc) for RMSD (default: same as trajf)";
 static const char __pyx_k_Set_of_coordinates_and_reference[] = "Set of coordinates and reference set coordinates do not have same shape";
 static const char __pyx_k_Timestep_to_extract_reference_co[] = "Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)";
-static const char __pyx_k_Write_atoms_per_probe_volume_dat[] = "Write atoms per probe volume data to pdb file";
+static const char __pyx_k_Write_per_atom_deviations_data_t[] = "Write per-atom deviations data to pdb file";
 static const char __pyx_k_coords_and_masses_not_of_same_le[] = "coords and masses not of same length";
 static const char __pyx_k_ndarray_is_not_Fortran_contiguou[] = "ndarray is not Fortran contiguous";
 static const char __pyx_k_numpy_core_umath_failed_to_impor[] = "numpy.core.umath failed to import";
@@ -2074,7 +2074,7 @@ static PyObject *__pyx_kp_s_Timestep_to_extract_reference_co;
 static PyObject *__pyx_kp_s_Trajectory_and_TimeSeries_times;
 static PyObject *__pyx_n_s_Universe;
 static PyObject *__pyx_n_s_ValueError;
-static PyObject *__pyx_kp_s_Write_atoms_per_probe_volume_dat;
+static PyObject *__pyx_kp_s_Write_per_atom_deviations_data_t;
 static PyObject *__pyx_n_s_Writer;
 static PyObject *__pyx_kp_s_Writing_PDB;
 static PyObject *__pyx_n_s__14;
@@ -2648,7 +2648,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
  * 
  *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
  *                                    action="store_true",
- *                                    help="Write atoms per probe volume data to pdb file")
+ *                                    help="Write per-atom deviations data to pdb file")
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -2660,20 +2660,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
  * 
  *         self.out_args.add_argument("--genpdb",
  *                                    action="store_true",             # <<<<<<<<<<<<<<
- *                                    help="Write atoms per probe volume data to pdb file")
+ *                                    help="Write per-atom deviations data to pdb file")
  * 
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Write_atoms_per_probe_volume_dat) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Write_per_atom_deviations_data_t) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
 
   /* "INDUSAnalysis/protein_order_params.pyx":42
  *                                     help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
  * 
  *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
  *                                    action="store_true",
- *                                    help="Write atoms per probe volume data to pdb file")
+ *                                    help="Write per-atom deviations data to pdb file")
  */
   __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -2682,7 +2682,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "INDUSAnalysis/protein_order_params.pyx":46
- *                                    help="Write atoms per probe volume data to pdb file")
+ *                                    help="Write per-atom deviations data to pdb file")
  * 
  *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
  *                                     action="store_true",
@@ -2707,7 +2707,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
   if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Display_progress) < 0) __PYX_ERR(0, 47, __pyx_L1_error)
 
   /* "INDUSAnalysis/protein_order_params.pyx":46
- *                                    help="Write atoms per probe volume data to pdb file")
+ *                                    help="Write per-atom deviations data to pdb file")
  * 
  *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
  *                                     action="store_true",
@@ -13557,7 +13557,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Trajectory_and_TimeSeries_times, __pyx_k_Trajectory_and_TimeSeries_times, sizeof(__pyx_k_Trajectory_and_TimeSeries_times), 0, 0, 1, 0},
   {&__pyx_n_s_Universe, __pyx_k_Universe, sizeof(__pyx_k_Universe), 0, 0, 1, 1},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
-  {&__pyx_kp_s_Write_atoms_per_probe_volume_dat, __pyx_k_Write_atoms_per_probe_volume_dat, sizeof(__pyx_k_Write_atoms_per_probe_volume_dat), 0, 0, 1, 0},
+  {&__pyx_kp_s_Write_per_atom_deviations_data_t, __pyx_k_Write_per_atom_deviations_data_t, sizeof(__pyx_k_Write_per_atom_deviations_data_t), 0, 0, 1, 0},
   {&__pyx_n_s_Writer, __pyx_k_Writer, sizeof(__pyx_k_Writer), 0, 0, 1, 1},
   {&__pyx_kp_s_Writing_PDB, __pyx_k_Writing_PDB, sizeof(__pyx_k_Writing_PDB), 0, 0, 1, 0},
   {&__pyx_n_s__14, __pyx_k__14, sizeof(__pyx_k__14), 0, 0, 1, 1},
@@ -13844,14 +13844,14 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  *         self.out_args.add_argument("--genpdb",             # <<<<<<<<<<<<<<
  *                                    action="store_true",
- *                                    help="Write atoms per probe volume data to pdb file")
+ *                                    help="Write per-atom deviations data to pdb file")
  */
   __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_genpdb); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
   /* "INDUSAnalysis/protein_order_params.pyx":46
- *                                    help="Write atoms per probe volume data to pdb file")
+ *                                    help="Write per-atom deviations data to pdb file")
  * 
  *         self.misc_args.add_argument("--verbose",             # <<<<<<<<<<<<<<
  *                                     action="store_true",

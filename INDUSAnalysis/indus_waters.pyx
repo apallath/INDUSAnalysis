@@ -190,16 +190,6 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
         else:
             plt.close()
 
-    def write_mean_std_waters(self, mu, ts_Ntw):
-        """Appends mean and std waters to text file."""
-        meanstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.mean())
-        with open(self.obspref + "_mean.txt", 'a+') as meanf:
-            meanf.write(meanstr)
-
-        stdstr = "{:.2f} {:.2f}\n".format(mu, ts_Ntw.std())
-        with open(self.obspref + "_std.txt", 'a+') as stdf:
-            stdf.write(stdstr)
-
     def write_probe_waters_pdb(self, u, skip, ts_probe_waters):
         """
         Writes instantaneous probe waters to PDB file.
@@ -263,7 +253,3 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
         # Write waters in individual probe volumes to PDB
         if self.genpdb:
             self.write_probe_waters_pdb(self.u, self.skip, ts_probe_waters)
-
-        """Observables"""
-        # Write mean and std of waters to text files
-        self.write_mean_std_waters(mu, ts_Ntw[self.obsstart:self.obsend])
