@@ -19,12 +19,41 @@ cimport numpy as np
 
 
 class TimeSeries:
-    """Stores N-dimensional time series data.
+    """Stores N-dimensional time series data, accessible and sliceable by time.
 
     Attributes:
         times (ndarray): 1-dimensional array of length N.
         data (ndarray): D-dimensional array of shape (N, ...).
         labels (list): List of strings describing what each dimension represents.
+
+    Examples:
+        >>> ts = TimeSeries([0, 100, 200], [10, 20, 10], ["Sample data"])
+        >>> ts
+        <TimeSeries object, ['Sample data'] with shape (3,), 3 time frames>
+        >>> len(ts)
+        3
+        >>> ts.time_array
+        array([  0, 100, 200])
+        >>> ts.data_array
+        array([10, 20, 10])
+        >>> ts.labels
+        ['Sample data']
+        >>> ts[100:]
+        <TimeSeries object, ['Sample data'] with shape (2,), 2 time frames>
+        >>> ts[100:].time_array
+        array([100, 200])
+        >>> ts[100:150]
+        <TimeSeries object, ['Sample data'] with shape (1,), 1 time frames>
+        >>> ts[100:150].time_array
+        array([100])
+        >>> ts[::2].time_array
+        array([  0, 200])
+        >>> ts.time_array = [0, 100, 200, 300, 400, 500]
+        >>> ts.time_array
+        array([  0, 100, 200, 300, 400, 500])
+        >>> ts.data_array = [10, 20, 20, 20, 10, 10]
+        >>> ts
+        <TimeSeries object, ['Sample data'] with shape (6,), 6 time frames>
     """
 
     def __init__(self, times, data, labels):
@@ -35,8 +64,8 @@ class TimeSeries:
             ValueError if time and data lengths do not match, or if length of
             labels does not equal number of dimensions of data.
         """
-        self._t = times
-        self._x = data
+        self._t = np.array(times)
+        self._x = np.array(data)
         if self._t.shape[0] != self._x.shape[0]:
             raise ValueError("Time and data do not match along axis 0")
 
@@ -84,7 +113,7 @@ class TimeSeries:
 
     @time_array.setter
     def time_array(self, t):
-        self._t = t
+        self._t = np.array(t)
 
     @property
     def data_array(self):
@@ -94,7 +123,7 @@ class TimeSeries:
     def data_array(self, x):
         if x.shape[0] != len(self._t):
             raise ValueError("Time and data do not match along axis 0.")
-        self._x = x
+        self._x = np.array(x)
 
     @property
     def labels(self):
@@ -180,13 +209,13 @@ class TimeSeries:
 
     # TODO: Implement
     @profiling.timefunc
-    def sem(self, axis=0):
+    def sem(self, axis=None):
         """
         Computes standard error of mean (estimate of the standard deviation
         of the distribution of the mean) using block bootstrapping.
 
         Args:
-            axis (int)
+            axis (int): Optional
         """
         pass
 

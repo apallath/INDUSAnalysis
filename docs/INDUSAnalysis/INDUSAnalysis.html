@@ -387,12 +387,6 @@ mu (np.float): Value of mu.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.write_mean_std_waters">
-<code class="sig-name descname">write_mean_std_waters</code><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.write_mean_std_waters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Appends mean and std waters to text file.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb">
 <code class="sig-name descname">write_probe_waters_pdb</code><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes instantaneous probe waters to PDB file.</p>
@@ -681,6 +675,36 @@ to use for alignment before calculating RMSD.</p></li>
 </dl>
 </dd></dl>
 
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">TimeSeries</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Sample data&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span>
+<span class="go">&lt;TimeSeries object, [&#39;Sample data&#39;] with shape (3,), 3 time frames&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">time_array</span>
+<span class="go">array([  0, 100, 200])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">data_array</span>
+<span class="go">array([10, 20, 10])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">labels</span>
+<span class="go">[&#39;Sample data&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">[</span><span class="mi">100</span><span class="p">:]</span>
+<span class="go">&lt;TimeSeries object, [&#39;Sample data&#39;] with shape (2,), 2 time frames&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">[</span><span class="mi">100</span><span class="p">:]</span><span class="o">.</span><span class="n">time_array</span>
+<span class="go">array([100, 200])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">150</span><span class="p">]</span>
+<span class="go">&lt;TimeSeries object, [&#39;Sample data&#39;] with shape (1,), 1 time frames&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">150</span><span class="p">]</span><span class="o">.</span><span class="n">time_array</span>
+<span class="go">array([100])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">time_array</span>
+<span class="go">array([  0, 200])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">time_array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">time_array</span>
+<span class="go">array([  0, 100, 200, 300, 400, 500])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">data_array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span>
+<span class="go">&lt;TimeSeries object, [&#39;Sample data&#39;] with shape (6,), 6 time frames&gt;</span>
+</pre></div>
+</div>
 <dl class="attribute">
 <dt id="INDUSAnalysis.timeseries.TimeSeries.cumulative_moving_average">
 <code class="sig-name descname">cumulative_moving_average</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.cumulative_moving_average" title="Permalink to this definition">¶</a></dt>

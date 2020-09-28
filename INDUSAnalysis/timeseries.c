@@ -1169,83 +1169,6 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
     PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
     const char* function_name);
 
-/* PyObjectSetAttrStr.proto */
-#if CYTHON_USE_TYPE_SLOTS
-#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
-#else
-#define __Pyx_PyObject_DelAttrStr(o,n)   PyObject_DelAttr(o,n)
-#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
-#endif
-
-/* GetItemInt.proto */
-#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
-    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
-               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
-#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
-                                                     int is_list, int wraparound, int boundscheck);
-
-/* PyObjectCall.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
-#else
-#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
-#endif
-
-/* PyThreadStateGet.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
-#define __Pyx_PyThreadState_assign  __pyx_tstate = __Pyx_PyThreadState_Current;
-#define __Pyx_PyErr_Occurred()  __pyx_tstate->curexc_type
-#else
-#define __Pyx_PyThreadState_declare
-#define __Pyx_PyThreadState_assign
-#define __Pyx_PyErr_Occurred()  PyErr_Occurred()
-#endif
-
-/* PyErrFetchRestore.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_PyErr_Clear() __Pyx_ErrRestore(NULL, NULL, NULL)
-#define __Pyx_ErrRestoreWithState(type, value, tb)  __Pyx_ErrRestoreInState(PyThreadState_GET(), type, value, tb)
-#define __Pyx_ErrFetchWithState(type, value, tb)    __Pyx_ErrFetchInState(PyThreadState_GET(), type, value, tb)
-#define __Pyx_ErrRestore(type, value, tb)  __Pyx_ErrRestoreInState(__pyx_tstate, type, value, tb)
-#define __Pyx_ErrFetch(type, value, tb)    __Pyx_ErrFetchInState(__pyx_tstate, type, value, tb)
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#if CYTHON_COMPILING_IN_CPYTHON
-#define __Pyx_PyErr_SetNone(exc) (Py_INCREF(exc), __Pyx_ErrRestore((exc), NULL, NULL))
-#else
-#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
-#endif
-#else
-#define __Pyx_PyErr_Clear() PyErr_Clear()
-#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
-#define __Pyx_ErrRestoreWithState(type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetchWithState(type, value, tb)  PyErr_Fetch(type, value, tb)
-#define __Pyx_ErrRestoreInState(tstate, type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetchInState(tstate, type, value, tb)  PyErr_Fetch(type, value, tb)
-#define __Pyx_ErrRestore(type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
-#endif
-
-/* RaiseException.proto */
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
-
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1323,6 +1246,13 @@ static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, 
     (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
 #endif
 
+/* PyObjectCall.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
+#else
+#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
+#endif
+
 /* PyObjectCall2Args.proto */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
 
@@ -1333,6 +1263,76 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject
 
 /* PyObjectCallOneArg.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
+
+/* PyObjectSetAttrStr.proto */
+#if CYTHON_USE_TYPE_SLOTS
+#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
+#else
+#define __Pyx_PyObject_DelAttrStr(o,n)   PyObject_DelAttr(o,n)
+#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
+#endif
+
+/* GetItemInt.proto */
+#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
+    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
+               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
+#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
+                                                     int is_list, int wraparound, int boundscheck);
+
+/* PyThreadStateGet.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
+#define __Pyx_PyThreadState_assign  __pyx_tstate = __Pyx_PyThreadState_Current;
+#define __Pyx_PyErr_Occurred()  __pyx_tstate->curexc_type
+#else
+#define __Pyx_PyThreadState_declare
+#define __Pyx_PyThreadState_assign
+#define __Pyx_PyErr_Occurred()  PyErr_Occurred()
+#endif
+
+/* PyErrFetchRestore.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyErr_Clear() __Pyx_ErrRestore(NULL, NULL, NULL)
+#define __Pyx_ErrRestoreWithState(type, value, tb)  __Pyx_ErrRestoreInState(PyThreadState_GET(), type, value, tb)
+#define __Pyx_ErrFetchWithState(type, value, tb)    __Pyx_ErrFetchInState(PyThreadState_GET(), type, value, tb)
+#define __Pyx_ErrRestore(type, value, tb)  __Pyx_ErrRestoreInState(__pyx_tstate, type, value, tb)
+#define __Pyx_ErrFetch(type, value, tb)    __Pyx_ErrFetchInState(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#if CYTHON_COMPILING_IN_CPYTHON
+#define __Pyx_PyErr_SetNone(exc) (Py_INCREF(exc), __Pyx_ErrRestore((exc), NULL, NULL))
+#else
+#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
+#endif
+#else
+#define __Pyx_PyErr_Clear() PyErr_Clear()
+#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
+#define __Pyx_ErrRestoreWithState(type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetchWithState(type, value, tb)  PyErr_Fetch(type, value, tb)
+#define __Pyx_ErrRestoreInState(tstate, type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetchInState(tstate, type, value, tb)  PyErr_Fetch(type, value, tb)
+#define __Pyx_ErrRestore(type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
+#endif
+
+/* RaiseException.proto */
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
 /* ObjectGetItem.proto */
 #if CYTHON_USE_TYPE_SLOTS
@@ -1879,6 +1879,7 @@ static const char __pyx_k_step[] = "step";
 static const char __pyx_k_stop[] = "stop";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_type[] = "type";
+static const char __pyx_k_array[] = "array";
 static const char __pyx_k_axval[] = "axval";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_dpi_2[] = "dpi";
@@ -2033,7 +2034,7 @@ static const char __pyx_k_Non_native_byte_order_not_suppor[] = "Non-native byte 
 static const char __pyx_k_Output_image_and_data_prefix_Def[] = "Output image and data prefix [Default = indus]";
 static const char __pyx_k_Prefix_of_text_file_to_append_co[] = "Prefix of text file to append computed observables to";
 static const char __pyx_k_Run_with_text_only_backend_on_re[] = "Run with text-only backend on remote cluster";
-static const char __pyx_k_Stores_N_dimensional_time_series[] = "Stores N-dimensional time series data.\n\n    Attributes:\n        times (ndarray): 1-dimensional array of length N.\n        data (ndarray): D-dimensional array of shape (N, ...).\n        labels (list): List of strings describing what each dimension represents.\n    ";
+static const char __pyx_k_Stores_N_dimensional_time_series[] = "Stores N-dimensional time series data, accessible and sliceable by time.\n\n    Attributes:\n        times (ndarray): 1-dimensional array of length N.\n        data (ndarray): D-dimensional array of shape (N, ...).\n        labels (list): List of strings describing what each dimension represents.\n\n    Examples:\n        >>> ts = TimeSeries([0, 100, 200], [10, 20, 10], [\"Sample data\"])\n        >>> ts\n        <TimeSeries object, ['Sample data'] with shape (3,), 3 time frames>\n        >>> len(ts)\n        3\n        >>> ts.time_array\n        array([  0, 100, 200])\n        >>> ts.data_array\n        array([10, 20, 10])\n        >>> ts.labels\n        ['Sample data']\n        >>> ts[100:]\n        <TimeSeries object, ['Sample data'] with shape (2,), 2 time frames>\n        >>> ts[100:].time_array\n        array([100, 200])\n        >>> ts[100:150]\n        <TimeSeries object, ['Sample data'] with shape (1,), 1 time frames>\n        >>> ts[100:150].time_array\n        array([100])\n        >>> ts[::2].time_array\n        array([  0, 200])\n        >>> ts.time_array = [0, 100, 200, 300, 400, 500]\n        >>> ts.time_array\n        array([  0, 100, 200, 300, 400, 500])\n        >>> ts.data_array = [10, 20, 20, 20, 10, 10]\n        >>> ts\n        <TimeSeries object, ['Sample data'] with shape (6,), 6 time frames>\n    ";
 static const char __pyx_k_TimeSeriesAnalysis_load_TimeSeri[] = "TimeSeriesAnalysis.load_TimeSeries";
 static const char __pyx_k_TimeSeriesAnalysis_save_TimeSeri[] = "TimeSeriesAnalysis.save_TimeSeries";
 static const char __pyx_k_TimeSeries_cumulative_moving_ave[] = "TimeSeries.cumulative_moving_average";
@@ -2108,6 +2109,7 @@ static PyObject *__pyx_n_s_add_argument;
 static PyObject *__pyx_n_s_add_argument_group;
 static PyObject *__pyx_n_s_argparse;
 static PyObject *__pyx_n_s_args;
+static PyObject *__pyx_n_s_array;
 static PyObject *__pyx_n_s_aspect;
 static PyObject *__pyx_n_s_auto;
 static PyObject *__pyx_kp_s_averaging_optional_arguments;
@@ -2384,7 +2386,7 @@ static PyObject *__pyx_codeobj__76;
 static PyObject *__pyx_codeobj__78;
 /* Late includes */
 
-/* "INDUSAnalysis/timeseries.pyx":30
+/* "INDUSAnalysis/timeseries.pyx":59
  *     """
  * 
  *     def __init__(self, times, data, labels):             # <<<<<<<<<<<<<<
@@ -2431,23 +2433,23 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_1__init__(Py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_times)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 1); __PYX_ERR(0, 30, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 1); __PYX_ERR(0, 59, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_data)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 2); __PYX_ERR(0, 30, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 2); __PYX_ERR(0, 59, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_labels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 3); __PYX_ERR(0, 30, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, 3); __PYX_ERR(0, 59, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 30, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 59, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -2464,7 +2466,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_1__init__(Py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 30, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 59, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2487,124 +2489,166 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries___init__(CYT
   Py_ssize_t __pyx_t_5;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":38
+  /* "INDUSAnalysis/timeseries.pyx":67
  *             labels does not equal number of dimensions of data.
  *         """
- *         self._t = times             # <<<<<<<<<<<<<<
- *         self._x = data
+ *         self._t = np.array(times)             # <<<<<<<<<<<<<<
+ *         self._x = np.array(data)
  *         if self._t.shape[0] != self._x.shape[0]:
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_t, __pyx_v_times) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_times) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_times);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_t, __pyx_t_1) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":39
+  /* "INDUSAnalysis/timeseries.pyx":68
  *         """
- *         self._t = times
- *         self._x = data             # <<<<<<<<<<<<<<
+ *         self._t = np.array(times)
+ *         self._x = np.array(data)             # <<<<<<<<<<<<<<
  *         if self._t.shape[0] != self._x.shape[0]:
  *             raise ValueError("Time and data do not match along axis 0")
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_x, __pyx_v_data) < 0) __PYX_ERR(0, 39, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_data) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_data);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_x, __pyx_t_1) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":40
- *         self._t = times
- *         self._x = data
+  /* "INDUSAnalysis/timeseries.pyx":69
+ *         self._t = np.array(times)
+ *         self._x = np.array(data)
  *         if self._t.shape[0] != self._x.shape[0]:             # <<<<<<<<<<<<<<
  *             raise ValueError("Time and data do not match along axis 0")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_shape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_2, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_t_2, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (unlikely(__pyx_t_4)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":41
- *         self._x = data
+    /* "INDUSAnalysis/timeseries.pyx":70
+ *         self._x = np.array(data)
  *         if self._t.shape[0] != self._x.shape[0]:
  *             raise ValueError("Time and data do not match along axis 0")             # <<<<<<<<<<<<<<
  * 
  *         self._labels = labels
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 70, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 41, __pyx_L1_error)
+    __PYX_ERR(0, 70, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":40
- *         self._t = times
- *         self._x = data
+    /* "INDUSAnalysis/timeseries.pyx":69
+ *         self._t = np.array(times)
+ *         self._x = np.array(data)
  *         if self._t.shape[0] != self._x.shape[0]:             # <<<<<<<<<<<<<<
  *             raise ValueError("Time and data do not match along axis 0")
  * 
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":43
+  /* "INDUSAnalysis/timeseries.pyx":72
  *             raise ValueError("Time and data do not match along axis 0")
  * 
  *         self._labels = labels             # <<<<<<<<<<<<<<
  *         if len(self._labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_labels_2, __pyx_v_labels) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_labels_2, __pyx_v_labels) < 0) __PYX_ERR(0, 72, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":44
+  /* "INDUSAnalysis/timeseries.pyx":73
  * 
  *         self._labels = labels
  *         if len(self._labels) < self._x.ndim:             # <<<<<<<<<<<<<<
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(self._labels) > self._x.ndim:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = PyObject_Length(__pyx_t_3); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_5 = PyObject_Length(__pyx_t_3); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ndim); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ndim); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_1, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_1, Py_LT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (unlikely(__pyx_t_4)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":45
+    /* "INDUSAnalysis/timeseries.pyx":74
  *         self._labels = labels
  *         if len(self._labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")             # <<<<<<<<<<<<<<
  *         if len(self._labels) > self._x.ndim:
  *             raise ValueError("Too many labels for data dimensions")
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 45, __pyx_L1_error)
+    __PYX_ERR(0, 74, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":44
+    /* "INDUSAnalysis/timeseries.pyx":73
  * 
  *         self._labels = labels
  *         if len(self._labels) < self._x.ndim:             # <<<<<<<<<<<<<<
@@ -2613,45 +2657,45 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries___init__(CYT
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":46
+  /* "INDUSAnalysis/timeseries.pyx":75
  *         if len(self._labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(self._labels) > self._x.ndim:             # <<<<<<<<<<<<<<
  *             raise ValueError("Too many labels for data dimensions")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_5 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ndim); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ndim); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_2, __pyx_t_3, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_2, __pyx_t_3, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_t_4)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":47
+    /* "INDUSAnalysis/timeseries.pyx":76
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(self._labels) > self._x.ndim:
  *             raise ValueError("Too many labels for data dimensions")             # <<<<<<<<<<<<<<
  * 
  *     def __getitem__(self, key):
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 47, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 47, __pyx_L1_error)
+    __PYX_ERR(0, 76, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":46
+    /* "INDUSAnalysis/timeseries.pyx":75
  *         if len(self._labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(self._labels) > self._x.ndim:             # <<<<<<<<<<<<<<
@@ -2660,7 +2704,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries___init__(CYT
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":30
+  /* "INDUSAnalysis/timeseries.pyx":59
  *     """
  * 
  *     def __init__(self, times, data, labels):             # <<<<<<<<<<<<<<
@@ -2683,7 +2727,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries___init__(CYT
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":49
+/* "INDUSAnalysis/timeseries.pyx":78
  *             raise ValueError("Too many labels for data dimensions")
  * 
  *     def __getitem__(self, key):             # <<<<<<<<<<<<<<
@@ -2724,11 +2768,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_3__getitem__
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_key)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__getitem__", 1, 2, 2, 1); __PYX_ERR(0, 49, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__getitem__", 1, 2, 2, 1); __PYX_ERR(0, 78, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__getitem__") < 0)) __PYX_ERR(0, 49, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__getitem__") < 0)) __PYX_ERR(0, 78, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2741,7 +2785,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_3__getitem__
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__getitem__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 49, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__getitem__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 78, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.__getitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2769,7 +2813,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("__getitem__", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":57
+  /* "INDUSAnalysis/timeseries.pyx":86
  *             Sliced and resampled TimeSeries object.
  *         """
  *         if isinstance(key, int):             # <<<<<<<<<<<<<<
@@ -2780,21 +2824,21 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "INDUSAnalysis/timeseries.pyx":58
+    /* "INDUSAnalysis/timeseries.pyx":87
  *         """
  *         if isinstance(key, int):
  *             idx = np.where(self._t == key)             # <<<<<<<<<<<<<<
  *             return TimeSeries(self._t[idx], self._x[idx], labels=self._labels)
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_where); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_where); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = PyObject_RichCompare(__pyx_t_4, __pyx_v_key, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 58, __pyx_L1_error)
+    __pyx_t_6 = PyObject_RichCompare(__pyx_t_4, __pyx_v_key, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -2809,13 +2853,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
     __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_4, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 87, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_idx = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":59
+    /* "INDUSAnalysis/timeseries.pyx":88
  *         if isinstance(key, int):
  *             idx = np.where(self._t == key)
  *             return TimeSeries(self._t[idx], self._x[idx], labels=self._labels)             # <<<<<<<<<<<<<<
@@ -2823,19 +2867,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
  *         if isinstance(key, slice):
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_v_idx); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_v_idx); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_v_idx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_v_idx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_6);
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6);
@@ -2843,13 +2887,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
     PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_4);
     __pyx_t_6 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_labels, __pyx_t_6) < 0) __PYX_ERR(0, 59, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_labels, __pyx_t_6) < 0) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 59, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -2858,7 +2902,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
     __pyx_t_6 = 0;
     goto __pyx_L0;
 
-    /* "INDUSAnalysis/timeseries.pyx":57
+    /* "INDUSAnalysis/timeseries.pyx":86
  *             Sliced and resampled TimeSeries object.
  *         """
  *         if isinstance(key, int):             # <<<<<<<<<<<<<<
@@ -2867,7 +2911,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":61
+  /* "INDUSAnalysis/timeseries.pyx":90
  *             return TimeSeries(self._t[idx], self._x[idx], labels=self._labels)
  * 
  *         if isinstance(key, slice):             # <<<<<<<<<<<<<<
@@ -2878,19 +2922,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (__pyx_t_1) {
 
-    /* "INDUSAnalysis/timeseries.pyx":62
+    /* "INDUSAnalysis/timeseries.pyx":91
  * 
  *         if isinstance(key, slice):
  *             sidx = key.start             # <<<<<<<<<<<<<<
  *             if sidx is not None:
  *                 sidx = np.searchsorted(self._t, key.start, side='left')
  */
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 62, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_v_sidx = __pyx_t_6;
     __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":63
+    /* "INDUSAnalysis/timeseries.pyx":92
  *         if isinstance(key, slice):
  *             sidx = key.start
  *             if sidx is not None:             # <<<<<<<<<<<<<<
@@ -2901,23 +2945,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
     __pyx_t_2 = (__pyx_t_1 != 0);
     if (__pyx_t_2) {
 
-      /* "INDUSAnalysis/timeseries.pyx":64
+      /* "INDUSAnalysis/timeseries.pyx":93
  *             sidx = key.start
  *             if sidx is not None:
  *                 sidx = np.searchsorted(self._t, key.start, side='left')             # <<<<<<<<<<<<<<
  * 
  *             eidx = key.stop
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 64, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 64, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 64, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6);
@@ -2925,10 +2969,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
       PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_5);
       __pyx_t_6 = 0;
       __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_side, __pyx_n_s_left) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 64, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_side, __pyx_n_s_left) < 0) __PYX_ERR(0, 93, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2936,7 +2980,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
       __Pyx_DECREF_SET(__pyx_v_sidx, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "INDUSAnalysis/timeseries.pyx":63
+      /* "INDUSAnalysis/timeseries.pyx":92
  *         if isinstance(key, slice):
  *             sidx = key.start
  *             if sidx is not None:             # <<<<<<<<<<<<<<
@@ -2945,19 +2989,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
  */
     }
 
-    /* "INDUSAnalysis/timeseries.pyx":66
+    /* "INDUSAnalysis/timeseries.pyx":95
  *                 sidx = np.searchsorted(self._t, key.start, side='left')
  * 
  *             eidx = key.stop             # <<<<<<<<<<<<<<
  *             if eidx is not None:
  *                 eidx = np.searchsorted(self._t, key.stop, side='right')
  */
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_stop); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 66, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_stop); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 95, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_v_eidx = __pyx_t_6;
     __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":67
+    /* "INDUSAnalysis/timeseries.pyx":96
  * 
  *             eidx = key.stop
  *             if eidx is not None:             # <<<<<<<<<<<<<<
@@ -2968,23 +3012,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
     __pyx_t_1 = (__pyx_t_2 != 0);
     if (__pyx_t_1) {
 
-      /* "INDUSAnalysis/timeseries.pyx":68
+      /* "INDUSAnalysis/timeseries.pyx":97
  *             eidx = key.stop
  *             if eidx is not None:
  *                 eidx = np.searchsorted(self._t, key.stop, side='right')             # <<<<<<<<<<<<<<
  * 
  *             return TimeSeries(self._t[sidx:eidx:key.step],
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 97, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 97, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_stop); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_stop); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 97, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6);
@@ -2992,10 +3036,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
       PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_3);
       __pyx_t_6 = 0;
       __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 68, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_side, __pyx_n_s_right) < 0) __PYX_ERR(0, 68, __pyx_L1_error)
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 68, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_side, __pyx_n_s_right) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 97, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3003,7 +3047,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
       __Pyx_DECREF_SET(__pyx_v_eidx, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "INDUSAnalysis/timeseries.pyx":67
+      /* "INDUSAnalysis/timeseries.pyx":96
  * 
  *             eidx = key.stop
  *             if eidx is not None:             # <<<<<<<<<<<<<<
@@ -3012,7 +3056,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
  */
     }
 
-    /* "INDUSAnalysis/timeseries.pyx":70
+    /* "INDUSAnalysis/timeseries.pyx":99
  *                 eidx = np.searchsorted(self._t, key.stop, side='right')
  * 
  *             return TimeSeries(self._t[sidx:eidx:key.step],             # <<<<<<<<<<<<<<
@@ -3020,47 +3064,47 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
  * 
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_step); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_step); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PySlice_New(__pyx_v_sidx, __pyx_v_eidx, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_5 = PySlice_New(__pyx_v_sidx, __pyx_v_eidx, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":71
+    /* "INDUSAnalysis/timeseries.pyx":100
  * 
  *             return TimeSeries(self._t[sidx:eidx:key.step],
  *                               self._x[sidx:eidx:key.step], labels=self._labels)             # <<<<<<<<<<<<<<
  * 
  *     def __len__(self):
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_step); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_key, __pyx_n_s_step); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = PySlice_New(__pyx_v_sidx, __pyx_v_eidx, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __pyx_t_7 = PySlice_New(__pyx_v_sidx, __pyx_v_eidx, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":70
+    /* "INDUSAnalysis/timeseries.pyx":99
  *                 eidx = np.searchsorted(self._t, key.stop, side='right')
  * 
  *             return TimeSeries(self._t[sidx:eidx:key.step],             # <<<<<<<<<<<<<<
  *                               self._x[sidx:eidx:key.step], labels=self._labels)
  * 
  */
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4);
@@ -3069,28 +3113,28 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
     __pyx_t_4 = 0;
     __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":71
+    /* "INDUSAnalysis/timeseries.pyx":100
  * 
  *             return TimeSeries(self._t[sidx:eidx:key.step],
  *                               self._x[sidx:eidx:key.step], labels=self._labels)             # <<<<<<<<<<<<<<
  * 
  *     def __len__(self):
  */
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 71, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_labels, __pyx_t_4) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_labels, __pyx_t_4) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":70
+    /* "INDUSAnalysis/timeseries.pyx":99
  *                 eidx = np.searchsorted(self._t, key.stop, side='right')
  * 
  *             return TimeSeries(self._t[sidx:eidx:key.step],             # <<<<<<<<<<<<<<
  *                               self._x[sidx:eidx:key.step], labels=self._labels)
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -3099,7 +3143,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
     __pyx_t_4 = 0;
     goto __pyx_L0;
 
-    /* "INDUSAnalysis/timeseries.pyx":61
+    /* "INDUSAnalysis/timeseries.pyx":90
  *             return TimeSeries(self._t[idx], self._x[idx], labels=self._labels)
  * 
  *         if isinstance(key, slice):             # <<<<<<<<<<<<<<
@@ -3108,7 +3152,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":49
+  /* "INDUSAnalysis/timeseries.pyx":78
  *             raise ValueError("Too many labels for data dimensions")
  * 
  *     def __getitem__(self, key):             # <<<<<<<<<<<<<<
@@ -3136,7 +3180,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_2__getitem__
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":73
+/* "INDUSAnalysis/timeseries.pyx":102
  *                               self._x[sidx:eidx:key.step], labels=self._labels)
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
@@ -3165,7 +3209,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_4__len__(CYT
   Py_ssize_t __pyx_t_2;
   __Pyx_RefNannySetupContext("__len__", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":74
+  /* "INDUSAnalysis/timeseries.pyx":103
  * 
  *     def __len__(self):
  *         return len(self._t)             # <<<<<<<<<<<<<<
@@ -3173,17 +3217,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_4__len__(CYT
  *     def __repr__(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":73
+  /* "INDUSAnalysis/timeseries.pyx":102
  *                               self._x[sidx:eidx:key.step], labels=self._labels)
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
@@ -3202,7 +3246,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_4__len__(CYT
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":76
+/* "INDUSAnalysis/timeseries.pyx":105
  *         return len(self._t)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -3239,7 +3283,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":77
+  /* "INDUSAnalysis/timeseries.pyx":106
  * 
  *     def __repr__(self):
  *         return "<{} object, {} with shape {}, {} time frames>".format(             # <<<<<<<<<<<<<<
@@ -3247,33 +3291,33 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_object_with_shape_time_frames, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_object_with_shape_time_frames, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "INDUSAnalysis/timeseries.pyx":78
+  /* "INDUSAnalysis/timeseries.pyx":107
  *     def __repr__(self):
  *         return "<{} object, {} with shape {}, {} time frames>".format(
  *             self.__class__.__name__, self._labels, self._x.shape, len(self._t))             # <<<<<<<<<<<<<<
  * 
  *     # TODO: Add unit tests for setters
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_class); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_class); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_shape); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_shape); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_7 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_8 = NULL;
   __pyx_t_9 = 0;
@@ -3290,7 +3334,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_4, __pyx_t_3, __pyx_t_6, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3302,7 +3346,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_4, __pyx_t_3, __pyx_t_6, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3312,7 +3356,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
   } else
   #endif
   {
-    __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 77, __pyx_L1_error)
+    __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     if (__pyx_t_8) {
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -3329,7 +3373,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
     __pyx_t_3 = 0;
     __pyx_t_6 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 77, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   }
@@ -3338,7 +3382,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":76
+  /* "INDUSAnalysis/timeseries.pyx":105
  *         return len(self._t)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -3364,7 +3408,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_6__repr__(CY
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":82
+/* "INDUSAnalysis/timeseries.pyx":111
  *     # TODO: Add unit tests for setters
  *     @property
  *     def time_array(self):             # <<<<<<<<<<<<<<
@@ -3392,7 +3436,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_8time_array(
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("time_array", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":83
+  /* "INDUSAnalysis/timeseries.pyx":112
  *     @property
  *     def time_array(self):
  *         return self._t             # <<<<<<<<<<<<<<
@@ -3400,13 +3444,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_8time_array(
  *     @time_array.setter
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":82
+  /* "INDUSAnalysis/timeseries.pyx":111
  *     # TODO: Add unit tests for setters
  *     @property
  *     def time_array(self):             # <<<<<<<<<<<<<<
@@ -3425,11 +3469,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_8time_array(
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":86
+/* "INDUSAnalysis/timeseries.pyx":115
  * 
  *     @time_array.setter
  *     def time_array(self, t):             # <<<<<<<<<<<<<<
- *         self._t = t
+ *         self._t = np.array(t)
  * 
  */
 
@@ -3465,11 +3509,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_11time_array
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_t_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("time_array", 1, 2, 2, 1); __PYX_ERR(0, 86, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("time_array", 1, 2, 2, 1); __PYX_ERR(0, 115, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "time_array") < 0)) __PYX_ERR(0, 86, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "time_array") < 0)) __PYX_ERR(0, 115, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -3482,7 +3526,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_11time_array
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("time_array", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 86, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("time_array", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 115, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.time_array", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3498,22 +3542,46 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_11time_array
 static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_10time_array(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_t) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("time_array", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":87
+  /* "INDUSAnalysis/timeseries.pyx":116
  *     @time_array.setter
  *     def time_array(self, t):
- *         self._t = t             # <<<<<<<<<<<<<<
+ *         self._t = np.array(t)             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_t, __pyx_v_t) < 0) __PYX_ERR(0, 87, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_t) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_t);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_t, __pyx_t_1) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":86
+  /* "INDUSAnalysis/timeseries.pyx":115
  * 
  *     @time_array.setter
  *     def time_array(self, t):             # <<<<<<<<<<<<<<
- *         self._t = t
+ *         self._t = np.array(t)
  * 
  */
 
@@ -3521,6 +3589,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_10time_array
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.time_array", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -3529,7 +3600,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_10time_array
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":90
+/* "INDUSAnalysis/timeseries.pyx":119
  * 
  *     @property
  *     def data_array(self):             # <<<<<<<<<<<<<<
@@ -3557,7 +3628,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_12data_array
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("data_array", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":91
+  /* "INDUSAnalysis/timeseries.pyx":120
  *     @property
  *     def data_array(self):
  *         return self._x             # <<<<<<<<<<<<<<
@@ -3565,13 +3636,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_12data_array
  *     @data_array.setter
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":90
+  /* "INDUSAnalysis/timeseries.pyx":119
  * 
  *     @property
  *     def data_array(self):             # <<<<<<<<<<<<<<
@@ -3590,7 +3661,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_12data_array
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":94
+/* "INDUSAnalysis/timeseries.pyx":123
  * 
  *     @data_array.setter
  *     def data_array(self, x):             # <<<<<<<<<<<<<<
@@ -3630,11 +3701,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_15data_array
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x_2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("data_array", 1, 2, 2, 1); __PYX_ERR(0, 94, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("data_array", 1, 2, 2, 1); __PYX_ERR(0, 123, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "data_array") < 0)) __PYX_ERR(0, 94, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "data_array") < 0)) __PYX_ERR(0, 123, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -3647,7 +3718,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_15data_array
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("data_array", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 94, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("data_array", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 123, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.data_array", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3670,63 +3741,84 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_14data_array
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("data_array", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":95
+  /* "INDUSAnalysis/timeseries.pyx":124
  *     @data_array.setter
  *     def data_array(self, x):
  *         if x.shape[0] != len(self._t):             # <<<<<<<<<<<<<<
  *             raise ValueError("Time and data do not match along axis 0.")
- *         self._x = x
+ *         self._x = np.array(x)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_3 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_NE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (unlikely(__pyx_t_5)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":96
+    /* "INDUSAnalysis/timeseries.pyx":125
  *     def data_array(self, x):
  *         if x.shape[0] != len(self._t):
  *             raise ValueError("Time and data do not match along axis 0.")             # <<<<<<<<<<<<<<
- *         self._x = x
+ *         self._x = np.array(x)
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(0, 96, __pyx_L1_error)
+    __PYX_ERR(0, 125, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":95
+    /* "INDUSAnalysis/timeseries.pyx":124
  *     @data_array.setter
  *     def data_array(self, x):
  *         if x.shape[0] != len(self._t):             # <<<<<<<<<<<<<<
  *             raise ValueError("Time and data do not match along axis 0.")
- *         self._x = x
+ *         self._x = np.array(x)
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":97
+  /* "INDUSAnalysis/timeseries.pyx":126
  *         if x.shape[0] != len(self._t):
  *             raise ValueError("Time and data do not match along axis 0.")
- *         self._x = x             # <<<<<<<<<<<<<<
+ *         self._x = np.array(x)             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_x, __pyx_v_x) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_1);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_x) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_x);
+  __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_x, __pyx_t_4) < 0) __PYX_ERR(0, 126, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":94
+  /* "INDUSAnalysis/timeseries.pyx":123
  * 
  *     @data_array.setter
  *     def data_array(self, x):             # <<<<<<<<<<<<<<
@@ -3749,7 +3841,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_14data_array
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":100
+/* "INDUSAnalysis/timeseries.pyx":129
  * 
  *     @property
  *     def labels(self):             # <<<<<<<<<<<<<<
@@ -3777,7 +3869,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_16labels(CYT
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("labels", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":101
+  /* "INDUSAnalysis/timeseries.pyx":130
  *     @property
  *     def labels(self):
  *         return self._labels             # <<<<<<<<<<<<<<
@@ -3785,13 +3877,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_16labels(CYT
  *     @labels.setter
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":100
+  /* "INDUSAnalysis/timeseries.pyx":129
  * 
  *     @property
  *     def labels(self):             # <<<<<<<<<<<<<<
@@ -3810,7 +3902,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_16labels(CYT
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":104
+/* "INDUSAnalysis/timeseries.pyx":133
  * 
  *     @labels.setter
  *     def labels(self, labels):             # <<<<<<<<<<<<<<
@@ -3850,11 +3942,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_19labels(PyO
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_labels)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("labels", 1, 2, 2, 1); __PYX_ERR(0, 104, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("labels", 1, 2, 2, 1); __PYX_ERR(0, 133, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "labels") < 0)) __PYX_ERR(0, 104, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "labels") < 0)) __PYX_ERR(0, 133, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -3867,7 +3959,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_19labels(PyO
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("labels", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 104, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("labels", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 133, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.labels", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3890,42 +3982,42 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_18labels(CYT
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("labels", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":105
+  /* "INDUSAnalysis/timeseries.pyx":134
  *     @labels.setter
  *     def labels(self, labels):
  *         if len(labels) < self._x.ndim:             # <<<<<<<<<<<<<<
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(labels) > self._x.ndim:
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_labels); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 105, __pyx_L1_error)
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(__pyx_v_labels); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ndim); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_ndim); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_t_4, Py_LT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 134, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (unlikely(__pyx_t_5)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":106
+    /* "INDUSAnalysis/timeseries.pyx":135
  *     def labels(self, labels):
  *         if len(labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")             # <<<<<<<<<<<<<<
  *         if len(labels) > self._x.ndim:
  *             raise ValueError("Too many labels for data dimensions")
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 106, __pyx_L1_error)
+    __PYX_ERR(0, 135, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":105
+    /* "INDUSAnalysis/timeseries.pyx":134
  *     @labels.setter
  *     def labels(self, labels):
  *         if len(labels) < self._x.ndim:             # <<<<<<<<<<<<<<
@@ -3934,42 +4026,42 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_18labels(CYT
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":107
+  /* "INDUSAnalysis/timeseries.pyx":136
  *         if len(labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(labels) > self._x.ndim:             # <<<<<<<<<<<<<<
  *             raise ValueError("Too many labels for data dimensions")
  *         self._labels = labels
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_labels); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 107, __pyx_L1_error)
-  __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(__pyx_v_labels); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (unlikely(__pyx_t_5)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":108
+    /* "INDUSAnalysis/timeseries.pyx":137
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(labels) > self._x.ndim:
  *             raise ValueError("Too many labels for data dimensions")             # <<<<<<<<<<<<<<
  *         self._labels = labels
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 108, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(0, 108, __pyx_L1_error)
+    __PYX_ERR(0, 137, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":107
+    /* "INDUSAnalysis/timeseries.pyx":136
  *         if len(labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(labels) > self._x.ndim:             # <<<<<<<<<<<<<<
@@ -3978,16 +4070,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_18labels(CYT
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":109
+  /* "INDUSAnalysis/timeseries.pyx":138
  *         if len(labels) > self._x.ndim:
  *             raise ValueError("Too many labels for data dimensions")
  *         self._labels = labels             # <<<<<<<<<<<<<<
  * 
  *     def moving_average(self, window):
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_labels_2, __pyx_v_labels) < 0) __PYX_ERR(0, 109, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_labels_2, __pyx_v_labels) < 0) __PYX_ERR(0, 138, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":104
+  /* "INDUSAnalysis/timeseries.pyx":133
  * 
  *     @labels.setter
  *     def labels(self, labels):             # <<<<<<<<<<<<<<
@@ -4010,7 +4102,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_18labels(CYT
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":111
+/* "INDUSAnalysis/timeseries.pyx":140
  *         self._labels = labels
  * 
  *     def moving_average(self, window):             # <<<<<<<<<<<<<<
@@ -4051,11 +4143,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_21moving_ave
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_window)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("moving_average", 1, 2, 2, 1); __PYX_ERR(0, 111, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("moving_average", 1, 2, 2, 1); __PYX_ERR(0, 140, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "moving_average") < 0)) __PYX_ERR(0, 111, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "moving_average") < 0)) __PYX_ERR(0, 140, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4068,7 +4160,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_21moving_ave
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("moving_average", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 111, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("moving_average", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 140, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.moving_average", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4095,39 +4187,39 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("moving_average", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":121
+  /* "INDUSAnalysis/timeseries.pyx":150
  *             ValueError if data is not 1-dimensional.
  *         """
  *         if self._x.ndim != 1:             # <<<<<<<<<<<<<<
  *             raise ValueError("Data is not 1-dimensional")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_t_3)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":122
+    /* "INDUSAnalysis/timeseries.pyx":151
  *         """
  *         if self._x.ndim != 1:
  *             raise ValueError("Data is not 1-dimensional")             # <<<<<<<<<<<<<<
  * 
  *         w = np.repeat(1.0, window) / window
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 151, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 122, __pyx_L1_error)
+    __PYX_ERR(0, 151, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":121
+    /* "INDUSAnalysis/timeseries.pyx":150
  *             ValueError if data is not 1-dimensional.
  *         """
  *         if self._x.ndim != 1:             # <<<<<<<<<<<<<<
@@ -4136,16 +4228,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":124
+  /* "INDUSAnalysis/timeseries.pyx":153
  *             raise ValueError("Data is not 1-dimensional")
  * 
  *         w = np.repeat(1.0, window) / window             # <<<<<<<<<<<<<<
  *         ma = np.convolve(self._x, w, 'valid')
  *         return TimeSeries(self._t[window - 1:], ma, labels=self._labels)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_repeat); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_repeat); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -4163,7 +4255,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_float_1_0, __pyx_v_window};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -4171,13 +4263,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_float_1_0, __pyx_v_window};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -4188,30 +4280,30 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
     __Pyx_INCREF(__pyx_v_window);
     __Pyx_GIVEREF(__pyx_v_window);
     PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_v_window);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_v_window); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_v_window); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_w = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":125
+  /* "INDUSAnalysis/timeseries.pyx":154
  * 
  *         w = np.repeat(1.0, window) / window
  *         ma = np.convolve(self._x, w, 'valid')             # <<<<<<<<<<<<<<
  *         return TimeSeries(self._t[window - 1:], ma, labels=self._labels)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_convolve); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_convolve); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = NULL;
   __pyx_t_5 = 0;
@@ -4228,7 +4320,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[4] = {__pyx_t_2, __pyx_t_1, __pyx_v_w, __pyx_n_s_valid};
-    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4237,14 +4329,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[4] = {__pyx_t_2, __pyx_t_1, __pyx_v_w, __pyx_n_s_valid};
-    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 154, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -4258,7 +4350,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
     __Pyx_GIVEREF(__pyx_n_s_valid);
     PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_5, __pyx_n_s_valid);
     __pyx_t_1 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
@@ -4266,7 +4358,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   __pyx_v_ma = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":126
+  /* "INDUSAnalysis/timeseries.pyx":155
  *         w = np.repeat(1.0, window) / window
  *         ma = np.convolve(self._x, w, 'valid')
  *         return TimeSeries(self._t[window - 1:], ma, labels=self._labels)             # <<<<<<<<<<<<<<
@@ -4274,17 +4366,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
  *     def cumulative_moving_average(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_SubtractObjC(__pyx_v_window, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_SubtractObjC(__pyx_v_window, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_1 = __Pyx_PyObject_GetSlice(__pyx_t_6, 0, 0, &__pyx_t_7, NULL, NULL, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetSlice(__pyx_t_6, 0, 0, &__pyx_t_7, NULL, NULL, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
@@ -4292,13 +4384,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   __Pyx_GIVEREF(__pyx_v_ma);
   PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_v_ma);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_labels, __pyx_t_6) < 0) __PYX_ERR(0, 126, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_labels, __pyx_t_6) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -4307,7 +4399,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   __pyx_t_6 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":111
+  /* "INDUSAnalysis/timeseries.pyx":140
  *         self._labels = labels
  * 
  *     def moving_average(self, window):             # <<<<<<<<<<<<<<
@@ -4332,7 +4424,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_20moving_ave
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":128
+/* "INDUSAnalysis/timeseries.pyx":157
  *         return TimeSeries(self._t[window - 1:], ma, labels=self._labels)
  * 
  *     def cumulative_moving_average(self):             # <<<<<<<<<<<<<<
@@ -4369,39 +4461,39 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
   Py_ssize_t __pyx_t_6;
   __Pyx_RefNannySetupContext("cumulative_moving_average", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":135
+  /* "INDUSAnalysis/timeseries.pyx":164
  *             ValueError if data is not 1-dimensional.
  *         """
  *         if self._x.ndim != 1:             # <<<<<<<<<<<<<<
  *             raise ValueError("Data is not 1-dimensional")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_t_3)) {
 
-    /* "INDUSAnalysis/timeseries.pyx":136
+    /* "INDUSAnalysis/timeseries.pyx":165
  *         """
  *         if self._x.ndim != 1:
  *             raise ValueError("Data is not 1-dimensional")             # <<<<<<<<<<<<<<
  * 
  *         csum = np.cumsum(self._x)
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 136, __pyx_L1_error)
+    __PYX_ERR(0, 165, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":135
+    /* "INDUSAnalysis/timeseries.pyx":164
  *             ValueError if data is not 1-dimensional.
  *         """
  *         if self._x.ndim != 1:             # <<<<<<<<<<<<<<
@@ -4410,19 +4502,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":138
+  /* "INDUSAnalysis/timeseries.pyx":167
  *             raise ValueError("Data is not 1-dimensional")
  * 
  *         csum = np.cumsum(self._x)             # <<<<<<<<<<<<<<
  *         nvals = range(1, len(self) + 1)
  *         cma = csum / nvals
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_cumsum); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_cumsum); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -4437,23 +4529,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_csum = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":139
+  /* "INDUSAnalysis/timeseries.pyx":168
  * 
  *         csum = np.cumsum(self._x)
  *         nvals = range(1, len(self) + 1)             # <<<<<<<<<<<<<<
  *         cma = csum / nvals
  *         return TimeSeries(self._t, cma, labels=self._labels)
  */
-  __pyx_t_6 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 139, __pyx_L1_error)
-  __pyx_t_1 = PyInt_FromSsize_t((__pyx_t_6 + 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_6 = PyObject_Length(__pyx_v_self); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 168, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t((__pyx_t_6 + 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -4461,25 +4553,25 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_nvals = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":140
+  /* "INDUSAnalysis/timeseries.pyx":169
  *         csum = np.cumsum(self._x)
  *         nvals = range(1, len(self) + 1)
  *         cma = csum / nvals             # <<<<<<<<<<<<<<
  *         return TimeSeries(self._t, cma, labels=self._labels)
  * 
  */
-  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_csum, __pyx_v_nvals); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_csum, __pyx_v_nvals); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_cma = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":141
+  /* "INDUSAnalysis/timeseries.pyx":170
  *         nvals = range(1, len(self) + 1)
  *         cma = csum / nvals
  *         return TimeSeries(self._t, cma, labels=self._labels)             # <<<<<<<<<<<<<<
@@ -4487,11 +4579,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
  *     def mean(self, axis=None):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
@@ -4499,13 +4591,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
   __Pyx_GIVEREF(__pyx_v_cma);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_cma);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_labels, __pyx_t_5) < 0) __PYX_ERR(0, 141, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_labels, __pyx_t_5) < 0) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4514,7 +4606,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":128
+  /* "INDUSAnalysis/timeseries.pyx":157
  *         return TimeSeries(self._t[window - 1:], ma, labels=self._labels)
  * 
  *     def cumulative_moving_average(self):             # <<<<<<<<<<<<<<
@@ -4539,7 +4631,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_22cumulative
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":143
+/* "INDUSAnalysis/timeseries.pyx":172
  *         return TimeSeries(self._t, cma, labels=self._labels)
  * 
  *     def mean(self, axis=None):             # <<<<<<<<<<<<<<
@@ -4585,7 +4677,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_25mean(PyObj
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mean") < 0)) __PYX_ERR(0, 143, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "mean") < 0)) __PYX_ERR(0, 172, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4601,7 +4693,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_25mean(PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("mean", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 143, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("mean", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 172, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.mean", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4632,7 +4724,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
   PyObject *(*__pyx_t_9)(PyObject *);
   __Pyx_RefNannySetupContext("mean", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":155
+  /* "INDUSAnalysis/timeseries.pyx":184
  *             TimeSeries object if mean is computed along axis > 0.
  *         """
  *         if axis is None or axis == 0:             # <<<<<<<<<<<<<<
@@ -4646,15 +4738,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
     __pyx_t_1 = __pyx_t_3;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_axis, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_axis, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 155, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_1 = __pyx_t_3;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "INDUSAnalysis/timeseries.pyx":156
+    /* "INDUSAnalysis/timeseries.pyx":185
  *         """
  *         if axis is None or axis == 0:
  *             return np.mean(self._x, axis=axis)             # <<<<<<<<<<<<<<
@@ -4662,22 +4754,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
  *             mean = np.mean(self._x, axis=axis)
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_mean); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_mean); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 156, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4686,7 +4778,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
     __pyx_t_7 = 0;
     goto __pyx_L0;
 
-    /* "INDUSAnalysis/timeseries.pyx":155
+    /* "INDUSAnalysis/timeseries.pyx":184
  *             TimeSeries object if mean is computed along axis > 0.
  *         """
  *         if axis is None or axis == 0:             # <<<<<<<<<<<<<<
@@ -4695,7 +4787,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":158
+  /* "INDUSAnalysis/timeseries.pyx":187
  *             return np.mean(self._x, axis=axis)
  *         else:
  *             mean = np.mean(self._x, axis=axis)             # <<<<<<<<<<<<<<
@@ -4703,22 +4795,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
  *             return TimeSeries(self._t, mean, labels=labels)
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_mean); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_mean); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7);
     __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 158, __pyx_L1_error)
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 158, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 187, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4726,26 +4818,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
     __pyx_v_mean = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":159
+    /* "INDUSAnalysis/timeseries.pyx":188
  *         else:
  *             mean = np.mean(self._x, axis=axis)
  *             labels = [x for i, x in enumerate(self._labels) if i != axis]             # <<<<<<<<<<<<<<
  *             return TimeSeries(self._t, mean, labels=labels)
  * 
  */
-    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 188, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_int_0);
     __pyx_t_7 = __pyx_int_0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (likely(PyList_CheckExact(__pyx_t_6)) || PyTuple_CheckExact(__pyx_t_6)) {
       __pyx_t_4 = __pyx_t_6; __Pyx_INCREF(__pyx_t_4); __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
     } else {
-      __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_9 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_9 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 188, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     for (;;) {
@@ -4753,17 +4845,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
         if (likely(PyList_CheckExact(__pyx_t_4))) {
           if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 159, __pyx_L1_error)
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         } else {
           if (__pyx_t_8 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 159, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         }
@@ -4773,7 +4865,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 159, __pyx_L1_error)
+            else __PYX_ERR(0, 188, __pyx_L1_error)
           }
           break;
         }
@@ -4783,16 +4875,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
       __pyx_t_6 = 0;
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_7);
-      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_t_7, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_t_7, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_7);
       __pyx_t_7 = __pyx_t_6;
       __pyx_t_6 = 0;
-      __pyx_t_6 = PyObject_RichCompare(__pyx_v_i, __pyx_v_axis, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 159, __pyx_L1_error)
-      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_6 = PyObject_RichCompare(__pyx_v_i, __pyx_v_axis, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       if (__pyx_t_1) {
-        if (unlikely(__Pyx_ListComp_Append(__pyx_t_5, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 159, __pyx_L1_error)
+        if (unlikely(__Pyx_ListComp_Append(__pyx_t_5, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 188, __pyx_L1_error)
       }
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -4800,7 +4892,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
     __pyx_v_labels = ((PyObject*)__pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":160
+    /* "INDUSAnalysis/timeseries.pyx":189
  *             mean = np.mean(self._x, axis=axis)
  *             labels = [x for i, x in enumerate(self._labels) if i != axis]
  *             return TimeSeries(self._t, mean, labels=labels)             # <<<<<<<<<<<<<<
@@ -4808,11 +4900,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
  *     def std(self, axis=None):
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_7);
@@ -4820,10 +4912,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
     __Pyx_GIVEREF(__pyx_v_mean);
     PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_mean);
     __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_labels, __pyx_v_labels) < 0) __PYX_ERR(0, 160, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 160, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_labels, __pyx_v_labels) < 0) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -4833,7 +4925,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
     goto __pyx_L0;
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":143
+  /* "INDUSAnalysis/timeseries.pyx":172
  *         return TimeSeries(self._t, cma, labels=self._labels)
  * 
  *     def mean(self, axis=None):             # <<<<<<<<<<<<<<
@@ -4859,7 +4951,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_24mean(CYTHO
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":162
+/* "INDUSAnalysis/timeseries.pyx":191
  *             return TimeSeries(self._t, mean, labels=labels)
  * 
  *     def std(self, axis=None):             # <<<<<<<<<<<<<<
@@ -4905,7 +4997,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_27std(PyObje
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "std") < 0)) __PYX_ERR(0, 162, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "std") < 0)) __PYX_ERR(0, 191, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4921,7 +5013,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_27std(PyObje
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("std", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 162, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("std", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 191, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.std", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4952,7 +5044,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
   PyObject *(*__pyx_t_9)(PyObject *);
   __Pyx_RefNannySetupContext("std", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":174
+  /* "INDUSAnalysis/timeseries.pyx":203
  *             TimeSeries object if mean is computed along axis > 0.
  *         """
  *         if axis is None or axis == 0:             # <<<<<<<<<<<<<<
@@ -4966,15 +5058,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
     __pyx_t_1 = __pyx_t_3;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_axis, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_axis, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_1 = __pyx_t_3;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "INDUSAnalysis/timeseries.pyx":175
+    /* "INDUSAnalysis/timeseries.pyx":204
  *         """
  *         if axis is None or axis == 0:
  *             return np.std(self._x, axis=axis)             # <<<<<<<<<<<<<<
@@ -4982,22 +5074,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
  *             std = np.std(self._x, axis=axis)
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_std); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_std); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 175, __pyx_L1_error)
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 204, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -5006,7 +5098,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
     __pyx_t_7 = 0;
     goto __pyx_L0;
 
-    /* "INDUSAnalysis/timeseries.pyx":174
+    /* "INDUSAnalysis/timeseries.pyx":203
  *             TimeSeries object if mean is computed along axis > 0.
  *         """
  *         if axis is None or axis == 0:             # <<<<<<<<<<<<<<
@@ -5015,7 +5107,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":177
+  /* "INDUSAnalysis/timeseries.pyx":206
  *             return np.std(self._x, axis=axis)
  *         else:
  *             std = np.std(self._x, axis=axis)             # <<<<<<<<<<<<<<
@@ -5023,22 +5115,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
  *             return TimeSeries(self._t, std, labels=labels)
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_std); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_std); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7);
     __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 177, __pyx_L1_error)
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_axis, __pyx_v_axis) < 0) __PYX_ERR(0, 206, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -5046,26 +5138,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
     __pyx_v_std = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":178
+    /* "INDUSAnalysis/timeseries.pyx":207
  *         else:
  *             std = np.std(self._x, axis=axis)
  *             labels = [x for i, x in enumerate(self._labels) if i != axis]             # <<<<<<<<<<<<<<
  *             return TimeSeries(self._t, std, labels=labels)
  * 
  */
-    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_int_0);
     __pyx_t_7 = __pyx_int_0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (likely(PyList_CheckExact(__pyx_t_6)) || PyTuple_CheckExact(__pyx_t_6)) {
       __pyx_t_4 = __pyx_t_6; __Pyx_INCREF(__pyx_t_4); __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
     } else {
-      __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_8 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 207, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_9 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_9 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 207, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     for (;;) {
@@ -5073,17 +5165,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
         if (likely(PyList_CheckExact(__pyx_t_4))) {
           if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 178, __pyx_L1_error)
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         } else {
           if (__pyx_t_8 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 178, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_8); __Pyx_INCREF(__pyx_t_6); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_4, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         }
@@ -5093,7 +5185,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 178, __pyx_L1_error)
+            else __PYX_ERR(0, 207, __pyx_L1_error)
           }
           break;
         }
@@ -5103,16 +5195,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
       __pyx_t_6 = 0;
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_7);
-      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_t_7, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_t_7, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_7);
       __pyx_t_7 = __pyx_t_6;
       __pyx_t_6 = 0;
-      __pyx_t_6 = PyObject_RichCompare(__pyx_v_i, __pyx_v_axis, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 178, __pyx_L1_error)
-      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_6 = PyObject_RichCompare(__pyx_v_i, __pyx_v_axis, Py_NE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       if (__pyx_t_1) {
-        if (unlikely(__Pyx_ListComp_Append(__pyx_t_5, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 178, __pyx_L1_error)
+        if (unlikely(__Pyx_ListComp_Append(__pyx_t_5, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 207, __pyx_L1_error)
       }
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -5120,7 +5212,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
     __pyx_v_labels = ((PyObject*)__pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":179
+    /* "INDUSAnalysis/timeseries.pyx":208
  *             std = np.std(self._x, axis=axis)
  *             labels = [x for i, x in enumerate(self._labels) if i != axis]
  *             return TimeSeries(self._t, std, labels=labels)             # <<<<<<<<<<<<<<
@@ -5128,11 +5220,11 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
  *     # TODO: Implement
  */
     __Pyx_XDECREF(__pyx_r);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_TimeSeries); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_7);
@@ -5140,10 +5232,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
     __Pyx_GIVEREF(__pyx_v_std);
     PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_std);
     __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_labels, __pyx_v_labels) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 179, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_labels, __pyx_v_labels) < 0) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -5153,7 +5245,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
     goto __pyx_L0;
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":162
+  /* "INDUSAnalysis/timeseries.pyx":191
  *             return TimeSeries(self._t, mean, labels=labels)
  * 
  *     def std(self, axis=None):             # <<<<<<<<<<<<<<
@@ -5179,17 +5271,17 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_26std(CYTHON
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":183
+/* "INDUSAnalysis/timeseries.pyx":212
  *     # TODO: Implement
  *     @profiling.timefunc
- *     def sem(self, axis=0):             # <<<<<<<<<<<<<<
+ *     def sem(self, axis=None):             # <<<<<<<<<<<<<<
  *         """
  *         Computes standard error of mean (estimate of the standard deviation
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_29sem(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_13INDUSAnalysis_10timeseries_10TimeSeries_28sem[] = "\n        Computes standard error of mean (estimate of the standard deviation\n        of the distribution of the mean) using block bootstrapping.\n\n        Args:\n            axis (int)\n        ";
+static char __pyx_doc_13INDUSAnalysis_10timeseries_10TimeSeries_28sem[] = "\n        Computes standard error of mean (estimate of the standard deviation\n        of the distribution of the mean) using block bootstrapping.\n\n        Args:\n            axis (int): Optional\n        ";
 static PyMethodDef __pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_29sem = {"sem", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_29sem, METH_VARARGS|METH_KEYWORDS, __pyx_doc_13INDUSAnalysis_10timeseries_10TimeSeries_28sem};
 static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_29sem(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_self = 0;
@@ -5200,7 +5292,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_29sem(PyObje
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_self,&__pyx_n_s_axis,0};
     PyObject* values[2] = {0,0};
-    values[1] = ((PyObject *)((PyObject *)__pyx_int_0));
+    values[1] = ((PyObject *)((PyObject *)Py_None));
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -5225,7 +5317,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_29sem(PyObje
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "sem") < 0)) __PYX_ERR(0, 183, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "sem") < 0)) __PYX_ERR(0, 212, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5241,7 +5333,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_29sem(PyObje
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("sem", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 183, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("sem", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 212, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.sem", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5266,7 +5358,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_28sem(CYTHON
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":193
+/* "INDUSAnalysis/timeseries.pyx":222
  *         pass
  * 
  *     def plot(self, *plotargs, **plotkwargs):             # <<<<<<<<<<<<<<
@@ -5318,7 +5410,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_31plot(PyObj
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t used_pos_args = (pos_args < 1) ? pos_args : 1;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_plotkwargs, values, used_pos_args, "plot") < 0)) __PYX_ERR(0, 193, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_plotkwargs, values, used_pos_args, "plot") < 0)) __PYX_ERR(0, 222, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) < 1) {
       goto __pyx_L5_argtuple_error;
@@ -5329,7 +5421,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_31plot(PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot", 0, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 193, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot", 0, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 222, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_DECREF(__pyx_v_plotargs); __pyx_v_plotargs = 0;
   __Pyx_DECREF(__pyx_v_plotkwargs); __pyx_v_plotkwargs = 0;
@@ -5358,16 +5450,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   PyObject *(*__pyx_t_5)(PyObject *);
   __Pyx_RefNannySetupContext("plot", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":206
+  /* "INDUSAnalysis/timeseries.pyx":235
  *             ValueError if data is not 1-dimensional.
  *         """
  *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
  *         ax.plot(self._t, self._x, *plotargs, **plotkwargs)
  *         ax.set_xlabel("Time")
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -5382,7 +5474,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
@@ -5391,7 +5483,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 206, __pyx_L1_error)
+      __PYX_ERR(0, 235, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -5404,15 +5496,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
     __Pyx_INCREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 206, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 206, __pyx_L1_error)
+    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
@@ -5420,7 +5512,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
     __Pyx_GOTREF(__pyx_t_3);
     index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 206, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 235, __pyx_L1_error)
     __pyx_t_5 = NULL;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     goto __pyx_L4_unpacking_done;
@@ -5428,7 +5520,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 206, __pyx_L1_error)
+    __PYX_ERR(0, 235, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_fig = __pyx_t_3;
@@ -5436,20 +5528,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   __pyx_v_ax = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":207
+  /* "INDUSAnalysis/timeseries.pyx":236
  *         """
  *         fig, ax = plt.subplots()
  *         ax.plot(self._t, self._x, *plotargs, **plotkwargs)             # <<<<<<<<<<<<<<
  *         ax.set_xlabel("Time")
  *         ax.set_ylabel(self._labels[0])
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_plot); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
@@ -5457,23 +5549,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Add(__pyx_t_4, __pyx_v_plotargs); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Add(__pyx_t_4, __pyx_v_plotargs); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_v_plotkwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_v_plotkwargs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":208
+  /* "INDUSAnalysis/timeseries.pyx":237
  *         fig, ax = plt.subplots()
  *         ax.plot(self._t, self._x, *plotargs, **plotkwargs)
  *         ax.set_xlabel("Time")             # <<<<<<<<<<<<<<
  *         ax.set_ylabel(self._labels[0])
  *         return fig
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -5487,23 +5579,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   }
   __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_1, __pyx_n_s_Time) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_n_s_Time);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 208, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 237, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":209
+  /* "INDUSAnalysis/timeseries.pyx":238
  *         ax.plot(self._t, self._x, *plotargs, **plotkwargs)
  *         ax.set_xlabel("Time")
  *         ax.set_ylabel(self._labels[0])             # <<<<<<<<<<<<<<
  *         return fig
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -5519,12 +5611,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":210
+  /* "INDUSAnalysis/timeseries.pyx":239
  *         ax.set_xlabel("Time")
  *         ax.set_ylabel(self._labels[0])
  *         return fig             # <<<<<<<<<<<<<<
@@ -5536,7 +5628,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   __pyx_r = __pyx_v_fig;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":193
+  /* "INDUSAnalysis/timeseries.pyx":222
  *         pass
  * 
  *     def plot(self, *plotargs, **plotkwargs):             # <<<<<<<<<<<<<<
@@ -5560,7 +5652,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_30plot(CYTHO
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":212
+/* "INDUSAnalysis/timeseries.pyx":241
  *         return fig
  * 
  *     def plot_2d_heatmap(self, **imshowkwargs):             # <<<<<<<<<<<<<<
@@ -5599,7 +5691,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_33plot_2d_he
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_imshowkwargs, values, pos_args, "plot_2d_heatmap") < 0)) __PYX_ERR(0, 212, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_imshowkwargs, values, pos_args, "plot_2d_heatmap") < 0)) __PYX_ERR(0, 241, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -5610,7 +5702,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_10TimeSeries_33plot_2d_he
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("plot_2d_heatmap", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 212, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("plot_2d_heatmap", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 241, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_DECREF(__pyx_v_imshowkwargs); __pyx_v_imshowkwargs = 0;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeries.plot_2d_heatmap", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -5646,16 +5738,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   PyObject *(*__pyx_t_7)(PyObject *);
   __Pyx_RefNannySetupContext("plot_2d_heatmap", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":224
+  /* "INDUSAnalysis/timeseries.pyx":253
  *             ValueError if data is not 2-dimensional.
  *         """
  *         fig, ax = plt.subplots()             # <<<<<<<<<<<<<<
  *         im = ax.imshow(self._x, origin='lower', aspect='auto', **imshowkwargs)
  *         cbar = fig.colorbar(im, ax=ax)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_plt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 253, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subplots); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -5670,7 +5762,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
@@ -5679,7 +5771,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 224, __pyx_L1_error)
+      __PYX_ERR(0, 253, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -5692,15 +5784,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
     __Pyx_INCREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 253, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     #endif
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 253, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
@@ -5708,7 +5800,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
     __Pyx_GOTREF(__pyx_t_3);
     index = 1; __pyx_t_2 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 224, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) __PYX_ERR(0, 253, __pyx_L1_error)
     __pyx_t_5 = NULL;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     goto __pyx_L4_unpacking_done;
@@ -5716,7 +5808,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 224, __pyx_L1_error)
+    __PYX_ERR(0, 253, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_fig = __pyx_t_3;
@@ -5724,30 +5816,30 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   __pyx_v_ax = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":225
+  /* "INDUSAnalysis/timeseries.pyx":254
  *         """
  *         fig, ax = plt.subplots()
  *         im = ax.imshow(self._x, origin='lower', aspect='auto', **imshowkwargs)             # <<<<<<<<<<<<<<
  *         cbar = fig.colorbar(im, ax=ax)
  *         cbar.set_label(self._labels[0])
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_imshow); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_imshow); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_origin, __pyx_n_s_lower) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_aspect, __pyx_n_s_auto) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_origin, __pyx_n_s_lower) < 0) __PYX_ERR(0, 254, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_aspect, __pyx_n_s_auto) < 0) __PYX_ERR(0, 254, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_4;
   __pyx_t_4 = 0;
-  if (__Pyx_MergeKeywords(__pyx_t_2, __pyx_v_imshowkwargs) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 225, __pyx_L1_error)
+  if (__Pyx_MergeKeywords(__pyx_t_2, __pyx_v_imshowkwargs) < 0) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -5755,24 +5847,24 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   __pyx_v_im = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":226
+  /* "INDUSAnalysis/timeseries.pyx":255
  *         fig, ax = plt.subplots()
  *         im = ax.imshow(self._x, origin='lower', aspect='auto', **imshowkwargs)
  *         cbar = fig.colorbar(im, ax=ax)             # <<<<<<<<<<<<<<
  *         cbar.set_label(self._labels[0])
  *         ax.set_xlabel(self._labels[1])
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_colorbar); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_colorbar); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_im);
   __Pyx_GIVEREF(__pyx_v_im);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_im);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_ax, __pyx_v_ax) < 0) __PYX_ERR(0, 226, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 226, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_ax, __pyx_v_ax) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5780,18 +5872,18 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   __pyx_v_cbar = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":227
+  /* "INDUSAnalysis/timeseries.pyx":256
  *         im = ax.imshow(self._x, origin='lower', aspect='auto', **imshowkwargs)
  *         cbar = fig.colorbar(im, ax=ax)
  *         cbar.set_label(self._labels[0])             # <<<<<<<<<<<<<<
  *         ax.set_xlabel(self._labels[1])
  *         ax.set_ylabel('Time')
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_cbar, __pyx_n_s_set_label); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_cbar, __pyx_n_s_set_label); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -5807,23 +5899,23 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":228
+  /* "INDUSAnalysis/timeseries.pyx":257
  *         cbar = fig.colorbar(im, ax=ax)
  *         cbar.set_label(self._labels[0])
  *         ax.set_xlabel(self._labels[1])             # <<<<<<<<<<<<<<
  *         ax.set_ylabel('Time')
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_xlabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 228, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_labels_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -5839,19 +5931,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":229
+  /* "INDUSAnalysis/timeseries.pyx":258
  *         cbar.set_label(self._labels[0])
  *         ax.set_xlabel(self._labels[1])
  *         ax.set_ylabel('Time')             # <<<<<<<<<<<<<<
  * 
  *         # Ticks
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_ylabel); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 258, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -5865,19 +5957,19 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_n_s_Time) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_n_s_Time);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":232
+  /* "INDUSAnalysis/timeseries.pyx":261
  * 
  *         # Ticks
  *         ticks = ax.get_yticks().tolist()             # <<<<<<<<<<<<<<
  *         start = self._t[0]
  *         sep = (self._t[-1] - self._t[0]) / (ticks[-2] - ticks[1])
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_get_yticks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_get_yticks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5891,10 +5983,10 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   }
   __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 232, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tolist); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tolist); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -5909,96 +6001,96 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_ticks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":233
+  /* "INDUSAnalysis/timeseries.pyx":262
  *         # Ticks
  *         ticks = ax.get_yticks().tolist()
  *         start = self._t[0]             # <<<<<<<<<<<<<<
  *         sep = (self._t[-1] - self._t[0]) / (ticks[-2] - ticks[1])
  *         newlabels = [(start + sep * axval) for axval in ticks]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_start = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":234
+  /* "INDUSAnalysis/timeseries.pyx":263
  *         ticks = ax.get_yticks().tolist()
  *         start = self._t[0]
  *         sep = (self._t[-1] - self._t[0]) / (ticks[-2] - ticks[1])             # <<<<<<<<<<<<<<
  *         newlabels = [(start + sep * axval) for axval in ticks]
  *         ax.set_yticklabels(newlabels)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_t); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_ticks, -2L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_ticks, -2L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_ticks, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_ticks, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyNumber_Subtract(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Subtract(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_sep = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":235
+  /* "INDUSAnalysis/timeseries.pyx":264
  *         start = self._t[0]
  *         sep = (self._t[-1] - self._t[0]) / (ticks[-2] - ticks[1])
  *         newlabels = [(start + sep * axval) for axval in ticks]             # <<<<<<<<<<<<<<
  *         ax.set_yticklabels(newlabels)
  * 
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (likely(PyList_CheckExact(__pyx_v_ticks)) || PyTuple_CheckExact(__pyx_v_ticks)) {
     __pyx_t_4 = __pyx_v_ticks; __Pyx_INCREF(__pyx_t_4); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_ticks); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_ticks); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __pyx_t_7 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 264, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_7)) {
       if (likely(PyList_CheckExact(__pyx_t_4))) {
         if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_2); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_2); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 264, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_2); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_2); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 264, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -6008,7 +6100,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 235, __pyx_L1_error)
+          else __PYX_ERR(0, 264, __pyx_L1_error)
         }
         break;
       }
@@ -6016,26 +6108,26 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
     }
     __Pyx_XDECREF_SET(__pyx_v_axval, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Multiply(__pyx_v_sep, __pyx_v_axval); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_v_sep, __pyx_v_axval); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Add(__pyx_v_start, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Add(__pyx_v_start, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 235, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_newlabels = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":236
+  /* "INDUSAnalysis/timeseries.pyx":265
  *         sep = (self._t[-1] - self._t[0]) / (ticks[-2] - ticks[1])
  *         newlabels = [(start + sep * axval) for axval in ticks]
  *         ax.set_yticklabels(newlabels)             # <<<<<<<<<<<<<<
  * 
  *         return fig
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_yticklabels); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ax, __pyx_n_s_set_yticklabels); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6049,12 +6141,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_v_newlabels) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_newlabels);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":238
+  /* "INDUSAnalysis/timeseries.pyx":267
  *         ax.set_yticklabels(newlabels)
  * 
  *         return fig             # <<<<<<<<<<<<<<
@@ -6066,7 +6158,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   __pyx_r = __pyx_v_fig;
   goto __pyx_L0;
 
-  /* "INDUSAnalysis/timeseries.pyx":212
+  /* "INDUSAnalysis/timeseries.pyx":241
  *         return fig
  * 
  *     def plot_2d_heatmap(self, **imshowkwargs):             # <<<<<<<<<<<<<<
@@ -6097,7 +6189,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_10TimeSeries_32plot_2d_he
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":248
+/* "INDUSAnalysis/timeseries.pyx":277
  *         args: Command line argument parser.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -6127,16 +6219,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":249
+  /* "INDUSAnalysis/timeseries.pyx":278
  *     """
  *     def __init__(self):
  *         self.parser = argparse.ArgumentParser()             # <<<<<<<<<<<<<<
  * 
  *         # Argument groups
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_argparse); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 249, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_argparse); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ArgumentParser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ArgumentParser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -6151,22 +6243,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_parser, __pyx_t_1) < 0) __PYX_ERR(0, 249, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_parser, __pyx_t_1) < 0) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":252
+  /* "INDUSAnalysis/timeseries.pyx":281
  * 
  *         # Argument groups
  *         self.req_file_args = self.parser.add_argument_group('required filename arguments')             # <<<<<<<<<<<<<<
  *         self.opt_file_args = self.parser.add_argument_group('optional filename arguments')
  *         self.calc_args = self.parser.add_argument_group('calculation arguments')
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -6181,22 +6273,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_required_filename_arguments) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_required_filename_arguments);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args, __pyx_t_1) < 0) __PYX_ERR(0, 252, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_req_file_args, __pyx_t_1) < 0) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":253
+  /* "INDUSAnalysis/timeseries.pyx":282
  *         # Argument groups
  *         self.req_file_args = self.parser.add_argument_group('required filename arguments')
  *         self.opt_file_args = self.parser.add_argument_group('optional filename arguments')             # <<<<<<<<<<<<<<
  *         self.calc_args = self.parser.add_argument_group('calculation arguments')
  *         self.avg_args = self.parser.add_argument_group('averaging optional arguments')
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -6211,22 +6303,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_kp_s_optional_filename_arguments) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_s_optional_filename_arguments);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_opt_file_args, __pyx_t_1) < 0) __PYX_ERR(0, 253, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_opt_file_args, __pyx_t_1) < 0) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":254
+  /* "INDUSAnalysis/timeseries.pyx":283
  *         self.req_file_args = self.parser.add_argument_group('required filename arguments')
  *         self.opt_file_args = self.parser.add_argument_group('optional filename arguments')
  *         self.calc_args = self.parser.add_argument_group('calculation arguments')             # <<<<<<<<<<<<<<
  *         self.avg_args = self.parser.add_argument_group('averaging optional arguments')
  *         self.out_args = self.parser.add_argument_group('output control arguments')
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 283, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -6241,22 +6333,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_calculation_arguments) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_calculation_arguments);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_calc_args, __pyx_t_1) < 0) __PYX_ERR(0, 254, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_calc_args, __pyx_t_1) < 0) __PYX_ERR(0, 283, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":255
+  /* "INDUSAnalysis/timeseries.pyx":284
  *         self.opt_file_args = self.parser.add_argument_group('optional filename arguments')
  *         self.calc_args = self.parser.add_argument_group('calculation arguments')
  *         self.avg_args = self.parser.add_argument_group('averaging optional arguments')             # <<<<<<<<<<<<<<
  *         self.out_args = self.parser.add_argument_group('output control arguments')
  *         self.replot_args = self.parser.add_argument_group('replot control arguments')
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -6271,22 +6363,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_kp_s_averaging_optional_arguments) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_s_averaging_optional_arguments);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_avg_args, __pyx_t_1) < 0) __PYX_ERR(0, 255, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_avg_args, __pyx_t_1) < 0) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":256
+  /* "INDUSAnalysis/timeseries.pyx":285
  *         self.calc_args = self.parser.add_argument_group('calculation arguments')
  *         self.avg_args = self.parser.add_argument_group('averaging optional arguments')
  *         self.out_args = self.parser.add_argument_group('output control arguments')             # <<<<<<<<<<<<<<
  *         self.replot_args = self.parser.add_argument_group('replot control arguments')
  *         self.misc_args = self.parser.add_argument_group('miscellanious arguments')
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -6301,22 +6393,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_output_control_arguments) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_output_control_arguments);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_out_args, __pyx_t_1) < 0) __PYX_ERR(0, 256, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_out_args, __pyx_t_1) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":257
+  /* "INDUSAnalysis/timeseries.pyx":286
  *         self.avg_args = self.parser.add_argument_group('averaging optional arguments')
  *         self.out_args = self.parser.add_argument_group('output control arguments')
  *         self.replot_args = self.parser.add_argument_group('replot control arguments')             # <<<<<<<<<<<<<<
  *         self.misc_args = self.parser.add_argument_group('miscellanious arguments')
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -6331,22 +6423,22 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_kp_s_replot_control_arguments) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_s_replot_control_arguments);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replot_args, __pyx_t_1) < 0) __PYX_ERR(0, 257, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replot_args, __pyx_t_1) < 0) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":258
+  /* "INDUSAnalysis/timeseries.pyx":287
  *         self.out_args = self.parser.add_argument_group('output control arguments')
  *         self.replot_args = self.parser.add_argument_group('replot control arguments')
  *         self.misc_args = self.parser.add_argument_group('miscellanious arguments')             # <<<<<<<<<<<<<<
  * 
  *         # Averaging options
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 258, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -6361,248 +6453,248 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_s_miscellanious_arguments) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_miscellanious_arguments);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_misc_args, __pyx_t_1) < 0) __PYX_ERR(0, 258, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_misc_args, __pyx_t_1) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":261
+  /* "INDUSAnalysis/timeseries.pyx":290
  * 
  *         # Averaging options
  *         self.avg_args.add_argument("-obsstart", help="Time to begin computation of observables at")             # <<<<<<<<<<<<<<
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Time_to_begin_computation_of_obs) < 0) __PYX_ERR(0, 261, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 261, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Time_to_begin_computation_of_obs) < 0) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":262
+  /* "INDUSAnalysis/timeseries.pyx":291
  *         # Averaging options
  *         self.avg_args.add_argument("-obsstart", help="Time to begin computation of observables at")
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")             # <<<<<<<<<<<<<<
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")
  *         self.avg_args.add_argument("-window", help="Window size (number of points) for moving average")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Time_to_end_computation_of_obser) < 0) __PYX_ERR(0, 262, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__7, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Time_to_end_computation_of_obser) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__7, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":263
+  /* "INDUSAnalysis/timeseries.pyx":292
  *         self.avg_args.add_argument("-obsstart", help="Time to begin computation of observables at")
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")             # <<<<<<<<<<<<<<
  *         self.avg_args.add_argument("-window", help="Window size (number of points) for moving average")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Prefix_of_text_file_to_append_co) < 0) __PYX_ERR(0, 263, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__8, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Prefix_of_text_file_to_append_co) < 0) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__8, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":264
+  /* "INDUSAnalysis/timeseries.pyx":293
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")
  *         self.avg_args.add_argument("-window", help="Window size (number of points) for moving average")             # <<<<<<<<<<<<<<
  * 
  *         # Plotting options
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_avg_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Window_size_number_of_points_for) < 0) __PYX_ERR(0, 264, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_Window_size_number_of_points_for) < 0) __PYX_ERR(0, 293, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":267
+  /* "INDUSAnalysis/timeseries.pyx":296
  * 
  *         # Plotting options
  *         self.out_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")             # <<<<<<<<<<<<<<
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Output_image_and_data_prefix_Def) < 0) __PYX_ERR(0, 267, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__10, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Output_image_and_data_prefix_Def) < 0) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__10, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":268
+  /* "INDUSAnalysis/timeseries.pyx":297
  *         # Plotting options
  *         self.out_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")             # <<<<<<<<<<<<<<
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
  *         self.out_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Output_image_format_Default_png) < 0) __PYX_ERR(0, 268, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__11, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Output_image_format_Default_png) < 0) __PYX_ERR(0, 297, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__11, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":269
+  /* "INDUSAnalysis/timeseries.pyx":298
  *         self.out_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")             # <<<<<<<<<<<<<<
  *         self.out_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_type, ((PyObject *)(&PyInt_Type))) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_DPI_of_output_image_s_Default_15) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__12, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_type, ((PyObject *)(&PyInt_Type))) < 0) __PYX_ERR(0, 298, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_DPI_of_output_image_s_Default_15) < 0) __PYX_ERR(0, 298, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__12, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":270
+  /* "INDUSAnalysis/timeseries.pyx":299
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
  *         self.out_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")             # <<<<<<<<<<<<<<
  * 
  *         # Replot options
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_out_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 270, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Show_interactive_plot_s) < 0) __PYX_ERR(0, 270, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 299, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Show_interactive_plot_s) < 0) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":273
+  /* "INDUSAnalysis/timeseries.pyx":302
  * 
  *         # Replot options
  *         self.replot_args.add_argument("--replot", action="store_true", help="Replot from saved data")             # <<<<<<<<<<<<<<
  *         self.replot_args.add_argument("-replotpref", help="[replot] Prefix (REPLOTPREF[.npy]) of .npy file to replot from [Default = indus]")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 273, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Replot_from_saved_data) < 0) __PYX_ERR(0, 273, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__14, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 302, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_help, __pyx_kp_s_Replot_from_saved_data) < 0) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__14, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":274
+  /* "INDUSAnalysis/timeseries.pyx":303
  *         # Replot options
  *         self.replot_args.add_argument("--replot", action="store_true", help="Replot from saved data")
  *         self.replot_args.add_argument("-replotpref", help="[replot] Prefix (REPLOTPREF[.npy]) of .npy file to replot from [Default = indus]")             # <<<<<<<<<<<<<<
  * 
  *         # Miscellanious options
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replot_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_replot_Prefix_REPLOTPREF_npy_of) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__15, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 274, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_help, __pyx_kp_s_replot_Prefix_REPLOTPREF_npy_of) < 0) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__15, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":277
+  /* "INDUSAnalysis/timeseries.pyx":306
  * 
  *         # Miscellanious options
  *         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")             # <<<<<<<<<<<<<<
  * 
  *     def parse_args(self, args=None):
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_misc_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_misc_args); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 306, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_add_argument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 306, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 277, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Run_with_text_only_backend_on_re) < 0) __PYX_ERR(0, 277, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__16, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_action, __pyx_n_s_store_true) < 0) __PYX_ERR(0, 306, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_help, __pyx_kp_s_Run_with_text_only_backend_on_re) < 0) __PYX_ERR(0, 306, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__16, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 306, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":248
+  /* "INDUSAnalysis/timeseries.pyx":277
  *         args: Command line argument parser.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -6625,7 +6717,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis___in
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":279
+/* "INDUSAnalysis/timeseries.pyx":308
  *         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")
  * 
  *     def parse_args(self, args=None):             # <<<<<<<<<<<<<<
@@ -6671,7 +6763,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_3par
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "parse_args") < 0)) __PYX_ERR(0, 279, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "parse_args") < 0)) __PYX_ERR(0, 308, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -6687,7 +6779,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_3par
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("parse_args", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 279, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("parse_args", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 308, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeriesAnalysis.parse_args", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6710,7 +6802,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_2par
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("parse_args", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":286
+  /* "INDUSAnalysis/timeseries.pyx":315
  *             args (list): Arguments to parse, optional.
  *         """
  *         if args is None:             # <<<<<<<<<<<<<<
@@ -6721,16 +6813,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_2par
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "INDUSAnalysis/timeseries.pyx":287
+    /* "INDUSAnalysis/timeseries.pyx":316
  *         """
  *         if args is None:
  *             self.args = self.parser.parse_args()             # <<<<<<<<<<<<<<
  *         else:
  *             self.args = self.parser.parse_args(args)
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 316, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_parse_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_parse_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 316, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = NULL;
@@ -6745,13 +6837,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_2par
     }
     __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 287, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 316, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_args, __pyx_t_3) < 0) __PYX_ERR(0, 287, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_args, __pyx_t_3) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":286
+    /* "INDUSAnalysis/timeseries.pyx":315
  *             args (list): Arguments to parse, optional.
  *         """
  *         if args is None:             # <<<<<<<<<<<<<<
@@ -6761,7 +6853,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_2par
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":289
+  /* "INDUSAnalysis/timeseries.pyx":318
  *             self.args = self.parser.parse_args()
  *         else:
  *             self.args = self.parser.parse_args(args)             # <<<<<<<<<<<<<<
@@ -6769,9 +6861,9 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_2par
  *     def read_args(self):
  */
   /*else*/ {
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 289, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_parser); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 318, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_parse_args); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 289, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_parse_args); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 318, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -6786,15 +6878,15 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_2par
     }
     __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_v_args) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_args);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_args, __pyx_t_3) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_args, __pyx_t_3) < 0) __PYX_ERR(0, 318, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/timeseries.pyx":279
+  /* "INDUSAnalysis/timeseries.pyx":308
  *         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")
  * 
  *     def parse_args(self, args=None):             # <<<<<<<<<<<<<<
@@ -6817,7 +6909,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_2par
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":291
+/* "INDUSAnalysis/timeseries.pyx":320
  *             self.args = self.parser.parse_args(args)
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
@@ -6851,48 +6943,48 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("read_args", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":295
+  /* "INDUSAnalysis/timeseries.pyx":324
  *         Stores arguments from TimeSeries `args` parameter in class variables.
  *         """
  *         self.obsstart = self.args.obsstart             # <<<<<<<<<<<<<<
  *         if self.obsstart is not None:
  *             self.obsstart = np.float(self.obsstart)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 324, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_obsstart_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_obsstart_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2, __pyx_t_2) < 0) __PYX_ERR(0, 295, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2, __pyx_t_2) < 0) __PYX_ERR(0, 324, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":296
+  /* "INDUSAnalysis/timeseries.pyx":325
  *         """
  *         self.obsstart = self.args.obsstart
  *         if self.obsstart is not None:             # <<<<<<<<<<<<<<
  *             self.obsstart = np.float(self.obsstart)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = (__pyx_t_2 != Py_None);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = (__pyx_t_3 != 0);
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/timeseries.pyx":297
+    /* "INDUSAnalysis/timeseries.pyx":326
  *         self.obsstart = self.args.obsstart
  *         if self.obsstart is not None:
  *             self.obsstart = np.float(self.obsstart)             # <<<<<<<<<<<<<<
  * 
  *         self.obsend = self.args.obsend
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_float); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 297, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_float); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 326, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -6907,13 +6999,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
     __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 297, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 326, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2, __pyx_t_2) < 0) __PYX_ERR(0, 297, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsstart_2, __pyx_t_2) < 0) __PYX_ERR(0, 326, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":296
+    /* "INDUSAnalysis/timeseries.pyx":325
  *         """
  *         self.obsstart = self.args.obsstart
  *         if self.obsstart is not None:             # <<<<<<<<<<<<<<
@@ -6922,48 +7014,48 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":299
+  /* "INDUSAnalysis/timeseries.pyx":328
  *             self.obsstart = np.float(self.obsstart)
  * 
  *         self.obsend = self.args.obsend             # <<<<<<<<<<<<<<
  *         if self.obsend is not None:
  *             self.obsend = np.float(self.obsend)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_obsend_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_obsend_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2, __pyx_t_5) < 0) __PYX_ERR(0, 299, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2, __pyx_t_5) < 0) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":300
+  /* "INDUSAnalysis/timeseries.pyx":329
  * 
  *         self.obsend = self.args.obsend
  *         if self.obsend is not None:             # <<<<<<<<<<<<<<
  *             self.obsend = np.float(self.obsend)
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 329, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_4 = (__pyx_t_5 != Py_None);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_3 = (__pyx_t_4 != 0);
   if (__pyx_t_3) {
 
-    /* "INDUSAnalysis/timeseries.pyx":301
+    /* "INDUSAnalysis/timeseries.pyx":330
  *         self.obsend = self.args.obsend
  *         if self.obsend is not None:
  *             self.obsend = np.float(self.obsend)             # <<<<<<<<<<<<<<
  * 
  *         self.obspref = self.args.obspref
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 330, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -6978,13 +7070,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
     __pyx_t_5 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 301, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 330, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2, __pyx_t_5) < 0) __PYX_ERR(0, 301, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obsend_2, __pyx_t_5) < 0) __PYX_ERR(0, 330, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":300
+    /* "INDUSAnalysis/timeseries.pyx":329
  * 
  *         self.obsend = self.args.obsend
  *         if self.obsend is not None:             # <<<<<<<<<<<<<<
@@ -6993,63 +7085,63 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":303
+  /* "INDUSAnalysis/timeseries.pyx":332
  *             self.obsend = np.float(self.obsend)
  * 
  *         self.obspref = self.args.obspref             # <<<<<<<<<<<<<<
  * 
  *         self.window = self.args.window
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 332, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_obspref_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_obspref_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obspref_2, __pyx_t_1) < 0) __PYX_ERR(0, 303, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_obspref_2, __pyx_t_1) < 0) __PYX_ERR(0, 332, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":305
+  /* "INDUSAnalysis/timeseries.pyx":334
  *         self.obspref = self.args.obspref
  * 
  *         self.window = self.args.window             # <<<<<<<<<<<<<<
  *         if self.window is not None:
  *             self.window = np.int(self.window)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_window); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_window); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_window, __pyx_t_5) < 0) __PYX_ERR(0, 305, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_window, __pyx_t_5) < 0) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":306
+  /* "INDUSAnalysis/timeseries.pyx":335
  * 
  *         self.window = self.args.window
  *         if self.window is not None:             # <<<<<<<<<<<<<<
  *             self.window = np.int(self.window)
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 306, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 335, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_3 = (__pyx_t_5 != Py_None);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_4 = (__pyx_t_3 != 0);
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/timeseries.pyx":307
+    /* "INDUSAnalysis/timeseries.pyx":336
  *         self.window = self.args.window
  *         if self.window is not None:
  *             self.window = np.int(self.window)             # <<<<<<<<<<<<<<
  * 
  *         self.opref = self.args.opref
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 307, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_int); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_window); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -7064,13 +7156,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
     __pyx_t_5 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 307, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_window, __pyx_t_5) < 0) __PYX_ERR(0, 307, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_window, __pyx_t_5) < 0) __PYX_ERR(0, 336, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":306
+    /* "INDUSAnalysis/timeseries.pyx":335
  * 
  *         self.window = self.args.window
  *         if self.window is not None:             # <<<<<<<<<<<<<<
@@ -7079,45 +7171,45 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":309
+  /* "INDUSAnalysis/timeseries.pyx":338
  *             self.window = np.int(self.window)
  * 
  *         self.opref = self.args.opref             # <<<<<<<<<<<<<<
  *         if self.opref is None:
  *             self.opref = "indus"
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_opref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_opref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_opref_2, __pyx_t_2) < 0) __PYX_ERR(0, 309, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_opref_2, __pyx_t_2) < 0) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":310
+  /* "INDUSAnalysis/timeseries.pyx":339
  * 
  *         self.opref = self.args.opref
  *         if self.opref is None:             # <<<<<<<<<<<<<<
  *             self.opref = "indus"
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 339, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = (__pyx_t_2 == Py_None);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_3 = (__pyx_t_4 != 0);
   if (__pyx_t_3) {
 
-    /* "INDUSAnalysis/timeseries.pyx":311
+    /* "INDUSAnalysis/timeseries.pyx":340
  *         self.opref = self.args.opref
  *         if self.opref is None:
  *             self.opref = "indus"             # <<<<<<<<<<<<<<
  * 
  *         self.oformat = self.args.oformat
  */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_opref_2, __pyx_n_s_indus) < 0) __PYX_ERR(0, 311, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_opref_2, __pyx_n_s_indus) < 0) __PYX_ERR(0, 340, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":310
+    /* "INDUSAnalysis/timeseries.pyx":339
  * 
  *         self.opref = self.args.opref
  *         if self.opref is None:             # <<<<<<<<<<<<<<
@@ -7126,45 +7218,45 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":313
+  /* "INDUSAnalysis/timeseries.pyx":342
  *             self.opref = "indus"
  * 
  *         self.oformat = self.args.oformat             # <<<<<<<<<<<<<<
  *         if self.oformat is None:
  *             self.oformat = "png"
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_oformat_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_oformat_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2, __pyx_t_5) < 0) __PYX_ERR(0, 313, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2, __pyx_t_5) < 0) __PYX_ERR(0, 342, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":314
+  /* "INDUSAnalysis/timeseries.pyx":343
  * 
  *         self.oformat = self.args.oformat
  *         if self.oformat is None:             # <<<<<<<<<<<<<<
  *             self.oformat = "png"
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_3 = (__pyx_t_5 == Py_None);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_4 = (__pyx_t_3 != 0);
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/timeseries.pyx":315
+    /* "INDUSAnalysis/timeseries.pyx":344
  *         self.oformat = self.args.oformat
  *         if self.oformat is None:
  *             self.oformat = "png"             # <<<<<<<<<<<<<<
  * 
  *         self.dpi = self.args.dpi
  */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2, __pyx_n_s_png) < 0) __PYX_ERR(0, 315, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2, __pyx_n_s_png) < 0) __PYX_ERR(0, 344, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":314
+    /* "INDUSAnalysis/timeseries.pyx":343
  * 
  *         self.oformat = self.args.oformat
  *         if self.oformat is None:             # <<<<<<<<<<<<<<
@@ -7173,51 +7265,51 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":317
+  /* "INDUSAnalysis/timeseries.pyx":346
  *             self.oformat = "png"
  * 
  *         self.dpi = self.args.dpi             # <<<<<<<<<<<<<<
  *         if self.dpi is not None:
  *             self.dpi = int(self.dpi)
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 317, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2, __pyx_t_2) < 0) __PYX_ERR(0, 317, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2, __pyx_t_2) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":318
+  /* "INDUSAnalysis/timeseries.pyx":347
  * 
  *         self.dpi = self.args.dpi
  *         if self.dpi is not None:             # <<<<<<<<<<<<<<
  *             self.dpi = int(self.dpi)
  *         else:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 347, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = (__pyx_t_2 != Py_None);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_3 = (__pyx_t_4 != 0);
   if (__pyx_t_3) {
 
-    /* "INDUSAnalysis/timeseries.pyx":319
+    /* "INDUSAnalysis/timeseries.pyx":348
  *         self.dpi = self.args.dpi
  *         if self.dpi is not None:
  *             self.dpi = int(self.dpi)             # <<<<<<<<<<<<<<
  *         else:
  *             self.dpi = 150
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyNumber_Int(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2, __pyx_t_5) < 0) __PYX_ERR(0, 319, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2, __pyx_t_5) < 0) __PYX_ERR(0, 348, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":318
+    /* "INDUSAnalysis/timeseries.pyx":347
  * 
  *         self.dpi = self.args.dpi
  *         if self.dpi is not None:             # <<<<<<<<<<<<<<
@@ -7227,7 +7319,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
     goto __pyx_L8;
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":321
+  /* "INDUSAnalysis/timeseries.pyx":350
  *             self.dpi = int(self.dpi)
  *         else:
  *             self.dpi = 150             # <<<<<<<<<<<<<<
@@ -7235,79 +7327,79 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  *         self.show = self.args.show
  */
   /*else*/ {
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2, __pyx_int_150) < 0) __PYX_ERR(0, 321, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2, __pyx_int_150) < 0) __PYX_ERR(0, 350, __pyx_L1_error)
   }
   __pyx_L8:;
 
-  /* "INDUSAnalysis/timeseries.pyx":323
+  /* "INDUSAnalysis/timeseries.pyx":352
  *             self.dpi = 150
  * 
  *         self.show = self.args.show             # <<<<<<<<<<<<<<
  * 
  *         self.replot = self.args.replot
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_show_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 323, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_show_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_show_2, __pyx_t_2) < 0) __PYX_ERR(0, 323, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_show_2, __pyx_t_2) < 0) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":325
+  /* "INDUSAnalysis/timeseries.pyx":354
  *         self.show = self.args.show
  * 
  *         self.replot = self.args.replot             # <<<<<<<<<<<<<<
  *         self.replotpref = self.args.replotpref
  *         if self.replotpref is None:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_replot_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 325, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_replot_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replot_2, __pyx_t_5) < 0) __PYX_ERR(0, 325, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replot_2, __pyx_t_5) < 0) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":326
+  /* "INDUSAnalysis/timeseries.pyx":355
  * 
  *         self.replot = self.args.replot
  *         self.replotpref = self.args.replotpref             # <<<<<<<<<<<<<<
  *         if self.replotpref is None:
  *             self.replotpref = "indus"
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 326, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_replotpref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 326, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_replotpref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replotpref_2, __pyx_t_2) < 0) __PYX_ERR(0, 326, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replotpref_2, __pyx_t_2) < 0) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":327
+  /* "INDUSAnalysis/timeseries.pyx":356
  *         self.replot = self.args.replot
  *         self.replotpref = self.args.replotpref
  *         if self.replotpref is None:             # <<<<<<<<<<<<<<
  *             self.replotpref = "indus"
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = (__pyx_t_2 == Py_None);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = (__pyx_t_3 != 0);
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/timeseries.pyx":328
+    /* "INDUSAnalysis/timeseries.pyx":357
  *         self.replotpref = self.args.replotpref
  *         if self.replotpref is None:
  *             self.replotpref = "indus"             # <<<<<<<<<<<<<<
  * 
  *         # Forces matplotlib to not use any Xwindows backend if run on remote server
  */
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replotpref_2, __pyx_n_s_indus) < 0) __PYX_ERR(0, 328, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_replotpref_2, __pyx_n_s_indus) < 0) __PYX_ERR(0, 357, __pyx_L1_error)
 
-    /* "INDUSAnalysis/timeseries.pyx":327
+    /* "INDUSAnalysis/timeseries.pyx":356
  *         self.replot = self.args.replot
  *         self.replotpref = self.args.replotpref
  *         if self.replotpref is None:             # <<<<<<<<<<<<<<
@@ -7316,44 +7408,44 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":331
+  /* "INDUSAnalysis/timeseries.pyx":360
  * 
  *         # Forces matplotlib to not use any Xwindows backend if run on remote server
  *         self.remote = self.args.remote             # <<<<<<<<<<<<<<
  *         if self.remote:
  *             matplotlib.use('Agg')
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_remote_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_remote_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_remote_2, __pyx_t_5) < 0) __PYX_ERR(0, 331, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_remote_2, __pyx_t_5) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":332
+  /* "INDUSAnalysis/timeseries.pyx":361
  *         # Forces matplotlib to not use any Xwindows backend if run on remote server
  *         self.remote = self.args.remote
  *         if self.remote:             # <<<<<<<<<<<<<<
  *             matplotlib.use('Agg')
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_remote_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_remote_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 332, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if (__pyx_t_4) {
 
-    /* "INDUSAnalysis/timeseries.pyx":333
+    /* "INDUSAnalysis/timeseries.pyx":362
  *         self.remote = self.args.remote
  *         if self.remote:
  *             matplotlib.use('Agg')             # <<<<<<<<<<<<<<
  * 
  *     # TODO: Implement
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_matplotlib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 333, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_matplotlib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 362, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_use); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 333, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_use); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -7368,12 +7460,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
     }
     __pyx_t_5 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_n_s_Agg) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_n_s_Agg);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 333, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 362, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":332
+    /* "INDUSAnalysis/timeseries.pyx":361
  *         # Forces matplotlib to not use any Xwindows backend if run on remote server
  *         self.remote = self.args.remote
  *         if self.remote:             # <<<<<<<<<<<<<<
@@ -7382,7 +7474,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
  */
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":291
+  /* "INDUSAnalysis/timeseries.pyx":320
  *             self.args = self.parser.parse_args(args)
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
@@ -7406,7 +7498,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_4rea
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":336
+/* "INDUSAnalysis/timeseries.pyx":365
  * 
  *     # TODO: Implement
  *     def save_TimeSeries(self, tso, filename):             # <<<<<<<<<<<<<<
@@ -7450,17 +7542,17 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_7sav
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_tso)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("save_TimeSeries", 1, 3, 3, 1); __PYX_ERR(0, 336, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("save_TimeSeries", 1, 3, 3, 1); __PYX_ERR(0, 365, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_filename)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("save_TimeSeries", 1, 3, 3, 2); __PYX_ERR(0, 336, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("save_TimeSeries", 1, 3, 3, 2); __PYX_ERR(0, 365, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "save_TimeSeries") < 0)) __PYX_ERR(0, 336, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "save_TimeSeries") < 0)) __PYX_ERR(0, 365, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -7475,7 +7567,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_7sav
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("save_TimeSeries", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 336, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("save_TimeSeries", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 365, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_TimeSeries", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7506,7 +7598,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
   int __pyx_t_12;
   __Pyx_RefNannySetupContext("save_TimeSeries", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":343
+  /* "INDUSAnalysis/timeseries.pyx":372
  *             tso (TimeSeries): TimeSeries object to pickle and dump.
  *         """
  *         with open(filename, 'wb+') as f:             # <<<<<<<<<<<<<<
@@ -7514,7 +7606,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
  * 
  */
   /*with:*/ {
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_filename);
     __Pyx_GIVEREF(__pyx_v_filename);
@@ -7522,12 +7614,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
     __Pyx_INCREF(__pyx_kp_s_wb);
     __Pyx_GIVEREF(__pyx_kp_s_wb);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_kp_s_wb);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 343, __pyx_L3_error)
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 372, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -7541,7 +7633,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
     }
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 343, __pyx_L3_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = __pyx_t_1;
@@ -7559,16 +7651,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
           __pyx_v_f = __pyx_t_4;
           __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/timeseries.pyx":344
+          /* "INDUSAnalysis/timeseries.pyx":373
  *         """
  *         with open(filename, 'wb+') as f:
  *             pickle.dump(tso, f)             # <<<<<<<<<<<<<<
  * 
  *     def load_TimeSeries(self, filename):
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pickle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 344, __pyx_L7_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pickle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_dump); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 344, __pyx_L7_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_dump); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 373, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_t_2 = NULL;
@@ -7586,7 +7678,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_tso, __pyx_v_f};
-            __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 344, __pyx_L7_error)
+            __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 373, __pyx_L7_error)
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
             __Pyx_GOTREF(__pyx_t_4);
           } else
@@ -7594,13 +7686,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
             PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_tso, __pyx_v_f};
-            __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 344, __pyx_L7_error)
+            __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 373, __pyx_L7_error)
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
             __Pyx_GOTREF(__pyx_t_4);
           } else
           #endif
           {
-            __pyx_t_5 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 344, __pyx_L7_error)
+            __pyx_t_5 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 373, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_5);
             if (__pyx_t_2) {
               __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -7611,14 +7703,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
             __Pyx_INCREF(__pyx_v_f);
             __Pyx_GIVEREF(__pyx_v_f);
             PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_9, __pyx_v_f);
-            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 344, __pyx_L7_error)
+            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 373, __pyx_L7_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/timeseries.pyx":343
+          /* "INDUSAnalysis/timeseries.pyx":372
  *             tso (TimeSeries): TimeSeries object to pickle and dump.
  *         """
  *         with open(filename, 'wb+') as f:             # <<<<<<<<<<<<<<
@@ -7637,20 +7729,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_TimeSeries", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_5) < 0) __PYX_ERR(0, 343, __pyx_L9_except_error)
+          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_5) < 0) __PYX_ERR(0, 372, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_2 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 343, __pyx_L9_except_error)
+          __pyx_t_2 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_2);
           __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, NULL);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 343, __pyx_L9_except_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 372, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_10);
           __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (__pyx_t_11 < 0) __PYX_ERR(0, 343, __pyx_L9_except_error)
+          if (__pyx_t_11 < 0) __PYX_ERR(0, 372, __pyx_L9_except_error)
           __pyx_t_12 = ((!(__pyx_t_11 != 0)) != 0);
           if (__pyx_t_12) {
             __Pyx_GIVEREF(__pyx_t_4);
@@ -7658,7 +7750,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
             __Pyx_XGIVEREF(__pyx_t_5);
             __Pyx_ErrRestoreWithState(__pyx_t_4, __pyx_t_1, __pyx_t_5);
             __pyx_t_4 = 0; __pyx_t_1 = 0; __pyx_t_5 = 0; 
-            __PYX_ERR(0, 343, __pyx_L9_except_error)
+            __PYX_ERR(0, 372, __pyx_L9_except_error)
           }
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7684,7 +7776,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
         if (__pyx_t_3) {
           __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__17, NULL);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 343, __pyx_L1_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 372, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
@@ -7699,7 +7791,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
     __pyx_L16:;
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":336
+  /* "INDUSAnalysis/timeseries.pyx":365
  * 
  *     # TODO: Implement
  *     def save_TimeSeries(self, tso, filename):             # <<<<<<<<<<<<<<
@@ -7724,7 +7816,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_6sav
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":346
+/* "INDUSAnalysis/timeseries.pyx":375
  *             pickle.dump(tso, f)
  * 
  *     def load_TimeSeries(self, filename):             # <<<<<<<<<<<<<<
@@ -7765,11 +7857,11 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_9loa
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_filename)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("load_TimeSeries", 1, 2, 2, 1); __PYX_ERR(0, 346, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("load_TimeSeries", 1, 2, 2, 1); __PYX_ERR(0, 375, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load_TimeSeries") < 0)) __PYX_ERR(0, 346, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load_TimeSeries") < 0)) __PYX_ERR(0, 375, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -7782,7 +7874,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_9loa
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("load_TimeSeries", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 346, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("load_TimeSeries", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 375, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeriesAnalysis.load_TimeSeries", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7813,7 +7905,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
   int __pyx_t_11;
   __Pyx_RefNannySetupContext("load_TimeSeries", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":356
+  /* "INDUSAnalysis/timeseries.pyx":385
  *             TimeSeries object loaded from file
  *         """
  *         with open(filename, 'rb') as f:             # <<<<<<<<<<<<<<
@@ -7821,7 +7913,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
  *             return tso
  */
   /*with:*/ {
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_filename);
     __Pyx_GIVEREF(__pyx_v_filename);
@@ -7829,12 +7921,12 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
     __Pyx_INCREF(__pyx_n_s_rb);
     __Pyx_GIVEREF(__pyx_n_s_rb);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_rb);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 385, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 356, __pyx_L3_error)
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 385, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -7848,7 +7940,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
     }
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 356, __pyx_L3_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L3_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_4 = __pyx_t_1;
@@ -7866,16 +7958,16 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
           __pyx_v_f = __pyx_t_4;
           __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/timeseries.pyx":357
+          /* "INDUSAnalysis/timeseries.pyx":386
  *         """
  *         with open(filename, 'rb') as f:
  *             tso = pickle.load(f)             # <<<<<<<<<<<<<<
  *             return tso
  * 
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pickle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L7_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_pickle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_load); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 357, __pyx_L7_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_load); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_t_2 = NULL;
@@ -7890,13 +7982,13 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
           }
           __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_v_f) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_f);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 357, __pyx_L7_error)
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 386, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __pyx_v_tso = __pyx_t_4;
           __pyx_t_4 = 0;
 
-          /* "INDUSAnalysis/timeseries.pyx":358
+          /* "INDUSAnalysis/timeseries.pyx":387
  *         with open(filename, 'rb') as f:
  *             tso = pickle.load(f)
  *             return tso             # <<<<<<<<<<<<<<
@@ -7908,7 +8000,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
           __pyx_r = __pyx_v_tso;
           goto __pyx_L11_try_return;
 
-          /* "INDUSAnalysis/timeseries.pyx":356
+          /* "INDUSAnalysis/timeseries.pyx":385
  *             TimeSeries object loaded from file
  *         """
  *         with open(filename, 'rb') as f:             # <<<<<<<<<<<<<<
@@ -7923,20 +8015,20 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeriesAnalysis.load_TimeSeries", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_2) < 0) __PYX_ERR(0, 356, __pyx_L9_except_error)
+          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_2) < 0) __PYX_ERR(0, 385, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_5 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 356, __pyx_L9_except_error)
+          __pyx_t_5 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 385, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 356, __pyx_L9_except_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 385, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_9);
           __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          if (__pyx_t_10 < 0) __PYX_ERR(0, 356, __pyx_L9_except_error)
+          if (__pyx_t_10 < 0) __PYX_ERR(0, 385, __pyx_L9_except_error)
           __pyx_t_11 = ((!(__pyx_t_10 != 0)) != 0);
           if (__pyx_t_11) {
             __Pyx_GIVEREF(__pyx_t_4);
@@ -7944,7 +8036,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
             __Pyx_XGIVEREF(__pyx_t_2);
             __Pyx_ErrRestoreWithState(__pyx_t_4, __pyx_t_1, __pyx_t_2);
             __pyx_t_4 = 0; __pyx_t_1 = 0; __pyx_t_2 = 0; 
-            __PYX_ERR(0, 356, __pyx_L9_except_error)
+            __PYX_ERR(0, 385, __pyx_L9_except_error)
           }
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7975,7 +8067,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
         if (__pyx_t_3) {
           __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__17, NULL);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 356, __pyx_L1_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 385, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
@@ -7987,7 +8079,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
         if (__pyx_t_3) {
           __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__17, NULL);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 356, __pyx_L1_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 385, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
@@ -8004,7 +8096,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
     __pyx_L16:;
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":346
+  /* "INDUSAnalysis/timeseries.pyx":375
  *             pickle.dump(tso, f)
  * 
  *     def load_TimeSeries(self, filename):             # <<<<<<<<<<<<<<
@@ -8030,7 +8122,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_8loa
   return __pyx_r;
 }
 
-/* "INDUSAnalysis/timeseries.pyx":360
+/* "INDUSAnalysis/timeseries.pyx":389
  *             return tso
  * 
  *     def save_figure(self, fig, suffix=""):             # <<<<<<<<<<<<<<
@@ -8075,7 +8167,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_11sa
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fig)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("save_figure", 0, 2, 3, 1); __PYX_ERR(0, 360, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("save_figure", 0, 2, 3, 1); __PYX_ERR(0, 389, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -8085,7 +8177,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_11sa
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "save_figure") < 0)) __PYX_ERR(0, 360, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "save_figure") < 0)) __PYX_ERR(0, 389, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -8103,7 +8195,7 @@ static PyObject *__pyx_pw_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_11sa
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("save_figure", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 360, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("save_figure", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 389, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_figure", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -8128,75 +8220,75 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_10sa
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("save_figure", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":372
+  /* "INDUSAnalysis/timeseries.pyx":401
  *             suffix: Suffix of filename to save data to.
  *         """
  *         filename = self.opref + "_" + suffix + "." + self.oformat             # <<<<<<<<<<<<<<
  *         if self.dpi is not None:
  *             fig.savefig(filename, dpi=self.dpi)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_opref_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 401, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_n_s__19); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_n_s__19); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 401, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_v_suffix); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Add(__pyx_t_2, __pyx_v_suffix); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 401, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s__20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_t_1, __pyx_kp_s__20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 401, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_oformat_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 401, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyNumber_Add(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Add(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 401, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_filename = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":373
+  /* "INDUSAnalysis/timeseries.pyx":402
  *         """
  *         filename = self.opref + "_" + suffix + "." + self.oformat
  *         if self.dpi is not None:             # <<<<<<<<<<<<<<
  *             fig.savefig(filename, dpi=self.dpi)
  *         else:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 402, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = (__pyx_t_3 != Py_None);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "INDUSAnalysis/timeseries.pyx":374
+    /* "INDUSAnalysis/timeseries.pyx":403
  *         filename = self.opref + "_" + suffix + "." + self.oformat
  *         if self.dpi is not None:
  *             fig.savefig(filename, dpi=self.dpi)             # <<<<<<<<<<<<<<
  *         else:
  *             fig.savefig(filename)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_savefig); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_savefig); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 374, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_filename);
     __Pyx_GIVEREF(__pyx_v_filename);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_filename);
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 374, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_dpi_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dpi_2, __pyx_t_6) < 0) __PYX_ERR(0, 374, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dpi_2, __pyx_t_6) < 0) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 374, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "INDUSAnalysis/timeseries.pyx":373
+    /* "INDUSAnalysis/timeseries.pyx":402
  *         """
  *         filename = self.opref + "_" + suffix + "." + self.oformat
  *         if self.dpi is not None:             # <<<<<<<<<<<<<<
@@ -8206,14 +8298,14 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_10sa
     goto __pyx_L3;
   }
 
-  /* "INDUSAnalysis/timeseries.pyx":376
+  /* "INDUSAnalysis/timeseries.pyx":405
  *             fig.savefig(filename, dpi=self.dpi)
  *         else:
  *             fig.savefig(filename)             # <<<<<<<<<<<<<<
  *         print("Saving figure > " + filename)
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_savefig); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fig, __pyx_n_s_savefig); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8227,24 +8319,24 @@ static PyObject *__pyx_pf_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_10sa
     }
     __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_filename) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_filename);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 376, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
   __pyx_L3:;
 
-  /* "INDUSAnalysis/timeseries.pyx":377
+  /* "INDUSAnalysis/timeseries.pyx":406
  *         else:
  *             fig.savefig(filename)
  *         print("Saving figure > " + filename)             # <<<<<<<<<<<<<<
  */
-  __pyx_t_6 = PyNumber_Add(__pyx_kp_s_Saving_figure, __pyx_v_filename); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 377, __pyx_L1_error)
+  __pyx_t_6 = PyNumber_Add(__pyx_kp_s_Saving_figure, __pyx_v_filename); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 406, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (__Pyx_PrintOne(0, __pyx_t_6) < 0) __PYX_ERR(0, 377, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_t_6) < 0) __PYX_ERR(0, 406, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":360
+  /* "INDUSAnalysis/timeseries.pyx":389
  *             return tso
  * 
  *     def save_figure(self, fig, suffix=""):             # <<<<<<<<<<<<<<
@@ -10794,6 +10886,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_add_argument_group, __pyx_k_add_argument_group, sizeof(__pyx_k_add_argument_group), 0, 0, 1, 1},
   {&__pyx_n_s_argparse, __pyx_k_argparse, sizeof(__pyx_k_argparse), 0, 0, 1, 1},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
+  {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
   {&__pyx_n_s_aspect, __pyx_k_aspect, sizeof(__pyx_k_aspect), 0, 0, 1, 1},
   {&__pyx_n_s_auto, __pyx_k_auto, sizeof(__pyx_k_auto), 0, 0, 1, 1},
   {&__pyx_kp_s_averaging_optional_arguments, __pyx_k_averaging_optional_arguments, sizeof(__pyx_k_averaging_optional_arguments), 0, 0, 1, 0},
@@ -10967,11 +11060,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_property = __Pyx_GetBuiltinName(__pyx_n_s_property); if (!__pyx_builtin_property) __PYX_ERR(0, 81, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 41, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 139, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 159, __pyx_L1_error)
-  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 343, __pyx_L1_error)
+  __pyx_builtin_property = __Pyx_GetBuiltinName(__pyx_n_s_property); if (!__pyx_builtin_property) __PYX_ERR(0, 110, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 168, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 372, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(1, 856, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(1, 1038, __pyx_L1_error)
   return 0;
@@ -10983,190 +11076,190 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "INDUSAnalysis/timeseries.pyx":41
- *         self._x = data
+  /* "INDUSAnalysis/timeseries.pyx":70
+ *         self._x = np.array(data)
  *         if self._t.shape[0] != self._x.shape[0]:
  *             raise ValueError("Time and data do not match along axis 0")             # <<<<<<<<<<<<<<
  * 
  *         self._labels = labels
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Time_and_data_do_not_match_along); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Time_and_data_do_not_match_along); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "INDUSAnalysis/timeseries.pyx":45
+  /* "INDUSAnalysis/timeseries.pyx":74
  *         self._labels = labels
  *         if len(self._labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")             # <<<<<<<<<<<<<<
  *         if len(self._labels) > self._x.ndim:
  *             raise ValueError("Too many labels for data dimensions")
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Too_few_labels_for_data_dimensio); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_s_Too_few_labels_for_data_dimensio); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "INDUSAnalysis/timeseries.pyx":47
+  /* "INDUSAnalysis/timeseries.pyx":76
  *             raise ValueError("Too few labels for data dimensions")
  *         if len(self._labels) > self._x.ndim:
  *             raise ValueError("Too many labels for data dimensions")             # <<<<<<<<<<<<<<
  * 
  *     def __getitem__(self, key):
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_Too_many_labels_for_data_dimensi); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_Too_many_labels_for_data_dimensi); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "INDUSAnalysis/timeseries.pyx":96
+  /* "INDUSAnalysis/timeseries.pyx":125
  *     def data_array(self, x):
  *         if x.shape[0] != len(self._t):
  *             raise ValueError("Time and data do not match along axis 0.")             # <<<<<<<<<<<<<<
- *         self._x = x
+ *         self._x = np.array(x)
  * 
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_Time_and_data_do_not_match_along_2); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_s_Time_and_data_do_not_match_along_2); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 125, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "INDUSAnalysis/timeseries.pyx":122
+  /* "INDUSAnalysis/timeseries.pyx":151
  *         """
  *         if self._x.ndim != 1:
  *             raise ValueError("Data is not 1-dimensional")             # <<<<<<<<<<<<<<
  * 
  *         w = np.repeat(1.0, window) / window
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_Data_is_not_1_dimensional); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_Data_is_not_1_dimensional); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "INDUSAnalysis/timeseries.pyx":261
+  /* "INDUSAnalysis/timeseries.pyx":290
  * 
  *         # Averaging options
  *         self.avg_args.add_argument("-obsstart", help="Time to begin computation of observables at")             # <<<<<<<<<<<<<<
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_obsstart); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_obsstart); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "INDUSAnalysis/timeseries.pyx":262
+  /* "INDUSAnalysis/timeseries.pyx":291
  *         # Averaging options
  *         self.avg_args.add_argument("-obsstart", help="Time to begin computation of observables at")
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")             # <<<<<<<<<<<<<<
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")
  *         self.avg_args.add_argument("-window", help="Window size (number of points) for moving average")
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_obsend); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_obsend); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "INDUSAnalysis/timeseries.pyx":263
+  /* "INDUSAnalysis/timeseries.pyx":292
  *         self.avg_args.add_argument("-obsstart", help="Time to begin computation of observables at")
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")             # <<<<<<<<<<<<<<
  *         self.avg_args.add_argument("-window", help="Window size (number of points) for moving average")
  * 
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_obspref); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_obspref); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "INDUSAnalysis/timeseries.pyx":264
+  /* "INDUSAnalysis/timeseries.pyx":293
  *         self.avg_args.add_argument("-obsend", help="Time to end computation of observables at")
  *         self.avg_args.add_argument("-obspref", help="Prefix of text file to append computed observables to")
  *         self.avg_args.add_argument("-window", help="Window size (number of points) for moving average")             # <<<<<<<<<<<<<<
  * 
  *         # Plotting options
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_window_2); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_window_2); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 293, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "INDUSAnalysis/timeseries.pyx":267
+  /* "INDUSAnalysis/timeseries.pyx":296
  * 
  *         # Plotting options
  *         self.out_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")             # <<<<<<<<<<<<<<
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_s_opref); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_s_opref); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
-  /* "INDUSAnalysis/timeseries.pyx":268
+  /* "INDUSAnalysis/timeseries.pyx":297
  *         # Plotting options
  *         self.out_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")             # <<<<<<<<<<<<<<
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
  *         self.out_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_oformat); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_oformat); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "INDUSAnalysis/timeseries.pyx":269
+  /* "INDUSAnalysis/timeseries.pyx":298
  *         self.out_args.add_argument("-opref", help="Output image and data prefix [Default = indus]")
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")             # <<<<<<<<<<<<<<
  *         self.out_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")
  * 
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_dpi); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_dpi); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
 
-  /* "INDUSAnalysis/timeseries.pyx":270
+  /* "INDUSAnalysis/timeseries.pyx":299
  *         self.out_args.add_argument("-oformat", help="Output image format [Default = png]")
  *         self.out_args.add_argument("-dpi", type=int, help="DPI of output image(s) [Default = 150]")
  *         self.out_args.add_argument("--show", action='store_true', help="Show interactive plot(s)")             # <<<<<<<<<<<<<<
  * 
  *         # Replot options
  */
-  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_s_show); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_s_show); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__13);
   __Pyx_GIVEREF(__pyx_tuple__13);
 
-  /* "INDUSAnalysis/timeseries.pyx":273
+  /* "INDUSAnalysis/timeseries.pyx":302
  * 
  *         # Replot options
  *         self.replot_args.add_argument("--replot", action="store_true", help="Replot from saved data")             # <<<<<<<<<<<<<<
  *         self.replot_args.add_argument("-replotpref", help="[replot] Prefix (REPLOTPREF[.npy]) of .npy file to replot from [Default = indus]")
  * 
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_replot); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_replot); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
 
-  /* "INDUSAnalysis/timeseries.pyx":274
+  /* "INDUSAnalysis/timeseries.pyx":303
  *         # Replot options
  *         self.replot_args.add_argument("--replot", action="store_true", help="Replot from saved data")
  *         self.replot_args.add_argument("-replotpref", help="[replot] Prefix (REPLOTPREF[.npy]) of .npy file to replot from [Default = indus]")             # <<<<<<<<<<<<<<
  * 
  *         # Miscellanious options
  */
-  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_s_replotpref); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_s_replotpref); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
 
-  /* "INDUSAnalysis/timeseries.pyx":277
+  /* "INDUSAnalysis/timeseries.pyx":306
  * 
  *         # Miscellanious options
  *         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")             # <<<<<<<<<<<<<<
  * 
  *     def parse_args(self, args=None):
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_remote); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_remote); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 306, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);
   __Pyx_GIVEREF(__pyx_tuple__16);
 
-  /* "INDUSAnalysis/timeseries.pyx":343
+  /* "INDUSAnalysis/timeseries.pyx":372
  *             tso (TimeSeries): TimeSeries object to pickle and dump.
  *         """
  *         with open(filename, 'wb+') as f:             # <<<<<<<<<<<<<<
  *             pickle.dump(tso, f)
  * 
  */
-  __pyx_tuple__17 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 343, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 372, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
 
@@ -11247,294 +11340,294 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
 
-  /* "INDUSAnalysis/timeseries.pyx":30
+  /* "INDUSAnalysis/timeseries.pyx":59
  *     """
  * 
  *     def __init__(self, times, data, labels):             # <<<<<<<<<<<<<<
  *         """
  *         Creates time series class.
  */
-  __pyx_tuple__29 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_times, __pyx_n_s_data, __pyx_n_s_labels); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_tuple__29 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_times, __pyx_n_s_data, __pyx_n_s_labels); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__29);
   __Pyx_GIVEREF(__pyx_tuple__29);
-  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_init, 30, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_codeobj__30 = (PyObject*)__Pyx_PyCode_New(4, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__29, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_init, 59, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__30)) __PYX_ERR(0, 59, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":49
+  /* "INDUSAnalysis/timeseries.pyx":78
  *             raise ValueError("Too many labels for data dimensions")
  * 
  *     def __getitem__(self, key):             # <<<<<<<<<<<<<<
  *         """
  *         Performs indexing/slicing based on time values,
  */
-  __pyx_tuple__31 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_key, __pyx_n_s_idx, __pyx_n_s_sidx, __pyx_n_s_eidx); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_tuple__31 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_key, __pyx_n_s_idx, __pyx_n_s_sidx, __pyx_n_s_eidx); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__31);
   __Pyx_GIVEREF(__pyx_tuple__31);
-  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_getitem, 49, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_getitem, 78, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 78, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":73
+  /* "INDUSAnalysis/timeseries.pyx":102
  *                               self._x[sidx:eidx:key.step], labels=self._labels)
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
  *         return len(self._t)
  * 
  */
-  __pyx_tuple__33 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_tuple__33 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__33);
   __Pyx_GIVEREF(__pyx_tuple__33);
-  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_len, 73, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_len, 102, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 102, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":76
+  /* "INDUSAnalysis/timeseries.pyx":105
  *         return len(self._t)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return "<{} object, {} with shape {}, {} time frames>".format(
  *             self.__class__.__name__, self._labels, self._x.shape, len(self._t))
  */
-  __pyx_tuple__35 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_tuple__35 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__35);
   __Pyx_GIVEREF(__pyx_tuple__35);
-  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_repr, 76, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_repr, 105, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 105, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":82
+  /* "INDUSAnalysis/timeseries.pyx":111
  *     # TODO: Add unit tests for setters
  *     @property
  *     def time_array(self):             # <<<<<<<<<<<<<<
  *         return self._t
  * 
  */
-  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__37);
   __Pyx_GIVEREF(__pyx_tuple__37);
-  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_time_array, 82, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_time_array, 111, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 111, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":86
+  /* "INDUSAnalysis/timeseries.pyx":115
  * 
  *     @time_array.setter
  *     def time_array(self, t):             # <<<<<<<<<<<<<<
- *         self._t = t
+ *         self._t = np.array(t)
  * 
  */
-  __pyx_tuple__39 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_t_2); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_tuple__39 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_t_2); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__39);
   __Pyx_GIVEREF(__pyx_tuple__39);
-  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_time_array, 86, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_time_array, 115, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 115, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":90
+  /* "INDUSAnalysis/timeseries.pyx":119
  * 
  *     @property
  *     def data_array(self):             # <<<<<<<<<<<<<<
  *         return self._x
  * 
  */
-  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 119, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__41);
   __Pyx_GIVEREF(__pyx_tuple__41);
-  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_data_array, 90, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_data_array, 119, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 119, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":94
+  /* "INDUSAnalysis/timeseries.pyx":123
  * 
  *     @data_array.setter
  *     def data_array(self, x):             # <<<<<<<<<<<<<<
  *         if x.shape[0] != len(self._t):
  *             raise ValueError("Time and data do not match along axis 0.")
  */
-  __pyx_tuple__43 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_x_2); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_tuple__43 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_x_2); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__43);
   __Pyx_GIVEREF(__pyx_tuple__43);
-  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_data_array, 94, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__43, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_data_array, 123, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 123, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":100
+  /* "INDUSAnalysis/timeseries.pyx":129
  * 
  *     @property
  *     def labels(self):             # <<<<<<<<<<<<<<
  *         return self._labels
  * 
  */
-  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(0, 129, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__45);
   __Pyx_GIVEREF(__pyx_tuple__45);
-  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__45, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_labels, 100, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__45, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_labels, 129, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) __PYX_ERR(0, 129, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":104
+  /* "INDUSAnalysis/timeseries.pyx":133
  * 
  *     @labels.setter
  *     def labels(self, labels):             # <<<<<<<<<<<<<<
  *         if len(labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")
  */
-  __pyx_tuple__47 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_labels); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_tuple__47 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_labels); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__47);
   __Pyx_GIVEREF(__pyx_tuple__47);
-  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_labels, 104, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_labels, 133, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) __PYX_ERR(0, 133, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":111
+  /* "INDUSAnalysis/timeseries.pyx":140
  *         self._labels = labels
  * 
  *     def moving_average(self, window):             # <<<<<<<<<<<<<<
  *         """
  *         Computes moving (rolling) average of 1-d data.
  */
-  __pyx_tuple__49 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_window, __pyx_n_s_w, __pyx_n_s_ma); if (unlikely(!__pyx_tuple__49)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_tuple__49 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_window, __pyx_n_s_w, __pyx_n_s_ma); if (unlikely(!__pyx_tuple__49)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__49);
   __Pyx_GIVEREF(__pyx_tuple__49);
-  __pyx_codeobj__50 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__49, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_moving_average, 111, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__50)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_codeobj__50 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__49, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_moving_average, 140, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__50)) __PYX_ERR(0, 140, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":128
+  /* "INDUSAnalysis/timeseries.pyx":157
  *         return TimeSeries(self._t[window - 1:], ma, labels=self._labels)
  * 
  *     def cumulative_moving_average(self):             # <<<<<<<<<<<<<<
  *         """
  *         Computes cumulative moving average of 1-d data.
  */
-  __pyx_tuple__51 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_csum, __pyx_n_s_nvals, __pyx_n_s_cma); if (unlikely(!__pyx_tuple__51)) __PYX_ERR(0, 128, __pyx_L1_error)
+  __pyx_tuple__51 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_csum, __pyx_n_s_nvals, __pyx_n_s_cma); if (unlikely(!__pyx_tuple__51)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__51);
   __Pyx_GIVEREF(__pyx_tuple__51);
-  __pyx_codeobj__52 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__51, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_cumulative_moving_average, 128, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__52)) __PYX_ERR(0, 128, __pyx_L1_error)
+  __pyx_codeobj__52 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__51, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_cumulative_moving_average, 157, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__52)) __PYX_ERR(0, 157, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":143
+  /* "INDUSAnalysis/timeseries.pyx":172
  *         return TimeSeries(self._t, cma, labels=self._labels)
  * 
  *     def mean(self, axis=None):             # <<<<<<<<<<<<<<
  *         """
  *         Computes mean of timeseries data.
  */
-  __pyx_tuple__53 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_axis, __pyx_n_s_mean, __pyx_n_s_labels, __pyx_n_s_i, __pyx_n_s_x_2); if (unlikely(!__pyx_tuple__53)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_tuple__53 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_axis, __pyx_n_s_mean, __pyx_n_s_labels, __pyx_n_s_i, __pyx_n_s_x_2); if (unlikely(!__pyx_tuple__53)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__53);
   __Pyx_GIVEREF(__pyx_tuple__53);
-  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_mean, 143, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __pyx_tuple__55 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__55)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_mean, 172, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __pyx_tuple__55 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__55)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__55);
   __Pyx_GIVEREF(__pyx_tuple__55);
 
-  /* "INDUSAnalysis/timeseries.pyx":162
+  /* "INDUSAnalysis/timeseries.pyx":191
  *             return TimeSeries(self._t, mean, labels=labels)
  * 
  *     def std(self, axis=None):             # <<<<<<<<<<<<<<
  *         """
  *         Computes std of timeseries data.
  */
-  __pyx_tuple__56 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_axis, __pyx_n_s_std, __pyx_n_s_labels, __pyx_n_s_i, __pyx_n_s_x_2); if (unlikely(!__pyx_tuple__56)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_tuple__56 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_axis, __pyx_n_s_std, __pyx_n_s_labels, __pyx_n_s_i, __pyx_n_s_x_2); if (unlikely(!__pyx_tuple__56)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__56);
   __Pyx_GIVEREF(__pyx_tuple__56);
-  __pyx_codeobj__57 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__56, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_std, 162, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__57)) __PYX_ERR(0, 162, __pyx_L1_error)
-  __pyx_tuple__58 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__58)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_codeobj__57 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__56, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_std, 191, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__57)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_tuple__58 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__58)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__58);
   __Pyx_GIVEREF(__pyx_tuple__58);
 
-  /* "INDUSAnalysis/timeseries.pyx":183
+  /* "INDUSAnalysis/timeseries.pyx":212
  *     # TODO: Implement
  *     @profiling.timefunc
- *     def sem(self, axis=0):             # <<<<<<<<<<<<<<
+ *     def sem(self, axis=None):             # <<<<<<<<<<<<<<
  *         """
  *         Computes standard error of mean (estimate of the standard deviation
  */
-  __pyx_tuple__59 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_axis); if (unlikely(!__pyx_tuple__59)) __PYX_ERR(0, 183, __pyx_L1_error)
+  __pyx_tuple__59 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_axis); if (unlikely(!__pyx_tuple__59)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__59);
   __Pyx_GIVEREF(__pyx_tuple__59);
-  __pyx_codeobj__60 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__59, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_sem, 183, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__60)) __PYX_ERR(0, 183, __pyx_L1_error)
-  __pyx_tuple__61 = PyTuple_Pack(1, ((PyObject *)__pyx_int_0)); if (unlikely(!__pyx_tuple__61)) __PYX_ERR(0, 183, __pyx_L1_error)
+  __pyx_codeobj__60 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__59, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_sem, 212, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__60)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_tuple__61 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__61)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__61);
   __Pyx_GIVEREF(__pyx_tuple__61);
 
-  /* "INDUSAnalysis/timeseries.pyx":193
+  /* "INDUSAnalysis/timeseries.pyx":222
  *         pass
  * 
  *     def plot(self, *plotargs, **plotkwargs):             # <<<<<<<<<<<<<<
  *         """Plots 1-d timeseries data.
  * 
  */
-  __pyx_tuple__62 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_plotargs, __pyx_n_s_plotkwargs, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__62)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_tuple__62 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_plotargs, __pyx_n_s_plotkwargs, __pyx_n_s_fig, __pyx_n_s_ax); if (unlikely(!__pyx_tuple__62)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__62);
   __Pyx_GIVEREF(__pyx_tuple__62);
-  __pyx_codeobj__63 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__62, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_plot, 193, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__63)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_codeobj__63 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__62, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_plot, 222, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__63)) __PYX_ERR(0, 222, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":212
+  /* "INDUSAnalysis/timeseries.pyx":241
  *         return fig
  * 
  *     def plot_2d_heatmap(self, **imshowkwargs):             # <<<<<<<<<<<<<<
  *         """Plots 2-d timeseries data as a heatmap.
  * 
  */
-  __pyx_tuple__64 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_imshowkwargs, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_im, __pyx_n_s_cbar, __pyx_n_s_ticks, __pyx_n_s_start, __pyx_n_s_sep, __pyx_n_s_newlabels, __pyx_n_s_axval); if (unlikely(!__pyx_tuple__64)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_tuple__64 = PyTuple_Pack(11, __pyx_n_s_self, __pyx_n_s_imshowkwargs, __pyx_n_s_fig, __pyx_n_s_ax, __pyx_n_s_im, __pyx_n_s_cbar, __pyx_n_s_ticks, __pyx_n_s_start, __pyx_n_s_sep, __pyx_n_s_newlabels, __pyx_n_s_axval); if (unlikely(!__pyx_tuple__64)) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__64);
   __Pyx_GIVEREF(__pyx_tuple__64);
-  __pyx_codeobj__65 = (PyObject*)__Pyx_PyCode_New(1, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__64, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_plot_2d_heatmap, 212, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__65)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_codeobj__65 = (PyObject*)__Pyx_PyCode_New(1, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__64, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_plot_2d_heatmap, 241, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__65)) __PYX_ERR(0, 241, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":248
+  /* "INDUSAnalysis/timeseries.pyx":277
  *         args: Command line argument parser.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.parser = argparse.ArgumentParser()
  * 
  */
-  __pyx_tuple__66 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__66)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_tuple__66 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__66)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__66);
   __Pyx_GIVEREF(__pyx_tuple__66);
-  __pyx_codeobj__67 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__66, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_init, 248, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__67)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_codeobj__67 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__66, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_init, 277, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__67)) __PYX_ERR(0, 277, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":279
+  /* "INDUSAnalysis/timeseries.pyx":308
  *         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")
  * 
  *     def parse_args(self, args=None):             # <<<<<<<<<<<<<<
  *         """
  *         Parses arguments.
  */
-  __pyx_tuple__68 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_args); if (unlikely(!__pyx_tuple__68)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_tuple__68 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_args); if (unlikely(!__pyx_tuple__68)) __PYX_ERR(0, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__68);
   __Pyx_GIVEREF(__pyx_tuple__68);
-  __pyx_codeobj__69 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__68, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_parse_args, 279, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__69)) __PYX_ERR(0, 279, __pyx_L1_error)
-  __pyx_tuple__70 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_codeobj__69 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__68, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_parse_args, 308, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__69)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __pyx_tuple__70 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(0, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__70);
   __Pyx_GIVEREF(__pyx_tuple__70);
 
-  /* "INDUSAnalysis/timeseries.pyx":291
+  /* "INDUSAnalysis/timeseries.pyx":320
  *             self.args = self.parser.parse_args(args)
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
  *         """
  *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
-  __pyx_tuple__71 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__71)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_tuple__71 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__71)) __PYX_ERR(0, 320, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__71);
   __Pyx_GIVEREF(__pyx_tuple__71);
-  __pyx_codeobj__72 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__71, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_read_args, 291, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__72)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_codeobj__72 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__71, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_read_args, 320, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__72)) __PYX_ERR(0, 320, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":336
+  /* "INDUSAnalysis/timeseries.pyx":365
  * 
  *     # TODO: Implement
  *     def save_TimeSeries(self, tso, filename):             # <<<<<<<<<<<<<<
  *         """
  *         Saves TimeSeries object to file using pickle dump.
  */
-  __pyx_tuple__73 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_tso, __pyx_n_s_filename, __pyx_n_s_f); if (unlikely(!__pyx_tuple__73)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __pyx_tuple__73 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_tso, __pyx_n_s_filename, __pyx_n_s_f); if (unlikely(!__pyx_tuple__73)) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__73);
   __Pyx_GIVEREF(__pyx_tuple__73);
-  __pyx_codeobj__74 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_save_TimeSeries, 336, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__74)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __pyx_codeobj__74 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_save_TimeSeries, 365, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__74)) __PYX_ERR(0, 365, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":346
+  /* "INDUSAnalysis/timeseries.pyx":375
  *             pickle.dump(tso, f)
  * 
  *     def load_TimeSeries(self, filename):             # <<<<<<<<<<<<<<
  *         """
  *         Loads pickled TimeSeries object from file
  */
-  __pyx_tuple__75 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_filename, __pyx_n_s_f, __pyx_n_s_tso); if (unlikely(!__pyx_tuple__75)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __pyx_tuple__75 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_filename, __pyx_n_s_f, __pyx_n_s_tso); if (unlikely(!__pyx_tuple__75)) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__75);
   __Pyx_GIVEREF(__pyx_tuple__75);
-  __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__75, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_load_TimeSeries, 346, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__75, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_load_TimeSeries, 375, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) __PYX_ERR(0, 375, __pyx_L1_error)
 
-  /* "INDUSAnalysis/timeseries.pyx":360
+  /* "INDUSAnalysis/timeseries.pyx":389
  *             return tso
  * 
  *     def save_figure(self, fig, suffix=""):             # <<<<<<<<<<<<<<
  *         """
  *         Exports figure to image file.
  */
-  __pyx_tuple__77 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_fig, __pyx_n_s_suffix, __pyx_n_s_filename); if (unlikely(!__pyx_tuple__77)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_tuple__77 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_fig, __pyx_n_s_suffix, __pyx_n_s_filename); if (unlikely(!__pyx_tuple__77)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__77);
   __Pyx_GIVEREF(__pyx_tuple__77);
-  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_save_figure, 360, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) __PYX_ERR(0, 360, __pyx_L1_error)
-  __pyx_tuple__79 = PyTuple_Pack(1, ((PyObject*)__pyx_kp_s__18)); if (unlikely(!__pyx_tuple__79)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_timeseries_pyx, __pyx_n_s_save_figure, 389, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) __PYX_ERR(0, 389, __pyx_L1_error)
+  __pyx_tuple__79 = PyTuple_Pack(1, ((PyObject*)__pyx_kp_s__18)); if (unlikely(!__pyx_tuple__79)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__79);
   __Pyx_GIVEREF(__pyx_tuple__79);
   __Pyx_RefNannyFinishContext();
@@ -11982,109 +12075,109 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  * class TimeSeries:             # <<<<<<<<<<<<<<
- *     """Stores N-dimensional time series data.
+ *     """Stores N-dimensional time series data, accessible and sliceable by time.
  * 
  */
   __pyx_t_1 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_empty_tuple, __pyx_n_s_TimeSeries, __pyx_n_s_TimeSeries, (PyObject *) NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_kp_s_Stores_N_dimensional_time_series); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "INDUSAnalysis/timeseries.pyx":30
+  /* "INDUSAnalysis/timeseries.pyx":59
  *     """
  * 
  *     def __init__(self, times, data, labels):             # <<<<<<<<<<<<<<
  *         """
  *         Creates time series class.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_1__init__, 0, __pyx_n_s_TimeSeries___init, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__30)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_1__init__, 0, __pyx_n_s_TimeSeries___init, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__30)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_init, __pyx_t_2) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_init, __pyx_t_2) < 0) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":49
+  /* "INDUSAnalysis/timeseries.pyx":78
  *             raise ValueError("Too many labels for data dimensions")
  * 
  *     def __getitem__(self, key):             # <<<<<<<<<<<<<<
  *         """
  *         Performs indexing/slicing based on time values,
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_3__getitem__, 0, __pyx_n_s_TimeSeries___getitem, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__32)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_3__getitem__, 0, __pyx_n_s_TimeSeries___getitem, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__32)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_getitem, __pyx_t_2) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_getitem, __pyx_t_2) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":73
+  /* "INDUSAnalysis/timeseries.pyx":102
  *                               self._x[sidx:eidx:key.step], labels=self._labels)
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
  *         return len(self._t)
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_5__len__, 0, __pyx_n_s_TimeSeries___len, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__34)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_5__len__, 0, __pyx_n_s_TimeSeries___len, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__34)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_len, __pyx_t_2) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_len, __pyx_t_2) < 0) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":76
+  /* "INDUSAnalysis/timeseries.pyx":105
  *         return len(self._t)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return "<{} object, {} with shape {}, {} time frames>".format(
  *             self.__class__.__name__, self._labels, self._x.shape, len(self._t))
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_7__repr__, 0, __pyx_n_s_TimeSeries___repr, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__36)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_7__repr__, 0, __pyx_n_s_TimeSeries___repr, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__36)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_repr, __pyx_t_2) < 0) __PYX_ERR(0, 76, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_repr, __pyx_t_2) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":82
+  /* "INDUSAnalysis/timeseries.pyx":111
  *     # TODO: Add unit tests for setters
  *     @property
  *     def time_array(self):             # <<<<<<<<<<<<<<
  *         return self._t
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_9time_array, 0, __pyx_n_s_TimeSeries_time_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__38)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_9time_array, 0, __pyx_n_s_TimeSeries_time_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__38)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "INDUSAnalysis/timeseries.pyx":81
+  /* "INDUSAnalysis/timeseries.pyx":110
  * 
  *     # TODO: Add unit tests for setters
  *     @property             # <<<<<<<<<<<<<<
  *     def time_array(self):
  *         return self._t
  */
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_property, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_property, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_time_array, __pyx_t_3) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_time_array, __pyx_t_3) < 0) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":85
+  /* "INDUSAnalysis/timeseries.pyx":114
  *         return self._t
  * 
  *     @time_array.setter             # <<<<<<<<<<<<<<
  *     def time_array(self, t):
- *         self._t = t
+ *         self._t = np.array(t)
  */
   __pyx_t_2 = PyObject_GetItem(__pyx_t_1, __pyx_n_s_time_array);
   if (unlikely(!__pyx_t_2)) {
     PyErr_Clear();
     __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time_array);
   }
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 85, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_setter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_setter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":86
+  /* "INDUSAnalysis/timeseries.pyx":115
  * 
  *     @time_array.setter
  *     def time_array(self, t):             # <<<<<<<<<<<<<<
- *         self._t = t
+ *         self._t = np.array(t)
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_11time_array, 0, __pyx_n_s_TimeSeries_time_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__40)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_11time_array, 0, __pyx_n_s_TimeSeries_time_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__40)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -12099,36 +12192,36 @@ if (!__Pyx_RefNanny) {
   __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_time_array, __pyx_t_3) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_time_array, __pyx_t_3) < 0) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":90
+  /* "INDUSAnalysis/timeseries.pyx":119
  * 
  *     @property
  *     def data_array(self):             # <<<<<<<<<<<<<<
  *         return self._x
  * 
  */
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_13data_array, 0, __pyx_n_s_TimeSeries_data_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__42)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_13data_array, 0, __pyx_n_s_TimeSeries_data_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__42)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 119, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "INDUSAnalysis/timeseries.pyx":89
- *         self._t = t
+  /* "INDUSAnalysis/timeseries.pyx":118
+ *         self._t = np.array(t)
  * 
  *     @property             # <<<<<<<<<<<<<<
  *     def data_array(self):
  *         return self._x
  */
-  __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_property, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_property, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_data_array, __pyx_t_4) < 0) __PYX_ERR(0, 90, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_data_array, __pyx_t_4) < 0) __PYX_ERR(0, 119, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":93
+  /* "INDUSAnalysis/timeseries.pyx":122
  *         return self._x
  * 
  *     @data_array.setter             # <<<<<<<<<<<<<<
@@ -12140,20 +12233,20 @@ if (!__Pyx_RefNanny) {
     PyErr_Clear();
     __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_data_array);
   }
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 93, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_setter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 93, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_setter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":94
+  /* "INDUSAnalysis/timeseries.pyx":123
  * 
  *     @data_array.setter
  *     def data_array(self, x):             # <<<<<<<<<<<<<<
  *         if x.shape[0] != len(self._t):
  *             raise ValueError("Time and data do not match along axis 0.")
  */
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_15data_array, 0, __pyx_n_s_TimeSeries_data_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__44)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 94, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_15data_array, 0, __pyx_n_s_TimeSeries_data_array, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__44)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -12168,36 +12261,36 @@ if (!__Pyx_RefNanny) {
   __pyx_t_4 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 93, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_data_array, __pyx_t_4) < 0) __PYX_ERR(0, 94, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_data_array, __pyx_t_4) < 0) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":100
+  /* "INDUSAnalysis/timeseries.pyx":129
  * 
  *     @property
  *     def labels(self):             # <<<<<<<<<<<<<<
  *         return self._labels
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_17labels, 0, __pyx_n_s_TimeSeries_labels, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__46)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_17labels, 0, __pyx_n_s_TimeSeries_labels, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__46)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 129, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
 
-  /* "INDUSAnalysis/timeseries.pyx":99
- *         self._x = x
+  /* "INDUSAnalysis/timeseries.pyx":128
+ *         self._x = np.array(x)
  * 
  *     @property             # <<<<<<<<<<<<<<
  *     def labels(self):
  *         return self._labels
  */
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_property, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_property, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 128, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_labels, __pyx_t_2) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_labels, __pyx_t_2) < 0) __PYX_ERR(0, 129, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":103
+  /* "INDUSAnalysis/timeseries.pyx":132
  *         return self._labels
  * 
  *     @labels.setter             # <<<<<<<<<<<<<<
@@ -12209,20 +12302,20 @@ if (!__Pyx_RefNanny) {
     PyErr_Clear();
     __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_labels);
   }
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 103, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_setter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_setter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":104
+  /* "INDUSAnalysis/timeseries.pyx":133
  * 
  *     @labels.setter
  *     def labels(self, labels):             # <<<<<<<<<<<<<<
  *         if len(labels) < self._x.ndim:
  *             raise ValueError("Too few labels for data dimensions")
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_19labels, 0, __pyx_n_s_TimeSeries_labels, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__48)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_19labels, 0, __pyx_n_s_TimeSeries_labels, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__48)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -12237,83 +12330,83 @@ if (!__Pyx_RefNanny) {
   __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_labels, __pyx_t_2) < 0) __PYX_ERR(0, 104, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_labels, __pyx_t_2) < 0) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":111
+  /* "INDUSAnalysis/timeseries.pyx":140
  *         self._labels = labels
  * 
  *     def moving_average(self, window):             # <<<<<<<<<<<<<<
  *         """
  *         Computes moving (rolling) average of 1-d data.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_21moving_average, 0, __pyx_n_s_TimeSeries_moving_average, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__50)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_21moving_average, 0, __pyx_n_s_TimeSeries_moving_average, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__50)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_moving_average, __pyx_t_2) < 0) __PYX_ERR(0, 111, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_moving_average, __pyx_t_2) < 0) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":128
+  /* "INDUSAnalysis/timeseries.pyx":157
  *         return TimeSeries(self._t[window - 1:], ma, labels=self._labels)
  * 
  *     def cumulative_moving_average(self):             # <<<<<<<<<<<<<<
  *         """
  *         Computes cumulative moving average of 1-d data.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_23cumulative_moving_average, 0, __pyx_n_s_TimeSeries_cumulative_moving_ave, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__52)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 128, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_23cumulative_moving_average, 0, __pyx_n_s_TimeSeries_cumulative_moving_ave, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__52)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_cumulative_moving_average, __pyx_t_2) < 0) __PYX_ERR(0, 128, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_cumulative_moving_average, __pyx_t_2) < 0) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":143
+  /* "INDUSAnalysis/timeseries.pyx":172
  *         return TimeSeries(self._t, cma, labels=self._labels)
  * 
  *     def mean(self, axis=None):             # <<<<<<<<<<<<<<
  *         """
  *         Computes mean of timeseries data.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_25mean, 0, __pyx_n_s_TimeSeries_mean, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__54)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_25mean, 0, __pyx_n_s_TimeSeries_mean, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__54)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__55);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_mean, __pyx_t_2) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_mean, __pyx_t_2) < 0) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":162
+  /* "INDUSAnalysis/timeseries.pyx":191
  *             return TimeSeries(self._t, mean, labels=labels)
  * 
  *     def std(self, axis=None):             # <<<<<<<<<<<<<<
  *         """
  *         Computes std of timeseries data.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_27std, 0, __pyx_n_s_TimeSeries_std, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__57)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_27std, 0, __pyx_n_s_TimeSeries_std, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__57)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__58);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_std, __pyx_t_2) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_std, __pyx_t_2) < 0) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":182
+  /* "INDUSAnalysis/timeseries.pyx":211
  * 
  *     # TODO: Implement
  *     @profiling.timefunc             # <<<<<<<<<<<<<<
- *     def sem(self, axis=0):
+ *     def sem(self, axis=None):
  *         """
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_profiling); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_profiling); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_timefunc); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_timefunc); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":183
+  /* "INDUSAnalysis/timeseries.pyx":212
  *     # TODO: Implement
  *     @profiling.timefunc
- *     def sem(self, axis=0):             # <<<<<<<<<<<<<<
+ *     def sem(self, axis=None):             # <<<<<<<<<<<<<<
  *         """
  *         Computes standard error of mean (estimate of the standard deviation
  */
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_29sem, 0, __pyx_n_s_TimeSeries_sem, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__60)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_29sem, 0, __pyx_n_s_TimeSeries_sem, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__60)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_3, __pyx_tuple__61);
   __pyx_t_5 = NULL;
@@ -12329,41 +12422,41 @@ if (!__Pyx_RefNanny) {
   __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 182, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_sem, __pyx_t_2) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_sem, __pyx_t_2) < 0) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":193
+  /* "INDUSAnalysis/timeseries.pyx":222
  *         pass
  * 
  *     def plot(self, *plotargs, **plotkwargs):             # <<<<<<<<<<<<<<
  *         """Plots 1-d timeseries data.
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_31plot, 0, __pyx_n_s_TimeSeries_plot, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__63)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_31plot, 0, __pyx_n_s_TimeSeries_plot, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__63)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_plot, __pyx_t_2) < 0) __PYX_ERR(0, 193, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_plot, __pyx_t_2) < 0) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":212
+  /* "INDUSAnalysis/timeseries.pyx":241
  *         return fig
  * 
  *     def plot_2d_heatmap(self, **imshowkwargs):             # <<<<<<<<<<<<<<
  *         """Plots 2-d timeseries data as a heatmap.
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_33plot_2d_heatmap, 0, __pyx_n_s_TimeSeries_plot_2d_heatmap, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__65)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_10TimeSeries_33plot_2d_heatmap, 0, __pyx_n_s_TimeSeries_plot_2d_heatmap, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__65)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_plot_2d_heatmap, __pyx_t_2) < 0) __PYX_ERR(0, 212, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_plot_2d_heatmap, __pyx_t_2) < 0) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "INDUSAnalysis/timeseries.pyx":21
  * 
  * 
  * class TimeSeries:             # <<<<<<<<<<<<<<
- *     """Stores N-dimensional time series data.
+ *     """Stores N-dimensional time series data, accessible and sliceable by time.
  * 
  */
   __pyx_t_2 = __Pyx_Py3ClassCreate(((PyObject*)&__Pyx_DefaultClassType), __pyx_n_s_TimeSeries, __pyx_empty_tuple, __pyx_t_1, NULL, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
@@ -12372,100 +12465,100 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":241
+  /* "INDUSAnalysis/timeseries.pyx":270
  * 
  * 
  * class TimeSeriesAnalysis:             # <<<<<<<<<<<<<<
  *     """
  *     Template class for timeseries analysis of simulation data.
  */
-  __pyx_t_1 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_empty_tuple, __pyx_n_s_TimeSeriesAnalysis, __pyx_n_s_TimeSeriesAnalysis, (PyObject *) NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_kp_s_Template_class_for_timeseries_a); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_empty_tuple, __pyx_n_s_TimeSeriesAnalysis, __pyx_n_s_TimeSeriesAnalysis, (PyObject *) NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_kp_s_Template_class_for_timeseries_a); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "INDUSAnalysis/timeseries.pyx":248
+  /* "INDUSAnalysis/timeseries.pyx":277
  *         args: Command line argument parser.
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         self.parser = argparse.ArgumentParser()
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_1__init__, 0, __pyx_n_s_TimeSeriesAnalysis___init, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__67)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_1__init__, 0, __pyx_n_s_TimeSeriesAnalysis___init, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__67)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_init, __pyx_t_2) < 0) __PYX_ERR(0, 248, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_init, __pyx_t_2) < 0) __PYX_ERR(0, 277, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":279
+  /* "INDUSAnalysis/timeseries.pyx":308
  *         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")
  * 
  *     def parse_args(self, args=None):             # <<<<<<<<<<<<<<
  *         """
  *         Parses arguments.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_3parse_args, 0, __pyx_n_s_TimeSeriesAnalysis_parse_args, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__69)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_3parse_args, 0, __pyx_n_s_TimeSeriesAnalysis_parse_args, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__69)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__70);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_parse_args, __pyx_t_2) < 0) __PYX_ERR(0, 279, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_parse_args, __pyx_t_2) < 0) __PYX_ERR(0, 308, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":291
+  /* "INDUSAnalysis/timeseries.pyx":320
  *             self.args = self.parser.parse_args(args)
  * 
  *     def read_args(self):             # <<<<<<<<<<<<<<
  *         """
  *         Stores arguments from TimeSeries `args` parameter in class variables.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_5read_args, 0, __pyx_n_s_TimeSeriesAnalysis_read_args, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__72)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_5read_args, 0, __pyx_n_s_TimeSeriesAnalysis_read_args, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__72)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 320, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_read_args, __pyx_t_2) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_read_args, __pyx_t_2) < 0) __PYX_ERR(0, 320, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":336
+  /* "INDUSAnalysis/timeseries.pyx":365
  * 
  *     # TODO: Implement
  *     def save_TimeSeries(self, tso, filename):             # <<<<<<<<<<<<<<
  *         """
  *         Saves TimeSeries object to file using pickle dump.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_7save_TimeSeries, 0, __pyx_n_s_TimeSeriesAnalysis_save_TimeSeri, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__74)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 336, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_7save_TimeSeries, 0, __pyx_n_s_TimeSeriesAnalysis_save_TimeSeri, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__74)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_save_TimeSeries, __pyx_t_2) < 0) __PYX_ERR(0, 336, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_save_TimeSeries, __pyx_t_2) < 0) __PYX_ERR(0, 365, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":346
+  /* "INDUSAnalysis/timeseries.pyx":375
  *             pickle.dump(tso, f)
  * 
  *     def load_TimeSeries(self, filename):             # <<<<<<<<<<<<<<
  *         """
  *         Loads pickled TimeSeries object from file
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_9load_TimeSeries, 0, __pyx_n_s_TimeSeriesAnalysis_load_TimeSeri, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__76)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_9load_TimeSeries, 0, __pyx_n_s_TimeSeriesAnalysis_load_TimeSeri, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__76)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_load_TimeSeries, __pyx_t_2) < 0) __PYX_ERR(0, 346, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_load_TimeSeries, __pyx_t_2) < 0) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":360
+  /* "INDUSAnalysis/timeseries.pyx":389
  *             return tso
  * 
  *     def save_figure(self, fig, suffix=""):             # <<<<<<<<<<<<<<
  *         """
  *         Exports figure to image file.
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_11save_figure, 0, __pyx_n_s_TimeSeriesAnalysis_save_figure, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__78)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_13INDUSAnalysis_10timeseries_18TimeSeriesAnalysis_11save_figure, 0, __pyx_n_s_TimeSeriesAnalysis_save_figure, NULL, __pyx_n_s_INDUSAnalysis_timeseries, __pyx_d, ((PyObject *)__pyx_codeobj__78)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__79);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_save_figure, __pyx_t_2) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_save_figure, __pyx_t_2) < 0) __PYX_ERR(0, 389, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "INDUSAnalysis/timeseries.pyx":241
+  /* "INDUSAnalysis/timeseries.pyx":270
  * 
  * 
  * class TimeSeriesAnalysis:             # <<<<<<<<<<<<<<
  *     """
  *     Template class for timeseries analysis of simulation data.
  */
-  __pyx_t_2 = __Pyx_Py3ClassCreate(((PyObject*)&__Pyx_DefaultClassType), __pyx_n_s_TimeSeriesAnalysis, __pyx_empty_tuple, __pyx_t_1, NULL, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3ClassCreate(((PyObject*)&__Pyx_DefaultClassType), __pyx_n_s_TimeSeriesAnalysis, __pyx_empty_tuple, __pyx_t_1, NULL, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_TimeSeriesAnalysis, __pyx_t_2) < 0) __PYX_ERR(0, 241, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_TimeSeriesAnalysis, __pyx_t_2) < 0) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
@@ -12703,310 +12796,6 @@ bad:
     return -1;
 }
 
-/* PyObjectSetAttrStr */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
-    PyTypeObject* tp = Py_TYPE(obj);
-    if (likely(tp->tp_setattro))
-        return tp->tp_setattro(obj, attr_name, value);
-#if PY_MAJOR_VERSION < 3
-    if (likely(tp->tp_setattr))
-        return tp->tp_setattr(obj, PyString_AS_STRING(attr_name), value);
-#endif
-    return PyObject_SetAttr(obj, attr_name, value);
-}
-#endif
-
-/* GetItemInt */
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
-    PyObject *r;
-    if (!j) return NULL;
-    r = PyObject_GetItem(o, j);
-    Py_DECREF(j);
-    return r;
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyList_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyList_GET_SIZE(o)))) {
-        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              CYTHON_NCP_UNUSED int wraparound,
-                                                              CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    Py_ssize_t wrapped_i = i;
-    if (wraparound & unlikely(i < 0)) {
-        wrapped_i += PyTuple_GET_SIZE(o);
-    }
-    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyTuple_GET_SIZE(o)))) {
-        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
-        Py_INCREF(r);
-        return r;
-    }
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-#else
-    return PySequence_GetItem(o, i);
-#endif
-}
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
-                                                     CYTHON_NCP_UNUSED int wraparound,
-                                                     CYTHON_NCP_UNUSED int boundscheck) {
-#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
-    if (is_list || PyList_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
-        if ((!boundscheck) || (likely(__Pyx_is_valid_index(n, PyList_GET_SIZE(o))))) {
-            PyObject *r = PyList_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    }
-    else if (PyTuple_CheckExact(o)) {
-        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
-        if ((!boundscheck) || likely(__Pyx_is_valid_index(n, PyTuple_GET_SIZE(o)))) {
-            PyObject *r = PyTuple_GET_ITEM(o, n);
-            Py_INCREF(r);
-            return r;
-        }
-    } else {
-        PySequenceMethods *m = Py_TYPE(o)->tp_as_sequence;
-        if (likely(m && m->sq_item)) {
-            if (wraparound && unlikely(i < 0) && likely(m->sq_length)) {
-                Py_ssize_t l = m->sq_length(o);
-                if (likely(l >= 0)) {
-                    i += l;
-                } else {
-                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
-                        return NULL;
-                    PyErr_Clear();
-                }
-            }
-            return m->sq_item(o, i);
-        }
-    }
-#else
-    if (is_list || PySequence_Check(o)) {
-        return PySequence_GetItem(o, i);
-    }
-#endif
-    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-}
-
-/* PyObjectCall */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
-    PyObject *result;
-    ternaryfunc call = func->ob_type->tp_call;
-    if (unlikely(!call))
-        return PyObject_Call(func, arg, kw);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = (*call)(func, arg, kw);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
-
-/* PyErrFetchRestore */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    tmp_type = tstate->curexc_type;
-    tmp_value = tstate->curexc_value;
-    tmp_tb = tstate->curexc_traceback;
-    tstate->curexc_type = type;
-    tstate->curexc_value = value;
-    tstate->curexc_traceback = tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-}
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    *type = tstate->curexc_type;
-    *value = tstate->curexc_value;
-    *tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-}
-#endif
-
-/* RaiseException */
-#if PY_MAJOR_VERSION < 3
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb,
-                        CYTHON_UNUSED PyObject *cause) {
-    __Pyx_PyThreadState_declare
-    Py_XINCREF(type);
-    if (!value || value == Py_None)
-        value = NULL;
-    else
-        Py_INCREF(value);
-    if (!tb || tb == Py_None)
-        tb = NULL;
-    else {
-        Py_INCREF(tb);
-        if (!PyTraceBack_Check(tb)) {
-            PyErr_SetString(PyExc_TypeError,
-                "raise: arg 3 must be a traceback or None");
-            goto raise_error;
-        }
-    }
-    if (PyType_Check(type)) {
-#if CYTHON_COMPILING_IN_PYPY
-        if (!value) {
-            Py_INCREF(Py_None);
-            value = Py_None;
-        }
-#endif
-        PyErr_NormalizeException(&type, &value, &tb);
-    } else {
-        if (value) {
-            PyErr_SetString(PyExc_TypeError,
-                "instance exception may not have a separate value");
-            goto raise_error;
-        }
-        value = type;
-        type = (PyObject*) Py_TYPE(type);
-        Py_INCREF(type);
-        if (!PyType_IsSubtype((PyTypeObject *)type, (PyTypeObject *)PyExc_BaseException)) {
-            PyErr_SetString(PyExc_TypeError,
-                "raise: exception class must be a subclass of BaseException");
-            goto raise_error;
-        }
-    }
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrRestore(type, value, tb);
-    return;
-raise_error:
-    Py_XDECREF(value);
-    Py_XDECREF(type);
-    Py_XDECREF(tb);
-    return;
-}
-#else
-static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause) {
-    PyObject* owned_instance = NULL;
-    if (tb == Py_None) {
-        tb = 0;
-    } else if (tb && !PyTraceBack_Check(tb)) {
-        PyErr_SetString(PyExc_TypeError,
-            "raise: arg 3 must be a traceback or None");
-        goto bad;
-    }
-    if (value == Py_None)
-        value = 0;
-    if (PyExceptionInstance_Check(type)) {
-        if (value) {
-            PyErr_SetString(PyExc_TypeError,
-                "instance exception may not have a separate value");
-            goto bad;
-        }
-        value = type;
-        type = (PyObject*) Py_TYPE(value);
-    } else if (PyExceptionClass_Check(type)) {
-        PyObject *instance_class = NULL;
-        if (value && PyExceptionInstance_Check(value)) {
-            instance_class = (PyObject*) Py_TYPE(value);
-            if (instance_class != type) {
-                int is_subclass = PyObject_IsSubclass(instance_class, type);
-                if (!is_subclass) {
-                    instance_class = NULL;
-                } else if (unlikely(is_subclass == -1)) {
-                    goto bad;
-                } else {
-                    type = instance_class;
-                }
-            }
-        }
-        if (!instance_class) {
-            PyObject *args;
-            if (!value)
-                args = PyTuple_New(0);
-            else if (PyTuple_Check(value)) {
-                Py_INCREF(value);
-                args = value;
-            } else
-                args = PyTuple_Pack(1, value);
-            if (!args)
-                goto bad;
-            owned_instance = PyObject_Call(type, args, NULL);
-            Py_DECREF(args);
-            if (!owned_instance)
-                goto bad;
-            value = owned_instance;
-            if (!PyExceptionInstance_Check(value)) {
-                PyErr_Format(PyExc_TypeError,
-                             "calling %R should have returned an instance of "
-                             "BaseException, not %R",
-                             type, Py_TYPE(value));
-                goto bad;
-            }
-        }
-    } else {
-        PyErr_SetString(PyExc_TypeError,
-            "raise: exception class must be a subclass of BaseException");
-        goto bad;
-    }
-    if (cause) {
-        PyObject *fixed_cause;
-        if (cause == Py_None) {
-            fixed_cause = NULL;
-        } else if (PyExceptionClass_Check(cause)) {
-            fixed_cause = PyObject_CallObject(cause, NULL);
-            if (fixed_cause == NULL)
-                goto bad;
-        } else if (PyExceptionInstance_Check(cause)) {
-            fixed_cause = cause;
-            Py_INCREF(fixed_cause);
-        } else {
-            PyErr_SetString(PyExc_TypeError,
-                            "exception causes must derive from "
-                            "BaseException");
-            goto bad;
-        }
-        PyException_SetCause(value, fixed_cause);
-    }
-    PyErr_SetObject(type, value);
-    if (tb) {
-#if CYTHON_COMPILING_IN_PYPY
-        PyObject *tmp_type, *tmp_value, *tmp_tb;
-        PyErr_Fetch(&tmp_type, &tmp_value, &tmp_tb);
-        Py_INCREF(tb);
-        PyErr_Restore(tmp_type, tmp_value, tb);
-        Py_XDECREF(tmp_tb);
-#else
-        PyThreadState *tstate = __Pyx_PyThreadState_Current;
-        PyObject* tmp_tb = tstate->curexc_traceback;
-        if (tb != tmp_tb) {
-            Py_INCREF(tb);
-            tstate->curexc_traceback = tb;
-            Py_XDECREF(tmp_tb);
-        }
-#endif
-    }
-bad:
-    Py_XDECREF(owned_instance);
-    return;
-}
-#endif
-
 /* PyDictVersioning */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
@@ -13210,6 +12999,26 @@ done:
 #endif
 #endif
 
+/* PyObjectCall */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
+    PyObject *result;
+    ternaryfunc call = func->ob_type->tp_call;
+    if (unlikely(!call))
+        return PyObject_Call(func, arg, kw);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = (*call)(func, arg, kw);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
 /* PyObjectCall2Args */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
     PyObject *args, *result = NULL;
@@ -13296,6 +13105,290 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObjec
     result = __Pyx_PyObject_Call(func, args, NULL);
     Py_DECREF(args);
     return result;
+}
+#endif
+
+/* PyObjectSetAttrStr */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
+    PyTypeObject* tp = Py_TYPE(obj);
+    if (likely(tp->tp_setattro))
+        return tp->tp_setattro(obj, attr_name, value);
+#if PY_MAJOR_VERSION < 3
+    if (likely(tp->tp_setattr))
+        return tp->tp_setattr(obj, PyString_AS_STRING(attr_name), value);
+#endif
+    return PyObject_SetAttr(obj, attr_name, value);
+}
+#endif
+
+/* GetItemInt */
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
+    PyObject *r;
+    if (!j) return NULL;
+    r = PyObject_GetItem(o, j);
+    Py_DECREF(j);
+    return r;
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyList_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyList_GET_SIZE(o)))) {
+        PyObject *r = PyList_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              CYTHON_NCP_UNUSED int wraparound,
+                                                              CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    Py_ssize_t wrapped_i = i;
+    if (wraparound & unlikely(i < 0)) {
+        wrapped_i += PyTuple_GET_SIZE(o);
+    }
+    if ((!boundscheck) || likely(__Pyx_is_valid_index(wrapped_i, PyTuple_GET_SIZE(o)))) {
+        PyObject *r = PyTuple_GET_ITEM(o, wrapped_i);
+        Py_INCREF(r);
+        return r;
+    }
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+#else
+    return PySequence_GetItem(o, i);
+#endif
+}
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, int is_list,
+                                                     CYTHON_NCP_UNUSED int wraparound,
+                                                     CYTHON_NCP_UNUSED int boundscheck) {
+#if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS && CYTHON_USE_TYPE_SLOTS
+    if (is_list || PyList_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyList_GET_SIZE(o);
+        if ((!boundscheck) || (likely(__Pyx_is_valid_index(n, PyList_GET_SIZE(o))))) {
+            PyObject *r = PyList_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    }
+    else if (PyTuple_CheckExact(o)) {
+        Py_ssize_t n = ((!wraparound) | likely(i >= 0)) ? i : i + PyTuple_GET_SIZE(o);
+        if ((!boundscheck) || likely(__Pyx_is_valid_index(n, PyTuple_GET_SIZE(o)))) {
+            PyObject *r = PyTuple_GET_ITEM(o, n);
+            Py_INCREF(r);
+            return r;
+        }
+    } else {
+        PySequenceMethods *m = Py_TYPE(o)->tp_as_sequence;
+        if (likely(m && m->sq_item)) {
+            if (wraparound && unlikely(i < 0) && likely(m->sq_length)) {
+                Py_ssize_t l = m->sq_length(o);
+                if (likely(l >= 0)) {
+                    i += l;
+                } else {
+                    if (!PyErr_ExceptionMatches(PyExc_OverflowError))
+                        return NULL;
+                    PyErr_Clear();
+                }
+            }
+            return m->sq_item(o, i);
+        }
+    }
+#else
+    if (is_list || PySequence_Check(o)) {
+        return PySequence_GetItem(o, i);
+    }
+#endif
+    return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
+}
+
+/* PyErrFetchRestore */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    tmp_type = tstate->curexc_type;
+    tmp_value = tstate->curexc_value;
+    tmp_tb = tstate->curexc_traceback;
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    *type = tstate->curexc_type;
+    *value = tstate->curexc_value;
+    *tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+}
+#endif
+
+/* RaiseException */
+#if PY_MAJOR_VERSION < 3
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb,
+                        CYTHON_UNUSED PyObject *cause) {
+    __Pyx_PyThreadState_declare
+    Py_XINCREF(type);
+    if (!value || value == Py_None)
+        value = NULL;
+    else
+        Py_INCREF(value);
+    if (!tb || tb == Py_None)
+        tb = NULL;
+    else {
+        Py_INCREF(tb);
+        if (!PyTraceBack_Check(tb)) {
+            PyErr_SetString(PyExc_TypeError,
+                "raise: arg 3 must be a traceback or None");
+            goto raise_error;
+        }
+    }
+    if (PyType_Check(type)) {
+#if CYTHON_COMPILING_IN_PYPY
+        if (!value) {
+            Py_INCREF(Py_None);
+            value = Py_None;
+        }
+#endif
+        PyErr_NormalizeException(&type, &value, &tb);
+    } else {
+        if (value) {
+            PyErr_SetString(PyExc_TypeError,
+                "instance exception may not have a separate value");
+            goto raise_error;
+        }
+        value = type;
+        type = (PyObject*) Py_TYPE(type);
+        Py_INCREF(type);
+        if (!PyType_IsSubtype((PyTypeObject *)type, (PyTypeObject *)PyExc_BaseException)) {
+            PyErr_SetString(PyExc_TypeError,
+                "raise: exception class must be a subclass of BaseException");
+            goto raise_error;
+        }
+    }
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrRestore(type, value, tb);
+    return;
+raise_error:
+    Py_XDECREF(value);
+    Py_XDECREF(type);
+    Py_XDECREF(tb);
+    return;
+}
+#else
+static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause) {
+    PyObject* owned_instance = NULL;
+    if (tb == Py_None) {
+        tb = 0;
+    } else if (tb && !PyTraceBack_Check(tb)) {
+        PyErr_SetString(PyExc_TypeError,
+            "raise: arg 3 must be a traceback or None");
+        goto bad;
+    }
+    if (value == Py_None)
+        value = 0;
+    if (PyExceptionInstance_Check(type)) {
+        if (value) {
+            PyErr_SetString(PyExc_TypeError,
+                "instance exception may not have a separate value");
+            goto bad;
+        }
+        value = type;
+        type = (PyObject*) Py_TYPE(value);
+    } else if (PyExceptionClass_Check(type)) {
+        PyObject *instance_class = NULL;
+        if (value && PyExceptionInstance_Check(value)) {
+            instance_class = (PyObject*) Py_TYPE(value);
+            if (instance_class != type) {
+                int is_subclass = PyObject_IsSubclass(instance_class, type);
+                if (!is_subclass) {
+                    instance_class = NULL;
+                } else if (unlikely(is_subclass == -1)) {
+                    goto bad;
+                } else {
+                    type = instance_class;
+                }
+            }
+        }
+        if (!instance_class) {
+            PyObject *args;
+            if (!value)
+                args = PyTuple_New(0);
+            else if (PyTuple_Check(value)) {
+                Py_INCREF(value);
+                args = value;
+            } else
+                args = PyTuple_Pack(1, value);
+            if (!args)
+                goto bad;
+            owned_instance = PyObject_Call(type, args, NULL);
+            Py_DECREF(args);
+            if (!owned_instance)
+                goto bad;
+            value = owned_instance;
+            if (!PyExceptionInstance_Check(value)) {
+                PyErr_Format(PyExc_TypeError,
+                             "calling %R should have returned an instance of "
+                             "BaseException, not %R",
+                             type, Py_TYPE(value));
+                goto bad;
+            }
+        }
+    } else {
+        PyErr_SetString(PyExc_TypeError,
+            "raise: exception class must be a subclass of BaseException");
+        goto bad;
+    }
+    if (cause) {
+        PyObject *fixed_cause;
+        if (cause == Py_None) {
+            fixed_cause = NULL;
+        } else if (PyExceptionClass_Check(cause)) {
+            fixed_cause = PyObject_CallObject(cause, NULL);
+            if (fixed_cause == NULL)
+                goto bad;
+        } else if (PyExceptionInstance_Check(cause)) {
+            fixed_cause = cause;
+            Py_INCREF(fixed_cause);
+        } else {
+            PyErr_SetString(PyExc_TypeError,
+                            "exception causes must derive from "
+                            "BaseException");
+            goto bad;
+        }
+        PyException_SetCause(value, fixed_cause);
+    }
+    PyErr_SetObject(type, value);
+    if (tb) {
+#if CYTHON_COMPILING_IN_PYPY
+        PyObject *tmp_type, *tmp_value, *tmp_tb;
+        PyErr_Fetch(&tmp_type, &tmp_value, &tmp_tb);
+        Py_INCREF(tb);
+        PyErr_Restore(tmp_type, tmp_value, tb);
+        Py_XDECREF(tmp_tb);
+#else
+        PyThreadState *tstate = __Pyx_PyThreadState_Current;
+        PyObject* tmp_tb = tstate->curexc_traceback;
+        if (tb != tmp_tb) {
+            Py_INCREF(tb);
+            tstate->curexc_traceback = tb;
+            Py_XDECREF(tmp_tb);
+        }
+#endif
+    }
+bad:
+    Py_XDECREF(owned_instance);
+    return;
 }
 #endif
 
