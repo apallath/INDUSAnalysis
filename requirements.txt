@@ -5,6 +5,7 @@ scipy
 matplotlib
 
 #Requirements for analyzing MD trajectories
+biopython==1.76
 MDAnalysis==0.20.1
 
 #Other requirements

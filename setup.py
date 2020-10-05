@@ -17,6 +17,8 @@ ext_modules = [Extension("INDUSAnalysis.timeseries", ["INDUSAnalysis/timeseries.
                Extension("INDUSAnalysis.contacts", ["INDUSAnalysis/contacts.pyx"],
                include_dirs=[numpy_include]),
                Extension("INDUSAnalysis.lib.profiling", ["INDUSAnalysis/lib/profiling.pyx"],
+               include_dirs=[numpy_include]),
+               Extension("INDUSAnalysis.lib.collective", ["INDUSAnalysis/lib/collective.pyx"],
                include_dirs=[numpy_include])]
 
 setup(

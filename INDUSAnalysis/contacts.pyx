@@ -30,7 +30,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         self.req_file_args.add_argument("structf", help="Topology or structure file (.tpr, .gro; .tpr required for atomic-sh)")
         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
 
-        self.calc_args.add_argument("-method", help="Method for calculating contacts (atomic-sh; default=atomic-sh)")
+        self.calc_args.add_argument("-method", help="Method for calculating contacts (atomic-h, atomic-sh; default=atomic-h)")
         self.calc_args.add_argument("-distcutoff", help="Distance cutoff for contacts, in A")
         self.calc_args.add_argument("-connthreshold", help="Connectivity threshold for contacts (definition varies by method)")
         self.calc_args.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
@@ -51,7 +51,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
 
         self.method = self.args.method
         if self.method is None:
-            self.method = "atomic-sh"
+            self.method = "atomic-h"
 
         self.opref = self.opref + "_" + self.method
         self.replotpref = self.replotpref + "_" + self.method
@@ -114,10 +114,89 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         Raises:
             ValueError if calculation method is not recognized.
         """
-        if method == "atomic-sh":
+        if method == "atomic-h":
+            return self.calc_trajcontacts_atomic_h(u, distcutoff, connthreshold, start_time, end_time, skip)
+        elif method == "atomic-sh":
             return self.calc_trajcontacts_atomic_sh(u, distcutoff, connthreshold, start_time, end_time, skip)
         else:
             raise ValueError("Method not recognized")
+
+    @profiling.timefunc
+    def calc_trajcontacts_atomic_h(self, u, distcutoff, connthreshold, start_time, end_time, skip):
+        """
+        Calculates contacts between heavy atoms along trajectory.
+
+        The connectivity threshold is the number of bonds heavy atoms
+        have to be separated by on the shortest bond network path between them
+        for the pair to be a candidate for contact formation. The distance cutoff
+        is the distance between a candidate atomic pair within which it is
+        considered to be a valid contact.
+
+        Side chain heavy atoms i and j form a contact if
+        N(i,j) > connthreshold and r(i,j) < distcutoff.
+        """
+        # MDAnalysis selection strings
+        heavy_sel = "protein and not name H*"
+        not_heavy_sel = "protein and name H*"
+
+        # Select heavy atoms only
+        protein_heavy = u.select_atoms(heavy_sel)
+        nheavy = len(protein_heavy.atoms)
+
+        start_index = None
+        stop_index = None
+        for tidx, ts in enumerate(u.trajectory):
+            if start_index is None and ts.time >= start_time:
+                start_index = tidx
+            if ts.time == end_time:
+                stop_index = tidx + 1
+
+        # Select trajectory to average over
+        utraj = u.trajectory[start_index:stop_index:skip]
+
+        # Determine indices to exclude based on connectivity
+        apsp, all_to_heavy = self.protein_heavy_APSP(u)
+
+        if connthreshold < 0:
+            raise ValueError("Connectivity threshold must be an integer value 0 or greater.")
+
+        # Variables to store computed contacts to
+        times = np.zeros(len(utraj))
+        total_contacts = np.zeros(len(utraj))
+        mean_contactmatrix = np.zeros((nheavy, nheavy))
+
+        if self.verbose:
+            pbar = tqdm(desc="Calculating contacts", total=len(utraj))
+
+        for tidx, ts in enumerate(utraj):
+            # Fast MDAnalysis distance matrix computation
+            dmatrix = mda.lib.distances.distance_array(protein_heavy.positions, protein_heavy.positions)
+
+            # Exclude i-j interactions below connectivity threshold from distance matrix
+            for i in range(apsp.shape[0]):
+                for j in range(apsp.shape[1]):
+                    if i == j and apsp[i, j] > 0:
+                        raise ValueError("Distance matrix is inconsistent: shortest path between same atom should be 0.")
+                    if apsp[i, j] <= connthreshold:
+                        dmatrix[i, j] = np.Inf
+
+            # Impose distance cutoff
+            contactmatrix = np.array(dmatrix < distcutoff)
+
+            # Store timeseries
+            times[tidx] = ts.time
+            total_contacts[tidx] = np.sum(contactmatrix)
+
+            # Add to mean
+            mean_contactmatrix += contactmatrix
+
+            if self.verbose:
+                pbar.update(1)
+
+        ts_contacts = timeseries.TimeSeries(times, total_contacts, labels=['Number of contacts'])
+        mean_contactmatrix = mean_contactmatrix / len(utraj)
+
+        return ts_contacts, mean_contactmatrix
 
     @profiling.timefunc
     def calc_trajcontacts_atomic_sh(self, u, distcutoff, connthreshold, start_time, end_time, skip):

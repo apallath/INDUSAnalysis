@@ -11,7 +11,7 @@ args=(
 /path/to/traj.xtc
 
 # Method for calculating contacts
--method atomic_sh
+-method atomic-sh
 # Distance cutoff for contacts calculation (in A)
 -distcutoff 7.0
 # Connectivity threshold for contacts (definition varies by method)
@@ -28,7 +28,6 @@ args=(
 -obsstart 500
 # Time to stop averaging at (in ps)
 # -obsend 4000
-
 
 # Prefix of output image and data files
 -opref indus
