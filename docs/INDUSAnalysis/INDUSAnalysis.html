@@ -94,6 +94,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.indus_waters">INDUSAnalysis.indus_waters module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.protein_order_params">INDUSAnalysis.protein_order_params module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.timeseries">INDUSAnalysis.timeseries module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="INDUSAnalysis.lib.html">INDUSAnalysis.lib package</a></li>
@@ -170,7 +171,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="INDUSAnalysis.lib.html">INDUSAnalysis.lib package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#module-INDUSAnalysis.lib.collective">INDUSAnalysis.lib.collective module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#module-INDUSAnalysis.lib.profiling">INDUSAnalysis.lib.profiling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#module-INDUSAnalysis.lib">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -182,6 +185,7 @@
 <div class="section" id="module-INDUSAnalysis.contacts">
 <span id="indusanalysis-contacts-module"></span><h2>INDUSAnalysis.contacts module<a class="headerlink" href="#module-INDUSAnalysis.contacts" title="Permalink to this headline">¶</a></h2>
 <p>Defines class for analysing contacts along GROMACS simulation trajectory.</p>
+<p>Extendable to add new types of contacts analysis.</p>
 <dl class="class">
 <dt id="INDUSAnalysis.contacts.ContactsAnalysis">
 <em class="property">class </em><code class="sig-prename descclassname">INDUSAnalysis.contacts.</code><code class="sig-name descname">ContactsAnalysis</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis" title="Permalink to this definition">¶</a></dt>
@@ -191,29 +195,63 @@
 <code class="sig-name descname">calc_plot_histogram_contacts</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_plot_histogram_contacts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates and plots histogram of contacts, and saves histogram of
 contacts to file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_contacts</strong> (<a class="reference internal" href="#INDUSAnalysis.timeseries.TimeSeries" title="INDUSAnalysis.timeseries.TimeSeries"><em>timeseries.TimeSeries</em></a>) – Timeseries of total contacts.</p></li>
+<li><p><strong>bins</strong> (<em>int</em>) – Number of bins for histogram</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts">
 <code class="sig-name descname">calc_trajcontacts</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates contacts along a trajectory.</p>
+<dd><p>Calculates contacts between heavy atoms along a trajectory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>MDAnalysis.Universe</em>) – Trajectory.</p></li>
+<li><p><strong>u</strong> (<em>mda.Universe</em>) – Trajectory.</p></li>
 <li><p><strong>method</strong> (<em>str</em>) – Calculation method to use to compute contacts.</p></li>
 <li><p><strong>distcutoff</strong> (<em>float</em>) – Distance cutoff (in A).</p></li>
 <li><p><strong>connthreshold</strong> (<em>int</em>) – Connectivity threshold.</p></li>
+<li><p><strong>start_time</strong> (<em>float</em>) – Time to start averaging at.</p></li>
+<li><p><strong>end_time</strong> (<em>float</em>) – Time to end averaging at.</p></li>
 <li><p><strong>skip</strong> (<em>int</em>) – Resampling interval.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>TimeSeries object of contact matrices.</p>
+<dd class="field-even"><p><dl class="simple">
+<dt>{</dt><dd><dl class="simple">
+<dt>ts_contacts (timeseries.TimeSeries): TimeSeries objects containing total</dt><dd><p>number of contacts formed at each timestep.</p>
+</dd>
+<dt>mean_contactmatrix(np.array): Array of shape (nheavy, nheavy) where</dt><dd><p>mean_contactmatrix[i,j] is ratio of number of timesteps where the contact
+[i,j] is formed to the total number of timesteps.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>}</p>
+</p>
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>ValueError if calculation method is not recognized.</strong> – </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_h">
+<code class="sig-name descname">calc_trajcontacts_atomic_h</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates contacts between heavy atoms along trajectory.</p>
+<p>The connectivity threshold is the number of bonds heavy atoms
+have to be separated by on the shortest bond network path between them
+for the pair to be a candidate for contact formation. The distance cutoff
+is the distance between a candidate atomic pair within which it is
+considered to be a valid contact.</p>
+<p>Side chain heavy atoms i and j form a contact if
+N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -227,12 +265,6 @@ is the distance between a candidate atomic pair within which it is
 considered to be a valid contact.</p>
 <p>Side chain heavy atoms i and j form a contact if
 N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.plot_contacts_per_atom">
-<code class="sig-name descname">plot_contacts_per_atom</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.plot_contacts_per_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots timeseries contacts per atom.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -250,6 +282,14 @@ N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
 <dt id="INDUSAnalysis.contacts.ContactsAnalysis.plot_total_fraction_contacts">
 <code class="sig-name descname">plot_total_fraction_contacts</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.plot_total_fraction_contacts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots timeseries number of contacts and fraction of contacts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts_contacts</strong> (<a class="reference internal" href="#INDUSAnalysis.timeseries.TimeSeries" title="INDUSAnalysis.timeseries.TimeSeries"><em>timeseries.TimeSeries</em></a>) – Timeseries of total contacts.</p></li>
+<li><p><strong>refcontacts</strong> (<em>float</em>) – Reference number of contacts</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -267,7 +307,7 @@ equal weight (of 1).</p>
 <dt>{</dt><dd><dl class="simple">
 <dt>D (np.array): Array of shape (nheavy, nheavy), where D[i,j] is the shortest</dt><dd><p>path distance between heavy atom i and heavy atom j.</p>
 </dd>
-<dt>index_map (dict): Dictionary mapping heavy atom i to its atom</dt><dd><p>index in the Universe.</p>
+<dt>all_to_heavy (dict): Dictionary mapping atom i in the Universe to its heavy atom</dt><dd><p>index.</p>
 </dd>
 </dl>
 </dd>
@@ -282,27 +322,6 @@ equal weight (of 1).</p>
 <dt id="INDUSAnalysis.contacts.ContactsAnalysis.read_args">
 <code class="sig-name descname">read_args</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.read_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores arguments from TimeSeries <cite>args</cite> parameter in class variables.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.write_contacts_per_atom_pdb">
-<code class="sig-name descname">write_contacts_per_atom_pdb</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.write_contacts_per_atom_pdb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes per-atom-contacts to PDB file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>mda.Universe</em>) – Universe containing solvated protein.</p></li>
-<li><p><strong>skip</strong> (<em>int</em>) – Trajectory resampling interval.</p></li>
-<li><p><strong>ts_contacts_per_atom</strong> (<a class="reference internal" href="#INDUSAnalysis.timeseries.TimeSeries" title="INDUSAnalysis.timeseries.TimeSeries"><em>TimeSeries</em></a>) – Per-atom contacts timeseries data.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError if the time for the same index in u.trajectory</strong><strong>[</strong><strong>::skip</strong><strong>]</strong> – </p></li>
-<li><p><strong>and ts_contacts_per_atom does not match.</strong> – </p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -641,7 +660,7 @@ to use for alignment before calculating RMSD.</p></li>
 <dt id="INDUSAnalysis.timeseries.TimeSeries">
 <em class="property">class </em><code class="sig-prename descclassname">INDUSAnalysis.timeseries.</code><code class="sig-name descname">TimeSeries</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Stores N-dimensional time series data.</p>
+<p>Stores N-dimensional time series data, accessible and sliceable by time.</p>
 <dl class="attribute">
 <dt id="INDUSAnalysis.timeseries.TimeSeries.times">
 <code class="sig-name descname">times</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.times" title="Permalink to this definition">¶</a></dt>
@@ -800,7 +819,7 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 of the distribution of the mean) using block bootstrapping.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>axis</strong> (<em>int</em>) – </p>
+<dd class="field-odd"><p><strong>axis</strong> (<em>int</em>) – Optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -900,6 +919,9 @@ OFORMAT is the class attribute storing the output image extension.</p>
 
 </dd></dl>
 
+</div>
+<div class="section" id="module-INDUSAnalysis">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

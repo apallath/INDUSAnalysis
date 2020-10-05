@@ -87,7 +87,9 @@
 <li class="toctree-l2 current"><a class="reference internal" href="INDUSAnalysis.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">INDUSAnalysis.lib package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-INDUSAnalysis.lib.collective">INDUSAnalysis.lib.collective module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-INDUSAnalysis.lib.profiling">INDUSAnalysis.lib.profiling module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-INDUSAnalysis.lib">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -97,11 +99,14 @@
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.html#module-INDUSAnalysis.indus_waters">INDUSAnalysis.indus_waters module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.html#module-INDUSAnalysis.protein_order_params">INDUSAnalysis.protein_order_params module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.html#module-INDUSAnalysis.timeseries">INDUSAnalysis.timeseries module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.html#module-INDUSAnalysis">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">INDUSAnalysis.lib package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.collective">INDUSAnalysis.lib.collective module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.profiling">INDUSAnalysis.lib.profiling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -176,6 +181,127 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-INDUSAnalysis.lib.collective">
+<span id="indusanalysis-lib-collective-module"></span><h2>INDUSAnalysis.lib.collective module<a class="headerlink" href="#module-INDUSAnalysis.lib.collective" title="Permalink to this headline">¶</a></h2>
+<p>Function definitions for:
+- Effective hydration shell pressure calculation
+- Curve fitting</p>
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.P_to_phi">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">P_to_phi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.P_to_phi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts effective hydration shell P (kbar) to phi (kJ/mol) given P0 (bar)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>np.float</em>) – Value of effective hydration shell pressure in kbar</p></li>
+<li><p><strong>P0</strong> (<em>np.float</em>) – Value of system (simulation) pressure in bar (optional, default = 1 bar)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>phi potential in kJ/mol</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>phi (np.float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">derivative_integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function defining the derivative of the integrated step gaussian model (aka step + gaussian)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.fit_integrated_step_gaussian">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">fit_integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits integrated step gaussian model to data with error bars using
+weighted least squares regression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xdata</strong> (<em>ndarray</em>) – 1-dimensional array containing x values</p></li>
+<li><p><strong>ydata</strong> (<em>ndarray</em>) – 1-dimensional array containing y values</p></li>
+<li><p><strong>yerr</strong> (<em>ndarray</em>) – 1-dimensional array containing y standard errors</p></li>
+<li><p><strong>p_guess</strong> (<em>ndarray</em>) – 1-dimensional array of length 6 containing initial guesses
+for curve fitting</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2-d tuple (popt, perr, chi_sq), where
+popt = array containing the fitted parameters for the integrated step gaussian model.
+perr = array containing errors corresponding to fitted parameters
+chi_sq = chi squared statistic</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.fit_linear_model">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">fit_linear_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_linear_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits linear model to data with error bars using
+weighted least squares regression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xdata</strong> (<em>ndarray</em>) – 1-dimensional array containing x values</p></li>
+<li><p><strong>ydata</strong> (<em>ndarray</em>) – 1-dimensional array containing y values</p></li>
+<li><p><strong>yerr</strong> (<em>ndarray</em>) – 1-dimensional array containing y standard errors</p></li>
+<li><p><strong>p_guess</strong> (<em>ndarray</em>) – 1-dimensional array of length 2 containing initial guesses
+for curve fitting</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>2-d tuple (popt, perr, chi_sq), where
+popt = array containing the fitted parameters for the linear model.
+perr = array containing errors corresponding to fitted parameters
+chi_sq = chi squared statistic</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.integrated_step_gaussian">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function defining integrated step gaussian model.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.linear_model">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">linear_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.linear_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function defining linear model</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">penalized_integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>*Deprecated*</strong>
+Use curve fitting with upper and lower bounds instead.</p>
+<p>Integrated step gaussian model with a penalty for positive slopes (which
+gets added to the residual during curve fitting).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="INDUSAnalysis.lib.collective.phi_to_P">
+<code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">phi_to_P</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.phi_to_P" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts phi (kJ/mol) to effective hydration shell P (kbar) given P0 (bar)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phi</strong> (<em>np.float</em>) – Value of phi in kJ/mol</p></li>
+<li><p><strong>P0</strong> (<em>np.float</em>) – Value of system (simulation) pressure in bar (optional, default = 1 bar)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Effective hydration shell pressure in kbar.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>P (np.float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-INDUSAnalysis.lib.profiling">
 <span id="indusanalysis-lib-profiling-module"></span><h2>INDUSAnalysis.lib.profiling module<a class="headerlink" href="#module-INDUSAnalysis.lib.profiling" title="Permalink to this headline">¶</a></h2>
 <p>Helper function definitions for code profiling</p>
@@ -197,6 +323,9 @@
 <dd><p>Reports function execution time to file [decorator]</p>
 </dd></dl>
 
+</div>
+<div class="section" id="module-INDUSAnalysis.lib">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis.lib" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
