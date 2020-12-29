@@ -2,7 +2,7 @@
 Cython
 numpy
 scipy
-matplotlib=3.2.2
+matplotlib==3.2.2
 
 #Requirements for analyzing MD trajectories
 biopython==1.76
