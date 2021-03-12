@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>INDUSAnalysis.lib package &mdash; INDUSAnalysis 0.1.0 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -30,6 +33,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -50,7 +54,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> INDUSAnalysis
+            <a href="../index.html" class="icon icon-home"> INDUSAnalysis
           
 
           
@@ -149,6 +153,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -162,7 +168,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/INDUSAnalysis/INDUSAnalysis.lib.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -186,7 +192,7 @@
 <p>Function definitions for:
 - Effective hydration shell pressure calculation
 - Curve fitting</p>
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.P_to_phi">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">P_to_phi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.P_to_phi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts effective hydration shell P (kbar) to phi (kJ/mol) given P0 (bar)</p>
@@ -206,17 +212,20 @@
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">derivative_integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function defining the derivative of the integrated step gaussian model (aka step + gaussian)</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.fit_integrated_step_gaussian">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">fit_integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fits integrated step gaussian model to data with error bars using
+<dd><p>Fits the integrated step gaussian model to data with error bars using
 weighted least squares regression.</p>
+<p>The integrated step gaussian model is defined as:</p>
+<div class="math notranslate nohighlight">
+\[y = A \cdot x + \frac{B - A}{S} \log(S \cdot x + \exp(S \cdot C)) - \frac{\sqrt{\pi}}{2} \cdot D \cdot E \cdot erf(\frac{C - x}{E})\]</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -236,7 +245,7 @@ chi_sq = chi squared statistic</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.fit_linear_model">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">fit_linear_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_linear_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fits linear model to data with error bars using
@@ -260,28 +269,31 @@ chi_sq = chi squared statistic</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.integrated_step_gaussian">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function defining integrated step gaussian model.</p>
+<dd><p>Function defining the integrated step gaussian model.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.linear_model">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">linear_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.linear_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function defining linear model</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">penalized_integrated_step_gaussian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>*Deprecated*</strong>
-Use curve fitting with upper and lower bounds instead.</p>
-<p>Integrated step gaussian model with a penalty for positive slopes (which
+<dd><p>Integrated step gaussian model with a penalty for positive slopes (which
 gets added to the residual during curve fitting).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function has been deprecated, as it can be unstable in certain situtations.
+Use curve fitting with upper and lower bounds instead (implemented in <cite>fit_integrated_step_gaussian</cite>).</p>
+</div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.collective.phi_to_P">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.collective.</code><code class="sig-name descname">phi_to_P</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.phi_to_P" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts phi (kJ/mol) to effective hydration shell P (kbar) given P0 (bar)</p>
@@ -305,19 +317,19 @@ gets added to the residual during curve fitting).</p>
 <div class="section" id="module-INDUSAnalysis.lib.profiling">
 <span id="indusanalysis-lib-profiling-module"></span><h2>INDUSAnalysis.lib.profiling module<a class="headerlink" href="#module-INDUSAnalysis.lib.profiling" title="Permalink to this headline">¶</a></h2>
 <p>Helper function definitions for code profiling</p>
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.profiling.skipfunc">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.profiling.</code><code class="sig-name descname">skipfunc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.skipfunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bypasses function execution [decorator]</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.profiling.timefunc">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.profiling.</code><code class="sig-name descname">timefunc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.timefunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reports function execution time to stdout [decorator]</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="INDUSAnalysis.lib.profiling.timefuncfile">
 <code class="sig-prename descclassname">INDUSAnalysis.lib.profiling.</code><code class="sig-name descname">timefuncfile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.timefuncfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reports function execution time to file [decorator]</p>
@@ -334,35 +346,28 @@ gets added to the residual during curve fitting).</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="INDUSAnalysis.html" class="btn btn-neutral float-left" title="INDUSAnalysis package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="INDUSAnalysis.html" class="btn btn-neutral float-left" title="INDUSAnalysis package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Akash Pallath
+        &#169; Copyright 2020, Akash Pallath.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

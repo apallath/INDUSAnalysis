@@ -84,7 +84,7 @@ def fit_linear_model(xdata, ydata, yerr, p_guess):
 
 def integrated_step_gaussian(x, A, B, C, D, E, F):
     """
-    Function defining integrated step gaussian model.
+    Function defining the integrated step gaussian model.
     """
     SH = 30  # Sharpness factor
     y = A * x + 1 / SH * (B - A) * np.log(np.exp(SH * x) + np.exp(SH * C)) - 0.5 * np.sqrt(np.pi) * D * E * erf((C - x) / E)
@@ -102,11 +102,12 @@ def derivative_integrated_step_gaussian(x, A, B, C, D, E, F):
 
 def penalized_integrated_step_gaussian(x, *p):
     """
-    ***Deprecated***
-    Use curve fitting with upper and lower bounds instead.
-
     Integrated step gaussian model with a penalty for positive slopes (which
     gets added to the residual during curve fitting).
+
+    Warning:
+        This function has been deprecated, as it can be unstable in certain situtations.
+        Use curve fitting with upper and lower bounds instead (implemented in `fit_integrated_step_gaussian`).
     """
     A = p[0]
     B = p[1]
@@ -121,8 +122,12 @@ def penalized_integrated_step_gaussian(x, *p):
 
 
 def fit_integrated_step_gaussian(xdata, ydata, yerr, p_guess):
-    """Fits integrated step gaussian model to data with error bars using
+    r"""Fits the integrated step gaussian model to data with error bars using
     weighted least squares regression.
+
+    The integrated step gaussian model is defined as:
+
+    .. math:: y = A \cdot x + \frac{B - A}{S} \log(S \cdot x + \exp(S \cdot C)) - \frac{\sqrt{\pi}}{2} \cdot D \cdot E \cdot erf(\frac{C - x}{E})
 
     Args:
         xdata (ndarray): 1-dimensional array containing x values

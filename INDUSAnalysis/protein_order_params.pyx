@@ -1,5 +1,5 @@
 """
-Defines class for analysing protein order parameters along GROMACS
+Module containing a class for analysing protein (or polymer) order parameters along a GROMACS
 simulation trajectory.
 """
 
@@ -20,7 +20,17 @@ cimport numpy as np
 
 class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
     """
-    Calculates order parameters.
+    Calculates order parameters along a GROMACS simulation trajectory.
+
+    Note:
+        The following selections are currently implemented in the selection parser:
+            - `protein`: Select all protein atoms
+            - `backbone`: Select all protein backbone atoms
+            - `alpha_C`: Select all protein alpha carbons along the backbone
+            - `heavy`: Select all protein heavy atoms
+            - `side_chain`: Select all protein side chain atoms
+            - `side_chain_heavy`: Select all protein side chain heavy atoms
+            - `alkane_ua`: Select all TraPPE-UA alkane united atoms
     """
     def __init__(self):
         super().__init__()
@@ -37,7 +47,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         self.calc_args.add_argument("-skip",
                                     help="Number of frames to skip between analyses (default = None)")
         self.calc_args.add_argument("-reftstep",
-                                    help="Timestep to extract reference coordinates from reference trajectory file for RMSD (default = 0)")
+                                    help="Timestep to extract reference coordinates from reference trajectory file for RMSD and SF (default = 0)")
 
         self.out_args.add_argument("--genpdb",
                                    action="store_true",
@@ -54,11 +64,13 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         self.selection_parser = {
             'protein': """protein""",
             'backbone': """name CA or name C or name N""",
+            'alpha_C': """name CA""",
+            'heavy': "protein and not name H*",
             'side_chain': """protein and not (name N or name CA or name C or name O or name H
                 or name H1 or name H2 or name H3 or name OC1 or name OC2)""",
-            'heavy': "protein and not name H*",
             'side_chain_heavy': """protein and not(name N or name CA or name C or name O
-                or name OC1 or name OC2 or name H*)"""
+                or name OC1 or name OC2 or name H*)""",
+            'alkane_ua': """name C*"""
         }
 
         super().read_args()
@@ -97,10 +109,18 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         self.genpdb = self.args.genpdb
         self.verbose = self.args.verbose
 
+    ###################################################
+    # Weighted radius of gyration                     #
+    # Rg(t)                                           #
+    ###################################################
+
     def calc_Rg_worker(self, coords, masses):
         """
-        Calculates radius of gyration of atoms with given coordinates and
+        Calculates the radius of gyration of atoms with given coordinates and
         masses.
+
+        If $r_i(t)$ is the selection of coordinates.
+        $$R_g = $$
 
         Args:
             coords (np.array): Array of shape (N, 3) containing atomic coordinates.
@@ -177,14 +197,33 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         else:
             plt.close()
 
-    def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):
-        """
-        Calculates RMSD of coordinates from reference after aligning them using
-        a subset of coordinates.
+    ###################################################
+    # Unweighted root mean square displacement        #
+    # RMSD(t)                                         #
+    ###################################################
 
-        Aligns coords and initcoords by performing translation and rotation
+    def calc_RMSD_worker(self, initcoords, coords, aligninitcoords, aligncoords):
+        r"""
+        Calculates the (unweighted) root mean square displacement of coordinates from reference
+        after aligning them using a subset of coordinates.
+
+        Aligns coords and initcoords by searching for the optimal translation and rotation
         transformations which, when applied to aligncoords and aligninitcoords,
-        minimizes the RMSD between them.
+        minimize the RMSD between them.
+
+        Finally, calculates the (unweighted) RMSD between coords and initcoords, as:
+
+        .. math:: RMSD(t) = \sqrt{\frac{1}{N} \sum_{i=1}^{N} || \vec{r_i}(t) - \vec{r_i}^{ref} ||^2}
+
+        where
+
+        .. math:: \vec{r_i}(t)
+
+        are the coordinates of atom *i* at time *t* and
+
+        .. math:: \vec{r_i}^{ref}
+
+        are the coordinates of the atom *i* in the reference structure.
 
         Args:
             initcoords (np.array): Array of shape (N, 3) containing reference coordinates.
@@ -209,8 +248,9 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
 
         # Center both alignment coordinates and coordinates
         aligninitcoords = aligninitcoords - aligninitcog
+        aligncoords = aligncoords - aligncog
+
         initcoords = initcoords - aligninitcog
-        aligncoods = aligncoords - aligncog
         coords = coords - aligncog
 
         # Get rotation matrix by minimizing RMSD between centered alignment coordinates
@@ -220,13 +260,14 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         coords = np.dot(coords, R.T)
 
         # Calculate RMSD
-        sq_distances = np.sum((coords - initcoords)**2, axis=1)
-        RMSD = np.sqrt(np.mean(sq_distances))
+        sq_displacements = np.sum((coords - initcoords)**2, axis=1)
+        RMSD = np.sqrt(np.mean(sq_displacements))
+
         return RMSD
 
     def calc_RMSD(self, u, refu, reftstep, skip, selection, alignment):
         """
-        Calculates RMSD of `selection` atom group in `u` from `selection` atom group
+        Calculates the (unweighted) RMSD of `selection` atom group in `u` from `selection` atom group
         in `refu` at `reftstep`, using `alignment` for alignment.
 
         Args:
@@ -297,14 +338,40 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         else:
             plt.close()
 
+    ###################################################
+    # Atomic deviations                               #
+    # delta_i(t)                                      #
+    # Can be used to calculate RMSF, as               #
+    # RMSF_i = sqrt(mean_t(delta_i(t)^2))             #
+    # Leave it to the user to compute RMSF            #
+    ###################################################
+
     def calc_deviation_worker(self, initcoords, coords, aligninitcoords, aligncoords):
-        """
+        r"""
         Calculates deviations of coordinates from reference after aligning them using
         a subset of coordinates.
 
-        Aligns coords and initcoords by performing translation and rotation
+        Aligns coords and initcoords by searching for the optimal translation and rotation
         transformations which, when applied to aligncoords and aligninitcoords,
-        minimizes the RMSD between them.
+        minimize the RMSD between them.
+
+        Finally, calculates deviations as:
+
+        .. math:: \delta_i(t) = \sqrt{|| \vec{r_i}(t) - \vec{r_i}^{ref} ||^2}
+
+        where
+
+        .. math:: \vec{r_i}(t)
+
+        are the coordinates of atom *i* at time *t* and
+
+        .. math:: \vec{r_i}^{ref}
+
+        are the coordinates of the atom *i* in the reference structure.
+
+        These deviations can be used to calculate the root mean square fluctuation (RMSF) over a (converged) time duration [t_s, t_e], as:
+
+        .. math:: RMSF_i = \sqrt{ \frac{1}{t_e - t_s + 1} \sum_{t=t_s}^{t_e} \delta_i(t)^2}
 
         Args:
             initcoords (np.array): Array of shape (N, 3) containing reference coordinates.
@@ -330,7 +397,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         # Center both alignment coordinates and coordinates
         aligninitcoords = aligninitcoords - aligninitcog
         initcoords = initcoords - aligninitcog
-        aligncoods = aligncoords - aligncog
+        aligncoords = aligncoords - aligncog
         coords = coords - aligncog
 
         # Get rotation matrix by minimizing RMSD between centered alignment coordinates
@@ -340,8 +407,9 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         coords = np.dot(coords, R.T)
 
         # Calculate deviations
-        deviation = np.sqrt(np.sum((coords - initcoords)**2, axis=1))
-        return deviation
+        deviations = np.sqrt(np.sum((coords - initcoords)**2, axis=1))
+
+        return deviations
 
     def calc_deviations(self, u, refu, reftstep, skip, selection, alignment):
         """
@@ -434,7 +502,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         if self.replot:
             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
-            ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations.pkl")
+            ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations" + self.align + "_" + self.select + ".pkl")
         else:
             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)
             ts_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)
@@ -442,7 +510,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
 
         self.save_TimeSeries(ts_Rg, self.opref + "_Rg.pkl")
         self.save_TimeSeries(ts_RMSD, self.opref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
-        self.save_TimeSeries(ts_deviations, self.opref + "_deviations.pkl")
+        self.save_TimeSeries(ts_deviations, self.opref + "_deviations" + self.align + "_" + self.select + ".pkl")
 
         """Rg plots"""
         self.plot_Rg(ts_Rg)
