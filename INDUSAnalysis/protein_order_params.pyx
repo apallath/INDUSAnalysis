@@ -472,7 +472,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         """
         protein_subselection = u.select_atoms(select)
         u.add_TopologyAttr('tempfactors')
-        pdbtrj = self.opref + "_deviations.pdb"
+        pdbtrj = self.opref + "_deviations" + self.align + "_" + self.select + ".pdb"
 
         utraj = u.trajectory[::skip]
 
