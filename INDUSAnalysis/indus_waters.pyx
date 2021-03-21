@@ -99,7 +99,7 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
                     if comment[0] == 'mu':
                         mu = comment[2]
                 # Parse data
-                if lstrip[0] != '#':
+                if lstrip[0] != '#' and '#' not in lstrip:
                     (tcur, Ncur, Ntwcur) = map(float, lstrip.split())
                     t.append(tcur)
                     N.append(Ncur)

@@ -57,10 +57,6 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
                                     action="store_true",
                                     help="Display progress")
 
-    def read_args(self):
-        """
-        Stores arguments from TimeSeries `args` parameter in class variables.
-        """
         self.selection_parser = {
             'protein': """protein""",
             'backbone': """name CA or name C or name N""",
@@ -73,6 +69,10 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
             'alkane_ua': """name C*"""
         }
 
+    def read_args(self):
+        """
+        Stores arguments from TimeSeries `args` parameter in class variables.
+        """
         super().read_args()
         self.structf = self.args.structf
         self.trajf = self.args.trajf
@@ -450,7 +450,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         """Plots deviations as a 2D heatmap."""
         fig = ts_deviations.plot_2d_heatmap(cmap='hot')
         fig.set_dpi(300)
-        self.save_figure(fig, suffix="deviation")
+        self.save_figure(fig, suffix="deviations_" + self.align + "_" + self.select)
         if self.show:
             plt.show()
         else:
@@ -472,7 +472,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         """
         protein_subselection = u.select_atoms(select)
         u.add_TopologyAttr('tempfactors')
-        pdbtrj = self.opref + "_deviations" + self.align + "_" + self.select + ".pdb"
+        pdbtrj = self.opref + "_deviations_" + self.align + "_" + self.select + ".pdb"
 
         utraj = u.trajectory[::skip]
 
@@ -491,14 +491,11 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
 
     def __call__(self):
         """Performs analysis."""
-
         # Retrieve value stored in parser if exists, else use as-is
         mda_select = self.selection_parser.get(self.select, self.select)
         mda_align = self.selection_parser.get(self.align, self.align)
-        mda_deviation_select = self.selection_parser.get("protein", "protein")
 
         """Raw data"""
-
         if self.replot:
             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
@@ -506,11 +503,11 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         else:
             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)
             ts_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)
-            ts_deviations = self.calc_deviations(self.u, self.refu, self.reftstep, self.skip, mda_deviation_select, mda_align)
+            ts_deviations = self.calc_deviations(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)
 
         self.save_TimeSeries(ts_Rg, self.opref + "_Rg.pkl")
         self.save_TimeSeries(ts_RMSD, self.opref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
-        self.save_TimeSeries(ts_deviations, self.opref + "_deviations" + self.align + "_" + self.select + ".pkl")
+        self.save_TimeSeries(ts_deviations, self.opref + "_deviations_" + self.align + "_" + self.select + ".pkl")
 
         """Rg plots"""
         self.plot_Rg(ts_Rg)
@@ -527,4 +524,4 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
 
         """Store per-atom deviations in PDB"""
         if self.genpdb:
-            self.write_deviations_pdb(self.u, mda_deviation_select, self.skip, ts_deviations)
+            self.write_deviations_pdb(self.u, mda_select, self.skip, ts_deviations)

@@ -25,6 +25,9 @@ class TimeSeries:
         times (ndarray): 1-dimensional array of length N.
         data (ndarray): D-dimensional array of shape (N, ...).
         labels (list): List of strings describing what each dimension represents.
+        correct_contiguous (boolean): Ensure that for elements (i, i+1), the time at i+1 > time at i.
+            If a pair is found such that the time at i+1 <= time at i, delete the preceding timeseries'
+            data which is repeated. Useful for correcting INDUS outputs on restart from checkpoint. (Default=True)
 
     Examples:
         >>> ts = TimeSeries([0, 100, 200], [10, 20, 10], ["Sample data"])
@@ -56,7 +59,7 @@ class TimeSeries:
         <TimeSeries object, ['Sample data'] with shape (6,), 6 time frames>
     """
 
-    def __init__(self, times, data, labels):
+    def __init__(self, times, data, labels, correct_contiguous=True):
         """
         Creates time series class.
 
@@ -74,6 +77,9 @@ class TimeSeries:
             raise ValueError("Too few labels for data dimensions")
         if len(self._labels) > self._x.ndim:
             raise ValueError("Too many labels for data dimensions")
+        if correct_contiguous:
+            self._correct_contiguous()
+
 
     def __getitem__(self, key):
         """
@@ -136,6 +142,34 @@ class TimeSeries:
         if len(labels) > self._x.ndim:
             raise ValueError("Too many labels for data dimensions")
         self._labels = labels
+
+    def _correct_contiguous(self):
+        delete_indices = []
+
+        last_lookup = 0
+        for tidx in range(len(self)):
+            # If discrepancy
+            if self._t[tidx] <= self._t[tidx - 1]:
+                # Find (from left) value equal to or just greater than this entry
+                start_del_slice = 0
+                for prev_tidx in range(last_lookup, tidx):
+                    if self._t[prev_tidx] >= self._t[tidx]:
+                        start_del_slice = prev_tidx
+                        break
+                # Add indices starting from this index to the index just before tidx to the list of indices to be deleted
+                delete_indices.extend(list(range(start_del_slice, tidx)))
+                # Ensure that future searches start from this index
+                last_lookup = tidx
+
+        new_t = np.delete(self._t, list(set(delete_indices)), axis=0)
+        new_x = np.delete(self._x, list(set(delete_indices)), axis=0)
+
+        self._t = new_t
+        self._x = new_x
+
+        if self._t.shape[0] != self._x.shape[0]:
+            raise ValueError("Time and data do not match along axis 0")
+
 
     def moving_average(self, window):
         """
