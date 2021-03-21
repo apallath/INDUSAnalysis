@@ -1955,8 +1955,7 @@ static const char __pyx_k_add_argument[] = "add_argument";
 static const char __pyx_k_aligninitcog[] = "aligninitcog";
 static const char __pyx_k_aligninitpos[] = "aligninitpos";
 static const char __pyx_k_deviations_2[] = "_deviations_";
-static const char __pyx_k_deviations_3[] = "_deviations";
-static const char __pyx_k_deviations_4[] = "deviations";
+static const char __pyx_k_deviations_3[] = "deviations";
 static const char __pyx_k_plot_ma_RMSD[] = "plot_ma_RMSD";
 static const char __pyx_k_select_atoms[] = "select_atoms";
 static const char __pyx_k_sq_distances[] = "sq_distances";
@@ -2149,7 +2148,6 @@ static PyObject *__pyx_n_s_deviation;
 static PyObject *__pyx_n_s_deviations;
 static PyObject *__pyx_n_s_deviations_2;
 static PyObject *__pyx_n_s_deviations_3;
-static PyObject *__pyx_n_s_deviations_4;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_dot;
 static PyObject *__pyx_n_s_enter;
@@ -10231,7 +10229,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
  *         if self.replot:
  *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")             # <<<<<<<<<<<<<<
  *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
- *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations" + self.align + "_" + self.select + ".pkl")
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations_" + self.align + "_" + self.select + ".pkl")
  */
     __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 500, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
@@ -10263,7 +10261,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
  *         if self.replot:
  *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
  *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")             # <<<<<<<<<<<<<<
- *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations" + self.align + "_" + self.select + ".pkl")
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations_" + self.align + "_" + self.select + ".pkl")
  *         else:
  */
     __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_load_TimeSeries); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 501, __pyx_L1_error)
@@ -10313,7 +10311,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
     /* "INDUSAnalysis/protein_order_params.pyx":502
  *             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
  *             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
- *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations" + self.align + "_" + self.select + ".pkl")             # <<<<<<<<<<<<<<
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations_" + self.align + "_" + self.select + ".pkl")             # <<<<<<<<<<<<<<
  *         else:
  *             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)
  */
@@ -10321,7 +10319,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_replotpref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = PyNumber_Add(__pyx_t_3, __pyx_n_s_deviations_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 502, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Add(__pyx_t_3, __pyx_n_s_deviations_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 502, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_align_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 502, __pyx_L1_error)
@@ -10372,7 +10370,7 @@ static PyObject *__pyx_pf_13INDUSAnalysis_20protein_order_params_19OrderParamsAn
   }
 
   /* "INDUSAnalysis/protein_order_params.pyx":504
- *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations" + self.align + "_" + self.select + ".pkl")
+ *             ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations_" + self.align + "_" + self.select + ".pkl")
  *         else:
  *             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)             # <<<<<<<<<<<<<<
  *             ts_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)
@@ -13814,7 +13812,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_deviations, __pyx_k_deviations, sizeof(__pyx_k_deviations), 0, 0, 1, 1},
   {&__pyx_n_s_deviations_2, __pyx_k_deviations_2, sizeof(__pyx_k_deviations_2), 0, 0, 1, 1},
   {&__pyx_n_s_deviations_3, __pyx_k_deviations_3, sizeof(__pyx_k_deviations_3), 0, 0, 1, 1},
-  {&__pyx_n_s_deviations_4, __pyx_k_deviations_4, sizeof(__pyx_k_deviations_4), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_dot, __pyx_k_dot, sizeof(__pyx_k_dot), 0, 0, 1, 1},
   {&__pyx_n_s_enter, __pyx_k_enter, sizeof(__pyx_k_enter), 0, 0, 1, 1},
@@ -14376,7 +14373,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *         r"""
  *         Calculates deviations of coordinates from reference after aligning them using
  */
-  __pyx_tuple__50 = PyTuple_Pack(10, __pyx_n_s_self, __pyx_n_s_initcoords, __pyx_n_s_coords, __pyx_n_s_aligninitcoords, __pyx_n_s_aligncoords, __pyx_n_s_aligninitcog, __pyx_n_s_aligncog, __pyx_n_s_R, __pyx_n_s_min_rms, __pyx_n_s_deviations_4); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 349, __pyx_L1_error)
+  __pyx_tuple__50 = PyTuple_Pack(10, __pyx_n_s_self, __pyx_n_s_initcoords, __pyx_n_s_coords, __pyx_n_s_aligninitcoords, __pyx_n_s_aligncoords, __pyx_n_s_aligninitcog, __pyx_n_s_aligncog, __pyx_n_s_R, __pyx_n_s_min_rms, __pyx_n_s_deviations_3); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__50);
   __Pyx_GIVEREF(__pyx_tuple__50);
   __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(5, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_deviation_worker, 349, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 349, __pyx_L1_error)
@@ -14388,7 +14385,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *         """
  *         Calculates deviations of `selection` AtomGroup atoms in `u` from `selection` AtomGroup atoms
  */
-  __pyx_tuple__52 = PyTuple_Pack(17, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_refu, __pyx_n_s_reftstep_2, __pyx_n_s_skip_2, __pyx_n_s_selection, __pyx_n_s_alignment, __pyx_n_s_sel, __pyx_n_s_refsel, __pyx_n_s_align_2, __pyx_n_s_refalign, __pyx_n_s_initpos, __pyx_n_s_aligninitpos, __pyx_n_s_times, __pyx_n_s_deviations_4, __pyx_n_s_ts, __pyx_n_s_deviation); if (unlikely(!__pyx_tuple__52)) __PYX_ERR(0, 414, __pyx_L1_error)
+  __pyx_tuple__52 = PyTuple_Pack(17, __pyx_n_s_self, __pyx_n_s_u, __pyx_n_s_refu, __pyx_n_s_reftstep_2, __pyx_n_s_skip_2, __pyx_n_s_selection, __pyx_n_s_alignment, __pyx_n_s_sel, __pyx_n_s_refsel, __pyx_n_s_align_2, __pyx_n_s_refalign, __pyx_n_s_initpos, __pyx_n_s_aligninitpos, __pyx_n_s_times, __pyx_n_s_deviations_3, __pyx_n_s_ts, __pyx_n_s_deviation); if (unlikely(!__pyx_tuple__52)) __PYX_ERR(0, 414, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__52);
   __Pyx_GIVEREF(__pyx_tuple__52);
   __pyx_codeobj__53 = (PyObject*)__Pyx_PyCode_New(7, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__52, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_INDUSAnalysis_protein_order_para_2, __pyx_n_s_calc_deviations, 414, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__53)) __PYX_ERR(0, 414, __pyx_L1_error)

@@ -499,7 +499,7 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         if self.replot:
             ts_Rg = self.load_TimeSeries(self.replotpref + "_Rg.pkl")
             ts_RMSD = self.load_TimeSeries(self.replotpref + "_RMSD_" + self.align + "_" + self.select + ".pkl")
-            ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations" + self.align + "_" + self.select + ".pkl")
+            ts_deviations = self.load_TimeSeries(self.replotpref + "_deviations_" + self.align + "_" + self.select + ".pkl")
         else:
             ts_Rg = self.calc_Rg(self.u, self.skip, mda_select)
             ts_RMSD = self.calc_RMSD(self.u, self.refu, self.reftstep, self.skip, mda_select, mda_align)
