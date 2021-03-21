@@ -31,6 +31,40 @@ def test_TimeSeries_1d_basic():
     assert(np.isclose(ts[50:70].std(), 0.0))
 
 
+def test_TimeSeries_contiguous_correct_1D():
+    """Checks correction of erroneous 1-D timeseries from a process which restarts from a previous checkpoint"""
+    t = np.array([0, 10, 20, 30, 40, 50, 20, 30, 40, 50, 40, 50, 50])
+    x = np.array([1, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22])
+    ts = timeseries.TimeSeries(t, x, ['Test'])
+
+    # Check
+    assert(np.allclose(ts.time_array, np.array([0, 10, 20, 30, 40, 50])))
+    assert(np.allclose(ts.data_array, np.array([1, 11, 16, 17, 20, 22])))
+
+
+def test_TimeSeries_contiguous_correct_2D():
+    """Checks correction of erroneous 2-D timeseries from a process which restarts from a previous checkpoint (to check array removal in multi-D)"""
+    t = np.array([0, 10, 20, 30, 40, 50, 20, 30, 40, 50, 40, 50, 50])
+    x = np.array([[0, 1],
+                  [1, 1],
+                  [1, 2],
+                  [1, 3],
+                  [1, 4],
+                  [1, 5],
+                  [1, 6],
+                  [1, 7],
+                  [1, 8],
+                  [1, 9],
+                  [2, 0],
+                  [2, 1],
+                  [2, 2]])
+    ts = timeseries.TimeSeries(t, x, ['Test 1', 'Test 2'])
+
+    # Check
+    assert(np.allclose(ts.time_array, np.array([0, 10, 20, 30, 40, 50])))
+    assert(np.allclose(ts.data_array, np.array([[0, 1], [1, 1], [1, 6], [1, 7], [2, 0], [2, 2]])))
+
+
 def test_TimeSeries_1d_ma_cma():
     """Tests moving average and cumulative moving average for 1-d data"""
     t = np.array([10, 20, 30, 40, 50, 60, 70, 80])
@@ -152,9 +186,6 @@ def test_TimeSeries_3d_dimred_vis():
     fig = mean_per_frame.plot('s--', lw=1.2, label='Mean contacts per timestep')
     fig.set_dpi(300)
     fig.savefig("timeseries_test_data/3d_dimred_1d.png")
-
-
-# TODO: Write tests for standard error of mean
 
 
 def test_TimeSeriesAnalysis_save_load_TimeSeries():
