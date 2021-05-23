@@ -64,7 +64,7 @@ def fit_linear_model(xdata, ydata, yerr, p_guess):
         2-d tuple (popt, perr, chi_sq), where
         popt = array containing the fitted parameters for the linear model.
         perr = array containing errors corresponding to fitted parameters
-        chi_sq = chi squared statistic
+        chi_sq = chi squared statistic (weighted sum of squared residuals)
     """
     popt, cov = curve_fit(linear_model, xdata, ydata, sigma=yerr,
                           p0=p_guess, absolute_sigma=True)
@@ -74,7 +74,7 @@ def fit_linear_model(xdata, ydata, yerr, p_guess):
     for i in range(len(popt)):
         perr[i] = np.absolute(cov[i][i]) ** 0.5
 
-    # Chi-squared of fit
+    # Chi-squared (weighted sum of squared residuals)
     y = ydata
     y_pred = linear_model(xdata, *popt)
     chi_sq = np.sum((y - y_pred) ** 2 / yerr ** 2)
@@ -140,7 +140,7 @@ def fit_integrated_step_gaussian(xdata, ydata, yerr, p_guess):
         2-d tuple (popt, perr, chi_sq), where
         popt = array containing the fitted parameters for the integrated step gaussian model.
         perr = array containing errors corresponding to fitted parameters
-        chi_sq = chi squared statistic
+        chi_sq = chi squared statistic (weighted sum of squared residuals)
     """
     #                        A    B    C    D    E    F
     lower_bounds = np.array([-np.inf, -np.inf, min(xdata), -np.inf, 0, -np.inf])
@@ -154,7 +154,7 @@ def fit_integrated_step_gaussian(xdata, ydata, yerr, p_guess):
     for i in range(len(popt)):
         perr[i] = np.absolute(cov[i][i]) ** 0.5
 
-    # Chi-squared of fit
+    # Chi-squared (weighted sum of squared residuals)
     y = ydata
     y_pred = integrated_step_gaussian(xdata, *popt)
     chi_sq = np.sum((y - y_pred) ** 2 / yerr ** 2)
