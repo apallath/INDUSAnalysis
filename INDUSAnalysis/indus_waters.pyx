@@ -1,12 +1,11 @@
 """
 Defines class for analysing waters in INDUS probe volumes.
 """
+import warnings
 
-import numpy as np
 import matplotlib.pyplot as plt
-
 import MDAnalysis as mda
-
+import numpy as np
 from tqdm import tqdm
 
 from INDUSAnalysis import timeseries
@@ -71,7 +70,8 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
 
     # Data calculation methods
 
-    def read_waters(self, filename):
+    @classmethod
+    def read_waters(cls, filename):
         """
         Reads data from GROMACS-INDUS phi/probe waters output file.
 
@@ -89,21 +89,33 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
         N = []
         Ntw = []
         mu = 0
+
         with open(filename) as f:
             # Read data file
             for l in f:
                 lstrip = l.strip()
+
+                # Skip zero-length lines
+                if len(lstrip) == 0:
+                    warnings.warn("Skipped blank line in %s" % filename)
+
                 # Parse comments
-                if lstrip[0] == '#':
+                elif lstrip[0] == '#':
                     comment = lstrip[1:].split()
                     if comment[0] == 'mu':
                         mu = comment[2]
+
                 # Parse data
-                if lstrip[0] != '#' and '#' not in lstrip:
-                    (tcur, Ncur, Ntwcur) = map(float, lstrip.split())
-                    t.append(tcur)
-                    N.append(Ncur)
-                    Ntw.append(Ntwcur)
+                elif lstrip[0] != '#' and '#' not in lstrip:
+                    lsplit = lstrip.split()
+                    # Skip incomplete lines
+                    if len(lsplit) != 3:
+                        warnings.warn("Incomplete data (%s) encountered in %s" % (lstrip, filename))
+                    else:
+                        (tcur, Ncur, Ntwcur) = map(float, lsplit)
+                        t.append(tcur)
+                        N.append(Ncur)
+                        Ntw.append(Ntwcur)
 
         t = np.array(t)
         N = np.array(N)

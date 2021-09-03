@@ -1,20 +1,18 @@
 """
 Defines class for analysing contacts along GROMACS simulation trajectory.
 
-Extendable to add new types of contacts analysis.
+Extendable to add new types of contacts analyses.
 """
 
 import copy
-import numpy as np
-import matplotlib.pyplot as plt
+from itertools import combinations
 
+import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import MDAnalysis.analysis.align
-
-from itertools import combinations
+import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import floyd_warshall
-
 from tqdm import tqdm
 
 from INDUSAnalysis import timeseries

@@ -1,12 +1,12 @@
-from distutils.core import setup
-from distutils.extension import Extension
+from setuptools import Extension, setup
+from Cython.Build import cythonize
 
 import numpy
 try:
     numpy_include = numpy.get_include()
 except AttributeError:
     numpy_include = numpy.get_numpy_include()
-from Cython.Distutils import build_ext
+
 
 ext_modules = [Extension("INDUSAnalysis.timeseries", ["INDUSAnalysis/timeseries.pyx"],
                include_dirs=[numpy_include],
@@ -29,8 +29,8 @@ ext_modules = [Extension("INDUSAnalysis.timeseries", ["INDUSAnalysis/timeseries.
 
 setup(
     name='INDUSAnalysis',
-    version='0.1',
+    version='0.2a0',
     packages=['INDUSAnalysis'],
-    cmdclass={'build_ext': build_ext},
-    ext_modules=ext_modules
+    ext_modules=cythonize(ext_modules,
+                          compiler_directives={'language_level' : "3"})
 )

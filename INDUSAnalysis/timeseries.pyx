@@ -1,16 +1,14 @@
 """
 Defines classes for storing and analysing timeseries data.
 """
+import argparse
+import pickle
 
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
-import pickle
-import argparse
-
-from scipy import stats
+import numpy as np
 from numpy import convolve
+from scipy import stats
 
 from INDUSAnalysis.lib import profiling
 
@@ -251,7 +249,7 @@ class TimeSeries:
         Args:
             axis (int): Optional
         """
-        pass
+        raise NotImplementedError()
 
     def plot(self, *plotargs, **plotkwargs):
         """Plots 1-d timeseries data.
@@ -339,6 +337,32 @@ class TimeSeriesAnalysis:
         # Miscellanious options
         self.misc_args.add_argument("--remote", action='store_true', help="Run with text-only backend on remote cluster")
 
+    @classmethod
+    def save_TimeSeries(cls, tso, filename):
+        """
+        Saves TimeSeries object to file using pickle dump.
+
+        Args:
+            tso (TimeSeries): TimeSeries object to pickle and dump.
+        """
+        with open(filename, 'wb+') as f:
+            pickle.dump(tso, f)
+
+    @classmethod
+    def load_TimeSeries(cls, filename):
+        """
+        Loads pickled TimeSeries object from file
+
+        Args:
+            filename: Name of file to load pickled TimeSeries object from
+
+        Returns:
+            TimeSeries object loaded from file
+        """
+        with open(filename, 'rb') as f:
+            tso = pickle.load(f)
+            return tso
+
     def parse_args(self, args=None):
         """
         Parses arguments.
@@ -394,31 +418,6 @@ class TimeSeriesAnalysis:
         self.remote = self.args.remote
         if self.remote:
             matplotlib.use('Agg')
-
-    # TODO: Implement
-    def save_TimeSeries(self, tso, filename):
-        """
-        Saves TimeSeries object to file using pickle dump.
-
-        Args:
-            tso (TimeSeries): TimeSeries object to pickle and dump.
-        """
-        with open(filename, 'wb+') as f:
-            pickle.dump(tso, f)
-
-    def load_TimeSeries(self, filename):
-        """
-        Loads pickled TimeSeries object from file
-
-        Args:
-            filename: Name of file to load pickled TimeSeries object from
-
-        Returns:
-            TimeSeries object loaded from file
-        """
-        with open(filename, 'rb') as f:
-            tso = pickle.load(f)
-            return tso
 
     def save_figure(self, fig, suffix=""):
         """
