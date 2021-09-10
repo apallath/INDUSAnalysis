@@ -1,6 +1,6 @@
 1d_binning:
-  NBINS: 246
-  NMAX: 245
+  NBINS: 291
+  NMAX: 290
   NMIN: 0
 1d_phi_ensemble:
   PEAK_CUT: null
@@ -12,8 +12,8 @@
   PHI_STAR_COEX: null
   PHI_STAR_EQ: null
 2d_binning:
-  NBINS2: 246
-  NMAX2: 245
+  NBINS2: 283
+  NMAX2: 282
   NMIN2: 0
   RGBINS2: 61
   RGMAX2: 16.565656565656568
@@ -49,6 +49,9 @@ data_collection:
   BASE_SAMP_FREQ: 1
   BASE_SAMP_FREQ2: 1
   TSTART: 0
+io_global:
+  calcoutdir: null
+  plotoutdir: null
 system:
   NBEAD: 45
   TEMP: 298

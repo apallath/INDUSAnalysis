@@ -294,14 +294,15 @@ class WHAM_analysis_biasN:
 
         base_samp_freq = self.BASE_SAMP_FREQ
 
-        for i in range(len(Ntw_win)):
+        for i in range(len(n_star_win)):
             Ntw_i = Ntw_win[i]
 
-            hist, edges = np.histogram(Ntw_i[self.NTSTART::self.NTSCALE * base_samp_freq], bins=bin_points, density=True)
+            NTSCALE = int(self.config["windows"][n_star_win[i]]["XTCDT"] / self.config["windows"][n_star_win[i]]["UMBDT"])
+            hist, edges = np.histogram(Ntw_i[self.TSTART::NTSCALE * base_samp_freq], bins=bin_points, density=True)
             x = 0.5 * (edges[1:] + edges[:-1])
             y = hist
-            ax.plot(x, y, color=colormap(normalize(Ntw_i[self.NTSTART::self.NTSCALE * base_samp_freq].mean())))
-            ax.fill_between(x, 0, y, color=colormap(normalize(Ntw_i[self.NTSTART::self.NTSCALE * base_samp_freq].mean())), alpha=0.4)
+            ax.plot(x, y, color=colormap(normalize(Ntw_i[self.TSTART::NTSCALE * base_samp_freq].mean())))
+            ax.fill_between(x, 0, y, color=colormap(normalize(Ntw_i[self.TSTART::self.NTSCALE * base_samp_freq].mean())), alpha=0.4)
 
         ax.set_xlabel(r"$\tilde{N}$")
 
@@ -316,7 +317,7 @@ class WHAM_analysis_biasN:
         fig.colorbar(scalarmappable, label=r"$N*$")
 
         # Show plot
-        plt.savefig(plotoutdir + "/" + out_hist_imgfile, format="png", bbox_inches='tight')
+        plt.savefig(self.plotdir + "/" + out_hist_imgfile, format="png", bbox_inches='tight')
         plt.close()
 
     ############################################################################

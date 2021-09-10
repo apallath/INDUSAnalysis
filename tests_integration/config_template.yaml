@@ -67,3 +67,7 @@ coex:
 basins:
   NC: ~
   NE: ~
+
+io_global:
+  calcoutdir: ~
+  plotoutdir: ~
