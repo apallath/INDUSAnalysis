@@ -8,6 +8,7 @@ import argparse
 from INDUSAnalysis import timeseries
 from INDUSAnalysis.indus_waters import WatersAnalysis
 
+
 def estimate_kappa(datf: str, temp: float, start_time: float = 0, end_time: float = None):
     """
     Estimates kappa based on var(N~) from an unbiased INDUS simulation.
@@ -26,6 +27,7 @@ def estimate_kappa(datf: str, temp: float, start_time: float = 0, end_time: floa
     ts_N, ts_Ntw, _ = WatersAnalysis.read_waters(datf)
     var_Ntw = ts_Ntw[start_time:end_time].std() ** 2
     return (8.314 / 1000 * temp * 2 / var_Ntw, 8.314 / 1000 * temp * 5 / var_Ntw)
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

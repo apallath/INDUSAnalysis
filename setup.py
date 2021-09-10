@@ -1,5 +1,7 @@
-from setuptools import Extension, setup
-from Cython.Build import cythonize
+import os
+from distutils.core import setup
+from distutils.extension import Extension
+from Cython.Distutils import build_ext
 
 import numpy
 try:
@@ -8,29 +10,47 @@ except AttributeError:
     numpy_include = numpy.get_numpy_include()
 
 
-ext_modules = [Extension("INDUSAnalysis.timeseries", ["INDUSAnalysis/timeseries.pyx"],
-               include_dirs=[numpy_include],
-               define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
-               Extension("INDUSAnalysis.indus_waters", ["INDUSAnalysis/indus_waters.pyx"],
-               include_dirs=[numpy_include],
-               define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
-               Extension("INDUSAnalysis.protein_order_params", ["INDUSAnalysis/protein_order_params.pyx"],
-               include_dirs=[numpy_include],
-               define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
-               Extension("INDUSAnalysis.contacts", ["INDUSAnalysis/contacts.pyx"],
-               include_dirs=[numpy_include],
-               define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
-               Extension("INDUSAnalysis.lib.profiling", ["INDUSAnalysis/lib/profiling.pyx"],
-               include_dirs=[numpy_include],
-               define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
-               Extension("INDUSAnalysis.lib.collective", ["INDUSAnalysis/lib/collective.pyx"],
-               include_dirs=[numpy_include],
-               define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")])]
+# scan the 'INDUSAnalysis' directory for extension files
+def scandir(dir, files=[]):
+    for file in os.listdir(dir):
+        path = os.path.join(dir, file)
+        if os.path.isfile(path) and path.endswith(".pyx"):
+            files.append(path.replace(os.path.sep, ".")[:-4])
+        elif os.path.isdir(path):
+            scandir(path, files)
+    return files
 
+
+# generate an Extension object from its dotted name
+def makeExtension(extName):
+    extPath = extName.replace(".", os.path.sep) + ".pyx"
+    return Extension(
+        extName,
+        [extPath],
+        include_dirs=[numpy_include],
+        define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
+        extra_compile_args=["-O3", "-Wall"],
+        extra_link_args=['-g'],
+    )
+
+
+# get the list of extensions
+extNames = scandir("INDUSAnalysis")
+
+# and build up the set of Extension objects
+extensions = [makeExtension(name) for name in extNames]
+
+# finally, we can pass all this to distutils
 setup(
-    name='INDUSAnalysis',
+    name="INDUSAnalysis",
     version='0.2a0',
-    packages=['INDUSAnalysis'],
-    ext_modules=cythonize(ext_modules,
-                          compiler_directives={'language_level' : "3"})
+    packages=["INDUSAnalysis",
+              "INDUSAnalysis.lib",
+              "INDUSAnalysis.ensemble",
+              "INDUSAnalysis.ensemble.proteins",
+              "INDUSAnalysis.ensemble.proteins.dewetting",
+              "INDUSAnalysis.ensemble.proteins.denaturation",
+              "INDUSAnalysis.ensemble.polymers"],
+    ext_modules=extensions,
+    cmdclass={'build_ext': build_ext},
 )

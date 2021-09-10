@@ -1,0 +1,315 @@
+1d_binning:
+  NBINS: 246
+  NMAX: 245
+  NMIN: 0
+1d_phi_ensemble:
+  PEAK_CUT: null
+  PHI_BINS: null
+  PHI_BIN_MAX: null
+  PHI_BIN_MIN: null
+1d_phi_star:
+  PHI_STAR: null
+  PHI_STAR_COEX: null
+  PHI_STAR_EQ: null
+2d_binning:
+  NBINS2: 246
+  NMAX2: 245
+  NMIN2: 0
+  RGBINS2: 61
+  RGMAX2: 16.565656565656568
+  RGMIN2: 4.444444444444445
+2d_phi_star:
+  PHI_STAR2: null
+  PHI_STAR_COEX2: null
+  PHI_STAR_EQ2: null
+2d_plot:
+  PLOT_BETAF_LEVELS: null
+  PLOT_BETAF_MAX: null
+  PLOT_N_MAX: null
+  PLOT_N_MIN: null
+  PLOT_PV_LEVELS: null
+2d_plot_phi_star:
+  PLOT_PHI_STAR_BETAF_LEVELS: null
+  PLOT_PHI_STAR_BETAF_MAX: null
+  PLOT_PHI_STAR_N_MAX: null
+  PLOT_PHI_STAR_N_MIN: null
+  PLOT_PHI_STAR_PV_LEVELS: null
+  PLOT_PHI_STAR_RG_MAX: null
+  PLOT_PHI_STAR_RG_MIN: null
+basins:
+  NC: null
+  NE: null
+coex:
+  NTRG_SPLIT_c: null
+  NTRG_SPLIT_m: null
+  NTRG_SPLIT_x0: null
+  NT_SPLIT: null
+  RG_SPLIT: null
+data_collection:
+  BASE_SAMP_FREQ: 1
+  BASE_SAMP_FREQ2: 1
+  TSTART: 0
+system:
+  NBEAD: 45
+  TEMP: 298
+umbrellas:
+  KAPPA: 0.0243
+windows:
+  unbiased:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/unbiased/nt_ntw_k0_N0.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/unbiased/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -240:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-240/ntw_k0.0243_N-240.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-240/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -220:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-220/ntw_k0.0243_N-220.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-220/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -200:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-200/ntw_k0.0243_N-200.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-200/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -180:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-180/ntw_k0.0243_N-180.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-180/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -160:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-160/ntw_k0.0243_N-160.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-160/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -140:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-140/ntw_k0.0243_N-140.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-140/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -120:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-120/ntw_k0.0243_N-120.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-120/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -100:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-100/ntw_k0.0243_N-100.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-100/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -80:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-80/ntw_k0.0243_N-80.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-80/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -60:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-60/ntw_k0.0243_N-60.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-60/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -40:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-40/ntw_k0.0243_N-40.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-40/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  -20:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-20/ntw_k0.0243_N-20.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N-20/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  0:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N0/ntw_k0.0243_N0.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N0/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  20:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N20/ntw_k0.0243_N20.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N20/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  40:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N40/ntw_k0.0243_N40.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N40/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  60:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N60/ntw_k0.0243_N60.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N60/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  80:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N80/ntw_k0.0243_N80.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N80/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  100:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N100/ntw_k0.0243_N100.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N100/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  120:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N120/ntw_k0.0243_N120.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N120/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  140:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N140/ntw_k0.0243_N140.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N140/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  160:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N160/ntw_k0.0243_N160.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N160/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  180:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N180/ntw_k0.0243_N180.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N180/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  200:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N200/ntw_k0.0243_N200.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N200/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  220:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N220/ntw_k0.0243_N220.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N220/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  240:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N240/ntw_k0.0243_N240.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N240/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  260:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N260/ntw_k0.0243_N260.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N260/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  280:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N280/ntw_k0.0243_N280.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N280/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  300:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N300/ntw_k0.0243_N300.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N300/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  320:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N320/ntw_k0.0243_N320.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N320/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  340:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N340/ntw_k0.0243_N340.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N340/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  360:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N360/ntw_k0.0243_N360.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N360/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  380:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N380/ntw_k0.0243_N380.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N380/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  400:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N400/ntw_k0.0243_N400.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N400/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  420:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N420/ntw_k0.0243_N420.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N420/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  440:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N440/ntw_k0.0243_N440.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N440/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  460:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N460/ntw_k0.0243_N460.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N460/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  480:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N480/ntw_k0.0243_N480.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N480/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  500:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N500/ntw_k0.0243_N500.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N500/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  520:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N520/ntw_k0.0243_N520.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N520/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  540:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N540/ntw_k0.0243_N540.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N540/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  560:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N560/ntw_k0.0243_N560.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N560/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100
+  580:
+    Nt_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298/K0.0243/K0.0243N580/ntw_k0.0243_N580.dat
+    Rg_file: inputs_ensemble.polymer.wham_nt_ntrg/C45_T298_OP/K0.0243/K0.0243N580/C45_Rg.pkl
+    TSTEP: 0.002
+    UMBDT: 50
+    XTCDT: 100

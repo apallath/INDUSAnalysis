@@ -1,0 +1,3 @@
++ python -u /home/akash/analysis_scripts/scripts/run_protein_order_params.py ../../../Inputs/C45/conf.gro ../../../C45_T298/K0.0243/K0.0243N560/ofile_mol.xtc -reftstep 1 -align alkane_ua -select alkane_ua -window 50 -opref C45 -oformat png -dpi 150 --remote --verbose
+/home/akash/analysis_scripts/scripts/run_protein_order_params.py:17: UserWarning: Attempting to set identical left == right == -0.5 results in singular transformations; automatically expanding.
+  prot()

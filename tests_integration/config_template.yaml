@@ -1,0 +1,69 @@
+system:
+  NBEAD: ~
+  TEMP: ~
+
+umbrellas:
+  KAPPA: ~
+
+windows: ~
+
+data_collection:
+  TSTART: 0
+  BASE_SAMP_FREQ: 1
+  BASE_SAMP_FREQ2: 1
+
+1d_binning:
+  NMIN: 0
+  NMAX: ~
+  NBINS: ~
+
+1d_phi_ensemble:
+  PHI_BIN_MIN: ~
+  PHI_BIN_MAX: ~
+  PHI_BINS: ~
+  PEAK_CUT: ~
+
+1d_phi_star:
+  PHI_STAR: ~
+  PHI_STAR_EQ: ~
+  PHI_STAR_COEX: ~
+
+2d_binning:
+  NMIN2: 0
+  NMAX2: ~
+  NBINS2: ~
+  RGMIN2: 0
+  RGMAX2: ~
+  RGBINS2: ~
+
+2d_plot:
+  PLOT_N_MIN: ~
+  PLOT_N_MAX: ~
+  PLOT_BETAF_MAX: ~
+  PLOT_BETAF_LEVELS: ~
+  PLOT_PV_LEVELS: ~
+
+2d_phi_star:
+  PHI_STAR2: ~
+  PHI_STAR_EQ2: ~
+  PHI_STAR_COEX2: ~
+
+2d_plot_phi_star:
+  PLOT_PHI_STAR_N_MIN: ~
+  PLOT_PHI_STAR_N_MAX: ~
+  PLOT_PHI_STAR_RG_MIN: ~
+  PLOT_PHI_STAR_RG_MAX: ~
+  PLOT_PHI_STAR_BETAF_MAX: ~
+  PLOT_PHI_STAR_BETAF_LEVELS: ~
+  PLOT_PHI_STAR_PV_LEVELS: ~
+
+coex:
+  NT_SPLIT: ~
+  RG_SPLIT: ~
+  NTRG_SPLIT_m: ~
+  NTRG_SPLIT_x0: ~
+  NTRG_SPLIT_c: ~
+
+basins:
+  NC: ~
+  NE: ~
