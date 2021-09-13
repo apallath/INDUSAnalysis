@@ -1,0 +1,11 @@
+#### Order Parameter Analysis ####
+Proceed with caution: this script requires PBC-corrected protein structures!
+
+Saving figure > C45_Rg.png
+Saving figure > C45_ma_Rg.png
+Saving figure > C45_cma_Rg.png
+Saving figure > C45_RMSD_alkane_ua_alkane_ua.png
+Saving figure > C45_ma_RMSD_alkane_ua_alkane_ua.png
+Saving figure > C45_cma_RMSD_alkane_ua_alkane_ua.png
+Saving figure > C45_deviation.png
+'main' 32.78 s 

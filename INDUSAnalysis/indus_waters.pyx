@@ -75,6 +75,10 @@ class WatersAnalysis(timeseries.TimeSeriesAnalysis):
         """
         Reads data from GROMACS-INDUS phi/probe waters output file.
 
+        This reader function is a classmethod, and can be called as a stand-alone
+        function for reading INDUS waters output files without making a WatersAnalysis
+        object.
+
         Args:
             filename (str): Name of GROMACS-INDUS waters output file.
 
