@@ -12,7 +12,7 @@
   PHI_BIN_MIN: 7.43
 1d_phi_star:
   PHI_STAR: -0.11
-  PHI_STAR_COEX: null
+  PHI_STAR_COEX: -0.11199
   PHI_STAR_EQ: -0.09579
   PLOT_PHI_STAR_BETAF_MAX: 6
   PLOT_PHI_STAR_N_MAX: 225
@@ -26,31 +26,32 @@
   RGMIN2: 4.444444444444445
 2d_phi_star:
   PHI_STAR2: -0.11
-  PHI_STAR_COEX2: null
-  PHI_STAR_EQ2: null
+  PHI_STAR_COEX2: -0.11199
+  PHI_STAR_EQ2: -0.09579
 2d_plot:
-  PLOT_BETAF_LEVELS2: null
-  PLOT_BETAF_MAX2: null
-  PLOT_N_MAX2: null
-  PLOT_N_MIN2: null
-  PLOT_PV_LEVELS2: null
+  PLOT_BETAF_LEVELS2: 22
+  PLOT_BETAF_MAX2: 168
+  PLOT_N_MAX2: 282
+  PLOT_N_MIN2: 0
+  PLOT_PV_LEVELS2: 22
 2d_plot_phi_star:
-  PLOT_PHI_STAR_BETAF_LEVELS2: null
-  PLOT_PHI_STAR_BETAF_MAX2: null
-  PLOT_PHI_STAR_N_MAX2: null
-  PLOT_PHI_STAR_N_MIN2: null
-  PLOT_PHI_STAR_PV_LEVELS2: null
-  PLOT_PHI_STAR_RG_MAX2: null
-  PLOT_PHI_STAR_RG_MIN2: null
+  PLOT_PHI_STAR_BETAF_LEVELS2: 11
+  PLOT_PHI_STAR_BETAF_MAX2: 6
+  PLOT_PHI_STAR_N_MAX2: 225
+  PLOT_PHI_STAR_N_MIN2: 105
+  PLOT_PHI_STAR_PV_LEVELS2: 11
+  PLOT_PHI_STAR_RG_MAX2: 14.6
+  PLOT_PHI_STAR_RG_MIN2: 4.6
 basins:
   NC: 131
   NE: 203
 coex:
-  NT_SPLIT: null
+  NT_SPLIT: 175
 coex2:
   NTRG_SPLIT_c: null
   NTRG_SPLIT_m: null
   NTRG_SPLIT_x0: null
+coexRg:
   RG_SPLIT: null
 data_collection:
   BASE_SAMP_FREQ: 1
@@ -65,10 +66,9 @@ find_basins:
 func_params:
   calc_deltaGu_diff_method:
     boot_errors: false
-    deltaGu_datfile: deltaGu.dat
-  calc_deltaGu_int_method_1D: null
-  coex_Nt: null
-  find_basins: null
+    deltaGu_datfile: deltaGu_diff.dat
+  calc_deltaGu_int_method_1D:
+    deltaGu_datfile: deltaGu_int.dat
   plot_hist:
     hist_imgfile: hist.png
   run_binless_log_likelihood:
@@ -91,6 +91,7 @@ func_params:
     betaFrew_datfile: betaF_phi_c_star.dat
     betaFrew_imgfile: betaF_phi_c_star.png
     in_calcfile: calc.pkl
+    opt_thresh: 0.0001
     probrew_datfile: prob_phi_c_star.dat
     probrew_imgfile: prob_phi_c_star.png
     saved: true
@@ -98,7 +99,7 @@ func_params:
     betaFrew_datfile: betaF_phi_e_star.dat
     betaFrew_imgfile: betaF_phi_e_star.png
     in_calcfile: calc.pkl
-    opt_thresh: 1.0e-05
+    opt_thresh: 0.0001
     probrew_datfile: prob_phi_e_star.dat
     probrew_imgfile: prob_phi_e_star.png
     saved: true
@@ -122,6 +123,39 @@ func_params:
     saved: true
     win_dir: windows
     win_format: betaF_biased_win_{}.png
+  run_2D_binless_log_likelihood:
+    saved: True
+    in_calcfile: calc.pkl
+    calcfile: calc_2D.pkl
+    betaF_imgfile: betaF_2D.png
+    x_bins_npyfile: x_bins_2D.npy
+    y_bins_npyfile: y_bins_2D.npy
+    betaF_npyfile: betaF_2D.npy
+    prob_imgfile: prob_2D.png
+    prob_npyfile: prob_2D.npy
+  run_2D_bin_Rg:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_datfile: betaF_Rg.dat
+    betaF_imgfile: betaF_Rg.png
+    prob_datfile: prob_Rg.dat
+    prob_imgfile: prob_Rg.png
+  run_2D_reweight_phi_star:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_imgformat: betaF_2D_{}.png
+    x_bins_npyformat: x_bins_2D_{}.npy
+    y_bins_npyformat: y_bins_2D_{}.npy
+    betaF_npyformat: betaF_2D_{}.npy
+    prob_imgformat: prob_2D_{}.png
+    prob_npyformat: prob_2D_{}.npy
+  run_2D_reweight_phi_star_bin_Rg:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_datfile: betaF_Rg_{}.dat
+    betaF_imgfile: betaF_Rg_{}.png
+    prob_datfile: prob_Rg_{}.dat
+    prob_imgfile: prob_Rg_{}.png
 io_global:
   calcoutdir: wham_nt_ntrg_test_data/calc
   plotoutdir: wham_nt_ntrg_test_data/plot

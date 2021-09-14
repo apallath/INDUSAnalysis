@@ -8,7 +8,7 @@ umbrellas:
 windows: ~
 
 data_collection:
-  TSTART: 0
+  TSTART: 2000
   TEND: ~
   BASE_SAMP_FREQ: 1
   BASE_SAMP_FREQ2: 1
@@ -23,10 +23,10 @@ data_collection:
   NWORKERS: 8
 
 1d_phi_ensemble:
-  PHI_BIN_MIN: ~
-  PHI_BIN_MAX: ~
-  PHI_BINS: ~
-  PEAK_CUT: ~
+  PHI_BIN_MIN: -2.47
+  PHI_BIN_MAX: 7.43
+  PHI_BINS: 991
+  PEAK_CUT: 100
 
 1d_phi_star:
   PHI_STAR: ~
@@ -85,8 +85,8 @@ basins:
   NE: ~
 
 io_global:
-  calcoutdir: ~
-  plotoutdir: ~
+  calcoutdir: calc
+  plotoutdir: plots
 
 func_params:
   plot_hist:
@@ -121,30 +121,63 @@ func_params:
     betaFrew_imgfile: betaF_phi_1_star.png
     probrew_datfile: prob_phi_1_star.dat
     probrew_imgfile: prob_phi_1_star.png
-  find_basins: ~
   run_phi_e_star_opt:
     saved: True
     in_calcfile: calc.pkl
-    opt_thresh: 1.0e-5
+    opt_thresh: 1.0e-04
     betaFrew_datfile: betaF_phi_e_star.dat
     betaFrew_imgfile: betaF_phi_e_star.png
     probrew_datfile: prob_phi_e_star.dat
     probrew_imgfile: prob_phi_e_star.png
   calc_deltaGu_diff_method:
-    boot_errors: False
-    deltaGu_datfile: deltaGu.dat
-  coex_Nt: ~
+    boot_errors: false
+    deltaGu_datfile: deltaGu_diff.dat
   run_phi_c_star_opt:
     saved: True
     in_calcfile: calc.pkl
+    opt_thresh: 1.0e-04
     betaFrew_datfile: betaF_phi_c_star.dat
     betaFrew_imgfile: betaF_phi_c_star.png
     probrew_datfile: prob_phi_c_star.dat
     probrew_imgfile: prob_phi_c_star.png
-  calc_deltaGu_int_method_1D: ~
+  calc_deltaGu_int_method_1D:
+    deltaGu_datfile: deltaGu_int.dat
   run_bootstrap_ll_phi_ensemble:
     betaFboot_datfile: betaF_boot.dat
     betaFboot_imgfile: betaF_boot.png
     phi_ens_boot_datfile: phi_ens_boot.dat
     phi_ens_boot_imgfile: phi_ens_boot.png
     phi_ens_peaks_boot_datfile: phi_ens_peaks_boot.dat
+  run_2D_binless_log_likelihood:
+    saved: True
+    in_calcfile: calc.pkl
+    calcfile: calc_2D.pkl
+    betaF_imgfile: betaF_2D.png
+    x_bins_npyfile: x_bins_2D.npy
+    y_bins_npyfile: y_bins_2D.npy
+    betaF_npyfile: betaF_2D.npy
+    prob_imgfile: prob_2D.png
+    prob_npyfile: prob_2D.npy
+  run_2D_bin_Rg:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_datfile: betaF_Rg.dat
+    betaF_imgfile: betaF_Rg.png
+    prob_datfile: prob_Rg.dat
+    prob_imgfile: prob_Rg.png
+  run_2D_reweight_phi_star:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_imgformat: betaF_2D_{}.png
+    x_bins_npyformat: x_bins_2D_{}.npy
+    y_bins_npyformat: y_bins_2D_{}.npy
+    betaF_npyformat: betaF_2D_{}.npy
+    prob_imgformat: prob_2D_{}.png
+    prob_npyformat: prob_2D_{}.npy
+  run_2D_reweight_phi_star_bin_Rg:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_datfile: betaF_Rg_{}.dat
+    betaF_imgfile: betaF_Rg_{}.png
+    prob_datfile: prob_Rg_{}.dat
+    prob_imgfile: prob_Rg_{}.png

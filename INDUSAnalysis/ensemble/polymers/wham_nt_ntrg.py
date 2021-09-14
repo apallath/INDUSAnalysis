@@ -1,9 +1,9 @@
 """
 Calculates 1D and 2D free energy profiles for solvated polymer INDUS calculations
 (biasing the solvation order parameter) using WHAM.
-
-TODO: Fix 2D
 """
+import argparse
+from collections import OrderedDict
 import logging
 from multiprocessing import Pool
 import os
@@ -47,89 +47,33 @@ class WHAM_analysis_biasN:
 
     Attributes:
         config: Dictionary containing all configuration parameters
-
-        (Global I/O <- io_global)
-        calcoutdir:
-        plotoutdir:
-
-        (System parameters <- system)
-        NBEAD (int):
-        TEMP (float):
-
-        (Umbrella parameters <- umbrellas)
-        KAPPA (float):
-
-        (Data collection parameters <- data_collection)
-        TSTART (float):
-        TEND (float):
-        BASE_SAMP_FREQ (int):
-        BASE_SAMP_FREQ_2 (int):
-
-        (1D-WHAM binning parameters <- 1d_binning)
-        NMIN (float):
-        NMAX (float):
-        NBINS (int):
-
-        (1D phi-ensemble reweighting and peak detection parameters <- 1d_phi_ensemble)
-        PHI_BIN_MIN (float):
-        PHI_BIN_MAX (float):
-        PHI_BINS (int):
-        PEAK_CUT (float):
-
-        (1D phi* reweighting parameters <- 1d_phi_star)
-        NBOOT (int):
-        NWORKERS (int):
-
-        (1D bootstrapping parameters <- 1d_phi_star)
-        PHI_STAR (float):
-        PHI_STAR_EQ (float):
-        PHI_STAR_COEX (float):
-
-        (Basin definitions <- basins)
-        NC (float):
-        NE (float):
-
-        (Coexistence split <- coex)
-        NT_SPLIT (float):
-
-        (2D-WHAM binning parameters <- 2d_binning)
-        NMIN2 (float):
-        NMAX2 (float):
-        NBINS2 (int):
-        RGMIN2 (float):
-        RGMAX2 (float):
-        RGBINS2 (int):
-
-        (2D plot parameters <- 2d_plot)
-        PLOT_N_MIN2 (float):
-        PLOT_N_MAX2 (float):
-        PLOT_BETAF_MAX2 (float):
-        PLOT_BETAF_LEVELS2 (int):
-        PLOT_PV_LEVELS2 (int):
-
-        (2D phi* reweighting parameters <- 2d_phi_star)
-        PHI_STAR2 (float):
-        PHI_STAR_EQ2 (float):
-        PHI_STAR_COEX2 (float):
-
-        (2D phi* plot parameters <- 2d_plot_phi_star)
-        PLOT_PHI_STAR_N_MIN2 (float):
-        PLOT_PHI_STAR_N_MAX2 (float):
-        PLOT_PHI_STAR_RG_MIN2 (float):
-        PLOT_PHI_STAR_RG_MAX2 (float):
-        PLOT_PHI_STAR_BETAF_MAX2 (float):
-        PLOT_PHI_STAR_BETAF_LEVELS2 (int):
-        PLOT_PHI_STAR_PV_LEVELS2 (int):
-
-        (Coexistence splits in 2D <- coex2)
-        RG_SPLIT (float):
-        NTRG_SPLIT_m (float):
-        NTRG_SPLIT_x0 (float):
-        NTRG_SPLIT_c (float):
     """
 
     def __init__(self, config_file="config.yaml"):
         self.config_file = config_file
+
+        self.func_registry = OrderedDict([
+            ("get", self.get_test_data),
+            ("get2", self.get_test_data2),
+            ("hist", self.plot_hist),
+            ("1D", self.run_binless_log_likelihood),
+            ("kappa", self.run_kappa_checks),
+            ("win_KLD", self.run_reweighting_checks),
+            ("phi", self.run_phi_ensemble_reweight),
+            ("phi_1_star", self.run_reweight_phi_1_star),
+            ("basins", self.find_basins),
+            ("phi_e_star", self.run_phi_e_star_opt),
+            ("deltaG_diff", self.calc_deltaGu_diff_method),
+            ("phi_c_star", self.run_phi_c_star_opt),
+            ("deltaG_int", self.calc_deltaGu_int_method_1D),
+            ("1D_boot_phi", self.run_bootstrap_ll_phi_ensemble),
+            ("2D", self.run_2D_binless_log_likelihood),
+            ("Rg", self.run_2D_bin_Rg),
+            ("2D_phi_stars", self.run_2D_reweight_phi_star),
+            ("Rg_phi_stars", self.run_2D_reweight_phi_star_bin_Rg),
+            ("2D_coex", self.run_coex_integration_2D),
+            ("Rg_coex", self.run_coex_integration_Rg)
+        ])
 
     def load_config(self):
         with open(self.config_file, 'r') as f:
@@ -153,7 +97,8 @@ class WHAM_analysis_biasN:
                       "2d_plot",
                       "2d_phi_star",
                       "2d_plot_phi_star",
-                      "coex2"]
+                      "coex2",
+                      "coexRg"]
         for category in categories:
             for k, v in self.config[category].items():
                 setattr(self, k, v)
@@ -209,7 +154,7 @@ class WHAM_analysis_biasN:
             NTSCALE = int(self.config["windows"][n_star]["XTCDT"] / self.config["windows"][n_star]["UMBDT"])
             Ntw_win.append(ts_Ntw[self.TSTART:self.TEND:NTSCALE * self.BASE_SAMP_FREQ].data_array)
             logger.debug("(N~) N*={}: {} to end, skipping {}. {} entries.".format(n_star, self.TSTART, self.BASE_SAMP_FREQ,
-                  len(ts_N[self.TSTART:self.TEND:NTSCALE * self.BASE_SAMP_FREQ].data_array)))
+                         len(ts_N[self.TSTART:self.TEND:NTSCALE * self.BASE_SAMP_FREQ].data_array)))
 
         beta = 1000 / (8.314 * int(self.TEMP))  # at T, in kJ/mol units
 
@@ -275,7 +220,7 @@ class WHAM_analysis_biasN:
             NTSCALE = int(self.config["windows"][n_star]["XTCDT"] / self.config["windows"][n_star]["UMBDT"])
             Ntw_win.append(ts_Ntw[self.TSTART:self.TEND:NTSCALE * self.BASE_SAMP_FREQ2].data_array)
             logger.debug("(N~) N*={}: {} to end, skipping {}. {} entries.".format(n_star, self.TSTART, self.BASE_SAMP_FREQ2,
-                  len(ts_N[self.TSTART:self.TEND:NTSCALE * self.BASE_SAMP_FREQ].data_array)))
+                         len(ts_N[self.TSTART:self.TEND:NTSCALE * self.BASE_SAMP_FREQ].data_array)))
 
         tsa = TimeSeriesAnalysis()
 
@@ -285,7 +230,7 @@ class WHAM_analysis_biasN:
             ts = tsa.load_TimeSeries(self.config["windows"][n_star]["Rg_file"])
             Rg_win.append(ts[self.TSTART:self.TEND:self.BASE_SAMP_FREQ2].data_array)
             logger.debug("(Rg) N*={}: {} to end, skipping {}. {} entries.".format(n_star, self.TSTART, self.BASE_SAMP_FREQ2,
-                  len(ts[self.TSTART:self.TEND:self.BASE_SAMP_FREQ2].data_array)))
+                         len(ts[self.TSTART:self.TEND:self.BASE_SAMP_FREQ2].data_array)))
 
         beta = 1000 / (8.314 * int(self.TEMP))  # at T K, in kJ/mol units
 
@@ -354,7 +299,7 @@ class WHAM_analysis_biasN:
     ############################################################################
     ############################################################################
     ############################################################################
-    ################################### 1D #####################################
+    # 1D
     ############################################################################
     ############################################################################
     ############################################################################
@@ -639,6 +584,10 @@ class WHAM_analysis_biasN:
 
         self.config["1d_phi_star"]["PHI_STAR"] = float("{:.5f}".format(sorted(phi_vals[peaks])[0]))
         self.config["2d_phi_star"]["PHI_STAR2"] = float("{:.5f}".format(sorted(phi_vals[peaks])[0]))
+        self.config["1d_phi_star"]["PHI_STAR_EQ"] = float("{:.5f}".format(sorted(phi_vals[peaks])[0]))
+        self.config["2d_phi_star"]["PHI_STAR_EQ2"] = float("{:.5f}".format(sorted(phi_vals[peaks])[0]))
+        self.config["1d_phi_star"]["PHI_STAR_COEX"] = float("{:.5f}".format(sorted(phi_vals[peaks])[0]))
+        self.config["2d_phi_star"]["PHI_STAR_COEX2"] = float("{:.5f}".format(sorted(phi_vals[peaks])[0]))
         self.update_config()
 
     ############################################################################
@@ -723,7 +672,7 @@ class WHAM_analysis_biasN:
 
         ax.margins(x=0, y=0)
 
-        plt.savefig(self.plotoutdir + "/" +  params["probrew_imgfile"], bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["probrew_imgfile"], bbox_inches='tight')
         plt.close()
 
     ############################################################################
@@ -736,8 +685,6 @@ class WHAM_analysis_biasN:
         """
         # Load config
         self.load_config()
-        # Load params
-        params = self.config["func_params"]["find_basins"]
 
         # load phi_1* ensemble data
         nt = []
@@ -754,9 +701,9 @@ class WHAM_analysis_biasN:
 
         # indices to search over
         nc_indices = np.where(np.logical_and(nt >= self.NC_MIN,
-                                          nt <= self.NC_MAX))[0]
+                                             nt <= self.NC_MAX))[0]
         ne_indices = np.where(np.logical_and(nt >= self.NE_MIN,
-                                          nt <= self.NE_MAX))[0]
+                                             nt <= self.NE_MAX))[0]
 
         nc_idx = np.argmin(fnt[nc_indices])
         ne_idx = np.argmin(fnt[ne_indices])
@@ -802,6 +749,9 @@ class WHAM_analysis_biasN:
         # Load params
         params = self.config["func_params"]["run_phi_e_star_opt"]
 
+        if not params["saved"]:
+            raise RuntimeError("Saved data required.")
+
         # Load params
         n_star_win, Ntw_win, bin_points, umbrella_win, beta = self.get_test_data()
         saveloc = self.calcoutdir + "/" + params["in_calcfile"]
@@ -809,7 +759,7 @@ class WHAM_analysis_biasN:
 
         # Optimize
         res = scipy.optimize.minimize(self.reweight_get_basin_diff2,
-                                      self.PHI_STAR,
+                                      self.PHI_STAR_EQ,
                                       args=(calc, bin_points, beta),
                                       method='Nelder-Mead',
                                       tol=params["opt_thresh"])
@@ -818,6 +768,7 @@ class WHAM_analysis_biasN:
 
         # Save results
         self.config["1d_phi_star"]["PHI_STAR_EQ"] = float("{:.5f}".format(phi_e_star))
+        self.config["2d_phi_star"]["PHI_STAR_EQ2"] = float("{:.5f}".format(phi_e_star))
         self.update_config()
 
         # Plot
@@ -871,7 +822,7 @@ class WHAM_analysis_biasN:
 
         ax.margins(x=0, y=0)
 
-        plt.savefig(self.plotoutdir + "/" +  params["probrew_imgfile"], bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["probrew_imgfile"], bbox_inches='tight')
         plt.close()
 
     ############################################################################
@@ -940,7 +891,7 @@ class WHAM_analysis_biasN:
 
         # Write to text file
         of = open(self.calcoutdir + "/" + params["deltaGu_datfile"], "w")
-        of.write("{:.5f} {:.5f}\n".format(bin_points[i], p_bin[i]))
+        of.write("{:.5f} {:.5f}\n".format(deltaGu, deltaGuerr))
         of.close()
 
         return deltaGu, deltaGuerr
@@ -949,44 +900,100 @@ class WHAM_analysis_biasN:
     # phi_c* optimization
     ############################################################################
 
-    def coex_Nt(self, plot=True):
+    def reweight_get_basin_int2(self, phi, calc, bin_points, beta):
         """
+        Objective function to minimize to calculate phi_c*
+        """
+        umb_phi = potentials.linear(phi)
+        betaF_il_reweight = WHAM.statistics.binless_reweighted_win_betaF(calc, bin_points, [umb_phi],
+                                                                         beta, bin_style='center')
+        betaF_rew = betaF_il_reweight[0]
+        betaF_rew = betaF_rew - np.min(betaF_rew)
+
+        idxC = np.argwhere(bin_points < self.NT_SPLIT)
+        idxE = np.argwhere(bin_points >= self.NT_SPLIT)
+
+        gC = -logsumexp(-betaF_rew[idxC].flatten())
+        gE = -logsumexp(-betaF_rew[idxE].flatten())
+
+        objective = (gC - gE) ** 2
+        logger.debug("phi = {:.5f}, betaphi = {:.5f}, objective = {:.5f}".format(float(phi),
+                                                                                 beta * float(phi),
+                                                                                 float(objective)))
+        return objective
+
+    def run_phi_c_star_opt(self, plot=True):
+        """
+        Finds optimal phi_e* and reweights 1D profile to phi_e* ensemble.
+
+        Loads the following params from the config file:
+            saved:
+            in_calcfile:
+            opt_thresh:
+            betaFrew_datfile:
+            betaFrew_imgfile:
+            probrew_datfile:
+            probrew_imgfile:
         """
         # Load config
         self.load_config()
         # Load params
-        params = self.config["func_params"]["calc_deltaGu_diff_method"]
-        f = open(self.calcoutdir + "/" + self.config["func_params"]["run_reweight_phi_1_star"]["betaFrew_datfile"])
+        params = self.config["func_params"]["run_phi_c_star_opt"]
 
-        nt = []
-        pvnt = []
+        if not params["saved"]:
+            raise RuntimeError("Saved data required.")
 
-        for line in f:
-            if line.strip().split()[0] != '#':
-                nt.append(float(line.strip().split()[0]))
-                pvnt.append(float(line.strip().split()[1]))
+        # Load params
+        n_star_win, Ntw_win, bin_points, umbrella_win, beta = self.get_test_data()
+        saveloc = self.calcoutdir + "/" + params["in_calcfile"]
+        calc = pickle.load(open(saveloc, "rb"))
 
-        f.close()
+        # Optimize
+        res = scipy.optimize.minimize(self.reweight_get_basin_int2,
+                                      self.PHI_STAR_COEX,
+                                      args=(calc, bin_points, beta),
+                                      method='Nelder-Mead',
+                                      tol=params["opt_thresh"])
 
-        nt = np.array(nt)
-        pvnt = np.array(pvnt)
+        phi_c_star = float(res.x)
 
-        idx1 = np.argwhere(nt < self.Nt_split)
-        idx2 = np.argwhere(nt >= self.Nt_split)
+        # Save results
+        self.config["1d_phi_star"]["PHI_STAR_COEX"] = float("{:.5f}".format(phi_c_star))
+        self.config["2d_phi_star"]["PHI_STAR_COEX2"] = float("{:.5f}".format(phi_c_star))
+        self.update_config()
 
-        dx = nt[1] - nt[0]
+        # Compute profile at phi_c*
+        umb_phi = potentials.linear(phi_c_star)
+        betaF_il_reweight = WHAM.statistics.binless_reweighted_win_betaF(calc, bin_points, [umb_phi],
+                                                                         beta, bin_style='center')
+        betaF_rew = betaF_il_reweight[0]
+        betaF_rew = betaF_rew - np.min(betaF_rew)
 
-        p1 = dx * np.sum(pvnt[idx1].flatten())
-        p2 = dx * np.sum(pvnt[idx2].flatten())
+        idxC = np.argwhere(bin_points < self.NT_SPLIT)
+        idxE = np.argwhere(bin_points >= self.NT_SPLIT)
 
-        logger.info("Probabilities in N: {:.5f} {:.5f}".format(p1, p2))
+        delta_x_bin = bin_points[1] - bin_points[0]
+        p_bin = delta_x_bin * np.exp(-betaF_rew)
+        p_bin = p_bin / (delta_x_bin * np.sum(p_bin))  # normalize
 
-        # Plot
+        pC = np.sum(p_bin[idxC].flatten())
+        pE = np.sum(p_bin[idxE].flatten())
+
+        # Write to text file
+        of = open(self.calcoutdir + "/" + params["betaFrew_datfile"], "w")
+        of.write("# N    betaF\n")
+        for i in range(len(bin_points)):
+            of.write("{:.5f} {:.5f}\n".format(bin_points[i], betaF_rew[i]))
+        of.close()
+
+        # Plot results
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-        ax.plot(nt, pvnt, label="Log-likelihood probability density")
-        ax.axvline(x=self.Nt_split, label=r"$\tilde{{N}}={:.2f}$".format(self.Nt_split))
-        ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
-        ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
+        indices = np.where(np.logical_and(bin_points >= self.PLOT_PHI_STAR_N_MIN,
+                                          bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
+        ax.plot(bin_points[indices], betaF_rew[indices], label=r"Biased free energy profile in $\phi_c^*$ ensemble.")
+        ax.axvline(x=self.NT_SPLIT, label=r"$\tilde{{N}}={:.2f}$".format(self.NT_SPLIT))
+        ax.text(0.2, 0.5, "P = {:.2f}".format(pC), transform=ax.transAxes)
+        ax.text(0.8, 0.5, "P = {:.2f}".format(pE), transform=ax.transAxes)
         ax.set_xlabel(r"$\tilde{N}$")
         ax.set_ylabel(r"$P_v(\tilde{N})$")
         ax.legend()
@@ -996,34 +1003,28 @@ class WHAM_analysis_biasN:
         plt.savefig(self.plotoutdir + "/" + "coex_Nt.png", bbox_inches='tight')
         plt.close()
 
-        # Plot free energies
-        f = open(self.calcoutdir + "/" + "binless_ll_phi_1_star.dat")
+        """Probabilities"""
+        # Write to text file
+        of = open(self.calcoutdir + "/" + params["probrew_datfile"], "w")
+        of.write("# Nt    Pv(Nt)\n")
+        for i in range(len(bin_points)):
+            of.write("{:.5f} {:.5f}\n".format(bin_points[i], p_bin[i]))
+        of.close()
 
-        fnt = []
-
-        for line in f:
-            if line.strip().split()[0] != '#':
-                fnt.append(float(line.strip().split()[1]))
-
-        fnt = np.array(fnt)
-
+        # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-        ax.plot(nt, fnt, label="Log-likelihood free energy")
-        ax.axvline(x=self.Nt_split, label=r"$\tilde{{N}}={:.2f}$".format(self.Nt_split))
-        ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
-        ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
+        ax.plot(bin_points, p_bin, label=r"Log-likelihood probability density in $\phi_c^*$ ensemble.")
+        ax.axvline(x=self.NT_SPLIT, label=r"$\tilde{{N}}={:.2f}$".format(self.NT_SPLIT))
+        ax.text(0.2, 0.5, "P = {:.2f}".format(pC), transform=ax.transAxes)
+        ax.text(0.8, 0.5, "P = {:.2f}".format(pE), transform=ax.transAxes)
         ax.set_xlabel(r"$\tilde{N}$")
-        ax.set_ylabel(r"$F(\tilde{N})$")
+        ax.set_ylabel(r"$P_v(\tilde{N})$")
         ax.legend()
-        ax.margins(x=0, y=0)
         ax.set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-        ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX])
+        ax.margins(x=0, y=0)
 
-        plt.savefig(self.plotoutdir + "/" + "coex_Nt_free_energy.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["probrew_imgfile"], bbox_inches='tight')
         plt.close()
-
-    def run_phi_c_star_opt(self):
-        pass
 
     ############################################################################
     # deltaGu calculation by basin integrations
@@ -1031,7 +1032,12 @@ class WHAM_analysis_biasN:
 
     def calc_deltaGu_int_method_1D(self):
         """Calculate ratio of C basin to E basin probabilities, in N~, to get deltaGu."""
-        f = open(self.calcoutdir + "/" + "binless_ll.dat")
+        # Load config
+        self.load_config()
+        # Load params
+        params = self.config["func_params"]["calc_deltaGu_int_method_1D"]
+
+        f = open(self.calcoutdir + "/" + self.config["func_params"]["run_binless_log_likelihood"]["betaF_datfile"])
 
         nt = []
         fnt = []
@@ -1046,13 +1052,20 @@ class WHAM_analysis_biasN:
         nt = np.array(nt)
         fnt = np.array(fnt)
 
-        idx1 = np.argwhere(nt < self.Nt_split)
-        idx2 = np.argwhere(nt >= self.Nt_split)
+        idx1 = np.argwhere(nt < self.NT_SPLIT)
+        idx2 = np.argwhere(nt >= self.NT_SPLIT)
 
         g1 = -logsumexp(-fnt[idx1].flatten())
         g2 = -logsumexp(-fnt[idx2].flatten())
 
-        return(g2 - g1)
+        deltaGu = g2 - g1
+
+        # Write to text file
+        of = open(self.calcoutdir + "/" + params["deltaGu_datfile"], "w")
+        of.write("{:.5f}\n".format(deltaGu))
+        of.close()
+
+        return deltaGu
 
     ############################################################################
     # 1D phi-ensemble bootstrapping and phi_1_star + error bar calculation
@@ -1066,7 +1079,7 @@ class WHAM_analysis_biasN:
         Ntw_win_boot = timeseries.bootstrap_window_samples(Ntw_win)
         logger.info("Worker {}: N* = {}".format(boot_worker_idx, [len(win) for win in Ntw_win_boot]))
 
-        phi_vals = np.linspace(self.PHI_BIN_MIN, self.PHI_BIN_MAX, self.PHIBINS)
+        phi_vals = np.linspace(self.PHI_BIN_MIN, self.PHI_BIN_MAX, self.PHI_BINS)
 
         # Perform WHAM calculation
         calc = WHAM.binless.Calc1D()
@@ -1113,7 +1126,7 @@ class WHAM_analysis_biasN:
         betaF_all = []
         N_avg_all = []
         N_var_all = []
-        for boot_idx in range(nboot):
+        for boot_idx in range(self.NBOOT):
             betaF_all.append(ret_dicts[boot_idx]["betaF"])
             N_avg_all.append(ret_dicts[boot_idx]["Navg"])
             N_var_all.append(ret_dicts[boot_idx]["Nvar"])
@@ -1154,7 +1167,7 @@ class WHAM_analysis_biasN:
         N_var = N_var_all.mean(axis=0)
         N_var_err = N_var_all.std(axis=0)
 
-        phi_vals = np.linspace(self.PHI_BIN_MIN, self.PHI_BIN_MAX, self.PHIBINS)
+        phi_vals = np.linspace(self.PHI_BIN_MIN, self.PHI_BIN_MAX, self.PHI_BINS)
 
         # Write to text file
         of = open(self.calcoutdir + "/" + params["phi_ens_boot_datfile"], "w")
@@ -1164,14 +1177,14 @@ class WHAM_analysis_biasN:
                                                                    N_var[i], N_var_err[i]))
         of.close()
 
-        phi_1_stars = np.zeros(nboot)
-        phi_2_stars = np.zeros(nboot)
+        phi_1_stars = np.zeros(self.NBOOT)
+        phi_2_stars = np.zeros(self.NBOOT)
 
         # START
         all_peaks = []
 
         # Calculate phi_1_star and error bars on phi_1_star from bootstrapping
-        for nb in range(nboot):
+        for nb in range(self.NBOOT):
             # Find peak indices
             peaks, _ = find_peaks(N_var_all[nb, :], height=self.PEAK_CUT)
 
@@ -1196,7 +1209,7 @@ class WHAM_analysis_biasN:
         of.write("\n")
 
         of.write("beta phi_1* and beta phi_2* values:\n")
-        for nb in range(nboot):
+        for nb in range(self.NBOOT):
             of.write("{:.5f} {:.5f}\n".format(beta * phi_1_stars[nb], beta * phi_2_stars[nb]))
         of.write("\n")
 
@@ -1247,7 +1260,7 @@ class WHAM_analysis_biasN:
     ############################################################################
     ############################################################################
     ############################################################################
-    ################################### 2D #####################################
+    # 2D
     ############################################################################
     ############################################################################
     ############################################################################
@@ -1256,13 +1269,27 @@ class WHAM_analysis_biasN:
     # 2D WHAM plot and Rg plot
     ############################################################################
 
-    def run_2D_binless_log_likelihood(self, saved1D=True, saved1Dfile="calc_1D_saved.pkl", saved2D=False, saved2Dfile="calc_2D_saved.pkl"):
+    def run_2D_binless_log_likelihood(self):
         """
-        Runs 2D binless log likelihood calculation if 1D data is not available. If 1D data is available, uses 1D point
-        weights to re-bin data to 2D.
+        Runs 2D binless log likelihood calculation.
+
+        Loads the following params from the config file:
+            saved:
+            in_calcfile:
+            calcfile:
+            betaF_imgfile:
+            x_bins_npyfile:
+            y_bins_npyfile:
+            betaF_npyfile:
+            prob_imgfile:
+            prob_npyfile:
         """
-        saved1Dloc = self.calcoutdir + "/" + saved1Dfile
-        saved2Dloc = self.calcoutdir + "/" + saved2Dfile
+        # Load config
+        self.load_config()
+        # Load params
+        params = self.config["func_params"]["run_2D_binless_log_likelihood"]
+
+        savedloc = self.calcoutdir + "/" + params["in_calcfile"]
 
         n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
 
@@ -1281,17 +1308,15 @@ class WHAM_analysis_biasN:
 
         N_i = np.array([len(arr) for arr in Ntw_win])
 
-        if saved1D:
-            calc = pickle.load(open(saved1Dloc, "rb"))
-        elif saved2D:
-            calc = pickle.load(open(saved2Dloc, "rb"))
+        if params["saved"]:
+            calc = pickle.load(open(savedloc, "rb"))
         else:
             # Perform WHAM calculations
             calc = WHAM.binless.Calc1D()
             status = calc.compute_point_weights(x_l, N_i, umbrella_win, beta,
                                                 solver='log-likelihood',
                                                 logevery=1)
-            pickle.dump(calc, open(self.calcoutdir + "/calc_2D_saved.pkl", "wb"))
+            pickle.dump(calc, open(self.calcoutdir + "/" + params["calcfile"], "wb"))
 
             # Optimized?
             logger.debug(status)
@@ -1308,7 +1333,7 @@ class WHAM_analysis_biasN:
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
 
-        levels = np.linspace(0, self.PLOT_BETAF_MAX, self.PLOT_BETAF_LEVELS)
+        levels = np.linspace(0, self.PLOT_BETAF_MAX2, self.PLOT_BETAF_LEVELS2)
         cmap = cm.RdYlBu
         contour_filled = ax.contourf(x_bin_points, y_bin_points, betaF_2D_bin.T, levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
         ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
@@ -1328,15 +1353,15 @@ class WHAM_analysis_biasN:
 
         ax.tick_params(axis='both', which='both', direction='in', pad=10)
 
-        plt.savefig(self.plotoutdir + "/binless_2D_log_likelihood.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["betaF_imgfile"], bbox_inches='tight')
         plt.close()
 
-        # Write to npy file
-        np.save(self.calcoutdir + "/binless_ll_2D.npy", betaF_2D_bin)
-
         # Write bin points to npy files
-        np.save(self.calcoutdir + "/binless_2D_bin_N.npy", x_bin_points)
-        np.save(self.calcoutdir + "/binless_2D_bin_Rg.npy", y_bin_points)
+        np.save(self.calcoutdir + "/" + params["x_bins_npyfile"], x_bin_points)
+        np.save(self.calcoutdir + "/" + params["y_bins_npyfile"], y_bin_points)
+
+        # Write to npy file
+        np.save(self.calcoutdir + "/" + params["betaF_npyfile"], betaF_2D_bin)
 
         """Probabilities"""
         delta_x_bin = x_bin_points[1] - x_bin_points[0]
@@ -1348,7 +1373,7 @@ class WHAM_analysis_biasN:
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
 
-        levels = np.linspace(0, np.max(p_bin), self.PLOT_PV_LEVELS)
+        levels = np.linspace(0, np.max(p_bin), self.PLOT_PV_LEVELS2)
         cmap = cm.YlGnBu
         contour_filled = ax.contourf(x_bin_points, y_bin_points, p_bin.T, levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
         ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
@@ -1368,18 +1393,28 @@ class WHAM_analysis_biasN:
 
         ax.tick_params(axis='both', which='both', direction='in', pad=10)
 
-        plt.savefig(self.plotoutdir + "/binless_2D_ll_prob.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["prob_imgfile"], bbox_inches='tight')
         plt.close()
 
         # Write to npy file
-        np.save(self.calcoutdir + "/binless_ll_2D_prob.npy", p_bin)
+        np.save(self.calcoutdir + "/" + params["prob_npyfile"], p_bin)
 
-    def run_2D_bin_Rg(self, saved1D=True, saved1Dfile="calc_1D_saved.pkl", saved2D=False, saved2Dfile="calc_2D_saved.pkl"):
+    def run_2D_bin_Rg(self):
         """
-        Calculates 1D profile in Rg by integrating out N coordinate from 2D profile.
+        Loads the following params from the config file:
+            saved:
+            in_calcfile:
+            betaF_datfile:
+            betaF_imgfile:
+            prob_datfile:
+            prob_imgfile:
         """
-        saved1Dloc = self.calcoutdir + "/" + saved1Dfile
-        saved2Dloc = self.calcoutdir + "/" + saved2Dfile
+        # Load config
+        self.load_config()
+        # Load params
+        params = self.config["func_params"]["run_2D_bin_Rg"]
+
+        savedloc = self.calcoutdir + "/" + params["in_calcfile"]
 
         n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
 
@@ -1396,22 +1431,10 @@ class WHAM_analysis_biasN:
         for i in range(1, len(Rg_win)):
             y_l = np.hstack((y_l, Rg_win[i]))
 
-        N_i = np.array([len(arr) for arr in Ntw_win])
-
-        if saved1D:
-            calc = pickle.load(open(saved1Dloc, "rb"))
-        elif saved2D:
-            calc = pickle.load(open(saved2Dloc, "rb"))
+        if params["saved"]:
+            calc = pickle.load(open(savedloc, "rb"))
         else:
-            # Perform WHAM calculations
-            calc = WHAM.binless.Calc1D()
-            status = calc.compute_point_weights(x_l, N_i, umbrella_win, beta,
-                                                solver='log-likelihood',
-                                                logevery=1)
-            pickle.dump(calc, open(self.calcoutdir + "/calc_2D_saved.pkl", "wb"))
-
-            # Optimized?
-            logger.debug(status)
+            raise RuntimeError("Run WHAM calc first.")
 
         g_i = calc.g_i
 
@@ -1423,7 +1446,7 @@ class WHAM_analysis_biasN:
         betaF_Rg = betaF_Rg - np.min(betaF_Rg)
 
         # Write to text file
-        of = open(self.calcoutdir + "/" + "binless_ll_Rg.dat", "w")
+        of = open(self.calcoutdir + "/" + params["betaF_datfile"], "w")
         of.write("# Nt    betaF\n")
         for i in range(len(y_bin_points)):
             of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], betaF_Rg[i]))
@@ -1436,7 +1459,7 @@ class WHAM_analysis_biasN:
         ax.set_ylabel(r"$\beta F$")
         ax.margins(x=0, y=0)
 
-        plt.savefig(self.plotoutdir + "/" + "binless_log_likelihood_Rg.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["betaF_imgfile"], bbox_inches='tight')
         plt.close()
 
         """Probabilities"""
@@ -1446,7 +1469,7 @@ class WHAM_analysis_biasN:
         p_bin = p_bin / (delta_y_bin * np.sum(p_bin))  # normalize
 
         # Write to text file
-        of = open(self.calcoutdir + "/" + "binless_ll_prob_Rg.dat", "w")
+        of = open(self.calcoutdir + "/" + params["prob_datfile"], "w")
         of.write("# Nt    Pv(Rg)\n")
         for i in range(len(y_bin_points)):
             of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], p_bin[i]))
@@ -1459,67 +1482,347 @@ class WHAM_analysis_biasN:
         ax.set_ylabel(r"$P_v(R_g)$")
         ax.margins(x=0, y=0)
 
-        plt.savefig(self.plotoutdir + "/" + "binless_ll_prob_Rg.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["prob_imgfile"], bbox_inches='tight')
         plt.close()
 
     ############################################################################
     # 2D phi_1* reweighting
     ############################################################################
 
-    def run_2D_reweight_phi_1_star(self, saved1D=True, saved1Dfile="calc_1D_saved.pkl", saved2D=False, saved2Dfile="calc_2D_saved.pkl"):
+    def run_2D_reweight_phi_star(self):
         """
-        Reweights 2D profile to phi_1* ensemble.
+        Reweights 2D profile to different phi_star ensembles.
+
+        Loads the following params from the config file:
+            saved:
+            in_calcfile:
+            betaF_imgformat:
+            x_bins_npyformat:
+            y_bins_npyformat:
+            betaF_npyformat:
+            prob_imgformat:
+            prob_npyformat:
         """
-        saved1Dloc = self.calcoutdir + "/" + saved1Dfile
-        saved2Dloc = self.calcoutdir + "/" + saved2Dfile
+        # Load config
+        self.load_config()
+        # Load params
+        params = self.config["func_params"]["run_2D_reweight_phi_star"]
 
-        n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
+        # Loop over params
+        for phi_star_key in ["PHI_STAR2", "PHI_STAR_EQ2", "PHI_STAR_COEX2"]:
 
-        assert(len(Ntw_win[0]) == len(Rg_win[0]))
-        assert(len(Ntw_win[1]) == len(Rg_win[1]))
+            savedloc = self.calcoutdir + "/" + params["in_calcfile"]
 
-        # Unroll Ntw_win into a single array
-        x_l = Ntw_win[0]
-        for i in range(1, len(Ntw_win)):
-            x_l = np.hstack((x_l, Ntw_win[i]))
+            n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
 
-        # Unroll Rg_win into a single array
-        y_l = Rg_win[0]
-        for i in range(1, len(Rg_win)):
-            y_l = np.hstack((y_l, Rg_win[i]))
+            assert(len(Ntw_win[0]) == len(Rg_win[0]))
+            assert(len(Ntw_win[1]) == len(Rg_win[1]))
 
-        N_i = np.array([len(arr) for arr in Ntw_win])
+            # Unroll Ntw_win into a single array
+            x_l = Ntw_win[0]
+            for i in range(1, len(Ntw_win)):
+                x_l = np.hstack((x_l, Ntw_win[i]))
 
-        if saved1D:
-            calc = pickle.load(open(saved1Dloc, "rb"))
-        elif saved2D:
-            calc = pickle.load(open(saved2Dloc, "rb"))
-        else:
-            # Perform WHAM calculations
-            calc = WHAM.binless.Calc1D()
-            status = calc.compute_point_weights(x_l, N_i, umbrella_win, beta,
-                                                solver='log-likelihood',
-                                                logevery=1)
-            pickle.dump(calc, open(self.calcoutdir + "/calc_2D_saved.pkl", "wb"))
+            # Unroll Rg_win into a single array
+            y_l = Rg_win[0]
+            for i in range(1, len(Rg_win)):
+                y_l = np.hstack((y_l, Rg_win[i]))
 
-            # Optimized?
-            logger.debug(status)
+            if params["saved"]:
+                calc = pickle.load(open(savedloc, "rb"))
+            else:
+                raise RuntimeError("Run WHAM calc first.")
 
-        g_i = calc.g_i
+            g_i = calc.g_i
 
-        # Useful for debugging:
-        logger.debug("Window free energies: ", g_i)
+            # Useful for debugging:
+            logger.debug("Window free energies: ", g_i)
 
-        phi_1_star = self.PHI_STAR2
-        logger.debug(phi_1_star)
+            phi_star = getattr(self, phi_star_key)
 
-        G_l_rew = calc.reweight(beta, u_bias=potentials.linear(phi_1_star))
+            logger.debug("phi* = {}".format(phi_star))
 
-        betaF_2D_rew, (betaF_2D_rew_bin_counts, _1, _2) = calc.bin_2D_betaF_profile(y_l, x_bin_points, y_bin_points,
-                                                                                    G_l=G_l_rew, x_bin_style='center', y_bin_style='center')
-        betaF_2D_rew = betaF_2D_rew - np.min(betaF_2D_rew)
+            G_l_rew = calc.reweight(beta, u_bias=potentials.linear(phi_star))
+
+            betaF_2D_rew, (betaF_2D_rew_bin_counts, _1, _2) = calc.bin_2D_betaF_profile(y_l, x_bin_points, y_bin_points,
+                                                                                        G_l=G_l_rew, x_bin_style='center', y_bin_style='center')
+            betaF_2D_rew = betaF_2D_rew - np.min(betaF_2D_rew)
+
+            # Plot
+            fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
+
+            levels = np.linspace(0, self.PLOT_PHI_STAR_BETAF_MAX2, self.PLOT_PHI_STAR_BETAF_LEVELS2)
+            cmap = cm.RdYlBu
+
+            x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN2, x_bin_points <= self.PLOT_PHI_STAR_N_MAX2))[0]
+            x_min = np.min(x_indices)
+            x_max = np.max(x_indices)
+
+            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
+            y_min = np.min(y_indices)
+            y_max = np.max(y_indices)
+
+            contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
+                                         betaF_2D_rew[x_min:x_max, y_min:y_max].T,
+                                         levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
+            ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes('right', size='5%', pad=0.05)
+            fig.colorbar(contour_filled, cax=cax, orientation='vertical')
+
+            ax.set_xlabel(r"$\tilde{N}$")
+            ax.set_ylabel(r"$R_g$ (nm)")
+
+            cax.set_title(r"$\beta G_v^{\phi_1^*}(\tilde{N}, R_g)$")
+
+            ax.xaxis.set_minor_locator(AutoMinorLocator())
+            ax.yaxis.set_minor_locator(AutoMinorLocator())
+
+            ax.margins(x=0, y=0)
+
+            ax.tick_params(axis='both', which='both', direction='in', pad=10)
+
+            ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_star))
+
+            plt.savefig(self.plotoutdir + "/" + params["betaF_imgformat"].format(phi_star_key), bbox_inches='tight')
+            plt.close()
+
+            # Write free energy to npy file
+            np.save(self.calcoutdir + "/" + params["betaF_npyformat"].format(phi_star_key), betaF_2D_rew)
+
+            # Write bin points to npy files
+            np.save(self.calcoutdir + "/" + params["x_bins_npyformat"].format(phi_star_key), x_bin_points)
+            np.save(self.calcoutdir + "/" + params["y_bins_npyformat"].format(phi_star_key), y_bin_points)
+
+            """Probabilities"""
+            delta_x_bin = x_bin_points[1] - x_bin_points[0]
+            delta_y_bin = y_bin_points[1] - y_bin_points[0]
+            p_bin = delta_x_bin * delta_y_bin * np.exp(-betaF_2D_rew)
+
+            p_bin = p_bin / (delta_x_bin * delta_y_bin * np.sum(p_bin))  # normalize
+
+            # Plot
+            fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
+
+            levels = np.linspace(0, np.max(p_bin), self.PLOT_PHI_STAR_PV_LEVELS2)
+            cmap = cm.YlGnBu
+
+            x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN2, x_bin_points <= self.PLOT_PHI_STAR_N_MAX2))[0]
+            x_min = np.min(x_indices)
+            x_max = np.max(x_indices)
+
+            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
+            y_min = np.min(y_indices)
+            y_max = np.max(y_indices)
+
+            contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
+                                         p_bin[x_min:x_max, y_min:y_max].T,
+                                         levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
+            ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes('right', size='5%', pad=0.05)
+            fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
+
+            ax.set_xlabel(r"$\tilde{N}$")
+            ax.set_ylabel(r"$R_g$ (nm)")
+
+            cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, R_g)$")
+
+            ax.xaxis.set_minor_locator(AutoMinorLocator())
+            ax.yaxis.set_minor_locator(AutoMinorLocator())
+
+            ax.margins(x=0, y=0)
+
+            ax.tick_params(axis='both', which='both', direction='in', pad=10)
+
+            ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_star))
+
+            plt.savefig(self.plotoutdir + "/" + params["prob_imgformat"].format(phi_star_key), bbox_inches='tight')
+            plt.close()
+
+            # Write probabilities to npy file
+            np.save(self.calcoutdir + "/" + params["prob_npyformat"].format(phi_star_key), p_bin)
+
+    def run_2D_reweight_phi_star_bin_Rg(self):
+        """
+        Calculates 1D profile in Rg at different phi_star values by integrating out
+        N coordinate from 2D reweighted profile.
+
+        Loads the following params from the config file:
+            saved:
+            in_calcfile:
+            betaF_datformat:
+            betaF_imgformat:
+            prob_datformat:
+            prob_imgformat:
+        """
+        # Load config
+        self.load_config()
+        # Load params
+        params = self.config["func_params"]["run_2D_reweight_phi_star_bin_Rg"]
+
+        # Loop over params
+        for phi_star_key in ["PHI_STAR2", "PHI_STAR_EQ2", "PHI_STAR_COEX2"]:
+
+            savedloc = self.calcoutdir + "/" + params["in_calcfile"]
+
+            n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
+
+            assert(len(Ntw_win[0]) == len(Rg_win[0]))
+            assert(len(Ntw_win[1]) == len(Rg_win[1]))
+
+            # Unroll Ntw_win into a single array
+            x_l = Ntw_win[0]
+            for i in range(1, len(Ntw_win)):
+                x_l = np.hstack((x_l, Ntw_win[i]))
+
+            # Unroll Rg_win into a single array
+            y_l = Rg_win[0]
+            for i in range(1, len(Rg_win)):
+                y_l = np.hstack((y_l, Rg_win[i]))
+
+            if params["saved"]:
+                calc = pickle.load(open(savedloc, "rb"))
+            else:
+                raise RuntimeError("Run WHAM calc first.")
+
+            g_i = calc.g_i
+
+            # Useful for debugging:
+            logger.debug("Window free energies: ", g_i)
+
+            phi_star = getattr(self, phi_star_key)
+
+            logger.debug("phi* = {}".format(phi_star))
+
+            G_l_rew = calc.reweight(beta, u_bias=potentials.linear(phi_star))
+
+            betaF_Rg_rew = calc.bin_second_betaF_profile(y_l, x_bin_points, y_bin_points,
+                                                         G_l=G_l_rew, x_bin_style='center', y_bin_style='center')
+            betaF_Rg_rew = betaF_Rg_rew - np.min(betaF_Rg_rew)
+
+            # Plot
+            fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
+            indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2,
+                                              y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
+            ax.plot(y_bin_points[indices], betaF_Rg_rew[indices], label=r"Biased free energy profile in $\phi_1^*$ ensemble.")
+            ax.set_xlabel(r"$R_g$")
+            ax.set_ylabel(r"$\beta F$")
+            ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX2])
+
+            ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_star))
+
+            plt.savefig(self.plotoutdir + "/" + params["betaF_imgformat"].format(phi_star_key), bbox_inches='tight')
+            plt.close()
+
+            # Write to text file
+            of = open(self.calcoutdir + "/" + params["betaF_datformat"].format(phi_star_key), "w")
+            of.write("# N    betaF\n")
+            for i in range(len(y_bin_points)):
+                of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], betaF_Rg_rew[i]))
+            of.close()
+
+            """Probabilities"""
+            delta_y_bin = y_bin_points[1] - y_bin_points[0]
+            p_bin = delta_y_bin * np.exp(-betaF_Rg_rew)
+
+            p_bin = p_bin / (delta_y_bin * np.sum(p_bin))  # normalize
+
+            # Write to text file
+            of = open(self.calcoutdir + "/" + params["prob_datformat"].format(phi_star_key), "w")
+            of.write("# Nt    Pv(Rg)\n")
+            for i in range(len(y_bin_points)):
+                of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], p_bin[i]))
+            of.close()
+
+            # Plot
+            fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
+            ax.plot(y_bin_points, p_bin, label="Log-likelihood probability density")
+            ax.set_xlabel(r"$R_g$")
+            ax.set_ylabel(r"$P_v(R_g)$")
+
+            ax.margins(x=0, y=0)
+
+            ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_star))
+
+            plt.savefig(self.plotoutdir + "/" + params["prob_imgformat"].format(phi_star_key), bbox_inches='tight')
+            plt.close()
+
+    ############################################################################
+    # phi_c* coexistence integrations
+    ############################################################################
+
+    def run_coex_integration_2D(self):
+        """
+        Integrates reweighted 2D profile, at phi_star_coex, to determine coexistence.
+        """
+        pvntrg = np.load(self.calcoutdir + "/binless_2D_phi_1_star_prob.npy")
+        x_bin_points = np.load(self.calcoutdir + "/binless_2D_phi_1_star_bin_N.npy")
+        y_bin_points = np.load(self.calcoutdir + "/binless_2D_phi_1_star_bin_Rg.npy")
+
+        xv, yv = np.meshgrid(x_bin_points, y_bin_points, indexing='ij')
+        logger.debug(xv.shape)
+        mask1 = yv < self.NtRg_split_m * (xv - self.NtRg_split_x0) + self.NtRg_split_c
+        mask2 = yv >= self.NtRg_split_m * (xv - self.NtRg_split_x0) + self.NtRg_split_c
+
+        dx = x_bin_points[1] - x_bin_points[0]
+        dy = y_bin_points[1] - y_bin_points[0]
+
+        p1 = dx * dy * np.sum(mask1 * pvntrg)
+        p2 = dx * dy * np.sum(mask2 * pvntrg)
+
+        logger.info("Probabilities in N, Rg: {:.5f} {:.5f}".format(p1, p2))
 
         # Plot
+        fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
+
+        levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS)
+        cmap = cm.YlGnBu
+
+        x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
+        x_min = np.min(x_indices)
+        x_max = np.max(x_indices)
+
+        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
+        y_min = np.min(y_indices)
+        y_max = np.max(y_indices)
+
+        contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
+                                     pvntrg[x_min:x_max, y_min:y_max].T,
+                                     levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
+        ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size='5%', pad=0.05)
+
+        fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
+
+        # Plot dividing line
+        ax.plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
+        ax.plot(self.NT_SPLIT, self.Rg_split, 'x')
+        ax.text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
+
+        ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
+        ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
+
+        ax.set_xlabel(r"$\tilde{N}$")
+        ax.set_ylabel(r"$R_g$ (nm)")
+
+        cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, R_g)$")
+
+        ax.xaxis.set_minor_locator(AutoMinorLocator())
+        ax.yaxis.set_minor_locator(AutoMinorLocator())
+
+        ax.set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
+        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
+
+        ax.tick_params(axis='both', which='both', direction='in', pad=10)
+
+        plt.savefig(self.plotoutdir + "/" + "coex_NtRg.png", bbox_inches='tight')
+        plt.close()
+
+        # Plot free energies
+        fntrg = np.load(self.calcoutdir + "/binless_2D_phi_1_star.npy")
+
         fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
 
         levels = np.linspace(0, self.PLOT_PHI_STAR_BETAF_MAX, self.PLOT_PHI_STAR_BETAF_LEVELS)
@@ -1534,12 +1837,21 @@ class WHAM_analysis_biasN:
         y_max = np.max(y_indices)
 
         contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                     betaF_2D_rew[x_min:x_max, y_min:y_max].T,
+                                     fntrg[x_min:x_max, y_min:y_max].T,
                                      levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
         ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('right', size='5%', pad=0.05)
+
         fig.colorbar(contour_filled, cax=cax, orientation='vertical')
+
+        # Plot dividing line
+        ax.plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
+        ax.plot(self.NT_SPLIT, self.Rg_split, 'x')
+        ax.text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
+
+        ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
+        ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
 
         ax.set_xlabel(r"$\tilde{N}$")
         ax.set_ylabel(r"$R_g$ (nm)")
@@ -1549,36 +1861,18 @@ class WHAM_analysis_biasN:
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
 
-        ax.margins(x=0, y=0)
+        ax.set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
+        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
 
         ax.tick_params(axis='both', which='both', direction='in', pad=10)
 
-        ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_1_star))
-
-        plt.savefig(self.plotoutdir + "/binless_2D_phi_1_star.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + "coex_NtRg_free_energy.png", bbox_inches='tight')
         plt.close()
 
-        # Write free energy to npy file
-        np.save(self.calcoutdir + "/binless_2D_phi_1_star.npy", betaF_2D_rew)
+        """Plot masks"""
+        fig, ax = plt.subplots(1, 2, figsize=(8, 4), dpi=600)
 
-        # Write bin points to npy files
-        np.save(self.calcoutdir + "/binless_2D_phi_1_star_bin_N.npy", x_bin_points)
-        np.save(self.calcoutdir + "/binless_2D_phi_1_star_bin_Rg.npy", y_bin_points)
-
-        # Write bin counts to npy file
-        np.save(self.calcoutdir + "/binless_2D_phi_1_star_bin_counts.npy", betaF_2D_rew_bin_counts)
-
-        """Probabilities"""
-        delta_x_bin = x_bin_points[1] - x_bin_points[0]
-        delta_y_bin = y_bin_points[1] - y_bin_points[0]
-        p_bin = delta_x_bin * delta_y_bin * np.exp(-betaF_2D_rew)
-
-        p_bin = p_bin / (delta_x_bin * delta_y_bin * np.sum(p_bin))  # normalize
-
-        # Plot
-        fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
-
-        levels = np.linspace(0, np.max(p_bin), self.PLOT_PHI_STAR_PV_LEVELS)
+        levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS)
         cmap = cm.YlGnBu
 
         x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
@@ -1589,415 +1883,144 @@ class WHAM_analysis_biasN:
         y_min = np.min(y_indices)
         y_max = np.max(y_indices)
 
-        contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                     p_bin[x_min:x_max, y_min:y_max].T,
-                                     levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-        ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes('right', size='5%', pad=0.05)
-        fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
+        # FIRST MASK
+        contour_filled = ax[0].contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
+                                        (mask1 * pvntrg)[x_min:x_max, y_min:y_max].T,
+                                        levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
+        ax[0].contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
 
-        ax.set_xlabel(r"$\tilde{N}$")
-        ax.set_ylabel(r"$R_g$ (nm)")
+        # Plot dividing line
+        ax[0].plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
+        ax[0].plot(self.NT_SPLIT, self.Rg_split, 'x')
+        ax[0].text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
 
-        cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, R_g)$")
+        ax[0].text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax[0].transAxes)
 
-        ax.xaxis.set_minor_locator(AutoMinorLocator())
-        ax.yaxis.set_minor_locator(AutoMinorLocator())
+        ax[0].set_xlabel(r"$\tilde{N}$")
+        ax[0].set_ylabel(r"$R_g$ (nm)")
 
-        ax.margins(x=0, y=0)
+        ax[0].xaxis.set_minor_locator(AutoMinorLocator())
+        ax[0].yaxis.set_minor_locator(AutoMinorLocator())
 
-        ax.tick_params(axis='both', which='both', direction='in', pad=10)
+        ax[0].set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
+        ax[0].set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
 
-        ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_1_star))
+        ax[0].tick_params(axis='both', which='both', direction='in', pad=10)
 
-        plt.savefig(self.plotoutdir + "/binless_2D_phi_1_star_prob.png", bbox_inches='tight')
+        # SECOND MASK
+        contour_filled = ax[1].contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
+                                        (mask2 * pvntrg)[x_min:x_max, y_min:y_max].T,
+                                        levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
+        ax[1].contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
+
+        # Plot dividing line
+        ax[1].plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
+        ax[1].plot(self.NT_SPLIT, self.Rg_split, 'x')
+        ax[1].text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
+
+        ax[1].text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax[1].transAxes)
+
+        ax[1].set_xlabel(r"$\tilde{N}$")
+        ax[1].set_ylabel(r"$R_g$ (nm)")
+
+        ax[1].xaxis.set_minor_locator(AutoMinorLocator())
+        ax[1].yaxis.set_minor_locator(AutoMinorLocator())
+
+        ax[1].set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
+        ax[1].set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
+
+        ax[1].tick_params(axis='both', which='both', direction='in', pad=10)
+
+        plt.savefig(self.plotoutdir + "/" + "coex_NtRg_int_regions.png", bbox_inches='tight')
         plt.close()
 
-        # Write probabilities to npy file
-        np.save(self.calcoutdir + "/binless_2D_phi_1_star_prob.npy", p_bin)
+    def run_coex_integration_Rg(self):
+        """Integrate Rg"""
+        f = open(self.calcoutdir + "/" + "binless_ll_phi_1_star_prob_Rg.dat")
 
-    def run_2D_reweight_phi_1_star_bin_Rg(self, saved1D=True, saved1Dfile="calc_1D_saved.pkl", saved2D=False, saved2Dfile="calc_2D_saved.pkl"):
-        """
-        Calculates 1D profile in Rg at phi_1_star by integrating out N coordinate from 2D reweighted profile.
-        """
-        saved1Dloc = self.calcoutdir + "/" + saved1Dfile
-        saved2Dloc = self.calcoutdir + "/" + saved2Dfile
+        rg = []
+        pvrg = []
 
-        n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
+        for line in f:
+            if line.strip().split()[0] != '#':
+                rg.append(float(line.strip().split()[0]))
+                pvrg.append(float(line.strip().split()[1]))
 
-        assert(len(Ntw_win[0]) == len(Rg_win[0]))
-        assert(len(Ntw_win[1]) == len(Rg_win[1]))
+        f.close()
 
-        # Unroll Ntw_win into a single array
-        x_l = Ntw_win[0]
-        for i in range(1, len(Ntw_win)):
-            x_l = np.hstack((x_l, Ntw_win[i]))
+        rg = np.array(rg)
+        pvrg = np.array(pvrg)
 
-        # Unroll Rg_win into a single array
-        y_l = Rg_win[0]
-        for i in range(1, len(Rg_win)):
-            y_l = np.hstack((y_l, Rg_win[i]))
+        idx1 = np.argwhere(rg < self.Rg_split)
+        idx2 = np.argwhere(rg >= self.Rg_split)
 
-        N_i = np.array([len(arr) for arr in Ntw_win])
+        dx = rg[1] - rg[0]
 
-        if saved1D:
-            calc = pickle.load(open(saved1Dloc, "rb"))
-        elif saved2D:
-            calc = pickle.load(open(saved2Dloc, "rb"))
-        else:
-            # Perform WHAM calculations
-            calc = WHAM.binless.Calc1D()
-            status = calc.compute_point_weights(x_l, N_i, umbrella_win, beta,
-                                                solver='log-likelihood',
-                                                logevery=1)
-            pickle.dump(calc, open(self.calcoutdir + "/calc_2D_saved.pkl", "wb"))
+        p1 = dx * np.sum(pvrg[idx1].flatten())
+        p2 = dx * np.sum(pvrg[idx2].flatten())
 
-            # Optimized?
-            logger.debug(status)
-
-        g_i = calc.g_i
-
-        # Useful for debugging:
-        logger.debug("Window free energies: ", g_i)
-
-        phi_1_star = self.PHI_STAR2
-        logger.debug(phi_1_star)
-
-        G_l_rew = calc.reweight(beta, u_bias=potentials.linear(phi_1_star))
-
-        betaF_Rg_rew = calc.bin_second_betaF_profile(y_l, x_bin_points, y_bin_points,
-                                                     G_l=G_l_rew, x_bin_style='center', y_bin_style='center')
-        betaF_Rg_rew = betaF_Rg_rew - np.min(betaF_Rg_rew)
+        logger.info("Probabilities in Rg: {:.5f} {:.5f}".format(p1, p2))
 
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-        indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN,
-                                          y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
-        ax.plot(y_bin_points[indices], betaF_Rg_rew[indices], label=r"Biased free energy profile in $\phi_1^*$ ensemble.")
-        ax.set_xlabel(r"$R_g$")
-        ax.set_ylabel(r"$\beta F$")
-        ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX])
-
-        ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_1_star))
-
-        plt.savefig(self.plotoutdir + "/free_energy_phi_1_star_Rg.png", bbox_inches='tight')
-        plt.close()
-
-        # Write to text file
-        of = open(self.calcoutdir + "/binless_ll_phi_1_star_Rg.dat", "w")
-        of.write("# N    betaF\n")
-        for i in range(len(y_bin_points)):
-            of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], betaF_Rg_rew[i]))
-        of.close()
-
-        """Probabilities"""
-        delta_y_bin = y_bin_points[1] - y_bin_points[0]
-        p_bin = delta_y_bin * np.exp(-betaF_Rg_rew)
-
-        p_bin = p_bin / (delta_y_bin * np.sum(p_bin))  # normalize
-
-        # Write to text file
-        of = open(self.calcoutdir + "/" + "binless_ll_phi_1_star_prob_Rg.dat", "w")
-        of.write("# Nt    Pv(Rg)\n")
-        for i in range(len(y_bin_points)):
-            of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], p_bin[i]))
-        of.close()
-
-        # Plot
-        fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-        ax.plot(y_bin_points, p_bin, label="Log-likelihood probability density")
+        ax.plot(rg, pvrg, label="Probability density")
+        ax.axvline(x=self.Rg_split, label=r"$R_g ={:.2f}$".format(self.Rg_split))
+        ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
+        ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
         ax.set_xlabel(r"$R_g$")
         ax.set_ylabel(r"$P_v(R_g)$")
-
+        ax.legend()
         ax.margins(x=0, y=0)
 
-        ax.set_title(r"$\beta \phi = \beta \phi^*$={:.3f}".format(beta * phi_1_star))
+        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
 
-        plt.savefig(self.plotoutdir + "/" + "binless_ll_phi_1_star_prob_Rg.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + "coex_Rg.png", bbox_inches='tight')
         plt.close()
 
-    ############################################################################
-    # phi_c* coexistence integrations
-    ############################################################################
-
-    def coex_2D(self, int_Rg=True, int_NtRg=True):
-        """
-        Integrates reweighted 1D profiles in Rg and 2D profile, at phi_1_star, to determine coexistence.
-        """
-        if int_Rg:
-            """Integrate Rg"""
-            f = open(self.calcoutdir + "/" + "binless_ll_phi_1_star_prob_Rg.dat")
-
-            rg = []
-            pvrg = []
-
-            for line in f:
-                if line.strip().split()[0] != '#':
-                    rg.append(float(line.strip().split()[0]))
-                    pvrg.append(float(line.strip().split()[1]))
-
-            f.close()
-
-            rg = np.array(rg)
-            pvrg = np.array(pvrg)
-
-            idx1 = np.argwhere(rg < self.Rg_split)
-            idx2 = np.argwhere(rg >= self.Rg_split)
-
-            dx = rg[1] - rg[0]
-
-            p1 = dx * np.sum(pvrg[idx1].flatten())
-            p2 = dx * np.sum(pvrg[idx2].flatten())
-
-            logger.info("Probabilities in Rg: {:.5f} {:.5f}".format(p1, p2))
-
-            # Plot
-            fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-            ax.plot(rg, pvrg, label="Probability density")
-            ax.axvline(x=self.Rg_split, label=r"$R_g ={:.2f}$".format(self.Rg_split))
-            ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
-            ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
-            ax.set_xlabel(r"$R_g$")
-            ax.set_ylabel(r"$P_v(R_g)$")
-            ax.legend()
-            ax.margins(x=0, y=0)
-
-            ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-
-            plt.savefig(self.plotoutdir + "/" + "coex_Rg.png", bbox_inches='tight')
-            plt.close()
-
-            # Plot free energies
-            f = open(self.calcoutdir + "/" + "binless_ll_phi_1_star_Rg.dat")
-
-            frg = []
-
-            for line in f:
-                if line.strip().split()[0] != '#':
-                    frg.append(float(line.strip().split()[1]))
-
-            f.close()
-
-            frg = np.array(frg)
-
-            fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-            ax.plot(rg, frg, label="Free energy")
-            ax.axvline(x=self.Rg_split, label=r"$R_g ={:.2f}$".format(self.Rg_split))
-            ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
-            ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
-            ax.set_xlabel(r"$R_g$")
-            ax.set_ylabel(r"$F(R_g)$")
-            ax.legend()
-            ax.margins(x=0, y=0)
-            ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-            ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX])
-
-            plt.savefig(self.plotoutdir + "/" + "coex_Rg_free_energy.png", bbox_inches='tight')
-            plt.close()
-
-        if int_NtRg:
-            """Integrate N, Rg"""
-            pvntrg = np.load(self.calcoutdir + "/binless_2D_phi_1_star_prob.npy")
-            x_bin_points = np.load(self.calcoutdir + "/binless_2D_phi_1_star_bin_N.npy")
-            y_bin_points = np.load(self.calcoutdir + "/binless_2D_phi_1_star_bin_Rg.npy")
-
-            xv, yv = np.meshgrid(x_bin_points, y_bin_points, indexing='ij')
-            logger.debug(xv.shape)
-            mask1 = yv < self.NtRg_split_m * (xv - self.NtRg_split_x0) + self.NtRg_split_c
-            mask2 = yv >= self.NtRg_split_m * (xv - self.NtRg_split_x0) + self.NtRg_split_c
-
-            dx = x_bin_points[1] - x_bin_points[0]
-            dy = y_bin_points[1] - y_bin_points[0]
-
-            p1 = dx * dy * np.sum(mask1 * pvntrg)
-            p2 = dx * dy * np.sum(mask2 * pvntrg)
-
-            logger.info("Probabilities in N, Rg: {:.5f} {:.5f}".format(p1, p2))
-
-            # Plot
-            fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
-
-            levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS)
-            cmap = cm.YlGnBu
-
-            x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
-            x_min = np.min(x_indices)
-            x_max = np.max(x_indices)
-
-            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
-            y_min = np.min(y_indices)
-            y_max = np.max(y_indices)
-
-            contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                         pvntrg[x_min:x_max, y_min:y_max].T,
-                                         levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-            ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
-            divider = make_axes_locatable(ax)
-            cax = divider.append_axes('right', size='5%', pad=0.05)
-
-            fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
-
-            # Plot dividing line
-            ax.plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-            ax.plot(self.Nt_split, self.Rg_split, 'x')
-            ax.text(self.Nt_split + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.Nt_split, self.Rg_split))
-
-            ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
-            ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
-
-            ax.set_xlabel(r"$\tilde{N}$")
-            ax.set_ylabel(r"$R_g$ (nm)")
-
-            cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, R_g)$")
-
-            ax.xaxis.set_minor_locator(AutoMinorLocator())
-            ax.yaxis.set_minor_locator(AutoMinorLocator())
-
-            ax.set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-            ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-
-            ax.tick_params(axis='both', which='both', direction='in', pad=10)
-
-            plt.savefig(self.plotoutdir + "/" + "coex_NtRg.png", bbox_inches='tight')
-            plt.close()
-
-            # Plot free energies
-            fntrg = np.load(self.calcoutdir + "/binless_2D_phi_1_star.npy")
-
-            fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
-
-            levels = np.linspace(0, self.PLOT_PHI_STAR_BETAF_MAX, self.PLOT_PHI_STAR_BETAF_LEVELS)
-            cmap = cm.RdYlBu
-
-            x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
-            x_min = np.min(x_indices)
-            x_max = np.max(x_indices)
-
-            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
-            y_min = np.min(y_indices)
-            y_max = np.max(y_indices)
-
-            contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                         fntrg[x_min:x_max, y_min:y_max].T,
-                                         levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-            ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
-            divider = make_axes_locatable(ax)
-            cax = divider.append_axes('right', size='5%', pad=0.05)
-
-            fig.colorbar(contour_filled, cax=cax, orientation='vertical')
-
-            # Plot dividing line
-            ax.plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-            ax.plot(self.Nt_split, self.Rg_split, 'x')
-            ax.text(self.Nt_split + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.Nt_split, self.Rg_split))
-
-            ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
-            ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
-
-            ax.set_xlabel(r"$\tilde{N}$")
-            ax.set_ylabel(r"$R_g$ (nm)")
-
-            cax.set_title(r"$\beta G_v^{\phi_1^*}(\tilde{N}, R_g)$")
-
-            ax.xaxis.set_minor_locator(AutoMinorLocator())
-            ax.yaxis.set_minor_locator(AutoMinorLocator())
-
-            ax.set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-            ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-
-            ax.tick_params(axis='both', which='both', direction='in', pad=10)
-
-            plt.savefig(self.plotoutdir + "/" + "coex_NtRg_free_energy.png", bbox_inches='tight')
-            plt.close()
-
-            """Plot masks"""
-            fig, ax = plt.subplots(1, 2, figsize=(8, 4), dpi=600)
-
-            levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS)
-            cmap = cm.YlGnBu
-
-            x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
-            x_min = np.min(x_indices)
-            x_max = np.max(x_indices)
-
-            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
-            y_min = np.min(y_indices)
-            y_max = np.max(y_indices)
-
-            # FIRST MASK
-            contour_filled = ax[0].contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                            (mask1 * pvntrg)[x_min:x_max, y_min:y_max].T,
-                                            levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-            ax[0].contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
-
-            # Plot dividing line
-            ax[0].plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-            ax[0].plot(self.Nt_split, self.Rg_split, 'x')
-            ax[0].text(self.Nt_split + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.Nt_split, self.Rg_split))
-
-            ax[0].text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax[0].transAxes)
-
-            ax[0].set_xlabel(r"$\tilde{N}$")
-            ax[0].set_ylabel(r"$R_g$ (nm)")
-
-            ax[0].xaxis.set_minor_locator(AutoMinorLocator())
-            ax[0].yaxis.set_minor_locator(AutoMinorLocator())
-
-            ax[0].set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-            ax[0].set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-
-            ax[0].tick_params(axis='both', which='both', direction='in', pad=10)
-
-            # SECOND MASK
-            contour_filled = ax[1].contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                            (mask2 * pvntrg)[x_min:x_max, y_min:y_max].T,
-                                            levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-            ax[1].contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
-
-            # Plot dividing line
-            ax[1].plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-            ax[1].plot(self.Nt_split, self.Rg_split, 'x')
-            ax[1].text(self.Nt_split + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.Nt_split, self.Rg_split))
-
-            ax[1].text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax[1].transAxes)
-
-            ax[1].set_xlabel(r"$\tilde{N}$")
-            ax[1].set_ylabel(r"$R_g$ (nm)")
-
-            ax[1].xaxis.set_minor_locator(AutoMinorLocator())
-            ax[1].yaxis.set_minor_locator(AutoMinorLocator())
-
-            ax[1].set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-            ax[1].set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-
-            ax[1].tick_params(axis='both', which='both', direction='in', pad=10)
-
-            plt.savefig(self.plotoutdir + "/" + "coex_NtRg_int_regions.png", bbox_inches='tight')
-            plt.close()
-
-    def calc_deltaGu_int_method_2D(self):
-        """Calculate ratio of C basin to E basin probabilities, in 2D, to get deltaGu."""
-        pass
+        # Plot free energies
+        f = open(self.calcoutdir + "/" + "binless_ll_phi_1_star_Rg.dat")
+
+        frg = []
+
+        for line in f:
+            if line.strip().split()[0] != '#':
+                frg.append(float(line.strip().split()[1]))
+
+        f.close()
+
+        frg = np.array(frg)
+
+        fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
+        ax.plot(rg, frg, label="Free energy")
+        ax.axvline(x=self.Rg_split, label=r"$R_g ={:.2f}$".format(self.Rg_split))
+        ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
+        ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
+        ax.set_xlabel(r"$R_g$")
+        ax.set_ylabel(r"$F(R_g)$")
+        ax.legend()
+        ax.margins(x=0, y=0)
+        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
+        ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX])
+
+        plt.savefig(self.plotoutdir + "/" + "coex_Rg_free_energy.png", bbox_inches='tight')
+        plt.close()
 
     ############################################################################
     # computation call
     ############################################################################
 
     def __call__(self, calc_types, calc_args={}):
-        func_registry = {
-            "hist": self.plot_hist,
-            "1D": self.run_binless_log_likelihood
-        }
         for calc_type in calc_types:
             if calc_type == "all":
-                pass
+                for f in self.func_registry.keys():
+                    f()
             else:
-                f = func_registry.get(calc_type, None)
+                f = self.func_registry.get(calc_type, None)
                 if f is None:
                     raise ValueError("Calc type {} not recognized.".format(calc_type))
                 else:
                     f()
+
 
 def main():
     parser = argparse.ArgumentParser(description='WHAM-based analysis and plots')
