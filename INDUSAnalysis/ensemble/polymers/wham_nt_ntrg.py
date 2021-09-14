@@ -51,7 +51,9 @@ class WHAM_analysis_biasN:
 
     def __init__(self, config_file="config.yaml"):
         self.config_file = config_file
+        self.register()
 
+    def register(self):
         self.func_registry = OrderedDict([
             ("get", self.get_test_data),
             ("get2", self.get_test_data2),
@@ -74,6 +76,7 @@ class WHAM_analysis_biasN:
             ("2D_coex", self.run_coex_integration_2D),
             ("Rg_coex", self.run_coex_integration_Rg)
         ])
+        return self.func_registry
 
     def load_config(self):
         with open(self.config_file, 'r') as f:
@@ -165,7 +168,7 @@ class WHAM_analysis_biasN:
         max_Ntws = []
         for Ntwwin in Ntw_win:
             max_Ntws.append(Ntwwin.max())
-        logger.debug("MIN Ntw = {:.2f}, MAX Ntw = {:.2f}".format(np.min(np.array(min_Ntws)), np.max(np.array(max_Ntws))))
+        logger.info("MIN Ntw = {:.2f}, MAX Ntw = {:.2f}".format(np.min(np.array(min_Ntws)), np.max(np.array(max_Ntws))))
 
         return n_star_win, Ntw_win, bin_points, umbrella_win, beta
 
@@ -234,6 +237,15 @@ class WHAM_analysis_biasN:
 
         beta = 1000 / (8.314 * int(self.TEMP))  # at T K, in kJ/mol units
 
+        # Show min and max Ntw across dataset
+        min_Ntws = []
+        for Ntwwin in Ntw_win:
+            min_Ntws.append(Ntwwin.min())
+        max_Ntws = []
+        for Ntwwin in Ntw_win:
+            max_Ntws.append(Ntwwin.max())
+        logger.info("MIN Ntw = {:.2f}, MAX Ntw = {:.2f}".format(np.min(np.array(min_Ntws)), np.max(np.array(max_Ntws))))
+
         # Show min and max Rg across dataset
         min_Rgs = []
         for Rgwin in Rg_win:
@@ -241,7 +253,7 @@ class WHAM_analysis_biasN:
         max_Rgs = []
         for Rgwin in Rg_win:
             max_Rgs.append(Rgwin.max())
-        logger.debug("MIN Rg = {:.2f}, MAX Rg = {:.2f}".format(np.min(np.array(min_Rgs)), np.max(np.array(max_Rgs))))
+        logger.info("MIN Rg = {:.2f}, MAX Rg = {:.2f}".format(np.min(np.array(min_Rgs)), np.max(np.array(max_Rgs))))
 
         return n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta
 
@@ -1755,15 +1767,28 @@ class WHAM_analysis_biasN:
     def run_coex_integration_2D(self):
         """
         Integrates reweighted 2D profile, at phi_star_coex, to determine coexistence.
+
+        Loads the following params from config file:
+            in_x_bins_npyformat:
+            in_y_bins_npyformat:
+            in_betaF_npyformat:
+            in_prob_npyformat:
+            betaF_coex_imgfile:
+            prob_coex_imgfile:
         """
-        pvntrg = np.load(self.calcoutdir + "/binless_2D_phi_1_star_prob.npy")
-        x_bin_points = np.load(self.calcoutdir + "/binless_2D_phi_1_star_bin_N.npy")
-        y_bin_points = np.load(self.calcoutdir + "/binless_2D_phi_1_star_bin_Rg.npy")
+        # Load config
+        self.load_config()
+        # Load params
+        params = self.config["func_params"]["run_coex_integration_2D"]
+
+        pvntrg = np.load(self.calcoutdir + "/" + params["in_prob_npyformat"].format("PHI_STAR_COEX2"))
+        x_bin_points = np.load(self.calcoutdir + "/" + params["in_x_bins_npyformat"].format("PHI_STAR_COEX2"))
+        y_bin_points = np.load(self.calcoutdir + "/" + params["in_y_bins_npyformat"].format("PHI_STAR_COEX2"))
 
         xv, yv = np.meshgrid(x_bin_points, y_bin_points, indexing='ij')
         logger.debug(xv.shape)
-        mask1 = yv < self.NtRg_split_m * (xv - self.NtRg_split_x0) + self.NtRg_split_c
-        mask2 = yv >= self.NtRg_split_m * (xv - self.NtRg_split_x0) + self.NtRg_split_c
+        mask1 = yv < self.NTRG_SPLIT_m * (xv - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c
+        mask2 = yv >= self.NTRG_SPLIT_m * (xv - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c
 
         dx = x_bin_points[1] - x_bin_points[0]
         dy = y_bin_points[1] - y_bin_points[0]
@@ -1776,14 +1801,14 @@ class WHAM_analysis_biasN:
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
 
-        levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS)
+        levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS2)
         cmap = cm.YlGnBu
 
-        x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
+        x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN2, x_bin_points <= self.PLOT_PHI_STAR_N_MAX2))[0]
         x_min = np.min(x_indices)
         x_max = np.max(x_indices)
 
-        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
+        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
         y_min = np.min(y_indices)
         y_max = np.max(y_indices)
 
@@ -1797,9 +1822,11 @@ class WHAM_analysis_biasN:
         fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
 
         # Plot dividing line
-        ax.plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-        ax.plot(self.NT_SPLIT, self.Rg_split, 'x')
-        ax.text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
+        ax.plot(x_bin_points[x_indices], self.NTRG_SPLIT_m * (x_bin_points[x_indices] - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c)
+
+        # Plot Nt, Rg dividing lines
+        ax.plot(self.NT_SPLIT, self.RG_SPLIT, 'x')
+        ax.text(self.NT_SPLIT + 5, self.RG_SPLIT + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.RG_SPLIT))
 
         ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
@@ -1812,27 +1839,27 @@ class WHAM_analysis_biasN:
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
 
-        ax.set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
+        ax.set_xlim([self.PLOT_PHI_STAR_N_MIN2, self.PLOT_PHI_STAR_N_MAX2])
+        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
 
         ax.tick_params(axis='both', which='both', direction='in', pad=10)
 
-        plt.savefig(self.plotoutdir + "/" + "coex_NtRg.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["prob_coex_imgfile"], bbox_inches='tight')
         plt.close()
 
         # Plot free energies
-        fntrg = np.load(self.calcoutdir + "/binless_2D_phi_1_star.npy")
+        fntrg = np.load(self.calcoutdir + "/" + params["in_betaF_npyformat"].format("PHI_STAR_COEX2"))
 
         fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
 
-        levels = np.linspace(0, self.PLOT_PHI_STAR_BETAF_MAX, self.PLOT_PHI_STAR_BETAF_LEVELS)
+        levels = np.linspace(0, self.PLOT_PHI_STAR_BETAF_MAX2, self.PLOT_PHI_STAR_BETAF_LEVELS2)
         cmap = cm.RdYlBu
 
-        x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
+        x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN2, x_bin_points <= self.PLOT_PHI_STAR_N_MAX2))[0]
         x_min = np.min(x_indices)
         x_max = np.max(x_indices)
 
-        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
+        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
         y_min = np.min(y_indices)
         y_max = np.max(y_indices)
 
@@ -1846,9 +1873,11 @@ class WHAM_analysis_biasN:
         fig.colorbar(contour_filled, cax=cax, orientation='vertical')
 
         # Plot dividing line
-        ax.plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-        ax.plot(self.NT_SPLIT, self.Rg_split, 'x')
-        ax.text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
+        ax.plot(x_bin_points[x_indices], self.NTRG_SPLIT_m * (x_bin_points[x_indices] - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c)
+
+        # Plot Nt, Rg dividing lines
+        ax.plot(self.NT_SPLIT, self.RG_SPLIT, 'x')
+        ax.text(self.NT_SPLIT + 5, self.RG_SPLIT + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.RG_SPLIT))
 
         ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
@@ -1861,82 +1890,30 @@ class WHAM_analysis_biasN:
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
 
-        ax.set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
+        ax.set_xlim([self.PLOT_PHI_STAR_N_MIN2, self.PLOT_PHI_STAR_N_MAX2])
+        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
 
         ax.tick_params(axis='both', which='both', direction='in', pad=10)
 
-        plt.savefig(self.plotoutdir + "/" + "coex_NtRg_free_energy.png", bbox_inches='tight')
-        plt.close()
-
-        """Plot masks"""
-        fig, ax = plt.subplots(1, 2, figsize=(8, 4), dpi=600)
-
-        levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS)
-        cmap = cm.YlGnBu
-
-        x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN, x_bin_points <= self.PLOT_PHI_STAR_N_MAX))[0]
-        x_min = np.min(x_indices)
-        x_max = np.max(x_indices)
-
-        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX))[0]
-        y_min = np.min(y_indices)
-        y_max = np.max(y_indices)
-
-        # FIRST MASK
-        contour_filled = ax[0].contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                        (mask1 * pvntrg)[x_min:x_max, y_min:y_max].T,
-                                        levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-        ax[0].contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
-
-        # Plot dividing line
-        ax[0].plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-        ax[0].plot(self.NT_SPLIT, self.Rg_split, 'x')
-        ax[0].text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
-
-        ax[0].text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax[0].transAxes)
-
-        ax[0].set_xlabel(r"$\tilde{N}$")
-        ax[0].set_ylabel(r"$R_g$ (nm)")
-
-        ax[0].xaxis.set_minor_locator(AutoMinorLocator())
-        ax[0].yaxis.set_minor_locator(AutoMinorLocator())
-
-        ax[0].set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-        ax[0].set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-
-        ax[0].tick_params(axis='both', which='both', direction='in', pad=10)
-
-        # SECOND MASK
-        contour_filled = ax[1].contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                        (mask2 * pvntrg)[x_min:x_max, y_min:y_max].T,
-                                        levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
-        ax[1].contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
-
-        # Plot dividing line
-        ax[1].plot(x_bin_points[x_indices], self.NtRg_split_m * (x_bin_points[x_indices] - self.NtRg_split_x0) + self.NtRg_split_c)
-        ax[1].plot(self.NT_SPLIT, self.Rg_split, 'x')
-        ax[1].text(self.NT_SPLIT + 5, self.Rg_split + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.Rg_split))
-
-        ax[1].text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax[1].transAxes)
-
-        ax[1].set_xlabel(r"$\tilde{N}$")
-        ax[1].set_ylabel(r"$R_g$ (nm)")
-
-        ax[1].xaxis.set_minor_locator(AutoMinorLocator())
-        ax[1].yaxis.set_minor_locator(AutoMinorLocator())
-
-        ax[1].set_xlim([self.PLOT_PHI_STAR_N_MIN, self.PLOT_PHI_STAR_N_MAX])
-        ax[1].set_ylim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-
-        ax[1].tick_params(axis='both', which='both', direction='in', pad=10)
-
-        plt.savefig(self.plotoutdir + "/" + "coex_NtRg_int_regions.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["betaF_coex_imgfile"], bbox_inches='tight')
         plt.close()
 
     def run_coex_integration_Rg(self):
-        """Integrate Rg"""
-        f = open(self.calcoutdir + "/" + "binless_ll_phi_1_star_prob_Rg.dat")
+        """
+        Integrates reweighted Rg profile, at phi_star_coex, to determine coexistence.
+
+        Loads the following params from config file:
+            in_betaF_datformat:
+            in_prob_datformat:
+            betaF_coex_imgfile:
+            prob_coex_imgfile:
+        """
+        # Load config
+        self.load_config()
+        # Load params
+        params = self.config["func_params"]["run_coex_integration_Rg"]
+
+        f = open(self.calcoutdir + "/" + params["in_prob_datformat"].format("PHI_STAR_COEX2"))
 
         rg = []
         pvrg = []
@@ -1951,8 +1928,8 @@ class WHAM_analysis_biasN:
         rg = np.array(rg)
         pvrg = np.array(pvrg)
 
-        idx1 = np.argwhere(rg < self.Rg_split)
-        idx2 = np.argwhere(rg >= self.Rg_split)
+        idx1 = np.argwhere(rg < self.RG_SPLIT)
+        idx2 = np.argwhere(rg >= self.RG_SPLIT)
 
         dx = rg[1] - rg[0]
 
@@ -1964,7 +1941,7 @@ class WHAM_analysis_biasN:
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
         ax.plot(rg, pvrg, label="Probability density")
-        ax.axvline(x=self.Rg_split, label=r"$R_g ={:.2f}$".format(self.Rg_split))
+        ax.axvline(x=self.RG_SPLIT, label=r"$R_g ={:.2f}$".format(self.RG_SPLIT))
         ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
         ax.set_xlabel(r"$R_g$")
@@ -1972,13 +1949,13 @@ class WHAM_analysis_biasN:
         ax.legend()
         ax.margins(x=0, y=0)
 
-        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
+        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
 
-        plt.savefig(self.plotoutdir + "/" + "coex_Rg.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["prob_coex_imgfile"], bbox_inches='tight')
         plt.close()
 
         # Plot free energies
-        f = open(self.calcoutdir + "/" + "binless_ll_phi_1_star_Rg.dat")
+        f = open(self.calcoutdir + "/" + params["in_betaF_datformat"].format("PHI_STAR_COEX2"))
 
         frg = []
 
@@ -1992,17 +1969,17 @@ class WHAM_analysis_biasN:
 
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
         ax.plot(rg, frg, label="Free energy")
-        ax.axvline(x=self.Rg_split, label=r"$R_g ={:.2f}$".format(self.Rg_split))
+        ax.axvline(x=self.RG_SPLIT, label=r"$R_g ={:.2f}$".format(self.RG_SPLIT))
         ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
         ax.set_xlabel(r"$R_g$")
         ax.set_ylabel(r"$F(R_g)$")
         ax.legend()
         ax.margins(x=0, y=0)
-        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN, self.PLOT_PHI_STAR_RG_MAX])
-        ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX])
+        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
+        ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX2])
 
-        plt.savefig(self.plotoutdir + "/" + "coex_Rg_free_energy.png", bbox_inches='tight')
+        plt.savefig(self.plotoutdir + "/" + params["betaF_coex_imgfile"], bbox_inches='tight')
         plt.close()
 
     ############################################################################
@@ -2024,8 +2001,10 @@ class WHAM_analysis_biasN:
 
 def main():
     parser = argparse.ArgumentParser(description='WHAM-based analysis and plots')
-    parser.add_argument('config_file', help="Path to configuration file")
-    parser.add_argument('type', nargs='+', help='Types of analysis (hist, 1D, 2D, ...) separated by space OR all')
+    parser.add_argument('config_file', help="Path to configuration file (.yaml)")
+    allowed_types = list(WHAM_analysis_biasN().register().keys())
+    parser.add_argument('type', nargs='+',
+                        help='Types of analysis ({}) separated by space OR all'.format(",".join(allowed_types)))
     parser.add_argument('--loglevel', help='Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL), default=INFO', default='INFO')
     args = parser.parse_args()
     anl = WHAM_analysis_biasN(args.config_file)
@@ -2035,7 +2014,7 @@ def main():
         raise ValueError('Invalid log level: %s' % args.loglevel)
     logging.basicConfig(level=numeric_level)
 
-    anl()
+    anl(args.type)
 
 
 if __name__ == "__main__":

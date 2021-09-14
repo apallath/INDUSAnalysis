@@ -177,7 +177,19 @@ func_params:
   run_2D_reweight_phi_star_bin_Rg:
     saved: True
     in_calcfile: calc.pkl
-    betaF_datfile: betaF_Rg_{}.dat
-    betaF_imgfile: betaF_Rg_{}.png
-    prob_datfile: prob_Rg_{}.dat
-    prob_imgfile: prob_Rg_{}.png
+    betaF_datformat: betaF_Rg_{}.dat
+    betaF_imgformat: betaF_Rg_{}.png
+    prob_datformat: prob_Rg_{}.dat
+    prob_imgformat: prob_Rg_{}.png
+  run_coex_integration_2D:
+    in_x_bins_npyformat: x_bins_2D_{}.npy
+    in_y_bins_npyformat: y_bins_2D_{}.npy
+    in_betaF_npyformat: betaF_2D_{}.npy
+    in_prob_npyformat: prob_2D_{}.npy
+    betaF_coex_imgfile: betaF_coex_2D.png
+    prob_coex_imgfile: prob_coex_2D.png
+  run_coex_integration_Rg:
+    in_betaF_datformat: betaF_Rg_{}.dat
+    in_prob_datformat: prob_Rg_{}.dat
+    betaF_coex_imgfile: betaF_coex_Rg.png
+    prob_coex_imgfile: prob_coex_rg.png

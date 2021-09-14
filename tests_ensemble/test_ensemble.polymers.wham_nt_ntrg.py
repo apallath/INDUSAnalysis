@@ -48,9 +48,9 @@ def test_ensemble_polymers_wham_nt_ntrg_C45_1D():
     #anl.run_2D_binless_log_likelihood()
     #anl.run_2D_bin_Rg()
     #anl.run_2D_reweight_phi_star()
-    anl.run_2D_reweight_phi_star_bin_Rg()
+    #anl.run_2D_reweight_phi_star_bin_Rg()
     #anl.run_coex_integration_2D()
-    #anl.run_coex_integration_Rg()
+    anl.run_coex_integration_Rg()
 
 
 if __name__ == "__main__":
