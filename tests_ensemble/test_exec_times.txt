@@ -1,7 +1,0 @@
-'test_ensemble_polymers_wham_nt_ntrg_C45_1D' 0.03 s
-'test_ensemble_polymers_wham_nt_ntrg_C45_1D' 40.19 s
-'test_ensemble_polymers_wham_nt_ntrg_C45_1D' 29.05 s
-'test_ensemble_polymers_wham_nt_ntrg_C45_1D' 0.03 s
-'test_ensemble_polymers_wham_nt_ntrg_C45_1D' 127.94 s
-'test_ensemble_polymers_wham_nt_ntrg_C45_1D' 147.53 s
-'test_ensemble_polymers_wham_nt_ntrg_C45_1D' 145.43 s

@@ -126,3 +126,5 @@ dmypy.json
 # Test data
 tests_integration/*_test_data/*
 tests_integration/test_exec_times.txt
+tests_ensemble/*_test_data/*
+tests_ensemble/test_exec_times.txt
