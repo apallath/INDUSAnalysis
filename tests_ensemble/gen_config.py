@@ -10,8 +10,8 @@ def main(backup=True):
     NBEAD = 45
     TEMP = 298
 
-    wd_nt = "inputs_ensemble.polymer.wham_nt_ntrg/C{}_T{}".format(NBEAD, TEMP)
-    wd_rg = "inputs_ensemble.polymer.wham_nt_ntrg/C{}_T{}_OP".format(NBEAD, TEMP)
+    wd_nt = "inputs_wham_nt_ntrg/C{}_T{}".format(NBEAD, TEMP)
+    wd_rg = "inputs_wham_nt_ntrg/C{}_T{}_OP".format(NBEAD, TEMP)
 
     TSTEP = 0.002
     UMBDT = 50
