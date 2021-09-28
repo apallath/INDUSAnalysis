@@ -1,24 +1,24 @@
 boxes:
   C:
-    N_center: 0
-    Rg_center: 0
-    N_width: 2
-    Rg_width: 2
+    N_center: 130
+    Rg_center: 5.2
+    N_width: 3
+    Rg_width: 0.2
   IC:
-    N_center: 0
-    Rg_center: 0
-    N_width: 2
-    Rg_width: 2
+    N_center: 175
+    Rg_center: 8
+    N_width: 3
+    Rg_width: 0.2
   IE:
-    N_center: 0
-    Rg_center: 0
-    N_width: 2
-    Rg_width: 2
+    N_center: 199
+    Rg_center: 9.1
+    N_width: 3
+    Rg_width: 0.2
   E:
-    N_center: 0
-    center: 0
-    N_width: 2
-    Rg_width: 2
+    N_center: 204
+    Rg_center: 12.5
+    N_width: 3
+    Rg_width: 0.2
 cutoffs:
   binary:
     solvation_cutoff: null
@@ -26,6 +26,10 @@ cutoffs:
   contacts:
     r_cut: 4.5
     n_thresh: 5
+data_collection:
+  base_samp_freq: 1
+  tend: null
+  tstart: 2000
 free_energy_profile:
   betaF_file: null
   prob_file: null

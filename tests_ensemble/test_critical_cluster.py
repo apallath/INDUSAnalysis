@@ -12,7 +12,7 @@ import logging
 import re
 
 from INDUSAnalysis.lib import profiling
-from INDUSAnalysis.ensemble.polymers.wham_nt_ntrg import WHAM_analysis_biasN
+from INDUSAnalysis.ensemble.polymers.critical_cluster import CriticalClusterAnalysis
 
 # Logging
 logging.basicConfig(level=logging.DEBUG)
@@ -22,6 +22,8 @@ logging.basicConfig(level=logging.DEBUG)
 def test_ensemble_polymers_critical_cluster():
     if not os.path.exists('critical_cluster_test_data'):
         os.makedirs('critical_cluster_test_data')
+    anl = CriticalClusterAnalysis("cluster_config.yaml")
+    anl(["get"])
 
 
 if __name__ == "__main__":

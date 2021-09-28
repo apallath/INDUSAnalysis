@@ -85,10 +85,44 @@ class CriticalClusterAnalysis:
         # Load config
         self.load_config()
 
+        # N* associated with each window
+        # First window is unbiased
+        n_star_win = ["unbiased"]
+
+        biased_windows = list(self.config["windows"].keys())
+        biased_windows.remove("unbiased")
+
+        n_star_win.extend(sorted(biased_windows))
+
+        # Raw, correlated timeseries CV data from each window
+        Ntw_win = []
+
+        # Read waters
+        for n_star in n_star_win:
+            ts_N, ts_Ntw, _ = WatersAnalysis.read_waters(self.config["windows"][n_star]["Nt_file"])
+            NTSCALE = int(self.config["windows"][n_star]["XTCDT"] / self.config["windows"][n_star]["UMBDT"])
+            Ntw_win.append(ts_Ntw[self.config["data_collection"]["tstart"]:self.config["data_collection"]["tend"]:NTSCALE * self.config["data_collection"]["base_samp_freq"]].data_array)
+            logger.debug("(N~) N*={}: {} to end, skipping {}. {} entries.".format(n_star, self.config["data_collection"]["tstart"], self.config["data_collection"]["base_samp_freq"],
+                         len(ts_N[self.config["data_collection"]["tstart"]:self.config["data_collection"]["tend"]:NTSCALE * self.config["data_collection"]["base_samp_freq"]].data_array)))
+
+        tsa = TimeSeriesAnalysis()
+
+        Rg_win = []
+
+        for n_star in n_star_win:
+            ts = tsa.load_TimeSeries(self.config["windows"][n_star]["Rg_file"])
+            Rg_win.append(ts[self.config["data_collection"]["tstart"]:self.config["data_collection"]["tend"]:self.config["data_collection"]["base_samp_freq"]].data_array)
+            logger.debug("(Rg) N*={}: {} to end, skipping {}. {} entries.".format(n_star, self.config["data_collection"]["tstart"], self.config["data_collection"]["base_samp_freq"],
+                         len(ts[self.config["data_collection"]["tstart"]:self.config["data_collection"]["tend"]:self.config["data_collection"]["base_samp_freq"]].data_array)))
+
+        return n_star_win, Ntw_win, Rg_win
+
     def get_full_waters_data(self):
         """Gets all window data from full umbrella sampling simulations (with solvent coordinates)."""
         # Load config
         self.load_config()
+
+        raise NotImplementedError()
 
     ############################################################################
     # boxes and windows identification
@@ -174,7 +208,7 @@ class CriticalClusterAnalysis:
     # computation call
     ############################################################################
 
-    def __call__(self, calc_types, calc_args={}):
+    def __call__(self, calc_types):
         for calc_type in calc_types:
             if calc_type == "all":
                 for f in self.func_registry.keys():
