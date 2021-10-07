@@ -18,22 +18,57 @@ from INDUSAnalysis.indus_waters import WatersAnalysis
 
 def estimate_kappa(datf: str, temp: float, start_time: float = 0, end_time: float = None):
     """
-    Estimates kappa based on var(N~) from an unbiased INDUS simulation.
+    Estimates kappa and corresponding deltan based on var(N~) from an unbiased INDUS simulation.
 
-    beta * kappa = 2 / var(Nt) to 5 / var(Nt).
+    beta * kappa = alpha / var(Nt), alpha = 2 to 5
+
+    beta * kappa = 4 * sqrt(1 + alpha) / alpha * sqrt(var(Nt))
 
     Args:
         datf (str): Path to INDUS waters data file.
         temp (float): Simulation temperature (in K).
         start_time (float): Time to begin computation of variance at.
         end_time (float): Time to end computation of variance at.
-
-    Returns:
-        kappa_range (tuple): Estimated range of kappa in kJ/mol (kappa_lower: float, kappa_upper: float)
     """
     ts_N, ts_Ntw, _ = WatersAnalysis.read_waters(datf)
     var_Ntw = ts_Ntw[start_time:end_time].std() ** 2
-    return (8.314 / 1000 * temp * 2 / var_Ntw, 8.314 / 1000 * temp * 5 / var_Ntw)
+    alphas = np.array([2, 3, 4, 5])
+    kappas = 8.314 / 1000 * temp / var_Ntw * alphas
+    deltas = 4 * np.sqrt((1 + alphas)) / alphas * np.sqrt(var_Ntw)
+
+    print("alpha\tkappa\tdelta N*")
+    for i in range(len(alphas)):
+        if alphas[i] == 3:
+            # recommended values
+            print("{:.2f} {:.5f} kJ/mol {:.2f} ***".format(alphas[i], kappas[i], deltas[i]))
+        else:
+            print("{:.2f} {:.5f} kJ/mol {:.2f}".format(alphas[i], kappas[i], deltas[i]))
+
+
+def estimate_min_max_Nstar(datf: str, start_time: float = 0, end_time: float = None, true_Nmin: float = 0, true_Nmax: float = 0):
+    """
+    Estimates the minimum and maximum values of N* to set to get sampling in the desired range (true_Nmin, true_Nmax)
+
+    True biased distribution is centered around a value of N that is in-between the unbiased average <N>0 and chosen N* (Rego 2020, ProQuest).
+
+    Args:
+        datf (str): Path to INDUS waters data file.
+        start_time (float): Time to begin computation of variance at.
+        end_time (float): Time to end computation of variance at.
+    """
+    ts_N, ts_Ntw, _ = WatersAnalysis.read_waters(datf)
+    mean_Ntw = ts_Ntw[start_time:end_time].mean()
+    alphas = np.array([2, 3, 4, 5])
+    nstar_min = (true_Nmin * (1 + alphas) - mean_Ntw) / alphas
+    nstar_max = (true_Nmax * (1 + alphas) - mean_Ntw) / alphas
+
+    print("alpha\tmin N*\tmax N*")
+    for i in range(len(alphas)):
+        if alphas[i] == 3:
+            # recommended values
+            print("{:.2f} {:.2f} {:.2f} ***".format(alphas[i], nstar_min[i], nstar_max[i]))
+        else:
+            print("{:.2f} {:.2f} {:.2f}".format(alphas[i], nstar_min[i], nstar_max[i]))
 
 
 def _read_energy_xvg(xvg_file):
@@ -113,6 +148,13 @@ if __name__ == "__main__":
     est_kappa_args.add_argument("-tstart", type=float, help="Time to begin computation of variance at", default=0)
     est_kappa_args.add_argument("-tend", type=float, help="Time to end computation of variance at", default=None)
 
+    est_minmax_args = parser.add_argument_group("min-max N* estimation arguments")
+    est_minmax_args.add_argument("-watersf", help="INDUS waters data file")
+    est_minmax_args.add_argument("-tstart", type=float, help="Time to begin computation of variance at", default=0)
+    est_minmax_args.add_argument("-tend", type=float, help="Time to end computation of variance at", default=None)
+    est_minmax_args.add_argument("-true_Nmin", type=float, help="Desired (true) value of Nmin", default=0)
+    est_minmax_args.add_argument("-true_Nmax", type=float, help="Desired (true) value of Nmax", default=0)
+
     energy_overlap_args = parser.add_argument_group("energy overlap histogram arguments")
     energy_overlap_args.add_argument("-temps", type=float, help="Simulation temperature", action='append', nargs='+')
     energy_overlap_args.add_argument("-xvgfs", type=str, help="XVG files containing potential energy data", action='append', nargs='+')
@@ -127,6 +169,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.calc_type == "est_kappa":
-        print(estimate_kappa(args.watersf, args.temp, args.tstart, args.tend))
+        estimate_kappa(args.watersf, args.temp, args.tstart, args.tend)
+    if args.calc_type == "est_minmax":
+        estimate_min_max_Nstar(args.watersf, args.tstart, args.tend, args.true_Nmin, args.true_Nmax)
     elif args.calc_type == "energy_overlap":
         energy_overlap(args.temps[0], args.xvgfs[0], args.e_bin_min, args.e_bin_max, args.nbins, args.tstart, args.tend, args.outfile)
