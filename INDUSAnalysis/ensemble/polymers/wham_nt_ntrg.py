@@ -65,10 +65,10 @@ class WHAM_analysis_biasN:
             ("phi_1_star", self.run_reweight_phi_1_star),
             ("basins", self.find_basins),
             ("phi_e_star", self.run_phi_e_star_opt),
-            ("deltaG_diff", self.calc_deltaGu_diff_method),
             ("phi_c_star", self.run_phi_c_star_opt),
-            ("deltaG_int", self.calc_deltaGu_int_method_1D),
             ("1D_boot_phi", self.run_bootstrap_ll_phi_ensemble),
+            ("deltaG_diff", self.calc_deltaGu_diff_method),
+            ("deltaG_int", self.calc_deltaGu_int_method_1D),
             ("2D", self.run_2D_binless_log_likelihood),
             ("Rg", self.run_2D_bin_Rg),
             ("2D_phi_stars", self.run_2D_reweight_phi_star),
@@ -90,6 +90,7 @@ class WHAM_analysis_biasN:
                       "1d_binning",
                       "1d_phi_ensemble",
                       "1d_phi_star",
+                      "1d_plot_phi_star",
                       "find_basins",
                       "basins",
                       "coex",
@@ -1989,7 +1990,8 @@ class WHAM_analysis_biasN:
     def __call__(self, calc_types, calc_args={}):
         for calc_type in calc_types:
             if calc_type == "all":
-                for f in self.func_registry.keys():
+                for key in self.func_registry.keys():
+                    f = self.func_registry[key]
                     f()
             else:
                 f = self.func_registry.get(calc_type, None)

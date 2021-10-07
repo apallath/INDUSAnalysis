@@ -37,8 +37,10 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
         self.req_file_args.add_argument("structf", help="Structure file (.gro)")
         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
 
+        self.opt_file_args.add_argument("-refstructf",
+                                        help="Reference structure file (.gro) for RMSD (default: same as trajf)")
         self.opt_file_args.add_argument("-reftrajf",
-                                        help="Reference trajectory file (.xtc) for RMSD (default: same as trajf)")
+                                        help="Reference trajectory file (.xtc) for RMSD (default: same as trajf if refstructf is not specified.)")
 
         self.calc_args.add_argument("-select",
                                     help="Atoms/groups to track order parameters for (MDA selection string)")
@@ -79,9 +81,14 @@ class OrderParamsAnalysis(timeseries.TimeSeriesAnalysis):
 
         self.u = mda.Universe(self.structf, self.trajf)
 
+        self.refstructf = self.args.refstructf
         self.reftrajf = self.args.reftrajf
 
-        if self.reftrajf is not None:
+        if self.refstructf is not None and self.reftrajf is not None:
+            self.refu = mda.Universe(self.refstructf, self.reftrajf)
+        elif self.refstructf is not None and self.reftrajf is None:
+            self.refu = mda.Universe(self.refstructf)
+        elif self.refstructf is None and self.reftrajf is not None:
             self.refu = mda.Universe(self.structf, self.reftrajf)
         else:
             self.refu = mda.Universe(self.structf, self.trajf)

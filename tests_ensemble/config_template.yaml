@@ -32,6 +32,8 @@ data_collection:
   PHI_STAR: ~
   PHI_STAR_EQ: ~
   PHI_STAR_COEX: ~
+
+1d_plot_phi_star:
   PLOT_PHI_STAR_N_MIN: ~
   PLOT_PHI_STAR_N_MAX: ~
   PLOT_PHI_STAR_BETAF_MAX: ~
