@@ -3,7 +3,7 @@
 Package to analyze simulation data generated using
 [INDUS](https://link.springer.com/article/10.1007/s10955-011-0269-9). 
 
-At present, the focus of this package is on analysis of solvated protein and polymer systems.
+This package analyses data I generated from molecular dynamics simulations of solvated protein and polymer systems at the Patel group.
 
 [Documentation](https://apallath.github.io/INDUSAnalysis) hosted on GitHub pages.
 
@@ -43,6 +43,9 @@ pip install [-e] .
 Run both unit tests and integration tests to make sure the package is installed
 and working correctly. All tests should pass.
 
+Run ensemble tests (scientific tests) to make sure that selected ensemble methods
+generate the correct results.
+
 ### Unit tests:
 
 Run
@@ -71,6 +74,11 @@ INDUSAnalysis library functions can be imported using
 
 ```python
 import INDUSAnalysis.lib
+```
+
+INDUSAnalysis ensemble scripts can be run directly using
+```sh
+python /path/to/INDUSAnalysis/ensemble/.../script.py
 ```
 
 ## Scripts
