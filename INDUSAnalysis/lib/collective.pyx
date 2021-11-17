@@ -19,7 +19,7 @@ def phi_to_P(phi, P0=1):
     Returns:
         P (np.float): Effective hydration shell pressure in kbar.
     """
-    rho_w = 997 / (18.015e-3)  # mol/m^3
+    rho_w = 997 / (18.015 * 0.001)  # mol/m^3
     # phi: kJ/mol -> J/mol; rho_w phi: Pa -> bar; bar -> kbar
     P = (P0 - rho_w * (1000 * phi) * 1e-5) * 1e-3
     return P
