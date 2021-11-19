@@ -140,7 +140,7 @@ def energy_overlap(temps: list,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(conflict_handler='resolve')
 
-    parser.add_argument("calc_type", help="Type of calculation (options = est_kappa)")
+    parser.add_argument("calc_type", help="Type of calculation (options = est_kappa, est_minmax, energy_overlap)")
 
     est_kappa_args = parser.add_argument_group("kappa estimation arguments")
     est_kappa_args.add_argument("-watersf", help="INDUS waters data file")
