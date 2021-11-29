@@ -2,6 +2,7 @@
 Plots Nv v/s phi and phi* for unfolding or folding simulation.
 """
 import argparse
+from functools import partial
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
@@ -19,8 +20,9 @@ def phi_ensemble(phivals: list,
                  calc_dir: str = "./",
                  Ntw_format: str = "",
                  imgfile: str = "phi_star.png",
-                 D_by_A_guess = 5,
-                 E_guess = 0.05):
+                 D_by_A_guess=5,
+                 E_guess=0.05,
+                 P0=1):
 
     nruns = len(runs)
 
@@ -94,13 +96,16 @@ def phi_ensemble(phivals: list,
     ax.grid(which='major', linestyle='-')
     ax.grid(which='minor', linestyle=':')
 
-    secax = ax.secondary_xaxis('top', functions=(phi_to_P, P_to_phi))
+    phi_to_P_custom = partial(phi_to_P, P0=P0)
+    P_to_phi_custom = partial(P_to_phi, P0=P0)
+
+    secax = ax.secondary_xaxis('top', functions=(phi_to_P_custom, P_to_phi_custom))
     secax.set_xlabel(r"Effective hydration shell pressure, $P$ (kbar)")
 
     plt.savefig(imgfile, format="png")
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Nv v/s phi and phi* for simulation.")
     parser.add_argument("-phi", type=str, nargs='+', help="phi values to read (phi=0 must be first)")
     parser.add_argument("-runs", type=int, nargs='+', help="runs to read")
@@ -110,7 +115,8 @@ if __name__=="__main__":
     parser.add_argument("-imgfile", help="output image (default=phi_star.png)")
     parser.add_argument("-D_by_A_guess", default=5, help="initial guess for two-state model D/A parameter (default=5)")
     parser.add_argument("-E_guess", default=0.05, help="initial guess for two-state model E parameter (default=0.05)")
+    parser.add_argument("-P0", type=float, default=1, help="simulation pressure, in bar (default=1)")
 
     a = parser.parse_args()
 
-    phi_ensemble(a.phi, a.runs, a.start, a.calc_dir, a.Ntw_format, a.imgfile, a.D_by_A_guess, a.E_guess)
+    phi_ensemble(a.phi, a.runs, a.start, a.calc_dir, a.Ntw_format, a.imgfile, a.D_by_A_guess, a.E_guess, a.P0)

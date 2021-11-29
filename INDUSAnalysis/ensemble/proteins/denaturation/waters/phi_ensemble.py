@@ -2,6 +2,7 @@
 Plots Nv v/s phi for unfolding and/or folding simulation.
 """
 import argparse
+from functools import partial
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
@@ -20,7 +21,8 @@ def phi_ensemble(phivals: list,
                  fwd_Ntw_format: str = "",
                  plot_rev: bool = True,
                  rev_Ntw_format: str = "",
-                 imgfile: str = "phi_ensemble.png"):
+                 imgfile: str = "phi_ensemble.png",
+                 P0=1):
 
     nruns = len(runs)
 
@@ -109,13 +111,17 @@ def phi_ensemble(phivals: list,
     ax.grid(which='major', linestyle='-')
     ax.grid(which='minor', linestyle=':')
 
-    secax = ax.secondary_xaxis('top', functions=(phi_to_P, P_to_phi))
+    print(P0)
+    phi_to_P_custom = partial(phi_to_P, P0=float(P0))
+    P_to_phi_custom = partial(P_to_phi, P0=float(P0))
+
+    secax = ax.secondary_xaxis('top', functions=(phi_to_P_custom, P_to_phi_custom))
     secax.set_xlabel(r"Effective hydration shell pressure, $P$ (kbar)")
 
     plt.savefig(imgfile, format="png")
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Nv v/s phi for unfolding or folding simulation.")
     parser.add_argument("-phi", type=str, nargs='+', help="phi values to read (phi=0 must be first)")
     parser.add_argument("-runs", type=int, nargs='+', help="runs to read")
@@ -126,7 +132,8 @@ if __name__=="__main__":
     parser.add_argument("--plot_rev", action="store_true")
     parser.add_argument("-rev_Ntw_format", help="format of .pkl file containing rev Ntw, with {phi} placeholders for phi value and {run} placeholders for run value")
     parser.add_argument("-imgfile", help="output image (default=phi_ensemble.png)")
+    parser.add_argument("-P0", default=1, help="simulation pressure, in bar (default=1)")
 
     a = parser.parse_args()
 
-    phi_ensemble(a.phi, a.runs, a.start, a.calc_dir, a.plot_fwd, a.fwd_Ntw_format, a.plot_rev, a.rev_Ntw_format, a.imgfile)
+    phi_ensemble(a.phi, a.runs, a.start, a.calc_dir, a.plot_fwd, a.fwd_Ntw_format, a.plot_rev, a.rev_Ntw_format, a.imgfile, a.P0)
