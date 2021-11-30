@@ -2,16 +2,17 @@
 Plots unfolding and folding RMSFs of one or two protein structures, given BLAST alignment with STRIDE secondary structures.
 """
 import argparse
+import os
 
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import MDAnalysis as mda
+import numpy as np
+from tqdm import tqdm
 
 from INDUSAnalysis.protein_order_params import OrderParamsAnalysis as OPA
 from INDUSAnalysis.timeseries import TimeSeries
 from INDUSAnalysis.timeseries import TimeSeriesAnalysis
-import MDAnalysis as mda
-from tqdm import tqdm
 
 
 def RMSF(nprot: int,
@@ -23,7 +24,15 @@ def RMSF(nprot: int,
          calc_dirs: list,
          di_formats: list,
          imgformat: str,
-         plot_native: bool):
+         plot_native: bool,
+         set_max: bool,
+         make_movie: bool,
+         moviefile: str):
+
+    print("Already generated the images?")
+    print("Here's the bash command to stitch them into a movie:")
+    print("ffmpeg -r 0.5 -i {} -vcodec mpeg4 -y -vb 200M -q:v 1 {}".format(imgformat.format(phi=r"movie.%05d"), moviefile))
+
     ############################################################################
     # Read sequence alignment file with secondary structure data.
     #
@@ -180,13 +189,17 @@ def RMSF(nprot: int,
 
             ax.grid()
 
-            plt.savefig(imgformat.format(phi=phi), bbox_inches='tight')
+            if set_max:
+                ax.set_ylim([0, np.max(RMSF_mean) + np.max(RMSF_std)])
 
-            ax.set_ylim([0, np.max(RMSF_mean) + np.max(RMSF_std)])
+            plt.savefig(imgformat.format(phi=phi), bbox_inches='tight')
 
             plt.savefig(imgformat.format(phi="movie.{:05d}".format(phi_idx)), bbox_inches='tight')
 
             plt.close()
+
+        if make_movie:
+            os.system("ffmpeg -r 0.5 -i {} -vcodec mpeg4 -y -vb 200M -q:v 1 {}".format(imgformat.format(phi="movie.%05d"), moviefile))
 
     ############################################################################
     # Compare proteins
@@ -210,7 +223,10 @@ if __name__ == "__main__":
     parser.add_argument("-di_formats", type=str, nargs='+', help="format of .pkl file containing residue deviations, with {phi} placeholders for phi value and {run} placeholders for run value, one for each protein (space separated)")
     parser.add_argument("-imgformat", help="output image format, with {phi} placeholders for phi value")
     parser.add_argument("--plot_native", action='store_true', help="plot band indicating average RMSF in native state")
+    parser.add_argument("--set_max", action='store_true', help="set a fixed maximum value on the y-axis, determined by the max RMSF across the simulation")
+    parser.add_argument("--make_movie", action='store_true', help="stitch together image files with FFMPEG to make a movie")
+    parser.add_argument("-moviefile", type=str, help="movie file name")
 
     a = parser.parse_args()
 
-    RMSF(a.nprot, a.names, a.seqfile, a.phi, a.runs, a.start, a.calc_dirs, a.di_formats, a.imgformat, a.plot_native)
+    RMSF(a.nprot, a.names, a.seqfile, a.phi, a.runs, a.start, a.calc_dirs, a.di_formats, a.imgformat, a.plot_native, a.set_max, a.make_movie, a.moviefile)
