@@ -1,6 +1,8 @@
 """
 Plots unfolding and folding RMSFs of one or two protein structures, given BLAST alignment with STRIDE secondary structures.
 """
+import argparse
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -11,7 +13,17 @@ from INDUSAnalysis.timeseries import TimeSeriesAnalysis
 import MDAnalysis as mda
 from tqdm import tqdm
 
-def RMSF(nprot, seq_file):
+
+def RMSF(nprot: int,
+         names: list,
+         seq_file: str,
+         phivals: list,
+         runs: list,
+         start_time: int,
+         calc_dirs: list,
+         di_formats: list,
+         imgformat: str,
+         plot_native: bool):
     ############################################################################
     # Read sequence alignment file with secondary structure data.
     #
@@ -83,8 +95,14 @@ def RMSF(nprot, seq_file):
     for line in lines:
         assert(len(line) == seq_len)
 
-    # Read in lines
+    ############################################################################
+    # Single protein
+    ############################################################################
     if nprot == 1:
+        name = names[0]
+        calc_dir = calc_dirs[0]
+        di_format = di_formats[0]
+
         restype_dict = {}
         ss_dict = {}
 
@@ -95,188 +113,104 @@ def RMSF(nprot, seq_file):
             restype_dict[i] = seq[i]
             ss_dict[i] = ss[i]
 
+        tsa = TimeSeriesAnalysis()
+
+        # unfold          each phi      each select atom     each run
+        RMSF = []
+
+        # Unfold-fold
+        for phi_idx, phi in enumerate(phivals):
+            RMSF_phi = []
+            for run_idx, run in enumerate(runs):
+                dev_unfold = tsa.load_TimeSeries(calc_dir + di_format.format(phi=phi, run=run))
+                RMSF_run = np.sqrt(np.mean(dev_unfold[start_time:].data_array ** 2, axis=0))
+                RMSF_phi.append(RMSF_run)
+            RMSF.append(RMSF_phi)
+
+        RMSF = np.array(RMSF)
+
+        # (phi, run, heavy atom)
+        print(RMSF.shape)
+
+        RMSF_mean = RMSF.mean(axis=1)
+        RMSF_std = RMSF.std(axis=1)
+
+        RMSF_native_mean = RMSF_mean[0, :].mean()
+        RMSF_native_std = RMSF_mean[0, :].std()
+
+        for phi_idx, phi in enumerate(tqdm(phivals)):
+            fig, ax = plt.subplots(figsize=(16, 8), dpi=500)
+
+            xvals = np.array(range(seq_len))
+
+            yvals = RMSF_mean[phi_idx]
+            yerrs = RMSF_std[phi_idx]
+
+            ax.errorbar(xvals, yvals, yerr=yerrs, fmt='s', label=name, capsize=2.0)
+
+            if plot_native:
+                ax.axhline(y=RMSF_native_mean, label=r"$\phi = {}$".format(phivals[0]), color="green")
+                ax.fill_between(xvals, RMSF_native_mean - RMSF_native_std, RMSF_native_mean + RMSF_native_std, color="green", alpha=0.4)
+
+            # IMPORTANT: Modify when changing from alpha_C to other type
+            xticks = xvals
+            xticklabels = ['{}{}'.format(restype_dict[resid], resid + 1) for resid in range(seq_len)]
+            xtickcolors = [stride_colors[ss_dict[resid]] for resid in range(seq_len)]
+
+            ax.set_xticks(xticks)
+            ax.set_xticklabels(xticklabels, rotation=90)
+            ax.set_xlabel("Residue")
+
+            for idx, t in enumerate(ax.xaxis.get_ticklabels()):
+                t.set_color(xtickcolors[idx])
+                t.set_fontsize(8)
+
+            ax.set_ylabel(r"RMSF ($\AA$)")
+            ax.set_title(r"$\phi = {}$ kJ/mol".format(phi))
+
+            patchlist = []
+            for ss_type in stride_colors.keys():
+                if ss_type != '.' and ss_type != 'b':
+                    patchlist.append(mpatches.Patch(color=stride_colors[ss_type], label=stride_parser[ss_type]))
+
+            ss_legend = plt.legend(handles=patchlist, loc='upper left')
+            ax.add_artist(ss_legend)
+
+            plt.legend(loc='upper right')
+
+            ax.grid()
+
+            plt.savefig(imgformat.format(phi=phi), bbox_inches='tight')
+
+            ax.set_ylim([0, np.max(RMSF_mean) + np.max(RMSF_std)])
+
+            plt.savefig(imgformat.format(phi="movie.{:05d}".format(phi_idx)), bbox_inches='tight')
+
+            plt.close()
+
+    ############################################################################
+    # Compare proteins
+    ############################################################################
     elif nprot == 2:
-        for prot_idx in range(NPROT):
-            restype_dict = {}
-            alignment_dict = {}
-            ss_dict = {}
-            mutation_dict = {}
-
-            aligned_seq = lines[3 * prot_idx]
-            aligned_ss = lines[3 * prot_idx + 1]
-            aligned_mut = lines[3 * prot_idx + 2]
-
-            resctr = 0
-            for i in range(line_len):
-                if aligned_seq[i] != '-':
-                    restype_dict[resctr] = aligned_seq[i]
-                    alignment_dict[resctr] = i
-                    ss_dict[resctr] = aligned_ss[i]
-                    if aligned_mut[i] == '.':
-                        mutation_dict[resctr] = False
-                    else:
-                        mutation_dict[resctr] = True
-                    resctr += 1
-
-            restype_dicts.append(restype_dict)
-            alignment_dicts.append(alignment_dict)
-            ss_dicts.append(ss_dict)
-            mutation_dicts.append(mutation_dict)
-
-        align_len = line_len
+        pass
 
     else:
         raise ValueError("Invalid number of proteins. This script can work with either one or two proteins.")
 
-    """
-    tsa = TimeSeriesAnalysis()
-
-    align = "backbone"
-    selection = "alpha_C"
-    phivals = [4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, -0.5, -1, -1.25, -1.5, -1.75, -2, -2.05, -2.1, -2.15, -2.2, -2.25,
-               -2.3, -2.4, -2.5, -2.75, -3, -3.5, -4, -4.25, -5, -6, -7, -7.5, -8, -9, -10]
-    runs = [1, 2, 3, 4, 5]
-    start_time = 500
-    end_time = None
-
-    TPR_DIR = "/home/akash/Documents/pressure_denaturation/ubiquitin/"
-    CALC_DIR = "/home/akash/Documents/pressure_denaturation/ubiquitin_analysis/"
-    NAME = r"Ubiquitin"
-
-    # Load structure into MDA
-    u = mda.Universe(TPR_DIR + "alt_tpr/indus.tpr")
-    mda_select = OPA().selection_parser[selection]
-    u_select = u.select_atoms(mda_select)
-
-    assert(len(u_select.atoms) == seq_len)
-
-    # unfold          each phi      each select atom     each run
-    RMSFu = np.zeros((len(phivals), len(u_select.atoms), len(runs)))
-    # unfold          each phi      each select atom     each run
-    RMSFf = np.zeros((len(phivals), len(u_select.atoms), len(runs)))
-
-    # Unfold-fold
-    for phi_idx, phi in enumerate(phivals):
-        for run in runs:
-            dev_unfold = tsa.load_TimeSeries(CALC_DIR + "unfold_fold/OP/i{}/{}/unfold_deviations_{}_{}.pkl".format(phi, run, align, selection))
-            RMSFu_run = np.sqrt(np.mean(dev_unfold[start_time:end_time].data_array ** 2, axis=0))
-            RMSFu[phi_idx, :, run - 1] = RMSFu_run
-
-            dev_fold = tsa.load_TimeSeries(CALC_DIR + "unfold_fold/OP/i{}/{}/fold_deviations_{}_{}.pkl".format(phi, run, align, selection))
-            RMSFf_run = np.sqrt(np.mean(dev_fold[start_time:end_time].data_array ** 2, axis=0))
-            RMSFf[phi_idx, :, run - 1] = RMSFf_run
-
-    RMSFu_mean = RMSFu.mean(axis=2)
-    RMSFu_std = RMSFu.std(axis=2)
-
-    RMSFf_mean = RMSFf.mean(axis=2)
-    RMSFf_std = RMSFf.std(axis=2)
-
-    for phi_idx, phi in enumerate(tqdm(phivals)):
-        fig, ax = plt.subplots(figsize=(16, 8), dpi=500)
-
-        xvals = np.array(range(seq_len))
-
-        yvals = RMSFu_mean[phi_idx]
-        yerrs = RMSFu_std[phi_idx]
-
-        ax.errorbar(xvals, yvals, yerr=yerrs, fmt='s', label=NAME, capsize=2.0)
-
-        # IMPORTANT: Modify when changing from alpha_C to other type
-        xticks = xvals
-        xticklabels = ['{}{}'.format(restype_dict[resid], resid) for resid in range(seq_len)]
-        xtickcolors = [stride_colors[ss_dict[resid]] for resid in range(seq_len)]
-
-        ax.set_xticks(xticks)
-        ax.set_xticklabels(xticklabels, rotation=90)
-        ax.set_xlabel(NAME)
-
-        for idx, t in enumerate(ax.xaxis.get_ticklabels()):
-            t.set_color(xtickcolors[idx])
-            t.set_fontsize(8)
-
-        ax.set_ylabel("RMSF")
-        ax.set_title(r"$\phi = {}$ kJ/mol: P-unfold".format(phi))
-
-        patchlist = []
-        for ss_type in stride_colors.keys():
-            patchlist.append(mpatches.Patch(color=stride_colors[ss_type], label=stride_parser[ss_type]))
-
-        ss_legend = plt.legend(handles=patchlist, loc='upper left')
-        ax.add_artist(ss_legend)
-
-        plt.legend(loc='upper right')
-
-        ax.grid()
-
-        plt.savefig("compare_unfold_{}.png".format(phi), bbox_inches='tight')
-
-        ax.set_ylim([0, 30])
-
-        plt.savefig("compare_unfold.{0:02}.png".format(phi_idx), bbox_inches='tight')
-
-        plt.close()
-
-        #######################
-        # Fold
-        #######################
-
-        fig, ax = plt.subplots(figsize=(16, 8), dpi=500)
-
-        xvals = np.array(range(seq_len))
-
-        yvals = RMSFf_mean[phi_idx]
-        yerrs = RMSFf_std[phi_idx]
-
-        ax.errorbar(xvals, yvals, yerr=yerrs, fmt='s', label=NAME, capsize=2.0)
-
-        # IMPORTANT: Modify when changing from alpha_C to other type
-        xticks = xvals
-        xticklabels = ['{}{}'.format(restype_dict[resid], resid) for resid in range(seq_len)]
-        xtickcolors = [stride_colors[ss_dict[resid]] for resid in range(seq_len)]
-
-        ax.set_xticks(xticks)
-        ax.set_xticklabels(xticklabels, rotation=90)
-        ax.set_xlabel(NAME)
-
-        for idx, t in enumerate(ax.xaxis.get_ticklabels()):
-            t.set_color(xtickcolors[idx])
-            t.set_fontsize(8)
-
-        ax.set_ylabel("RMSF")
-        ax.set_title(r"$\phi = {}$ kJ/mol: P-relax".format(phi))
-
-        patchlist = []
-        for ss_type in stride_colors.keys():
-            patchlist.append(mpatches.Patch(color=stride_colors[ss_type], label=stride_parser[ss_type]))
-
-        ss_legend = plt.legend(handles=patchlist, loc='upper left')
-        ax.add_artist(ss_legend)
-
-        plt.legend(loc='upper right')
-
-        ax.grid()
-
-        plt.savefig("compare_fold_{}.png".format(phi), bbox_inches='tight')
-
-        ax.set_ylim([0, 30])
-
-        plt.savefig("compare_fold.{0:02}.png".format(phi_idx), bbox_inches='tight')
-
-    plt.close()
-    """
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot RMSF average across runs for each phi value for one or two proteins.")
-    parser.add_argument("-nprot", type=int, nargs='+', help="number of proteins (1 or 2)")
-    parser.add_argument("-seq_align", type=str, help="sequence alignment file")
+    parser.add_argument("-nprot", type=int, help="number of proteins (1 or 2)")
+    parser.add_argument("-names", type=str, nargs='+', help="names of proteins (space separated)")
+    parser.add_argument("-seqfile", type=str, help="sequence alignment file")
     parser.add_argument("-phi", type=str, nargs='+', help="phi values to read")
     parser.add_argument("-runs", type=int, nargs='+', help="runs to read")
     parser.add_argument("-start", type=int, help="time (ps) to start computing averages")
-    parser.add_argument("-calc_dir", help="directory containing hydration OPs extracted by INDUSAnalysis")
-    parser.add_argument("-di_format", help="format of .pkl file containing backbone atom deviations, with {phi} placeholders for phi value and {run} placeholders for run value")
+    parser.add_argument("-calc_dirs", type=str, nargs='+', help="directory containing hydration OPs extracted by INDUSAnalysis, one for each protein (space separated)")
+    parser.add_argument("-di_formats", type=str, nargs='+', help="format of .pkl file containing residue deviations, with {phi} placeholders for phi value and {run} placeholders for run value, one for each protein (space separated)")
     parser.add_argument("-imgformat", help="output image format, with {phi} placeholders for phi value")
+    parser.add_argument("--plot_native", action='store_true', help="plot band indicating average RMSF in native state")
 
     a = parser.parse_args()
 
-    RMSF(a.phi, a.runs, a.start, a.calc_dir, a.Ntw_format, a.imgfile, a.D_by_A_guess, a.E_guess, a.P0)
+    RMSF(a.nprot, a.names, a.seqfile, a.phi, a.runs, a.start, a.calc_dirs, a.di_formats, a.imgformat, a.plot_native)
