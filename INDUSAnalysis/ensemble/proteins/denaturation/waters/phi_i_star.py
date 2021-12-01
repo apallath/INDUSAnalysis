@@ -3,6 +3,8 @@ Plots ni v/s phi and phi_i* for a set of representative atoms, and also for each
 
 Stores calculated phi_i* values.
 """
+import argparse
+from functools import partial
 import os
 import warnings
 import pickle
@@ -28,9 +30,12 @@ def phi_i_star(phivals: list,
                structfile: str,
                calc_dir: str,
                ni_format: str,
-               imgformat: str,
+               sample_imgfile: str,
+               all_imgformat: str,
                pklfile: str,
                buried_cut: float,
+               phi_star_collective: float,
+               plot_probe_indices: list,
                P0=1,
                D_by_A_guess=5,
                E_guess=0.05,
@@ -39,7 +44,7 @@ def phi_i_star(phivals: list,
     tsa = TimeSeriesAnalysis()
 
     ############################################################################
-    # Load protein heavy indices
+    # Load data
     ############################################################################
 
     u = mda.Universe(structfile)
@@ -51,26 +56,31 @@ def phi_i_star(phivals: list,
 
     # All other phi values
     for idx, phi in enumerate(phivals):
-        for run in runs:
-            ts = tsa.load_TimeSeries(calc_dir + "/unfold_fold/2ns/waters/i{}/{}/unfold_probe_waters.pkl".format(phi, run))
+        for runidx, run in enumerate(runs):
+            ts = tsa.load_TimeSeries(calc_dir + ni_format.format(phi=phi, run=run))
             ts = ts[start_time:]
             run_waters = ts.data_array[:, protein_heavy_indices]
+
             # Calcuate per-atom mean waters and var waters for each run
             mean_run_waters = np.mean(run_waters, axis=0)
             var_run_waters = np.var(run_waters, axis=0)
+
             # Append per-atom mean and var waters for each run
-            meanwaters[idx, run - 1, :] = mean_run_waters
-            varwaters[idx, run - 1, :] = var_run_waters
+            meanwaters[idx, runidx, :] = mean_run_waters
+            varwaters[idx, runidx, :] = var_run_waters
 
     mean_meanwaters = np.mean(meanwaters, axis=1)
     std_meanwaters = np.std(meanwaters, axis=1)
 
-    """
-    SAMPLE FITS
-    """
-    fig, ax = plt.subplots(2, 1, figsize=(12, 16), dpi=300)
+    phivals = np.array([float(phi) for phi in phivals])
+    order = np.argsort(phivals)
 
-    plot_probe_indices = [82, 200, 364, 400, 600]
+    ############################################################################
+    # Sample fits
+    ############################################################################
+    plot_probe_indices = [int(x) for x in plot_probe_indices]
+
+    fig, ax = plt.subplots(2, 1, figsize=(12, 16), dpi=300)
 
     for ixx, probe in enumerate(plot_probe_indices):
         order = np.argsort(phivals)
@@ -99,8 +109,7 @@ def phi_i_star(phivals: list,
         C_guess_idx = np.argmin(dydx_data) + 1
 
         C_guess = xdata[C_guess_idx]
-        D_guess = 2 * A_guess
-        E_guess = 0.1
+        D_guess = D_by_A_guess * A_guess
         F_guess = ydata[C_guess_idx]
 
         p_guess = [A_guess, B_guess, C_guess, D_guess, E_guess, F_guess]
@@ -117,6 +126,7 @@ def phi_i_star(phivals: list,
             dydx = derivative_integrated_step_gaussian(x_fit_data, *popt)
 
             ax[1].plot(x_fit_data, -dydx, label="Probe on h. atom " + str(probe), color="C{}".format(ixx))
+
         except RuntimeError:
             print("Couldn't fit probe {}".format(probe))
 
@@ -128,7 +138,10 @@ def phi_i_star(phivals: list,
         ax[i].grid(which='major', linestyle='-')
         ax[i].grid(which='minor', linestyle=':')
 
-        secax = ax[i].secondary_xaxis('top', functions=(phi_to_P, P_to_phi))
+        phi_to_P_custom = partial(phi_to_P, P0=P0)
+        P_to_phi_custom = partial(P_to_phi, P0=P0)
+
+        secax = ax[i].secondary_xaxis('top', functions=(phi_to_P_custom, P_to_phi_custom))
         secax.set_xlabel(r"Effective hydration shell pressure, $P$ (kbar)")
         ax[i].legend()
 
@@ -138,15 +151,19 @@ def phi_i_star(phivals: list,
     ax[1].set_xlabel(r"$\phi$")
     ax[1].set_ylabel(r"Susceptibility $-d\langle n_i \rangle / d\phi$")
 
-    plt.savefig("sample_phi_i_star_unfold.png", format="png")
+    plt.savefig(sample_imgfile)
+
+    # Stopped here
+    # Edit here onwards
+
+    ############################################################################
+    # Actual fits
+
+    # Fit all probes to linear and integrated step gaussian models with different
+    # initial guesses, compare fit quality, and compute phi_i_star
+    ############################################################################
 
     """
-    ACTUAL FITS
-    """
-
-    """Fit all probes to linear and integrated step gaussian models with different initial
-    guesses, compare fit quality, and compute phi_i_star"""
-
     # Use text-only Matplotlib backend
     matplotlib.use('Agg')
 
@@ -160,7 +177,6 @@ def phi_i_star(phivals: list,
     phi_i_star_errors = np.zeros(len(protein_heavy_indices))
     delta_ni_trans = np.zeros(len(protein_heavy_indices))
     delta_phi_trans = np.zeros(len(protein_heavy_indices))
-    delta_phi_over = np.zeros(len(protein_heavy_indices))
 
     buried_surface_mask = np.zeros(len(protein_heavy_indices))
     buried_mask = mean_meanwaters[0, np.array(probes)] < BURIED_CUTOFF
@@ -303,13 +319,15 @@ def phi_i_star(phivals: list,
         x_fit_data = np.linspace(min(phivals), max(phivals), 100)
         y_fit_data = linear_model(x_fit_data, *popt_lin)
 
+        ########################################################################
         # Decide whether to use linear or non-linear fit
-        """Conditions for linear fit:
-        - phi_i^* has large errors (Error in phi_i* >= 2)
-        - There is no peak => value of -ve derivative at C is less than value at A and B
-        - F-test (https://en.wikipedia.org/wiki/F-test) fails, i.e. F < critical F"""
+        #
+        # Conditions for linear fit:
+        # - phi_i^* has large errors (Error in phi_i* >= 2)
+        # - There is no peak => value of -ve derivative at C is less than value at A and B
+        # - F-test (https://en.wikipedia.org/wiki/F-test) fails, i.e. F < critical F
+        ########################################################################
 
-        """Perform F-test"""
         # Compute F-statistic
         F = ((chi_sq_linear - chi_sq_nonlinear) / (6 - 2)) / chi_sq_red_nonlinear
 
@@ -365,13 +383,13 @@ def phi_i_star(phivals: list,
         plt.savefig("phi_i_star_images/nonlinear_vs_linear_fit_{}.png".format(probe))
         plt.close()
 
-        """Store data"""
+        # Store data
         phi_i_stars[probe] = phi_i_star
         phi_i_star_errors[probe] = phi_i_star_error
         delta_ni_trans[probe] = delta_ni
         delta_phi_trans[probe] = delta_phi
 
-    """Save phi_i_star data and errors to file"""
+    # Save phi_i_star data and errors to file
     phi_i_star_data = dict()
     phi_i_star_data['phi_i_stars'] = phi_i_stars
     phi_i_star_data['phi_i_star_errors'] = phi_i_star_errors
@@ -380,6 +398,8 @@ def phi_i_star(phivals: list,
 
     with open("phi_i_star_data.pkl", "wb") as outfile:
         pickle.dump(phi_i_star_data, outfile)
+    """
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Nv v/s phi and phi* for simulation.")
