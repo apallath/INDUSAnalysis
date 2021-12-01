@@ -98,7 +98,3 @@ python /path/to/INDUSAnalysis/scripts/run_agg_$analysis_name.py
 ```
 with the required and optional arguments to run aggregate analyses on data [
 use the -h or --help flags for help with arguments].
-
-## Contributing
-
-Read [Contributing Guidelines](CONTRIBUTING.md) for details.
