@@ -12,6 +12,7 @@ import MDAnalysis as mda
 from INDUSAnalysis.timeseries import TimeSeries
 from INDUSAnalysis.timeseries import TimeSeriesAnalysis
 
+
 def buried_surface_classifier(struct_file, traj_file, ni_native_format, ni_unfolded_format, runs, start, nirange, nbins, buried_cut, imgfile, classfile, classpdb):
     tsa = TimeSeriesAnalysis()
 

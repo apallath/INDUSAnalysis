@@ -153,17 +153,17 @@ def phi_i_star(phivals: list,
 
     plt.savefig(sample_imgfile)
 
-    # Stopped here
-    # Edit here onwards
-
     ############################################################################
     # Actual fits
 
     # Fit all probes to linear and integrated step gaussian models with different
     # initial guesses, compare fit quality, and compute phi_i_star
+    #
+    # TODO: Ensure that buried_cut uses the same (< / <=) algorithm as
+    # buried_surface cutoff
     ############################################################################
 
-    """
+    r"""
     # Use text-only Matplotlib backend
     matplotlib.use('Agg')
 
@@ -406,13 +406,21 @@ if __name__ == "__main__":
     parser.add_argument("-phi", type=str, nargs='+', help="phi values to read (phi=0 must be first)")
     parser.add_argument("-runs", type=int, nargs='+', help="runs to read")
     parser.add_argument("-start", type=int, help="time (ps) to start computing averages")
+    parser.add_argument("-structfile", help="path to structure file (.pdb, .gro, .tpr)")
     parser.add_argument("-calc_dir", help="directory containing hydration OPs extracted by INDUSAnalysis")
-    parser.add_argument("-Ntw_format", help="format of .pkl file containing Ntw, with {phi} placeholders for phi value and {run} placeholders for run value")
-    parser.add_argument("-imgfile", help="output image (default=phi_star.png)")
+    parser.add_argument("-ni_format", help="format of .pkl file containing Ntw, with {phi} placeholders for phi value and {run} placeholders for run value")
+    parser.add_argument("-sample_imgfile", help="sample phi_i* output image")
+    parser.add_argument("-all_imgformat", help="format of phi_i* output images for all heavy atoms, with {} placeholder for heavy atom index")
+    parser.add_argument("-pklfile", help="output file to dump phi_i* data to (.pkl)")
+    parser.add_argument("-buried_cut", type=int, help="buried waters cutoff")
+    parser.add_argument("-phi_star", type=float, help="collective phi* of the protein (used as a fit guess parameter)")
+    parser.add_argument("-plot_probe_indices", type=int, nargs='+', help="probe indices to plot in the sample image file")
+    parser.add_argument("-P0", type=float, default=1, help="simulation pressure, in bar (default=1)")
     parser.add_argument("-D_by_A_guess", default=5, help="initial guess for two-state model D/A parameter (default=5)")
     parser.add_argument("-E_guess", default=0.05, help="initial guess for two-state model E parameter (default=0.05)")
-    parser.add_argument("-P0", type=float, default=1, help="simulation pressure, in bar (default=1)")
+    parser.add_argument("-F_alpha", type=float, help="alpha level for F-test")
 
     a = parser.parse_args()
 
-    phi_ensemble(a.phi, a.runs, a.start, a.calc_dir, a.Ntw_format, a.imgfile, a.D_by_A_guess, a.E_guess, a.P0)
+    phi_i_star(a.phi, a.runs, a.start, a.structfile, a.calc_dir, a.ni_format, a.sample_imgfile, a.all_imgformat,
+               a.pklfile, a.buried_cut, a.phi_star, a.plot_probe_indices, a.P0, a.D_by_A_guess, a.E_guess, a.F_alpha)
