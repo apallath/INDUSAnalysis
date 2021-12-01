@@ -4,6 +4,7 @@ Plots unfolding and folding RMSFs of one or two protein structures, given BLAST 
 import argparse
 import os
 
+import matplotlib
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
@@ -15,7 +16,11 @@ from INDUSAnalysis.timeseries import TimeSeries
 from INDUSAnalysis.timeseries import TimeSeriesAnalysis
 
 
+matplotlib.use('Agg')
+
+
 def RMSF(nprot: int,
+         structfs: list,
          names: list,
          seq_file: str,
          phivals: list,
@@ -211,9 +216,12 @@ def RMSF(nprot: int,
         ss_dicts = []  # list of secondary structure dictionaries, one for each protein
         mutation_dicts = []  # list of mutation dictionaries, one for each protein
 
+        resid_prots = []  # residue IDs for each protein
+
         line_len = len(lines[0])
 
         for prot_idx in range(nprot):
+            # Parse sequence data
             restype_dict = {}
             alignment_dict = {}
             ss_dict = {}
@@ -239,6 +247,13 @@ def RMSF(nprot: int,
             alignment_dicts.append(alignment_dict)
             ss_dicts.append(ss_dict)
             mutation_dicts.append(mutation_dict)
+
+            # Load structure into MDA
+            u = mda.Universe(structfs[prot_idx])
+            mda_select = OPA().selection_parser["alpha_C"]
+            u_select = u.select_atoms(mda_select)
+            u_resid = [atom.residue.resid for atom in u_select]
+            resid_prots.append(u_resid)
 
         align_len = line_len
 
@@ -288,14 +303,14 @@ def RMSF(nprot: int,
                 RMSF_mean = RMSF_mean_prots[prot_idx]
                 RMSF_std = RMSF_std_prots[prot_idx]
 
-                prot_plot_len = len(RMSFu_mean_prots[prot_idx][phi_idx])
+                prot_plot_len = len(RMSF_mean_prots[prot_idx][phi_idx])
                 resids = [resid_prots[prot_idx][i] for i in range(prot_plot_len)]
 
                 xvals = [alignment_dicts[prot_idx][i] for i in resids]
                 yvals = RMSF_mean_prots[prot_idx][phi_idx]
                 yerrs = RMSF_std_prots[prot_idx][phi_idx]
 
-                ax.errorbar(xvals, yvals, yerr=yerrs, fmt='s', label=NAMES[prot_idx], capsize=2.0)
+                ax.errorbar(xvals, yvals, yerr=yerrs, fmt='s', label=names[prot_idx], capsize=2.0)
 
                 # IMPORTANT: Modify when changing from alpha_C to other type
                 xticks = xvals
@@ -312,7 +327,7 @@ def RMSF(nprot: int,
                 if(prot_idx == 0):
                     ax.set_xticks(xticks)
                     ax.set_xticklabels(xticklabels, rotation=90)
-                    ax.set_xlabel(NAMES[prot_idx])
+                    ax.set_xlabel(names[prot_idx])
 
                     for idx, t in enumerate(ax.xaxis.get_ticklabels()):
                         t.set_color(xtickcolors[idx])
@@ -323,7 +338,7 @@ def RMSF(nprot: int,
                     secax = ax.secondary_xaxis('top')
                     secax.set_xticks(xticks)
                     secax.set_xticklabels(xticklabels, rotation=90)
-                    secax.set_xlabel(NAMES[prot_idx])
+                    secax.set_xlabel(names[prot_idx])
 
                     for idx, t in enumerate(secax.xaxis.get_ticklabels()):
                         t.set_color(xtickcolors[idx])
@@ -345,13 +360,17 @@ def RMSF(nprot: int,
             plt.legend(loc='upper right')
 
             ax.set_xlim([0, align_len])
+
             ax.grid()
 
-            plt.savefig("compare_unfold_{}.png".format(phi), bbox_inches='tight')
+            # if set_max:
+            #     ax.set_ylim([0, np.max(RMSF_mean) + np.max(RMSF_std)])
 
-            ax.set_ylim([0, 35])
+            plt.savefig(imgformat.format(phi=phi), bbox_inches='tight')
 
-            plt.savefig("compare_unfold.{0:02}.png".format(phi_idx), bbox_inches='tight')
+            plt.savefig(imgformat.format(phi="movie.{:05d}".format(phi_idx)), bbox_inches='tight')
+
+            plt.close()
 
     else:
         raise ValueError("Invalid number of proteins. This script can work with either one or two proteins.")
@@ -360,6 +379,7 @@ def RMSF(nprot: int,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot RMSF average across runs for each phi value for one or two proteins.")
     parser.add_argument("-nprot", type=int, help="number of proteins (1 or 2)")
+    parser.add_argument("-structfs", type=str, nargs='+', help="path to structure files (.gro, .tpr) for each protein (space separated)")
     parser.add_argument("-names", type=str, nargs='+', help="names of proteins (space separated)")
     parser.add_argument("-seqfile", type=str, help="sequence alignment file")
     parser.add_argument("-phi", type=str, nargs='+', help="phi values to read")
@@ -375,4 +395,4 @@ if __name__ == "__main__":
 
     a = parser.parse_args()
 
-    RMSF(a.nprot, a.names, a.seqfile, a.phi, a.runs, a.start, a.calc_dirs, a.di_formats, a.imgformat, a.plot_native, a.set_max, a.make_movie, a.moviefile)
+    RMSF(a.nprot, a.structfs, a.names, a.seqfile, a.phi, a.runs, a.start, a.calc_dirs, a.di_formats, a.imgformat, a.plot_native, a.set_max, a.make_movie, a.moviefile)
