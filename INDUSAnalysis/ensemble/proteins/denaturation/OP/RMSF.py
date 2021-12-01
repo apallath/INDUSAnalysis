@@ -301,6 +301,9 @@ def RMSF(nprot: int,
             RMSF_native_mean_prots.append(RMSF_native_mean)
             RMSF_native_std_prots.append(RMSF_native_std)
 
+        RMSF_mean_max = max(np.max(RMSF_mean_prots[0]), np.max(RMSF_mean_prots[1]))
+        RMSF_std_max = max(np.max(RMSF_std_prots[0]), np.max(RMSF_std_prots[1]))
+
         for phi_idx, phi in enumerate(tqdm(phivals)):
             fig, ax = plt.subplots(figsize=(16, 8), dpi=500)
 
@@ -311,7 +314,7 @@ def RMSF(nprot: int,
                 prot_plot_len = len(RMSF_mean_prots[prot_idx][phi_idx])
                 resids = [resid_prots[prot_idx][i] for i in range(prot_plot_len)]
 
-                xvals = [alignment_dicts[prot_idx][i] for i in resids]
+                xvals = [alignment_dicts[prot_idx][i] for i in range(len(resids))]
                 yvals = RMSF_mean_prots[prot_idx][phi_idx]
                 yerrs = RMSF_std_prots[prot_idx][phi_idx]
 
@@ -368,8 +371,8 @@ def RMSF(nprot: int,
 
             ax.grid()
 
-            # if set_max:
-            #     ax.set_ylim([0, np.max(RMSF_mean) + np.max(RMSF_std)])
+            if set_max:
+                ax.set_ylim([0, RMSF_mean_max + RMSF_std_max])
 
             plt.savefig(imgformat.format(phi=phi), bbox_inches='tight')
 
