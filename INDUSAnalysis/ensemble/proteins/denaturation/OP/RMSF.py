@@ -108,10 +108,7 @@ def RMSF(nprot: int,
     # Single protein
     ############################################################################
     if nprot == 1:
-        name = names[0]
-        calc_dir = calc_dirs[0]
-        di_format = di_formats[0]
-
+        # Parse sequence data
         restype_dict = {}
         ss_dict = {}
 
@@ -122,9 +119,13 @@ def RMSF(nprot: int,
             restype_dict[i] = seq[i]
             ss_dict[i] = ss[i]
 
+        # Begin analysis
+        name = names[0]
+        calc_dir = calc_dirs[0]
+        di_format = di_formats[0]
+
         tsa = TimeSeriesAnalysis()
 
-        # unfold          each phi      each select atom     each run
         RMSF = []
 
         # Unfold-fold
@@ -205,7 +206,152 @@ def RMSF(nprot: int,
     # Compare proteins
     ############################################################################
     elif nprot == 2:
-        pass
+        restype_dicts = []  # list of residue type dictionaries, one for each protein
+        alignment_dicts = []  # list of alignment dictionaries, one for each protein
+        ss_dicts = []  # list of secondary structure dictionaries, one for each protein
+        mutation_dicts = []  # list of mutation dictionaries, one for each protein
+
+        line_len = len(lines[0])
+
+        for prot_idx in range(nprot):
+            restype_dict = {}
+            alignment_dict = {}
+            ss_dict = {}
+            mutation_dict = {}
+
+            aligned_seq = lines[3 * prot_idx]
+            aligned_ss = lines[3 * prot_idx + 1]
+            aligned_mut = lines[3 * prot_idx + 2]
+
+            resctr = 0
+            for i in range(line_len):
+                if aligned_seq[i] != '-':
+                    restype_dict[resctr] = aligned_seq[i]
+                    alignment_dict[resctr] = i
+                    ss_dict[resctr] = aligned_ss[i]
+                    if aligned_mut[i] == '.':
+                        mutation_dict[resctr] = False
+                    else:
+                        mutation_dict[resctr] = True
+                    resctr += 1
+
+            restype_dicts.append(restype_dict)
+            alignment_dicts.append(alignment_dict)
+            ss_dicts.append(ss_dict)
+            mutation_dicts.append(mutation_dict)
+
+        align_len = line_len
+
+        RMSF_mean_prots = []
+        RMSF_std_prots = []
+        RMSF_native_mean_prots = []
+        RMSF_native_std_prots = []
+
+        for prot_idx in range(nprot):
+            # Begin analysis
+            name = names[prot_idx]
+            calc_dir = calc_dirs[prot_idx]
+            di_format = di_formats[prot_idx]
+
+            tsa = TimeSeriesAnalysis()
+
+            RMSF = []
+
+            # Unfold-fold
+            for phi_idx, phi in enumerate(phivals):
+                RMSF_phi = []
+                for run_idx, run in enumerate(runs):
+                    dev_unfold = tsa.load_TimeSeries(calc_dir + di_format.format(phi=phi, run=run))
+                    RMSF_run = np.sqrt(np.mean(dev_unfold[start_time:].data_array ** 2, axis=0))
+                    RMSF_phi.append(RMSF_run)
+                RMSF.append(RMSF_phi)
+
+            RMSF = np.array(RMSF)
+
+            # (phi, run, heavy atom)
+            print(RMSF.shape)
+
+            RMSF_mean = RMSF.mean(axis=1)
+            RMSF_std = RMSF.std(axis=1)
+            RMSF_mean_prots.append(RMSF_mean)
+            RMSF_std_prots.append(RMSF_std)
+
+            RMSF_native_mean = RMSF_mean[0, :].mean()
+            RMSF_native_std = RMSF_mean[0, :].std()
+            RMSF_native_mean_prots.append(RMSF_native_mean)
+            RMSF_native_std_prots.append(RMSF_native_std)
+
+        for phi_idx, phi in enumerate(tqdm(phivals)):
+            fig, ax = plt.subplots(figsize=(16, 8), dpi=500)
+
+            for prot_idx in range(nprot):
+                RMSF_mean = RMSF_mean_prots[prot_idx]
+                RMSF_std = RMSF_std_prots[prot_idx]
+
+                prot_plot_len = len(RMSFu_mean_prots[prot_idx][phi_idx])
+                resids = [resid_prots[prot_idx][i] for i in range(prot_plot_len)]
+
+                xvals = [alignment_dicts[prot_idx][i] for i in resids]
+                yvals = RMSF_mean_prots[prot_idx][phi_idx]
+                yerrs = RMSF_std_prots[prot_idx][phi_idx]
+
+                ax.errorbar(xvals, yvals, yerr=yerrs, fmt='s', label=NAMES[prot_idx], capsize=2.0)
+
+                # IMPORTANT: Modify when changing from alpha_C to other type
+                xticks = xvals
+                xticklabels = ['{}{}'.format(restype_dicts[prot_idx][resid], resid) for resid in range(len(xticks))]
+                xtickcolors = [stride_colors[ss_dicts[prot_idx][resid]] for resid in range(len(xticks))]
+                xtickweights = []
+                for resid in range(len(xticks)):
+                    if(mutation_dicts[prot_idx][resid]):
+                        xtickweights.append("bold")
+                        xticklabels[resid] += "*"
+                    else:
+                        xtickweights.append("normal")
+
+                if(prot_idx == 0):
+                    ax.set_xticks(xticks)
+                    ax.set_xticklabels(xticklabels, rotation=90)
+                    ax.set_xlabel(NAMES[prot_idx])
+
+                    for idx, t in enumerate(ax.xaxis.get_ticklabels()):
+                        t.set_color(xtickcolors[idx])
+                        t.set_weight(xtickweights[idx])
+                        t.set_fontsize(8)
+
+                elif(prot_idx == 1):
+                    secax = ax.secondary_xaxis('top')
+                    secax.set_xticks(xticks)
+                    secax.set_xticklabels(xticklabels, rotation=90)
+                    secax.set_xlabel(NAMES[prot_idx])
+
+                    for idx, t in enumerate(secax.xaxis.get_ticklabels()):
+                        t.set_color(xtickcolors[idx])
+                        t.set_weight(xtickweights[idx])
+                        t.set_fontsize(8)
+                else:
+                    raise NotImplementedError()
+
+            ax.set_ylabel("RMSF")
+            ax.set_title(r"$\phi = {}$ kJ/mol: P-unfold".format(phi))
+
+            patchlist = []
+            for ss_type in stride_colors.keys():
+                patchlist.append(mpatches.Patch(color=stride_colors[ss_type], label=stride_parser[ss_type]))
+
+            ss_legend = plt.legend(handles=patchlist, loc='upper left')
+            ax.add_artist(ss_legend)
+
+            plt.legend(loc='upper right')
+
+            ax.set_xlim([0, align_len])
+            ax.grid()
+
+            plt.savefig("compare_unfold_{}.png".format(phi), bbox_inches='tight')
+
+            ax.set_ylim([0, 35])
+
+            plt.savefig("compare_unfold.{0:02}.png".format(phi_idx), bbox_inches='tight')
 
     else:
         raise ValueError("Invalid number of proteins. This script can work with either one or two proteins.")
