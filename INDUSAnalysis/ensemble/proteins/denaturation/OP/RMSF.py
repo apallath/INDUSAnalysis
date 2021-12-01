@@ -124,6 +124,12 @@ def RMSF(nprot: int,
             restype_dict[i] = seq[i]
             ss_dict[i] = ss[i]
 
+        # Load structure into MDA
+        u = mda.Universe(structfs[0])
+        mda_select = OPA().selection_parser["alpha_C"]
+        u_select = u.select_atoms(mda_select)
+        resids = [atom.residue.resid for atom in u_select]
+
         # Begin analysis
         name = names[0]
         calc_dir = calc_dirs[0]
@@ -167,10 +173,9 @@ def RMSF(nprot: int,
                 ax.axhline(y=RMSF_native_mean, label=r"$\phi = {}$".format(phivals[0]), color="green")
                 ax.fill_between(xvals, RMSF_native_mean - RMSF_native_std, RMSF_native_mean + RMSF_native_std, color="green", alpha=0.4)
 
-            # IMPORTANT: Modify when changing from alpha_C to other type
             xticks = xvals
-            xticklabels = ['{}{}'.format(restype_dict[resid], resid + 1) for resid in range(seq_len)]
-            xtickcolors = [stride_colors[ss_dict[resid]] for resid in range(seq_len)]
+            xticklabels = ['{}{}'.format(restype_dict[residx], resids[residx]) for residx in range(seq_len)]
+            xtickcolors = [stride_colors[ss_dict[residx]] for residx in range(seq_len)]
 
             ax.set_xticks(xticks)
             ax.set_xticklabels(xticklabels, rotation=90)
@@ -314,13 +319,13 @@ def RMSF(nprot: int,
 
                 # IMPORTANT: Modify when changing from alpha_C to other type
                 xticks = xvals
-                xticklabels = ['{}{}'.format(restype_dicts[prot_idx][resid], resid) for resid in range(len(xticks))]
-                xtickcolors = [stride_colors[ss_dicts[prot_idx][resid]] for resid in range(len(xticks))]
+                xticklabels = ['{}{}'.format(restype_dicts[prot_idx][residx], resids[residx]) for residx in range(len(xticks))]
+                xtickcolors = [stride_colors[ss_dicts[prot_idx][residx]] for residx in range(len(xticks))]
                 xtickweights = []
-                for resid in range(len(xticks)):
-                    if(mutation_dicts[prot_idx][resid]):
+                for residx in range(len(xticks)):
+                    if(mutation_dicts[prot_idx][residx]):
                         xtickweights.append("bold")
-                        xticklabels[resid] += "*"
+                        xticklabels[residx] += "*"
                     else:
                         xtickweights.append("normal")
 
@@ -379,7 +384,7 @@ def RMSF(nprot: int,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot RMSF average across runs for each phi value for one or two proteins.")
     parser.add_argument("-nprot", type=int, help="number of proteins (1 or 2)")
-    parser.add_argument("-structfs", type=str, nargs='+', help="path to structure files (.gro, .tpr) for each protein (space separated)")
+    parser.add_argument("-structfs", type=str, nargs='+', help="path to structure files (.pdb, .gro, or .tpr) for each protein (space separated)")
     parser.add_argument("-names", type=str, nargs='+', help="names of proteins (space separated)")
     parser.add_argument("-seqfile", type=str, help="sequence alignment file")
     parser.add_argument("-phi", type=str, nargs='+', help="phi values to read")
