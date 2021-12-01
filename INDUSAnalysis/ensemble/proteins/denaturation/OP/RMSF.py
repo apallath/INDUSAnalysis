@@ -209,9 +209,6 @@ def RMSF(nprot: int,
 
             plt.close()
 
-        if make_movie:
-            os.system("ffmpeg -r 0.5 -i {} -vcodec mpeg4 -y -vb 200M -q:v 1 {}".format(imgformat.format(phi="movie.%05d"), moviefile))
-
     ############################################################################
     # Compare proteins
     ############################################################################
@@ -382,6 +379,9 @@ def RMSF(nprot: int,
 
     else:
         raise ValueError("Invalid number of proteins. This script can work with either one or two proteins.")
+
+    if make_movie:
+        os.system("ffmpeg -r 0.5 -i {} -vcodec mpeg4 -y -vb 200M -q:v 1 {}".format(imgformat.format(phi="movie.%05d"), moviefile))
 
 
 if __name__ == "__main__":
