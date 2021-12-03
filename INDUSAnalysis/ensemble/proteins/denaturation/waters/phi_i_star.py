@@ -416,8 +416,8 @@ if __name__ == "__main__":
     parser.add_argument("-phi_star", type=float, help="collective phi* of the protein (used as a fit guess parameter)")
     parser.add_argument("-plot_probe_indices", type=int, nargs='+', help="probe indices to plot in the sample image file")
     parser.add_argument("-P0", type=float, default=1, help="simulation pressure, in bar (default=1)")
-    parser.add_argument("-D_by_A_guess", default=5, help="initial guess for two-state model D/A parameter (default=5)")
-    parser.add_argument("-E_guess", default=0.05, help="initial guess for two-state model E parameter (default=0.05)")
+    parser.add_argument("-D_by_A_guess", type=float, default=5, help="initial guess for two-state model D/A parameter (default=5)")
+    parser.add_argument("-E_guess", type=float, default=0.05, help="initial guess for two-state model E parameter (default=0.05)")
     parser.add_argument("-F_alpha", type=float, help="alpha level for F-test")
 
     a = parser.parse_args()
