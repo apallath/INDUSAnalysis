@@ -54,7 +54,7 @@ def phi_i_star(phivals: list,
     meanwaters = np.zeros((len(phivals), len(runs), len(protein_heavy_indices)))
     varwaters = np.zeros((len(phivals), len(runs), len(protein_heavy_indices)))
 
-    # All other phi values
+    # All phi values
     for idx, phi in enumerate(phivals):
         for runidx, run in enumerate(runs):
             ts = tsa.load_TimeSeries(calc_dir + ni_format.format(phi=phi, run=run))
@@ -71,6 +71,9 @@ def phi_i_star(phivals: list,
 
     mean_meanwaters = np.mean(meanwaters, axis=1)
     std_meanwaters = np.std(meanwaters, axis=1)
+
+    # Compute max
+    maxwaters = np.max(mean_meanwaters) + np.max(std_meanwaters)
 
     phivals = np.array([float(phi) for phi in phivals])
     order = np.argsort(phivals)
@@ -158,12 +161,8 @@ def phi_i_star(phivals: list,
 
     # Fit all probes to linear and integrated step gaussian models with different
     # initial guesses, compare fit quality, and compute phi_i_star
-    #
-    # TODO: Ensure that buried_cut uses the same (< / <=) algorithm as
-    # buried_surface cutoff
     ############################################################################
 
-    r"""
     # Use text-only Matplotlib backend
     matplotlib.use('Agg')
 
@@ -177,13 +176,6 @@ def phi_i_star(phivals: list,
     phi_i_star_errors = np.zeros(len(protein_heavy_indices))
     delta_ni_trans = np.zeros(len(protein_heavy_indices))
     delta_phi_trans = np.zeros(len(protein_heavy_indices))
-
-    buried_surface_mask = np.zeros(len(protein_heavy_indices))
-    buried_mask = mean_meanwaters[0, np.array(probes)] < BURIED_CUTOFF
-    np.save("buried_heavy_atoms_mask.npy", buried_mask)
-
-    if not os.path.exists('phi_i_star_images'):
-        os.makedirs('phi_i_star_images')
 
     for probe in tqdm(probes):
         fig, ax = plt.subplots(figsize=(8, 6), dpi=150)
@@ -212,8 +204,8 @@ def phi_i_star(phivals: list,
         C_guess_idx = np.argmin(dydx_data) + 1
 
         C_guess_0 = xdata[C_guess_idx]
-        D_guess_0 = 2 * A_guess_0
-        E_guess_0 = 0.1
+        D_guess_0 = D_by_A_guess * A_guess_0
+        E_guess_0 = E_guess
         F_guess_0 = ydata[C_guess_idx]
 
         p_guess_0 = [A_guess_0, B_guess_0, C_guess_0, D_guess_0, E_guess_0, F_guess_0]
@@ -223,16 +215,16 @@ def phi_i_star(phivals: list,
         B_guess_123 = (ydata[-1] - ydata[0]) / (xdata[-1] - xdata[0])
         C_guess_1 = 0  # Zero
         D_guess_123 = 2 * (ydata[-1] - ydata[0]) / (xdata[-1] - xdata[0])
-        E_guess_123 = 0.1
+        E_guess_123 = E_guess
         F_guess_123 = 10
         p_guess_1 = [A_guess_123, B_guess_123, C_guess_1, D_guess_123, E_guess_123, F_guess_123]
 
         # Initial guess with inflection at global phi*
-        C_guess_2 = PHI_STAR_COLLECTIVE  # Global phi*
+        C_guess_2 = phi_star_collective  # Global phi*
         p_guess_2 = [A_guess_123, B_guess_123, C_guess_2, D_guess_123, E_guess_123, F_guess_123]
 
         # Initial guess with inflection at positive phi
-        C_guess_3 = -PHI_STAR_COLLECTIVE  # Global phi*
+        C_guess_3 = -phi_star_collective  # Global phi*
         p_guess_3 = [A_guess_123, B_guess_123, C_guess_3, D_guess_123, E_guess_123, F_guess_123]
 
         atom = protein_heavy.atoms[probe]
@@ -293,14 +285,14 @@ def phi_i_star(phivals: list,
             delta_ni = integrated_step_gaussian(C - E, *popts[method]) - integrated_step_gaussian(C + E, *popts[method])
             delta_phi = 2 * E
 
-            ax.text(C, 0.9 * UPPER_WATERS_LIMIT,
+            ax.text(C, 0.9 * maxwaters,
                     r"Guess {}, $C$ = {:.2f} $\pm$ {:.2f} kJ/mol".format(method, C, Cerr), bbox=dict(facecolor='C3', alpha=0.5))
             ax.axvspan(C - Cerr, C + Cerr, alpha=0.3, color='C3')
 
-            ax.text(C, 0.8 * UPPER_WATERS_LIMIT, r"$\Delta \langle n_i \rangle = {:.2f}; \Delta \langle n_i \rangle _{{trans}} / \Delta \phi_{{trans}}$ = {:.2f} / {:.2f}"
+            ax.text(C, 0.8 * maxwaters, r"$\Delta \langle n_i \rangle = {:.2f}; \Delta \langle n_i \rangle _{{trans}} / \Delta \phi_{{trans}}$ = {:.2f} / {:.2f}"
                     .format(ydata[0] - ydata[-1], delta_ni, delta_phi),
                     bbox=dict(facecolor='C1', alpha=0.5))
-            ax.text(0.9 * min(xdata), 0.1 * UPPER_WATERS_LIMIT,
+            ax.text(0.9 * min(xdata), 0.1 * maxwaters,
                     r"$A = {:.2f}, D + \frac{{A + B}}{{2}}$ = {:.2f}, B = {:.2f}".format(A, D + (A + B) / 2, B), bbox=dict(facecolor='C2', alpha=0.5))
             ax.axvline(x=C, linestyle=":", color="C2")
 
@@ -335,11 +327,11 @@ def phi_i_star(phivals: list,
         dfn = 6 - 2  # numerator degree of freedom for F-statistic
         dfd = (len(xdata) - 6)  # denominator degree of freedom for F-statistic
         # Compute critical value on F-distribution with dfn and dfd degrees of freedom
-        crit_F = scipy.stats.f.ppf(q=1 - F_ALPHA_LEVEL, dfn=dfn, dfd=dfd)
+        crit_F = scipy.stats.f.ppf(q=1 - F_alpha_level, dfn=dfn, dfd=dfd)
         # Reject if F > crit_F
 
-        ax.text(0.9 * min(xdata), 0.2 * UPPER_WATERS_LIMIT,
-                r"$F = {:.2f}$; $F_{{crit}}$ @ $\alpha$ = {:.2e} = {:.2f}".format(F, F_ALPHA_LEVEL, crit_F),
+        ax.text(0.9 * min(xdata), 0.2 * maxwaters,
+                r"$F = {:.2f}$; $F_{{crit}}$ @ $\alpha$ = {:.2e} = {:.2f}".format(F, F_alpha_level, crit_F),
                 bbox=dict(facecolor='C2', alpha=0.5))
 
         if Cerr > 2 or (D + (A + B) / 2 > min(A, B)) or (F < crit_F):
@@ -373,14 +365,14 @@ def phi_i_star(phivals: list,
         ax.set_ylabel(r"$\langle n_i \rangle$")
 
         ax.set_xlim([min(phivals), max(phivals)])
-        ax.set_ylim([-0.5, UPPER_WATERS_LIMIT])
+        ax.set_ylim([-0.5, maxwaters])
 
         ax.set_title(title)
 
         secax = ax.secondary_xaxis('top', functions=(phi_to_P, P_to_phi))
         secax.set_xlabel(r"Effective hydration shell pressure, $P$ (kbar)")
 
-        plt.savefig("phi_i_star_images/nonlinear_vs_linear_fit_{}.png".format(probe))
+        plt.savefig(all_imgformat.format(probe))
         plt.close()
 
         # Store data
@@ -396,9 +388,8 @@ def phi_i_star(phivals: list,
     phi_i_star_data['delta_ni_trans'] = delta_ni_trans
     phi_i_star_data['delta_phi_trans'] = delta_phi_trans
 
-    with open("phi_i_star_data.pkl", "wb") as outfile:
+    with open(pklfile, "wb") as outfile:
         pickle.dump(phi_i_star_data, outfile)
-    """
 
 
 if __name__ == "__main__":
