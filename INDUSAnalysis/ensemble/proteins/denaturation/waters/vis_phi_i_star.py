@@ -20,8 +20,8 @@ from MDAnalysis.analysis import align
 from tqdm import tqdm
 
 
-def vis_phi_i_star(pklfile, structfile, trajformat, phi_dyn, phi_static, pdb_dyn, pdb_static, infty_cutoff):
-
+def vis_phi_i_star(pklfile, structfile, trajformat, phi_dyn, phi_static, pdb_dyn,
+                   pdb_static, infty_cutoff):
     ############################################################################
     # Load data
     ############################################################################
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     parser.add_argument("-phi_static", nargs=3, type=float, help="parameters to choose phi values for static PDB (start end spacing)")
     parser.add_argument("-pdb_dyn", help="dynamic output PDB file")
     parser.add_argument("-pdb_static", help="static output PDB file")
-    parser.add_argument("-infty_cutoff", help="upper limit on phi_i* beyond which an atom is considered always hydrated (phi_i* = infinity)")
+    parser.add_argument("-infty_cutoff", type=float, help="upper limit on phi_i* beyond which an atom is considered always hydrated (phi_i* = infinity)")
     a = parser.parse_args()
 
     vis_phi_i_star(a.pklfile, a.structfile, a.trajformat, a.phi_dyn, a.phi_static, a.pdb_dyn, a.pdb_static, a.infty_cutoff)
