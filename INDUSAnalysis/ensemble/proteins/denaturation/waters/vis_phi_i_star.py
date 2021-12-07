@@ -118,6 +118,56 @@ def vis_phi_i_star(pklfile, structfile, trajformat, phi_dyn, phi_static, pdb_dyn
     # Static PDB generation
     ############################################################################
 
+    wetted_at_or_before = []
+
+    protein_sel = "protein"
+    backbone_sel = "name CA or name C or name N"
+    protein_heavy_sel = "protein and not name H*"
+
+    # Load equilibrium simulation universe (to manipulate and write)
+    u = mda.Universe(structfile, trajformat.format(phi=0))
+    u.add_TopologyAttr('tempfactors')
+
+    phi_static_vals = np.linspace(phi_static[0], phi_static[1], phi_static[2])
+    pbar = tqdm(total=len(phi_static_vals))
+
+    with mda.Writer(pdb_static, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
+        mask = 2 * (phi_i_stars < infty_cutoff)
+
+        u_protein = u.select_atoms(protein_sel)
+        u_protein_heavy = u.select_atoms(protein_heavy_sel)
+        u_protein_heavy.atoms.tempfactors = mask
+
+        PDB.write(u_protein.atoms)
+        pbar.update(1)
+
+        for idx, phi in enumerate(phi_static_vals):
+            # Select protein from current u
+            u_protein = u.select_atoms(protein_sel)
+
+            # If phi_i_star is more negative than current phi => needs more bias to undergo transition
+            # Then assign value = 1 + 1 = 2
+            # Else (i.e. phi_i_star >= phi => transition occurs at or before current phi
+            # Then assign value = 1
+            phi_i_star_premask = 1 + np.array(phi_i_stars < float(phi)).astype(np.float)
+
+            # If phi_i_star >= infty_cutoff => discarded from start
+            # Then assign value = 0
+            # => Assign non-zero value only if phi_i_star < infty_cutoff
+            mask = phi_i_stars < infty_cutoff
+            phi_i_star_mask = mask * phi_i_star_premask
+
+            # Assign values to protein heavy atoms
+            u_protein_heavy = u.select_atoms(protein_heavy_sel)
+            u_protein_heavy.atoms.tempfactors = phi_i_star_mask
+
+            # Record atom ids
+            wetted_at_or_before.append(set(np.argwhere(phi_i_star_mask == 1).flatten().tolist()))
+
+            # Write to PDB as a new frame
+            PDB.write(u_protein.atoms)
+            pbar.update(1)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Nv v/s phi and phi* for simulation.")
