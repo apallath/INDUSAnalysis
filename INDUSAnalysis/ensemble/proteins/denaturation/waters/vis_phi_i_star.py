@@ -95,7 +95,7 @@ def vis_phi_i_star(pklfile, structfile, trajformat, phi_dyn, phi_static, pdb_dyn
             # Then assign value = 1 + 1 = 2
             # Else (i.e. phi_i_star >= phi => transition occurs at or before current phi
             # Then assign value = 1
-            phi_i_star_premask = 1 + np.array(phi_i_stars < phi).astype(np.float)
+            phi_i_star_premask = 1 + np.array(np.array([float(phi) for phi in phi_i_stars]) < phi).astype(np.float)
 
             # If phi_i_star >= infty_cutoff => discarded from start
             # Then assign value = 0
