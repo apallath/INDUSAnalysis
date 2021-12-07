@@ -128,7 +128,7 @@ def vis_phi_i_star(pklfile, structfile, trajformat, phi_dyn, phi_static, pdb_dyn
     u = mda.Universe(structfile, trajformat.format(phi=0))
     u.add_TopologyAttr('tempfactors')
 
-    phi_static_vals = np.linspace(phi_static[0], phi_static[1], phi_static[2])
+    phi_static_vals = np.linspace(phi_static[0], phi_static[1], int(phi_static[2]))
     pbar = tqdm(total=len(phi_static_vals))
 
     with mda.Writer(pdb_static, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
