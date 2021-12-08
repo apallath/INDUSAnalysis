@@ -1,0 +1,362 @@
+[ ALA ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_135   -0.180     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+   HB3    opls_140    0.060     2
+     C    opls_235    0.500     3
+     O    opls_236   -0.500     3
+
+[ ARG ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_308   -0.050     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_307    0.190     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+    NE    opls_303   -0.700     5
+    HE    opls_304    0.440     5
+    CZ    opls_302    0.640	    5
+   NH1    opls_300   -0.800     6
+  HH11    opls_301    0.460     6
+  HH12    opls_301    0.460     6
+   NH2    opls_300   -0.800     7
+  HH21    opls_301    0.460     7
+  HH22    opls_301    0.460     7
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+
+[ ASN ]
+     N    opls_238   -0.500     0
+     H    opls_241    0.300     0
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_235    0.500     3
+   OD1    opls_236   -0.500     3
+   ND2    opls_237   -0.760     4
+  HD21    opls_240    0.380     4
+  HD22    opls_240    0.380     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+
+[ ASP ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_274   -0.220     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_271    0.700     3
+   OD1    opls_272   -0.800     3
+   OD2    opls_272   -0.800     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+
+[ CYS ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_206    0.060     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    SG    opls_200   -0.335     3
+    HG    opls_204    0.155     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+
+[ GLN ]
+     N    opls_238   -0.500     0
+     H    opls_241    0.300     0
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_235    0.500     4
+   OE1    opls_236   -0.500     4
+   NE2    opls_237   -0.760     5
+  HE21    opls_240    0.380     5
+  HE22    opls_240    0.380     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+
+[ GLU ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_274   -0.220     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_271    0.700     4
+   OE1    opls_272   -0.800     4
+   OE2    opls_272   -0.800     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+
+[ GLY ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_223B   0.080     1
+   HA1    opls_140    0.060     1
+   HA2    opls_140    0.060     1
+     C    opls_235    0.500     2
+     O    opls_236   -0.500     2
+
+[ HIS ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_505   -0.297     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_508   -0.261     3
+   ND1    opls_503   -0.291     4
+   HD1    opls_504    0.326     4
+   CD2    opls_507    0.504     5
+   HD2    opls_146    0.183     5
+   CE1    opls_506    0.182     6
+   HE1    opls_146    0.098     6
+   NE2    opls_511   -0.564     7
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+
+[ ILE ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_137   -0.060     2
+    HB    opls_140    0.060     2
+   CG1    opls_136   -0.120     3
+  HG11    opls_140    0.060     3
+  HG12    opls_140    0.060     3
+   CG2    opls_135   -0.180     4
+  HG21    opls_140    0.060     4
+  HG22    opls_140    0.060     4
+  HG23    opls_140    0.060     4
+    CD    opls_135   -0.180     5
+   HD1    opls_140    0.060     5
+   HD2    opls_140    0.060     5
+   HD3    opls_140    0.060     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+
+[ LEU ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_137   -0.060     3
+    HG    opls_140    0.060     3
+   CD1    opls_135   -0.180     4
+  HD11    opls_140    0.060     4
+  HD12    opls_140    0.060     4
+  HD13    opls_140    0.060     4
+   CD2    opls_135   -0.180     5
+  HD21    opls_140    0.060     5
+  HD22    opls_140    0.060     5
+  HD23    opls_140    0.060     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+
+[ LYS ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_136   -0.120     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+    CE    opls_906    0.060     5
+   HE1    opls_911    0.060     5
+   HE2    opls_911    0.060     5
+    NZ    opls_900   -0.900     6
+   HZ1    opls_909    0.360     6
+   HZ2    opls_909    0.360     6
+     C    opls_235    0.500     7
+     O    opls_236   -0.500     7
+
+[ MET ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_210    0.048     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    SD    opls_202   -0.335     4
+    CE    opls_209   -0.013     5
+   HE1    opls_140    0.060     5
+   HE2    opls_140    0.060     5
+   HE3    opls_140    0.060     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+
+[ PHE ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_149   -0.005     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_145   -0.115     2
+   CD1    opls_145   -0.115     3
+   HD1    opls_146    0.115     3
+   CD2    opls_145   -0.115     4
+   HD2    opls_146    0.115     4
+   CE1    opls_145   -0.115     5
+   HE1    opls_146    0.115     5
+   CE2    opls_145   -0.115     6
+   HE2    opls_146    0.115     6
+    CZ    opls_145   -0.115     7
+    HZ    opls_146    0.115     7
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+
+[ PRO ]
+     N    opls_239   -0.140     1
+    CA    opls_246    0.010     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_245   -0.050     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+
+[ SER ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_157    0.145     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    OG    opls_154   -0.683     3
+    HG    opls_155    0.418     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+
+[ THR ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_158    0.205     2
+    HB    opls_140    0.060     2
+   OG1    opls_154   -0.683     2
+   HG1    opls_155    0.418     2
+   CG2    opls_135   -0.180     3
+  HG21    opls_140    0.060     3
+  HG22    opls_140    0.060     3
+  HG23    opls_140    0.060     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+
+[ TRP ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_500    0.075     3
+   CD1    opls_514   -0.115     4
+   HD1    opls_146    0.115     4
+   CD2    opls_501   -0.055     5
+   NE1    opls_503   -0.570     6
+   HE1    opls_504    0.420     6
+   CE2    opls_502    0.130     6
+   CE3    opls_145   -0.115     7
+   HE3    opls_146    0.115     7
+   CZ2    opls_145   -0.115     8
+   HZ2    opls_146    0.115     8
+   CZ3    opls_145   -0.115     9
+   HZ3    opls_146    0.115     9
+   CH2    opls_145   -0.115     10
+   HH2    opls_146    0.115     10
+     C    opls_235    0.500     11
+     O    opls_236   -0.500     11
+
+[ TYR ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_149   -0.005     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_145   -0.115     2
+   CD1    opls_145   -0.115     4
+   HD1    opls_146    0.115     4
+   CD2    opls_145   -0.115     5
+   HD2    opls_146    0.115     5
+   CE1    opls_145   -0.115     6
+   HE1    opls_146    0.115     6
+   CE2    opls_145   -0.115     7
+   HE2    opls_146    0.115     7
+    CZ    opls_166    0.150     8
+    OH    opls_167   -0.585     8
+    HH    opls_168    0.435     8
+     C    opls_235    0.500     9
+     O    opls_236   -0.500     9
+
+[ VAL ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_137   -0.060	2
+    HB    opls_140    0.060     2
+   CG1    opls_135   -0.180     3
+  HG11    opls_140    0.060     3
+  HG12    opls_140    0.060     3
+  HG13    opls_140    0.060     3
+   CG2    opls_135   -0.180     4
+  HG21    opls_140    0.060     4
+  HG22    opls_140    0.060     4
+  HG23    opls_140    0.060     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
