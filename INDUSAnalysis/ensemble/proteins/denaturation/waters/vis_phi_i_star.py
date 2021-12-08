@@ -1,7 +1,7 @@
 """
-Plots ni v/s phi and phi_i* for a set of representative atoms, and also for each atom i.
-
-Stores calculated phi_i* values.
+Generates PDB files with indicators for whether an atom has passed it's phi_i*
+value, in order to visualize protein unfolding along the atomic hydration
+order parameters.
 """
 import argparse
 import os
