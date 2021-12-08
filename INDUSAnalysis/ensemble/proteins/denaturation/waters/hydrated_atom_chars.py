@@ -115,6 +115,11 @@ def sec_struct_group_valueslist(indices, protein_heavy, all_groups, stride_group
 
     return(np.array(comp))
 
+
+def nonzero_autopct(pct):
+    return ('%.2f' % pct) if pct > 0 else ''
+
+
 ###############################################################################
 # Main calculation function
 ###############################################################################
@@ -129,6 +134,10 @@ def hydrated_atom_chars(protname,
                         # kr_pklfile, ff, atomtype_imgfile, atomtype_movieformat,
                         # ssclass_imgfile, ssclass_movieformat,
                         # ssgroup_imgfile, ssgroup_imgformat):
+    print("Already generated the images?")
+    print("Here are the bash commands to stitch them into movies:")
+    print("ffmpeg -r 5 -i {} -vcodec mpeg4 -y -vb 40M {}".format(
+          buried_surface_movieformat.format("%05d"), buried_surface_movieformat.split(".")[0] + ".mp4"))
     ############################################################################
     # Load data
     ############################################################################
@@ -158,10 +167,15 @@ def hydrated_atom_chars(protname,
     # Buried/surface
     ############################################################################
 
+    # phi-series
+    phiseries = np.zeros((len(phivals) - 1, 2))
+
     # buried-surface indicator
     buried_indicator = np.load(buried_npyfile)
 
     # Plot overall surface composition
+    # --------------------------------
+
     fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
 
     all_indices = np.array(tuple(list(range(len(protein_heavy.atoms)))))
@@ -169,10 +183,83 @@ def hydrated_atom_chars(protname,
 
     ax.pie(values,
            labels=["Buried", "Surface"],
-           colors=["red", "dodgerblue"])
+           colors=["salmon", "skyblue"],
+           autopct=nonzero_autopct)
     ax.set_title("{} composition".format(protname))
 
     fig.savefig(buried_surface_movieformat.format("{:05d}".format(0)))
+
+    # Plot linear atoms
+    # -----------------
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    all_atoms_values = buried_surface_valueslist(all_indices, protein_heavy, buried_indicator)
+    linear_atoms_values = buried_surface_valueslist(hyd_indices[(phivals[1], phivals[0])].flatten(),
+                                                    protein_heavy, buried_indicator)
+
+    non_linear_atoms_values = all_atoms_values - linear_atoms_values
+
+    comb_atoms_values = [None] * (len(linear_atoms_values) + len(non_linear_atoms_values))
+    comb_atoms_values[::2] = linear_atoms_values
+    comb_atoms_values[1::2] = non_linear_atoms_values
+
+    for field in range(len(linear_atoms_values)):
+        phiseries[0, field] = linear_atoms_values[field]
+
+    ax.pie(comb_atoms_values,
+           labels=["Buried-hydrated", "Buried",
+                   "Surface-hydrated", "Surface"],
+           colors=["white", "salmon",
+                   "white", "skyblue"],
+           autopct=nonzero_autopct)
+    ax.set_title("Linear fit atoms" + r" ($\phi={}\ \leftarrow\ {}$)".format(phivals[1], r"\infty"))
+
+    fig.savefig(buried_surface_movieformat.format("{:05d}".format(1)))
+
+    # Plot over phi-ensemble
+    # ----------------------
+
+    prev_indices = np.array([])
+
+    for phiidx in tqdm(range(2, len(phivals))):
+        phi_range = (phivals[phiidx], phivals[phiidx - 1])
+
+        union_indices = np.concatenate((prev_indices, hyd_indices[phi_range].flatten())).astype(int)
+
+        wet_atoms_values = buried_surface_valueslist(union_indices, protein_heavy, buried_indicator)
+        non_linear_wet_atoms_values = all_atoms_values - linear_atoms_values - wet_atoms_values
+
+        comb_atoms_values = [None] * (len(linear_atoms_values) + len(wet_atoms_values) + len(non_linear_wet_atoms_values))
+        comb_atoms_values[::3] = linear_atoms_values
+        comb_atoms_values[1::3] = wet_atoms_values
+        comb_atoms_values[2::3] = non_linear_wet_atoms_values
+
+        for field in range(len(wet_atoms_values)):
+            phiseries[phiidx - 1, field] = phiseries[0, field] + wet_atoms_values[field]
+
+        fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+        ax.pie(comb_atoms_values,
+               labels=["", "", "Buried",
+                       "", "", "Surface"],
+               colors=["white", "red", "salmon",
+                       "white", "dodgerblue", "skyblue"],
+               autopct=nonzero_autopct,
+               wedgeprops={'linewidth': 3})
+
+        ax.set_title(r"$\phi$={:.2f} $\leftarrow {:.2f}$".format(phi_range[0], phivals[1]))
+
+        y_minor_locator = AutoMinorLocator(5)
+        ax.yaxis.set_minor_locator(y_minor_locator)
+        ax.grid(which='major', linestyle='--')
+        ax.grid(which='minor', linestyle=':')
+
+        fig.savefig(buried_surface_movieformat.format("{:05d}".format(phiidx)))
+
+        plt.close('all')
+
+        prev_indices = union_indices
 
     ############################################################################
     # Generate plot and movie frames for restype
@@ -197,6 +284,9 @@ def hydrated_atom_chars(protname,
     ############################################################################
     # Stitch movie frames into movie
     ############################################################################
+
+    os.system("ffmpeg -r 5 -i {} -vcodec mpeg4 -y -vb 40M {}".format(
+              buried_surface_movieformat.format("%05d"), buried_surface_movieformat.split(".")[0] + ".mp4"))
 
 
 if __name__ == "__main__":
