@@ -132,13 +132,16 @@ def hydrated_atom_chars(protname,
                         buried_npyfile, buried_surface_imgfile, buried_surface_movieformat,
                         restype_imgfile, restype_movieformat,
                         kr_pklfile, ff, atomtype_imgfile, atomtype_movieformat,
-                        stride_pklclass, ssclass_imgfile, ssclass_movieformat):
-                        # ssgroup_imgfile, ssgroup_imgformat):
+                        stride_pklfile, ssclass_imgfile, ssclass_movieformat,
+                        stride_group_pklfile, ssgroup_imgfile):
+
     print("Already generated the images?")
     print("Here are the bash commands to stitch them into movies:")
-    for movieformat in [buried_surface_movieformat, restype_movieformat, atomtype_movieformat]:
+    for movieformat in [buried_surface_movieformat, restype_movieformat, atomtype_movieformat,
+                        ssclass_movieformat]:
         print("ffmpeg -r 5 -i {} -vcodec mpeg4 -y -vb 40M {}".format(
               movieformat.format("%05d"), movieformat.split(".")[0] + ".mp4"))
+
     ############################################################################
     # Load data
     ############################################################################
@@ -169,7 +172,6 @@ def hydrated_atom_chars(protname,
     # Buried/surface
     #
     ############################################################################
-
     # phi-series
     phiseries = np.zeros((len(phivals) - 1, 2))
 
@@ -252,11 +254,6 @@ def hydrated_atom_chars(protname,
                wedgeprops={'linewidth': 3})
 
         ax.set_title(r"$\phi$={:.2f} $\leftarrow {:.2f}$".format(phi_range[0], phivals[1]))
-
-        y_minor_locator = AutoMinorLocator(5)
-        ax.yaxis.set_minor_locator(y_minor_locator)
-        ax.grid(which='major', linestyle='--')
-        ax.grid(which='minor', linestyle=':')
 
         fig.savefig(buried_surface_movieformat.format("{:05d}".format(phiidx)))
 
@@ -352,11 +349,6 @@ def hydrated_atom_chars(protname,
                wedgeprops={'linewidth': 3})
 
         ax.set_title(r"$\phi$={:.2f} $\leftarrow {:.2f}$".format(phi_range[0], phivals[1]))
-
-        y_minor_locator = AutoMinorLocator(5)
-        ax.yaxis.set_minor_locator(y_minor_locator)
-        ax.grid(which='major', linestyle='--')
-        ax.grid(which='minor', linestyle=':')
 
         fig.savefig(restype_movieformat.format("{:05d}".format(phiidx)))
 
@@ -454,11 +446,6 @@ def hydrated_atom_chars(protname,
 
         ax.set_title(r"$\phi$={:.2f} $\leftarrow {:.2f}$".format(phi_range[0], phivals[1]))
 
-        y_minor_locator = AutoMinorLocator(5)
-        ax.yaxis.set_minor_locator(y_minor_locator)
-        ax.grid(which='major', linestyle='--')
-        ax.grid(which='minor', linestyle=':')
-
         fig.savefig(atomtype_movieformat.format("{:05d}".format(phiidx)))
 
         plt.close('all')
@@ -469,6 +456,117 @@ def hydrated_atom_chars(protname,
     # Generate plot and movie frames for ssclass
     ############################################################################
 
+    struct_class = ["AlphaHelix", "310Helix", "PiHelix", "BetaStrand", "Turn", "Bridge", "Coil"]
+
+    # phi-series
+    phiseries = np.zeros((len(phivals) - 1, len(struct_class)))
+
+    with open(stride_pklfile, 'rb') as stride_dict_file:
+        stride_dict = pickle.load(stride_dict_file)
+
+    # Plot overall surface composition
+    # --------------------------------
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    all_indices = np.array(tuple(list(range(len(protein_heavy.atoms)))))
+    values = sec_struct_class_valueslist(all_indices, protein_heavy, stride_dict)
+
+    ax.pie(values,
+           labels=["AlphaHelix", "310Helix", "PiHelix", "BetaStrand", "Turn", "Bridge", "Coil"],
+           colors=["limegreen", "skyblue", "yellow", "salmon", "yellowgreen", "darkturquoise", "plum"],
+           autopct=nonzero_autopct)
+    ax.set_title("{} composition".format(protname))
+
+    fig.savefig(ssclass_movieformat.format("{:05d}".format(0)))
+
+    # Plot linear atoms
+    # -----------------
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    all_atoms_values = sec_struct_class_valueslist(all_indices, protein_heavy, stride_dict)
+    linear_atoms_values = sec_struct_class_valueslist(hyd_indices[(phivals[1], phivals[0])].flatten(), protein_heavy,
+                                                      stride_dict)
+
+    non_linear_atoms_values = all_atoms_values - linear_atoms_values
+
+    comb_atoms_values = [None] * (len(linear_atoms_values) + len(non_linear_atoms_values))
+    comb_atoms_values[::2] = linear_atoms_values
+    comb_atoms_values[1::2] = non_linear_atoms_values
+
+    for field in range(len(linear_atoms_values)):
+        phiseries[0, field] = linear_atoms_values[field]
+
+    ax.pie(comb_atoms_values,
+           labels=["", "AlphaHelix",
+                   "", "310Helix",
+                   "", "PiHelix",
+                   "", "BetaStrand",
+                   "", "Turn",
+                   "", "Bridge",
+                   "", "Coil"],
+           colors=["white", "limegreen",
+                   "white", "skyblue",
+                   "white", "yellow",
+                   "white", "salmon",
+                   "white", "yellowgreen",
+                   "white", "darkturquoise",
+                   "white", "plum"],
+           autopct=nonzero_autopct)
+    ax.set_title("Linear fit atoms" + r" ($\phi={}\ \leftarrow\ {}$)".format(phivals[1], r"\infty"))
+
+    fig.savefig(ssclass_movieformat.format("{:05d}".format(1)))
+
+    # Plot over phi-ensemble
+    # ----------------------
+
+    prev_indices = np.array([])
+
+    for phiidx in tqdm(range(2, len(phivals))):
+        phi_range = (phivals[phiidx], phivals[phiidx - 1])
+
+        union_indices = np.concatenate((prev_indices, hyd_indices[phi_range].flatten())).astype(int)
+
+        wet_atoms_values = sec_struct_class_valueslist(union_indices, protein_heavy, stride_dict)
+        non_linear_wet_atoms_values = all_atoms_values - linear_atoms_values - wet_atoms_values
+
+        comb_atoms_values = [None] * (len(linear_atoms_values) + len(wet_atoms_values) + len(non_linear_wet_atoms_values))
+        comb_atoms_values[::3] = linear_atoms_values
+        comb_atoms_values[1::3] = wet_atoms_values
+        comb_atoms_values[2::3] = non_linear_wet_atoms_values
+
+        for field in range(len(wet_atoms_values)):
+            phiseries[phiidx - 1, field] = phiseries[0, field] + wet_atoms_values[field]
+
+        fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+        ax.pie(comb_atoms_values,
+               labels=["", "", "AlphaHelix",
+                       "", "", "310Helix",
+                       "", "", "PiHelix",
+                       "", "", "BetaStrand",
+                       "", "", "Turn",
+                       "", "", "Bridge",
+                       "", "", "Coil"],
+               colors=["white", "green", "limegreen",
+                       "white", "dodgerblue", "skyblue",
+                       "white", "goldenrod", "yellow",
+                       "white", "red", "salmon",
+                       "white", "olivedrab", "yellowgreen",
+                       "white", "cadetblue", "darkturquoise",
+                       "white", "darkorchid", "plum"],
+               autopct=nonzero_autopct,
+               wedgeprops={'linewidth': 3})
+
+        ax.set_title(r"$\phi$={:.2f} $\leftarrow {:.2f}$".format(phi_range[0], phivals[1]))
+
+        fig.savefig(ssclass_movieformat.format("{:05d}".format(phiidx)))
+
+        plt.close('all')
+
+        prev_indices = union_indices
+
     ############################################################################
     # Generate plot and movie frames for ssgroup
     ############################################################################
@@ -477,7 +575,8 @@ def hydrated_atom_chars(protname,
     # Stitch movie frames into movie
     ############################################################################
 
-    for movieformat in [buried_surface_movieformat, restype_movieformat, atomtype_movieformat]:
+    for movieformat in [buried_surface_movieformat, restype_movieformat, atomtype_movieformat,
+                        ssclass_movieformat]:
         os.system("ffmpeg -r 5 -i {} -vcodec mpeg4 -y -vb 40M {}".format(
                   movieformat.format("%05d"), movieformat.split(".")[0] + ".mp4"))
 
@@ -513,6 +612,10 @@ if __name__ == "__main__":
     ssclassargs.add_argument("-ssclass_imgfile", help="output file for secondary structure types plot")
     ssclassargs.add_argument("-ssclass_movieformat", help="output format for secondary structure types movie frames, with {} placeholder for frame index")
 
+    ssgroupargs = parser.add_argument_group('Arguments for residue secondary structure groups classification')
+    ssgroupargs.add_argument("-stride_group_pklfile",
+                             help="file to read STRIDE group (modified from STRIDE) classification of each residue from (.pkl)")
+    ssgroupargs.add_argument("-ssgroup_imgfile", help="output file for secondary structure groups plot")
     a = parser.parse_args()
 
     hydrated_atom_chars(a.protname,
@@ -522,5 +625,5 @@ if __name__ == "__main__":
                         a.buried_npyfile, a.buried_surface_imgfile, a.buried_surface_movieformat,
                         a.restype_imgfile, a.restype_movieformat,
                         a.kr_pklfile, a.ff, a.atomtype_imgfile, a.atomtype_movieformat,
-                        a.ssclass_imgfile, a.ssclass_movieformat)
-                        #a.ssgroup_imgfile, a.ssgroup_imgformat)
+                        a.stride_pklfile, a.ssclass_imgfile, a.ssclass_movieformat,
+                        a.stride_group_pklfile, a.ssgroup_imgfile)
