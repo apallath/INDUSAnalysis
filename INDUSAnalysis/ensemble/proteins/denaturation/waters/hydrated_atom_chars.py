@@ -9,14 +9,14 @@ C) Hydration of atoms belonging to different secondary structure groups
 """
 import argparse
 import os
+from os.path import expanduser
 import pickle
-import warnings
+
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from tqdm import tqdm
-
 import MDAnalysis as mda
 
 # Use text-only Matplotlib backend
@@ -130,13 +130,13 @@ def hydrated_atom_chars(protname,
                         structfile,
                         phi_bins,
                         buried_npyfile, buried_surface_imgfile, buried_surface_movieformat,
-                        restype_imgfile, restype_movieformat):
-                        # kr_pklfile, ff, atomtype_imgfile, atomtype_movieformat,
-                        # ssclass_imgfile, ssclass_movieformat,
+                        restype_imgfile, restype_movieformat,
+                        kr_pklfile, ff, atomtype_imgfile, atomtype_movieformat,
+                        stride_pklclass, ssclass_imgfile, ssclass_movieformat):
                         # ssgroup_imgfile, ssgroup_imgformat):
     print("Already generated the images?")
     print("Here are the bash commands to stitch them into movies:")
-    for movieformat in [buried_surface_movieformat, restype_movieformat]:
+    for movieformat in [buried_surface_movieformat, restype_movieformat, atomtype_movieformat]:
         print("ffmpeg -r 5 -i {} -vcodec mpeg4 -y -vb 40M {}".format(
               movieformat.format("%05d"), movieformat.split(".")[0] + ".mp4"))
     ############################################################################
@@ -170,7 +170,6 @@ def hydrated_atom_chars(protname,
     #
     ############################################################################
 
-    r"""
     # phi-series
     phiseries = np.zeros((len(phivals) - 1, 2))
 
@@ -264,11 +263,10 @@ def hydrated_atom_chars(protname,
         plt.close('all')
 
         prev_indices = union_indices
-    """
 
     ############################################################################
     #
-    # Restype
+    # Residue type: charged/hydrophobic/hydrophilic
     #
     ############################################################################
 
@@ -299,7 +297,6 @@ def hydrated_atom_chars(protname,
     all_atoms_values = charged_hydrophobic_hydrophilic_residues_valueslist(all_indices, protein_heavy)
     linear_atoms_values = charged_hydrophobic_hydrophilic_residues_valueslist(hyd_indices[(phivals[1], phivals[0])].flatten(),
                                                                               protein_heavy)
-
     non_linear_atoms_values = all_atoms_values - linear_atoms_values
 
     comb_atoms_values = [None] * (len(linear_atoms_values) + len(non_linear_atoms_values))
@@ -368,12 +365,105 @@ def hydrated_atom_chars(protname,
         prev_indices = union_indices
 
     ############################################################################
-    # Generate plot and movie frames for atomtype
+    #
+    # Atom type: hydrophobic/hydrophilic
+    #
     ############################################################################
 
+    # phi-series
+    phiseries = np.zeros((len(phivals) - 1, 2))
+
     # kapcha rossky scale dictionary
-    # with open(kr_pklfile, 'rb') as kr_dict_file:
-    #     kr_scale = pickle.load(kr_dict_file)
+    with open(kr_pklfile, 'rb') as kr_dict_file:
+        kr_scale = pickle.load(kr_dict_file)
+
+    # Plot overall surface composition
+    # --------------------------------
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    all_indices = np.array(tuple(list(range(len(protein_heavy.atoms)))))
+    values = polar_nonpolar_atoms_valueslist(all_indices, protein_heavy, kr_scale, ff)
+
+    ax.pie(values,
+           labels=["Polar", "Nonpolar"],
+           colors=["skyblue", "salmon"],
+           autopct=nonzero_autopct)
+    ax.set_title("{} composition".format(protname))
+
+    fig.savefig(atomtype_movieformat.format("{:05d}".format(0)))
+
+    # Plot linear atoms
+    # -----------------
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    all_atoms_values = polar_nonpolar_atoms_valueslist(all_indices, protein_heavy, kr_scale, ff)
+    linear_atoms_values = polar_nonpolar_atoms_valueslist(hyd_indices[(phivals[1], phivals[0])].flatten(), protein_heavy,
+                                                          kr_scale, ff)
+
+    non_linear_atoms_values = all_atoms_values - linear_atoms_values
+
+    comb_atoms_values = [None] * (len(linear_atoms_values) + len(non_linear_atoms_values))
+    comb_atoms_values[::2] = linear_atoms_values
+    comb_atoms_values[1::2] = non_linear_atoms_values
+
+    for field in range(len(linear_atoms_values)):
+        phiseries[0, field] = linear_atoms_values[field]
+
+    ax.pie(comb_atoms_values,
+           labels=["Polar-hydrated", "Polar",
+                   "Nonpolar-hydrated", "Nonpolar"],
+           colors=["white", "skyblue",
+                   "white", "salmon"],
+           autopct=nonzero_autopct)
+    ax.set_title("Linear fit atoms" + r" ($\phi={}\ \leftarrow\ {}$)".format(phivals[1], r"\infty"))
+
+    fig.savefig(atomtype_movieformat.format("{:05d}".format(1)))
+
+    # Plot over phi-ensemble
+    # ----------------------
+
+    prev_indices = np.array([])
+
+    for phiidx in tqdm(range(2, len(phivals))):
+        phi_range = (phivals[phiidx], phivals[phiidx - 1])
+
+        union_indices = np.concatenate((prev_indices, hyd_indices[phi_range].flatten())).astype(int)
+
+        wet_atoms_values = polar_nonpolar_atoms_valueslist(union_indices, protein_heavy, kr_scale, ff)
+        non_linear_wet_atoms_values = all_atoms_values - linear_atoms_values - wet_atoms_values
+
+        comb_atoms_values = [None] * (len(linear_atoms_values) + len(wet_atoms_values) + len(non_linear_wet_atoms_values))
+        comb_atoms_values[::3] = linear_atoms_values
+        comb_atoms_values[1::3] = wet_atoms_values
+        comb_atoms_values[2::3] = non_linear_wet_atoms_values
+
+        for field in range(len(wet_atoms_values)):
+            phiseries[phiidx - 1, field] = phiseries[0, field] + wet_atoms_values[field]
+
+        fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+        ax.pie(comb_atoms_values,
+               labels=["", "", "Polar",
+                       "", "", "Nonpolar"],
+               colors=["white", "dodgerblue", "skyblue",
+                       "white", "red", "salmon"],
+               autopct=nonzero_autopct,
+               wedgeprops={'linewidth': 3})
+
+        ax.set_title(r"$\phi$={:.2f} $\leftarrow {:.2f}$".format(phi_range[0], phivals[1]))
+
+        y_minor_locator = AutoMinorLocator(5)
+        ax.yaxis.set_minor_locator(y_minor_locator)
+        ax.grid(which='major', linestyle='--')
+        ax.grid(which='minor', linestyle=':')
+
+        fig.savefig(atomtype_movieformat.format("{:05d}".format(phiidx)))
+
+        plt.close('all')
+
+        prev_indices = union_indices
 
     ############################################################################
     # Generate plot and movie frames for ssclass
@@ -387,7 +477,7 @@ def hydrated_atom_chars(protname,
     # Stitch movie frames into movie
     ############################################################################
 
-    for movieformat in [buried_surface_movieformat, restype_movieformat]:
+    for movieformat in [buried_surface_movieformat, restype_movieformat, atomtype_movieformat]:
         os.system("ffmpeg -r 5 -i {} -vcodec mpeg4 -y -vb 40M {}".format(
                   movieformat.format("%05d"), movieformat.split(".")[0] + ".mp4"))
 
@@ -409,13 +499,19 @@ if __name__ == "__main__":
     restypeargs.add_argument("-restype_imgfile", help="output file for residue types plot")
     restypeargs.add_argument("-restype_movieformat", help="output format for residue types movie frames, with {} placeholder for frame index")
 
-    #atomtypeargs = parser.add_argument_group('Arguments for atom type (polar/nonpolar) classification')
-    #atomtypeargs.add_argument("-kr_pklfile", default="~/analysis_scripts/data/kapcha_rossky_amber99sb/kapcha_rossky_scale.pkl",
-    #                          help="file to read Kapcha-Rossky dictionary from (.pkl) [default=load from INDUSAnalysis default install location]")
-    #atomtypeargs.add_argument("-ff", default="amber99sb",
-    #                          help="force field (for Kapcha-Rossky FF-specific atom type corrections)")
-    #atomtypeargs.add_argument("-atomtype_imgfile", help="output file for atom types plot")
-    #atomtypeargs.add_argument("-atomtype_movieformat", help="output format for atom types movie frames, with {} placeholder for frame index")
+    atomtypeargs = parser.add_argument_group('Arguments for atom type (polar/nonpolar) classification')
+    atomtypeargs.add_argument("-kr_pklfile", default=expanduser("~") + "/analysis_scripts/data/kapcha_rossky_amber99sb/kapcha_rossky_scale.pkl",
+                              help="file to read Kapcha-Rossky dictionary from (.pkl) [default=load from INDUSAnalysis default install location]")
+    atomtypeargs.add_argument("-ff", default="amber99sb",
+                              help="force field (for Kapcha-Rossky FF-specific atom type corrections)")
+    atomtypeargs.add_argument("-atomtype_imgfile", help="output file for atom types plot")
+    atomtypeargs.add_argument("-atomtype_movieformat", help="output format for atom types movie frames, with {} placeholder for frame index")
+
+    ssclassargs = parser.add_argument_group('Arguments for residue secondary structure type classification')
+    ssclassargs.add_argument("-stride_pklfile",
+                             help="file to read STRIDE classification of each residue from (.pkl)")
+    ssclassargs.add_argument("-ssclass_imgfile", help="output file for secondary structure types plot")
+    ssclassargs.add_argument("-ssclass_movieformat", help="output format for secondary structure types movie frames, with {} placeholder for frame index")
 
     a = parser.parse_args()
 
@@ -424,7 +520,7 @@ if __name__ == "__main__":
                         a.structfile,
                         a.phi_bins,
                         a.buried_npyfile, a.buried_surface_imgfile, a.buried_surface_movieformat,
-                        a.restype_imgfile, a.restype_movieformat)
-                        #a.atomtype_imgfile, a.atomtype_movieformat,
-                        #a.ssclass_imgfile, a.ssclass_movieformat,
+                        a.restype_imgfile, a.restype_movieformat,
+                        a.kr_pklfile, a.ff, a.atomtype_imgfile, a.atomtype_movieformat,
+                        a.ssclass_imgfile, a.ssclass_movieformat)
                         #a.ssgroup_imgfile, a.ssgroup_imgformat)
