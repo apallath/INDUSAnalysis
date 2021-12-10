@@ -133,7 +133,7 @@ def hydrated_atom_chars(protname,
                         restype_imgfile, restype_movieformat,
                         kr_pklfile, ff, atomtype_imgfile, atomtype_movieformat,
                         stride_pklfile, ssclass_imgfile, ssclass_movieformat,
-                        stride_group_pklfile, ssgroup_imgfile):
+                        all_groups_txtfile, stride_group_pklfile, ssgroup_imgfile):
 
     print("Already generated the images?")
     print("Here are the bash commands to stitch them into movies:")
@@ -172,6 +172,7 @@ def hydrated_atom_chars(protname,
     # Buried/surface
     #
     ############################################################################
+
     # phi-series
     phiseries = np.zeros((len(phivals) - 1, 2))
 
@@ -674,11 +675,77 @@ def hydrated_atom_chars(protname,
     plt.close()
 
     ############################################################################
+    #
     # Secondary structure groups [phi-series plot only]
+    #
     ############################################################################
 
+    groups = []
+
+    # Get all groups
+    with open(all_groups_txtfile, "r") as f:
+        for line in f:
+            if len(line.strip().split()) > 0:
+                groups.append(line.strip())
+
+    num_colors = len(groups)
+    cm = plt.get_cmap('gist_rainbow')
+    matplotlib.rcParams['axes.prop_cycle'] = matplotlib.cycler(color=[cm(1. * i / num_colors) for i in range(num_colors)])
+
+    # phi-series
+    phiseries = np.zeros((len(phivals) - 1, len(groups)))
+
+    with open(stride_group_pklfile, 'rb') as stride_group_dict_file:
+        stride_group_dict = pickle.load(stride_group_dict_file)
+
+    linear_atoms_values = sec_struct_group_valueslist(hyd_indices[(phivals[1], phivals[0])].flatten(), protein_heavy,
+                                                      groups, stride_group_dict)
+
+    for field in range(len(linear_atoms_values)):
+        phiseries[0, field] = linear_atoms_values[field]
+
+    prev_indices = np.array([])
+
+    for phiidx in tqdm(range(2, len(phivals))):
+        phi_range = (phivals[phiidx], phivals[phiidx - 1])
+
+        union_indices = np.concatenate((prev_indices, hyd_indices[phi_range].flatten())).astype(int)
+
+        wet_atoms_values = sec_struct_group_valueslist(union_indices, protein_heavy, groups, stride_group_dict)
+
+        for field in range(len(wet_atoms_values)):
+            phiseries[phiidx - 1, field] = phiseries[0, field] + wet_atoms_values[field]
+
+        fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+        prev_indices = union_indices
+
+    # Plot phi-series
+    fields = groups
+    ylabel = r"No. of wetted atoms"
+    title = "Secondary structure group"
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    for field in range(len(fields)):
+        half_idx = np.abs(phiseries[:, field] - phiseries[-1, field] / 2).argmin()
+        ax.scatter(phivals[half_idx + 1], phiseries[half_idx, field], color="C{}".format(field))
+        ax.plot(phivals[1:], phiseries[:, field], label=fields[field] + r" $\phi_{{1/2}} = {:.2f}$".format(phivals[half_idx + 1]))
+
+        ax.set_xlabel(r"$\phi$ (kJ/mol)")
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.legend(loc='upper right')
+
+    # Save
+    fig.savefig(ssgroup_imgfile)
+
+    plt.close()
+
     ############################################################################
+    #
     # Stitch movie frames into movie
+    #
     ############################################################################
 
     for movieformat in [buried_surface_movieformat, restype_movieformat, atomtype_movieformat,
@@ -719,6 +786,8 @@ if __name__ == "__main__":
     ssclassargs.add_argument("-ssclass_movieformat", help="output format for secondary structure types movie frames, with {} placeholder for frame index")
 
     ssgroupargs = parser.add_argument_group('Arguments for residue secondary structure groups classification')
+    ssgroupargs.add_argument("-all_groups_txtfile",
+                             help="text file to read all STRIDE groups from (.txt)")
     ssgroupargs.add_argument("-stride_group_pklfile",
                              help="file to read STRIDE group (modified from STRIDE) classification of each residue from (.pkl)")
     ssgroupargs.add_argument("-ssgroup_imgfile", help="output file for secondary structure groups plot")
@@ -732,4 +801,4 @@ if __name__ == "__main__":
                         a.restype_imgfile, a.restype_movieformat,
                         a.kr_pklfile, a.ff, a.atomtype_imgfile, a.atomtype_movieformat,
                         a.stride_pklfile, a.ssclass_imgfile, a.ssclass_movieformat,
-                        a.stride_group_pklfile, a.ssgroup_imgfile)
+                        a.all_groups_txtfile, a.stride_group_pklfile, a.ssgroup_imgfile)
