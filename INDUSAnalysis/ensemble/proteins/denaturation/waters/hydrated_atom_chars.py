@@ -194,6 +194,8 @@ def hydrated_atom_chars(protname,
 
     fig.savefig(buried_surface_movieformat.format("{:05d}".format(0)))
 
+    plt.close()
+
     # Plot linear atoms
     # -----------------
 
@@ -221,6 +223,8 @@ def hydrated_atom_chars(protname,
     ax.set_title("Linear fit atoms" + r" ($\phi={}\ \leftarrow\ {}$)".format(phivals[1], r"\infty"))
 
     fig.savefig(buried_surface_movieformat.format("{:05d}".format(1)))
+
+    plt.close()
 
     # Plot over phi-ensemble
     # ----------------------
@@ -257,9 +261,31 @@ def hydrated_atom_chars(protname,
 
         fig.savefig(buried_surface_movieformat.format("{:05d}".format(phiidx)))
 
-        plt.close('all')
+        plt.close()
 
         prev_indices = union_indices
+
+    # Plot phi-series
+    fields = ["Buried", "Surface"]
+    ylabel = r"No. of wetted atoms"
+    title = "Atom location (buried/surface)"
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    for field in range(len(fields)):
+        half_idx = np.abs(phiseries[:, field] - phiseries[-1, field] / 2).argmin()
+        ax.scatter(phivals[half_idx + 1], phiseries[half_idx, field], color="C{}".format(field))
+        ax.plot(phivals[1:], phiseries[:, field], label=fields[field] + r" $\phi_{{1/2}} = {:.2f}$".format(phivals[half_idx + 1]))
+
+        ax.set_xlabel(r"$\phi$ (kJ/mol)")
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.legend(loc='upper right')
+
+    # Save
+    fig.savefig(buried_surface_imgfile)
+
+    plt.close()
 
     ############################################################################
     #
@@ -285,6 +311,8 @@ def hydrated_atom_chars(protname,
     ax.set_title("{} composition".format(protname))
 
     fig.savefig(restype_movieformat.format("{:05d}".format(0)))
+
+    plt.close()
 
     # Plot linear atoms
     # -----------------
@@ -314,6 +342,8 @@ def hydrated_atom_chars(protname,
     ax.set_title("Linear fit atoms" + r" ($\phi={}\ \leftarrow\ {}$)".format(phivals[1], r"\infty"))
 
     fig.savefig(restype_movieformat.format("{:05d}".format(1)))
+
+    plt.close()
 
     # Plot over phi-ensemble
     # ----------------------
@@ -356,6 +386,28 @@ def hydrated_atom_chars(protname,
 
         prev_indices = union_indices
 
+    # Plot phi-series
+    fields = ["Charged", "Hydrophobic", "Hydrophilic"]
+    ylabel = r"No. of wetted residues"
+    title = "Residue type"
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    for field in range(len(fields)):
+        half_idx = np.abs(phiseries[:, field] - phiseries[-1, field] / 2).argmin()
+        ax.scatter(phivals[half_idx + 1], phiseries[half_idx, field], color="C{}".format(field))
+        ax.plot(phivals[1:], phiseries[:, field], label=fields[field] + r" $\phi_{{1/2}} = {:.2f}$".format(phivals[half_idx + 1]))
+
+        ax.set_xlabel(r"$\phi$ (kJ/mol)")
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.legend(loc='upper right')
+
+    # Save
+    fig.savefig(restype_imgfile)
+
+    plt.close()
+
     ############################################################################
     #
     # Atom type: hydrophobic/hydrophilic
@@ -385,6 +437,8 @@ def hydrated_atom_chars(protname,
 
     fig.savefig(atomtype_movieformat.format("{:05d}".format(0)))
 
+    plt.close()
+
     # Plot linear atoms
     # -----------------
 
@@ -412,6 +466,8 @@ def hydrated_atom_chars(protname,
     ax.set_title("Linear fit atoms" + r" ($\phi={}\ \leftarrow\ {}$)".format(phivals[1], r"\infty"))
 
     fig.savefig(atomtype_movieformat.format("{:05d}".format(1)))
+
+    plt.close()
 
     # Plot over phi-ensemble
     # ----------------------
@@ -452,8 +508,32 @@ def hydrated_atom_chars(protname,
 
         prev_indices = union_indices
 
+    # Plot phi-series
+    fields = ["Polar", "Nonpolar"]
+    ylabel = r"No. of wetted atoms"
+    title = "Atom type"
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    for field in range(len(fields)):
+        half_idx = np.abs(phiseries[:, field] - phiseries[-1, field] / 2).argmin()
+        ax.scatter(phivals[half_idx + 1], phiseries[half_idx, field], color="C{}".format(field))
+        ax.plot(phivals[1:], phiseries[:, field], label=fields[field] + r" $\phi_{{1/2}} = {:.2f}$".format(phivals[half_idx + 1]))
+
+        ax.set_xlabel(r"$\phi$ (kJ/mol)")
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.legend(loc='upper right')
+
+    # Save
+    fig.savefig(atomtype_imgfile)
+
+    plt.close()
+
     ############################################################################
-    # Generate plot and movie frames for ssclass
+    #
+    # Secondary structure class
+    #
     ############################################################################
 
     struct_class = ["AlphaHelix", "310Helix", "PiHelix", "BetaStrand", "Turn", "Bridge", "Coil"]
@@ -479,6 +559,8 @@ def hydrated_atom_chars(protname,
     ax.set_title("{} composition".format(protname))
 
     fig.savefig(ssclass_movieformat.format("{:05d}".format(0)))
+
+    plt.close()
 
     # Plot linear atoms
     # -----------------
@@ -517,6 +599,8 @@ def hydrated_atom_chars(protname,
     ax.set_title("Linear fit atoms" + r" ($\phi={}\ \leftarrow\ {}$)".format(phivals[1], r"\infty"))
 
     fig.savefig(ssclass_movieformat.format("{:05d}".format(1)))
+
+    plt.close()
 
     # Plot over phi-ensemble
     # ----------------------
@@ -567,8 +651,30 @@ def hydrated_atom_chars(protname,
 
         prev_indices = union_indices
 
+    # Plot phi-series
+    fields = ["AlphaHelix", "310Helix", "PiHelix", "BetaStrand", "Turn", "Bridge", "Coil"]
+    ylabel = r"No. of wetted atoms"
+    title = "Secondary structure type"
+
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=300)
+
+    for field in range(len(fields)):
+        half_idx = np.abs(phiseries[:, field] - phiseries[-1, field] / 2).argmin()
+        ax.scatter(phivals[half_idx + 1], phiseries[half_idx, field], color="C{}".format(field))
+        ax.plot(phivals[1:], phiseries[:, field], label=fields[field] + r" $\phi_{{1/2}} = {:.2f}$".format(phivals[half_idx + 1]))
+
+        ax.set_xlabel(r"$\phi$ (kJ/mol)")
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.legend(loc='upper right')
+
+    # Save
+    fig.savefig(ssclass_imgfile)
+
+    plt.close()
+
     ############################################################################
-    # Generate plot and movie frames for ssgroup
+    # Secondary structure groups [phi-series plot only]
     ############################################################################
 
     ############################################################################
