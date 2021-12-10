@@ -1,19 +1,11 @@
-#Basic requirements
-Cython
-numpy
-scipy
-matplotlib==3.2.2
-
-#Requirements for analyzing MD trajectories
 biopython==1.76
+Cython
+matplotlib==3.2.2
 MDAnalysis==0.20.1
-
-#Other requirements
+numpy
+pillow
 pymbar
-tqdm
-
-#Testing
 pytest
-
-#Docs
+scipy
 sphinxcontrib-napoleon
+tqdm

@@ -7,6 +7,7 @@ A) Hydration with phi, of
 B) Hydration of atoms belonging to different secondary structure classes
 C) Hydration of atoms belonging to different secondary structure groups
 """
+
 import argparse
 import os
 from os.path import expanduser
@@ -15,7 +16,7 @@ import pickle
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoMinorLocator
+
 from tqdm import tqdm
 import MDAnalysis as mda
 
