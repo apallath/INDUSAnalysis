@@ -2,6 +2,7 @@
 Merges images with frame descriptors (as list or linspace) into composite frames,
 and stitches composite frames into a movie with ffmpeg.
 """
+import math
 import argparse
 import os
 
@@ -32,8 +33,13 @@ a = parser.parse_args()
 
 ################################################################################
 # Merge images
-################################################################################\
+################################################################################
 
+print("Already generated composite images?")
+print("Here's the command you need to call to stitch them into a movie.")
+print("ffmpeg -r {rate} -i {informat} -vcodec mpeg4 -y -q:v 1 -vb 40M {out}".format(rate=a.rate,
+                                                                                    informat=a.compositeformat.format(r"%05d"),
+                                                                                    out=a.o))
 # Checks
 assert(a.shape[0] * a.shape[1] == len(a.imgformats))
 assert(len(a.imgformats) == len(a.imglabels))
@@ -61,31 +67,32 @@ for i, label in enumerate(framelabels):
         font_file = font_manager.findfont(font_prop)
         font = ImageFont.truetype(font_file, 48)
         # draw.text((x, y),"Sample Text",(r,g,b))
-        draw.text((100, 5), a.imglabels[imgidx] + a.framelabels_format.format(label), (0, 0, 0), font=font)
+        draw.text((100, 5), a.imglabels[imgidx] + " " + a.framelabels_format.format(label), (0, 0, 0), font=font)
 
     widths, heights = zip(*(im.size for im in images))
 
     new_width = a.shape[0] * max(widths)
     new_height = a.shape[1] * max(heights)
 
-    x_offset = new_width // 2
-    y_offset = new_height // 2
+    x_offset = new_width // a.shape[0]
+    y_offset = new_height // a.shape[1]
 
     new_image = Image.new('RGB', (new_width, new_height))
 
     # Paste and merge images
-    """
-    new_image.paste(images[0], (0, 0))
-    new_image.paste(images[1], (0, y_offset))
+    for imgidx in range(len(images)):
+        xloc = math.floor(imgidx / a.shape[0])
+        yloc = imgidx % a.shape[0]
+        # print("{} {}".format(xloc, yloc))
 
-    new_image.paste(images[2], (x_offset, 0))
-    new_image.paste(images[3], (x_offset, y_offset))
+        new_image.paste(images[imgidx], (xloc * x_offset, yloc * y_offset))
 
-    new_image.save(out_image_format.format(i + 1))
-    """
+    new_image.save(a.compositeformat.format("{:05d}".format(i)))
 
 ################################################################################
 # Make movie
 ################################################################################
 
-# os.system("ffmpeg -r 5 -i {}_compile_%05d.jpg -vcodec mpeg4 -y -q:v 1 -vb 40M 00_{}_tpfp.mp4".format(TYPE, TYPE))
+os.system("ffmpeg -r {rate} -i {informat} -vcodec mpeg4 -y -q:v 1 -vb 40M {out}".format(rate=a.rate,
+                                                                                        informat=a.compositeformat.format(r"%05d"),
+                                                                                        out=a.o))
