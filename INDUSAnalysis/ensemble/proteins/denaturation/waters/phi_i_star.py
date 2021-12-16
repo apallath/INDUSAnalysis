@@ -130,7 +130,7 @@ def phi_i_star(phivals: list,
 
             ax[1].plot(x_fit_data, -dydx, label="Probe on h. atom " + str(probe), color="C{}".format(ixx))
 
-        except RuntimeError:
+        except Exception:
             print("Couldn't fit probe {}".format(probe))
 
     for i in range(2):
@@ -242,7 +242,7 @@ def phi_i_star(phivals: list,
                 popts.append(popt)
                 perrs.append(perr)
 
-            except RuntimeError:
+            except Exception:
                 chi_sqs.append(np.inf)
                 popts.append([])
                 perrs.append([])

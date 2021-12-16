@@ -146,6 +146,9 @@ def fit_integrated_step_gaussian(xdata, ydata, yerr, p_guess):
     lower_bounds = np.array([-np.inf, -np.inf, min(xdata), -np.inf, 0, -np.inf])
     upper_bounds = np.array([0, 0, max(xdata), 0, np.inf, np.inf])
 
+    print(lower_bounds)
+    print(upper_bounds)
+
     popt, cov = curve_fit(integrated_step_gaussian, xdata, ydata, sigma=yerr,
                           p0=p_guess, absolute_sigma=True, bounds=(lower_bounds, upper_bounds))
 
