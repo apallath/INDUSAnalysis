@@ -9,6 +9,7 @@ import os
 from matplotlib import font_manager
 import numpy as np
 from PIL import Image, ImageFont, ImageDraw
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument("nframes", type=int, help="number of frames to write into movie")
@@ -48,14 +49,15 @@ assert(len(a.imgformats) == len(a.imglabels))
 if a.framelabels_list is not None:
     framelabels = a.framelabels_list
 elif a.framelabels_linspace is not None:
-    framelabels = np.linspace(float(a.framelabels_linspace[0]), float(a.framelabels_linspace[1]), int(a.framelabels_linspace[0]))
+    framelabels = np.linspace(float(a.framelabels_linspace[0]), float(a.framelabels_linspace[1]), int(a.framelabels_linspace[2]))
 else:
     framelabels = a.nframes * [""]
 
 assert(a.nframes == len(framelabels))
 
+
 # Load images and write composite images
-for i, label in enumerate(framelabels):
+for i, label in enumerate(tqdm(framelabels)):
     imgfiles = [imgformat.format(i + a.start) for imgformat in a.imgformats]
 
     images = [Image.open(x) for x in imgfiles]
@@ -81,8 +83,8 @@ for i, label in enumerate(framelabels):
 
     # Paste and merge images
     for imgidx in range(len(images)):
-        xloc = math.floor(imgidx / a.shape[0])
-        yloc = imgidx % a.shape[0]
+        xloc = math.floor(imgidx % a.shape[0])
+        yloc = imgidx // a.shape[0]
         # print("{} {}".format(xloc, yloc))
 
         new_image.paste(images[imgidx], (xloc * x_offset, yloc * y_offset))
