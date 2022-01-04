@@ -40,10 +40,24 @@ extNames = scandir("INDUSAnalysis")
 # and build up the set of Extension objects
 extensions = [makeExtension(name) for name in extNames]
 
+# load version information
+with open("INDUSAnalysis/_version.py", "r") as vh:
+    version_def = vh.read()
+    version = version_def.split('=')[1].strip()[1:-1]
+
+# load long description
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 # finally, we can pass all this to distutils
 setup(
     name="INDUSAnalysis",
-    version='0.2a0',
+    version=version,
+    author='Akash Pallath',
+    author_email='apallath@seas.upenn.edu',
+    description='Package to analyse simulation data generated using INDUS.',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=["INDUSAnalysis",
               "INDUSAnalysis.lib",
               "INDUSAnalysis.ensemble",
