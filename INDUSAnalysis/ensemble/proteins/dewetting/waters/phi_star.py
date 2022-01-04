@@ -1,6 +1,8 @@
 """
 Plots Nv v/s phi and phi* for dewetting simulation.
 """
+# TODO: Bootstrapping for error estimation in case of a single run.
+
 import argparse
 
 import matplotlib.pyplot as plt
@@ -17,9 +19,6 @@ def phi_star(phivals: list,
              calc_dir: str = "./",
              Ntw_format: str = "",
              imgfile: str = "phi_star.png",
-             D_by_A_guess=5,
-             E_guess=0.05,
-             P0=1,
              phi_star_method="absolute"):
 
     nruns = len(runs)
@@ -106,11 +105,8 @@ if __name__ == "__main__":
     parser.add_argument("-calc_dir", help="directory containing hydration OPs extracted by INDUSAnalysis")
     parser.add_argument("-Ntw_format", help="format of .pkl file containing Ntw, with {phi} placeholders for phi value and {run} placeholders for run value. Missing placeholders are ignored.")
     parser.add_argument("-imgfile", help="output image (default=phi_star.png)")
-    parser.add_argument("-D_by_A_guess", default=5, help="initial guess for two-state model D/A parameter (default=5)")
-    parser.add_argument("-E_guess", default=0.05, help="initial guess for two-state model E parameter (default=0.05)")
-    parser.add_argument("-P0", type=float, default=1, help="simulation pressure, in bar (default=1)")
     parser.add_argument("-phi_star_method", default="absolute", help="calculate phi* as when waters dip below 1/2 of native (absolute) or below midpoint of native and last dewetted simulation (relative)")
 
     a = parser.parse_args()
 
-    phi_star(a.phi, a.runs, a.start, a.calc_dir, a.Ntw_format, a.imgfile, a.D_by_A_guess, a.E_guess, a.P0, a.phi_star_method)
+    phi_star(a.phi, a.runs, a.start, a.calc_dir, a.Ntw_format, a.imgfile, a.phi_star_method)
