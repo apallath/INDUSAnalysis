@@ -25,21 +25,37 @@ def phi_star(phivals: list,
 
     tsa = TimeSeriesAnalysis()
 
-    meanwaters = np.zeros((len(phivals), nruns))
-    varwaters = np.zeros((len(phivals), nruns))
+    if nruns > 1:
+        meanwaters = np.zeros((len(phivals), nruns))
 
-    for phi_idx, phi in enumerate(phivals):
-        for run_idx, run in enumerate(runs):
-            ts = tsa.load_TimeSeries(calc_dir + Ntw_format.format(phi=phi, run=run))
-            meanw = ts[start_time:].mean(axis=0)
-            stdw = ts[start_time:].std(axis=0)
-            varw = stdw ** 2
+        for phi_idx, phi in enumerate(phivals):
+            for run_idx, run in enumerate(runs):
+                ts = tsa.load_TimeSeries(calc_dir + Ntw_format.format(phi=phi, run=run))
+                meanw = ts[start_time:].mean(axis=0)
+                meanwaters[phi_idx, run_idx] = meanw
 
-            meanwaters[phi_idx, run_idx] = meanw
-            varwaters[phi_idx, run_idx] = varw
+        # mean of mean
+        mean_meanwaters = np.mean(meanwaters, axis=1)
+        # standard error of mean
+        std_meanwaters = np.std(meanwaters, axis=1)
 
-    mean_meanwaters = np.mean(meanwaters, axis=1)
-    std_meanwaters = np.std(meanwaters, axis=1)
+    elif nruns == 1:
+        mean_meanwaters = np.zeros(len(phivals))
+        std_meanwaters = np.zeros(len(phivals))
+
+        for phi_idx, phi in enumerate(phivals):
+            ts = tsa.load_TimeSeries(calc_dir + Ntw_format.format(phi=phi))
+
+            # mean
+            mean_meanwaters[phi_idx] = ts[start_time:].mean()
+            # standard error of mean = std of mean through bootstrapping
+            std_meanwaters[phi_idx] = ts[start_time:].standard_error()
+
+            # print
+            print(phi, mean_meanwaters[phi_idx], std_meanwaters[phi_idx])
+
+    else:
+        raise ValueError("One or more runs are required.")
 
     """Plot waters and phi*"""
     phivals = np.array([float(phi) for phi in phivals])
