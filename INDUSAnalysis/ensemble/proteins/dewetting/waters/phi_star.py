@@ -1,7 +1,6 @@
 """
 Plots Nv v/s phi and phi* for dewetting simulation.
 """
-# TODO: Bootstrapping for error estimation in case of a single run.
 
 import argparse
 
@@ -9,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 from scipy.interpolate import UnivariateSpline
+from tqdm import tqdm
 
 from INDUSAnalysis.timeseries import TimeSeriesAnalysis
 
@@ -43,7 +43,7 @@ def phi_star(phivals: list,
         mean_meanwaters = np.zeros(len(phivals))
         std_meanwaters = np.zeros(len(phivals))
 
-        for phi_idx, phi in enumerate(phivals):
+        for phi_idx, phi in enumerate(tqdm(phivals, desc="Computing standard errors across dataset")):
             ts = tsa.load_TimeSeries(calc_dir + Ntw_format.format(phi=phi))
 
             # mean
@@ -52,7 +52,7 @@ def phi_star(phivals: list,
             std_meanwaters[phi_idx] = ts[start_time:].standard_error()
 
             # print
-            print(phi, mean_meanwaters[phi_idx], std_meanwaters[phi_idx])
+            # print(phi, mean_meanwaters[phi_idx], std_meanwaters[phi_idx])
 
     else:
         raise ValueError("One or more runs are required.")
