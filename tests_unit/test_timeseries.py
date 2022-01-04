@@ -197,10 +197,19 @@ def test_TimeSeries_bootstrap():
     # Compute standard error of the mean with 100 bootstrap samples
     se1 = ts.standard_error()
     print(se1)
+    assert(se1 < 0.10)
 
     # Compute standard error of the mean with 1000 bootstrap samples
     se2 = ts.standard_error(nboot=1000)
     print(se2)
+    assert(se2 < 0.10)
+
+
+def test_TimeSeries_bootstrap_correlated():
+    """Completely correlated test."""
+    x = np.ones(100)
+    assert(timeseries.create1DTimeSeries(x).standard_error(use_pymbar=True) == 0)
+    assert(timeseries.create1DTimeSeries(x).standard_error(use_pymbar=False) == 0)
 
 
 def test_TimeSeriesAnalysis_save_load_TimeSeries():

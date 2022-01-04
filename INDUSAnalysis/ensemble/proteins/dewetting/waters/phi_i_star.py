@@ -25,7 +25,7 @@ from tqdm import tqdm
 
 from INDUSAnalysis.timeseries import create1DTimeSeries, TimeSeriesAnalysis
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "CRITICAL"))
 
 
 def phi_i_star(phivals: list,
@@ -73,8 +73,7 @@ def phi_i_star(phivals: list,
         mean_meanwaters = np.zeros((len(phivals), len(protein_heavy_indices)))
         std_meanwaters = np.zeros((len(phivals), len(protein_heavy_indices)))
 
-        for idx, phi in enumerate(phivals):
-            print(phi)
+        for idx, phi in enumerate(tqdm(phivals, desc="Computing standard errors across dataset")):
             for hidx, h in enumerate(protein_heavy_indices):
                 ts = tsa.load_TimeSeries(calc_dir + ni_format.format(phi=phi))
                 ts = ts[start_time:]
@@ -84,7 +83,7 @@ def phi_i_star(phivals: list,
                 mean_meanwaters[idx, hidx] = run_waters.mean()
 
                 # Calculate sem with bootstrapping
-                std_meanwaters[idx, hidx] = create1DTimeSeries(run_waters).standard_error(nboot=25)
+                std_meanwaters[idx, hidx] = create1DTimeSeries(run_waters).standard_error(nboot=25, use_pymbar=False)
 
     phivals = np.array([float(phi) for phi in phivals])
     order = np.argsort(phivals)

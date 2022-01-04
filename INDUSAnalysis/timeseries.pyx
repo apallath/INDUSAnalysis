@@ -3,6 +3,7 @@ Defines classes for storing and analysing timeseries data.
 """
 import argparse
 import pickle
+import warnings
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -244,8 +245,7 @@ class TimeSeries:
             labels = [x for i, x in enumerate(self._labels) if i != axis]
             return TimeSeries(self._t, std, labels=labels)
 
-    @profiling.timefunc
-    def standard_error(self, estimator=np.mean, nboot=100):
+    def standard_error(self, estimator=np.mean, nboot=100, use_pymbar=True):
         """
         Computes standard error of estimator function using bootstrapping. If no estimator
         is specified, computes standard error of the mean.
@@ -253,17 +253,25 @@ class TimeSeries:
         Args:
             estimator (function): Function that computes estimator of data.
             nboot (int): Number of bootstrap samples to use (default=100).
+            use_pymbar (bool): Use pymbar to calculate statistical inefficiency (default=True).
 
         Raises:
             ValueError if data is not 1-dimensional.
         """
         if self._x.ndim <= 1:
-            # Draw bootstrap sample and compute estimator of each sample
-            estimator_samples = [estimator(bootstrap_independent_sample(self._x)) for i in range(nboot)]
+            try:
+                # Draw bootstrap sample and compute estimator of each sample
+                estimator_samples = [estimator(bootstrap_independent_sample(self._x, use_pymbar=use_pymbar)) for i in range(nboot)]
 
-            # Compute bootstrap estimate of standard error of estimator = standard deviation
-            # of the estimator over its bootstrapped sampling distribution
-            return(np.std(estimator_samples))
+                # Compute bootstrap estimate of standard error of estimator = standard deviation
+                # of the estimator over its bootstrapped sampling distribution
+                return(np.std(estimator_samples))
+
+            except (pymbar.utils.ParameterError, ValueError) as e:
+                # if statistical inefficiency cannot be computed
+                warnings.warn("Bootstrapping failed.")
+                return 0
+
         else:
             raise ValueError("Cannot perform bootstrapping for {} dimensional array".format(self._x.ndim))
 
@@ -353,9 +361,14 @@ def statisticalInefficiency(x, fft=True):
     acf_cross_point = np.argmax(acf < 0) - 1
 
     t = np.array(range(len(x[:acf_cross_point])))
+
     T = len(x)
     tau = np.sum(np.multiply(np.array(1 - t / T), acf[:acf_cross_point]))
+
     g = 1 + 2 * tau
+
+    if np.isnan(g):
+        raise ValueError("Statistical inefficiency is nan.")
 
     return g
 
@@ -368,7 +381,7 @@ def bootstrap_independent_sample(x, g=None, use_pymbar=True):
     Args:
         x (ndarray): 1-dimensional array of length N containing correlated data to draw (uncorrelated) sample from.
         g (float): Statistical inefficiency (default=None).
-        use_pymbar (bool): Use pymbar to calculate statistical inefficiency (default=True)
+        use_pymbar (bool): Use pymbar to calculate statistical inefficiency (default=True).
 
     Returns:
         y (ndarray): 1-dimensional array of length N/g containing random samples drawn from x (with replacement)."""
