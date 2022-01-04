@@ -1,8 +1,11 @@
 """
 Helper function definitions for code profiling
 """
-import time
 from functools import wraps
+import logging
+import time
+
+logger = logging.getLogger(__name__)
 
 
 def skipfunc(func):
@@ -25,7 +28,7 @@ def timefunc(func):
         output = func(*args, **kwargs)
         tend = time.time()
 
-        print("%r %.2f s " % (func.__name__, tend - tstart))
+        logger.debug("%r %.2f s " % (func.__name__, tend - tstart))
 
         return output
     return timedfunc

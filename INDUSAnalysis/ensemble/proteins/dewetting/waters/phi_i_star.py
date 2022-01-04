@@ -7,8 +7,11 @@ Stores calculated phi_i* values.
 
 import argparse
 from functools import partial
-import warnings
+import logging
+import os
 import pickle
+import warnings
+
 
 
 import matplotlib
@@ -20,7 +23,9 @@ import scipy
 from scipy.interpolate import UnivariateSpline
 from tqdm import tqdm
 
-from INDUSAnalysis.timeseries import TimeSeriesAnalysis
+from INDUSAnalysis.timeseries import create1DTimeSeries, TimeSeriesAnalysis
+
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 
 
 def phi_i_star(phivals: list,
@@ -46,26 +51,40 @@ def phi_i_star(phivals: list,
     protein_heavy = u.select_atoms("protein and not name H*")
     protein_heavy_indices = protein_heavy.atoms.indices
 
-    meanwaters = np.zeros((len(phivals), nruns, len(protein_heavy_indices)))
-    varwaters = np.zeros((len(phivals), nruns, len(protein_heavy_indices)))
+    if nruns > 1:
+        meanwaters = np.zeros((len(phivals), nruns, len(protein_heavy_indices)))
 
-    # All phi values
-    for idx, phi in enumerate(phivals):
-        for runidx, run in enumerate(runs):
-            ts = tsa.load_TimeSeries(calc_dir + ni_format.format(phi=phi, run=run))
-            ts = ts[start_time:]
-            run_waters = ts.data_array[:, protein_heavy_indices]
+        for idx, phi in enumerate(phivals):
+            for runidx, run in enumerate(runs):
+                ts = tsa.load_TimeSeries(calc_dir + ni_format.format(phi=phi, run=run))
+                ts = ts[start_time:]
+                run_waters = ts.data_array[:, protein_heavy_indices]
 
-            # Calcuate per-atom mean waters and var waters for each run
-            mean_run_waters = np.mean(run_waters, axis=0)
-            var_run_waters = np.var(run_waters, axis=0)
+                # Calculate per-atom mean waters for each run
+                mean_run_waters = np.mean(run_waters, axis=0)
 
-            # Append per-atom mean and var waters for each run
-            meanwaters[idx, runidx, :] = mean_run_waters
-            varwaters[idx, runidx, :] = var_run_waters
+                # Append per-atom mean waters for each run
+                meanwaters[idx, runidx, :] = mean_run_waters
 
-    mean_meanwaters = np.mean(meanwaters, axis=1)
-    std_meanwaters = np.std(meanwaters, axis=1)
+        mean_meanwaters = np.mean(meanwaters, axis=1)
+        std_meanwaters = np.std(meanwaters, axis=1)
+
+    elif nruns == 1:
+        mean_meanwaters = np.zeros((len(phivals), len(protein_heavy_indices)))
+        std_meanwaters = np.zeros((len(phivals), len(protein_heavy_indices)))
+
+        for idx, phi in enumerate(phivals):
+            print(phi)
+            for hidx, h in enumerate(protein_heavy_indices):
+                ts = tsa.load_TimeSeries(calc_dir + ni_format.format(phi=phi))
+                ts = ts[start_time:]
+                run_waters = ts.data_array[:, h]
+
+                # Calculate mean
+                mean_meanwaters[idx, hidx] = run_waters.mean()
+
+                # Calculate sem with bootstrapping
+                std_meanwaters[idx, hidx] = create1DTimeSeries(run_waters).standard_error(nboot=25)
 
     phivals = np.array([float(phi) for phi in phivals])
     order = np.argsort(phivals)
