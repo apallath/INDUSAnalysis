@@ -262,9 +262,15 @@ class TimeSeries:
             # Sampling distribution
             boot_samples = np.array([bootstrap_independent_sample(self._x) for i in range(nboot)])
 
+            print(boot_samples.shape)
+
+            estimator_samples = estimator(boot_samples, axis=1)
+
+            print(estimator_samples.shape)
+
             # Bootstrap estimate of standard error of estimator = standard deviation
             # of the estimator over its bootstrapped sampling distribution
-            return(np.std(estimator(boot_samples, axis=0)))
+            return(np.std(estimator_samples))
         else:
             raise ValueError("Cannot perform bootstrapping for {} dimensional array".format(self._x.ndim))
 
