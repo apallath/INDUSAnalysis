@@ -8,12 +8,19 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import convolve
+import pymbar
 from scipy import stats
+from statsmodels.tsa import stattools
 
 from INDUSAnalysis.lib import profiling
 
 # Cython
 cimport numpy as np
+
+
+################################################################################
+# Class for storing, performing computations with, and plotting timeseries data.
+################################################################################
 
 
 class TimeSeries:
@@ -77,7 +84,6 @@ class TimeSeries:
             raise ValueError("Too many labels for data dimensions")
         if correct_contiguous:
             self._correct_contiguous()
-
 
     def __getitem__(self, key):
         """
@@ -168,7 +174,6 @@ class TimeSeries:
         if self._t.shape[0] != self._x.shape[0]:
             raise ValueError("Time and data do not match along axis 0")
 
-
     def moving_average(self, window):
         """
         Computes moving (rolling) average of 1-d data.
@@ -239,17 +244,29 @@ class TimeSeries:
             labels = [x for i, x in enumerate(self._labels) if i != axis]
             return TimeSeries(self._t, std, labels=labels)
 
-    # TODO: Implement
     @profiling.timefunc
-    def sem(self, axis=None):
+    def standard_error(self, estimator=np.mean, nboot=100):
         """
-        Computes standard error of mean (estimate of the standard deviation
-        of the distribution of the mean) using block bootstrapping.
+        Computes standard error of estimator function using bootstrapping. If no estimator
+        is specified, computes standard error of the mean.
 
         Args:
-            axis (int): Optional
+            estimator (function): Function to compute estimator of, which can compute
+                estimator along an axis (default=np.mean).
+            nboot (int): Number of bootstrap samples to use (default=100).
+
+        Raises:
+            ValueError if data is not 1-dimensional.
         """
-        raise NotImplementedError()
+        if self._x.ndim <= 1:
+            # Sampling distribution
+            boot_samples = np.array([bootstrap_independent_sample(self._x) for i in range(nboot)])
+
+            # Bootstrap estimate of standard error of estimator = standard deviation
+            # of the estimator over its bootstrapped sampling distribution
+            return(np.std(estimator(boot_samples, axis=0)))
+        else:
+            raise ValueError("Cannot perform bootstrapping for {} dimensional array".format(self._x.ndim))
 
     def plot(self, *plotargs, **plotkwargs):
         """Plots 1-d timeseries data.
@@ -297,6 +314,78 @@ class TimeSeries:
         ax.set_yticklabels(newlabels)
 
         return fig
+
+
+################################################################################
+# Convenience factory for TimeSeries objects
+################################################################################
+
+
+def create1DTimeSeries(x):
+    """Creates a 1-dimensional TimeSeries object with data_array = x,
+       time_array = [0, 1, ..., N], and labels = ['x0', 'x1', ..., 'xD-1'] where
+       N is the shape of axis 0 of x, and D is the number of dimensions of x.
+
+    Args:
+        x (ndarray): 1-dimensional array containing correlated data.
+
+    Returns:
+        TimeSeries."""
+    return TimeSeries(times=np.arange(x.shape[0]),
+                      data=x,
+                      labels=['x{}' for i in range(x.ndim)])
+
+
+################################################################################
+# Convenience functions for bootstrapping
+################################################################################
+
+
+def statisticalInefficiency(x, fft=True):
+    """Computes the statistical inefficiency of x.
+
+    Args:
+        x (ndarray): 1-dimensional array containing correlated data.
+        fft (bool): Use fft when computing autocorrelation function (default=True).
+
+    Returns:
+        g (float): Statistical inefficiency of x."""
+    acf = stattools.acf(x, nlags=len(x), fft=fft)
+    acf_cross_point = np.argmax(acf < 0) - 1
+
+    t = np.array(range(len(x[:acf_cross_point])))
+    T = len(x)
+    tau = np.sum(np.multiply(np.array(1 - t / T), acf[:acf_cross_point]))
+    g = 1 + 2 * tau
+
+    return g
+
+
+def bootstrap_independent_sample(x, g=None, use_pymbar=True):
+    """Draws an independent sample of size N_ind = N/g from
+    x. If the statistical inefficiency g is not passed as a parameter,
+    it will be calculated first.
+
+    Args:
+        x (ndarray): 1-dimensional array of length N containing correlated data to draw (uncorrelated) sample from.
+        g (float): Statistical inefficiency (default=None).
+        use_pymbar (bool): Use pymbar to calculate statistical inefficiency (default=True)
+
+    Returns:
+        y (ndarray): 1-dimensional array of length N/g containing random samples drawn from x (with replacement)."""
+
+    if g is None:
+        if use_pymbar:
+            g = pymbar.timeseries.statisticalInefficiency(x)
+        else:
+            g = statisticalInefficiency(x)
+
+    return np.random.choice(x, size=int(len(x) / g), replace=True)
+
+
+################################################################################
+# Base class for analysis of timeseries data
+################################################################################
 
 
 class TimeSeriesAnalysis:

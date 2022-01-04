@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pymbar
 
 from INDUSAnalysis import timeseries
 
@@ -186,6 +187,22 @@ def test_TimeSeries_3d_dimred_vis():
     fig = mean_per_frame.plot('s--', lw=1.2, label='Mean contacts per timestep')
     fig.set_dpi(300)
     fig.savefig("timeseries_test_data/3d_dimred_1d.png")
+
+
+def test_TimeSeries_bootstrap():
+    """Stochastic test. There is a chance this might fail"""
+    x = pymbar.testsystems.correlated_timeseries_example(N=10000, tau=50, seed=415389)
+    ts = timeseries.create1DTimeSeries(x)
+
+    # Compute standard error of the mean with 100 bootstrap samples
+    se1 = ts.standard_error()
+    print(se1)
+    assert(se1 < 0.11)  # stochastic test may fail
+
+    # Compute standard error of the mean with 1000 bootstrap samples
+    se2 = ts.standard_error(nboot=1000)
+    print(se2)
+    assert(se2 < 0.10)  # stochastic test may fail
 
 
 def test_TimeSeriesAnalysis_save_load_TimeSeries():

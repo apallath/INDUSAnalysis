@@ -34,6 +34,8 @@ def phi_i_star(phivals: list,
                pklfile: str,
                plot_probe_indices: list):
 
+    nruns = len(runs)
+
     tsa = TimeSeriesAnalysis()
 
     ############################################################################
@@ -44,8 +46,8 @@ def phi_i_star(phivals: list,
     protein_heavy = u.select_atoms("protein and not name H*")
     protein_heavy_indices = protein_heavy.atoms.indices
 
-    meanwaters = np.zeros((len(phivals), len(runs), len(protein_heavy_indices)))
-    varwaters = np.zeros((len(phivals), len(runs), len(protein_heavy_indices)))
+    meanwaters = np.zeros((len(phivals), nruns, len(protein_heavy_indices)))
+    varwaters = np.zeros((len(phivals), nruns, len(protein_heavy_indices)))
 
     # All phi values
     for idx, phi in enumerate(phivals):
