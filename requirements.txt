@@ -8,4 +8,5 @@ pymbar
 pytest
 scipy
 sphinxcontrib-napoleon
+statsmodels
 tqdm

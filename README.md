@@ -3,8 +3,6 @@
 Package to analyze simulation data generated using
 [INDUS](https://link.springer.com/article/10.1007/s10955-011-0269-9). 
 
-This package analyses data I generated from molecular dynamics simulations of solvated protein and polymer systems at the Patel group.
-
 [Documentation](https://apallath.github.io/INDUSAnalysis) hosted on GitHub pages.
 
 ## Status
