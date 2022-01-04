@@ -22,7 +22,7 @@ def vis_phi_i_star(pklfile, structfile, trajfile, phi, pdb, buried_surface_indic
     phi_i_stars = phi_i_star_data['phi_i_stars']
 
     with open(buried_surface_indicator, "rb") as infile:
-        buried_surface_indicator = pickle.load(infile)
+        buried_surface_indicator = np.load(infile)
 
     ############################################################################
     # Static PDB generation
@@ -34,7 +34,7 @@ def vis_phi_i_star(pklfile, structfile, trajfile, phi, pdb, buried_surface_indic
     protein_heavy_sel = "protein and not name H*"
 
     # Load equilibrium simulation universe (to manipulate and write)
-    u = mda.Universe(structfile, trajfile.format(phi=0))
+    u = mda.Universe(structfile, trajfile)
     u.add_TopologyAttr('tempfactors')
 
     phi_static_vals = np.linspace(phi[0], phi[1], int(phi[2]))
