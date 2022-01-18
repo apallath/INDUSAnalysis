@@ -22,7 +22,9 @@ def phi_ensemble(phivals: list,
                  plot_rev: bool = True,
                  rev_Ntw_format: str = "",
                  imgfile: str = "phi_ensemble.png",
-                 P0=1):
+                 P0=1,
+                 no_pressure=False,
+                 invert_signs=False):
 
     nruns = len(runs)
 
@@ -69,9 +71,15 @@ def phi_ensemble(phivals: list,
         std_meanwaters_rev = np.std(meanwaters_rev, axis=1)
 
     """Plot waters"""
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
+    # CEMB grant figure edits
+    # TODO: Revert
+    fig, ax = plt.subplots(figsize=(4, 3), dpi=300)
+    # fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
 
-    phivals = np.array([float(phi) for phi in phivals])
+    if invert_signs:
+        phivals = -np.array([float(phi) for phi in phivals])
+    else:
+        phivals = np.array([float(phi) for phi in phivals])
 
     order = np.argsort(phivals)
 
@@ -90,35 +98,37 @@ def phi_ensemble(phivals: list,
                         alpha=0.5)
 
     if plot_fwd:
-        ax.axhline(mean_meanwaters[0], color="green", linestyle=":", label="Folded state")
+        ax.axhline(mean_meanwaters[0], color="green", linestyle=":", label="Native state")
         ax.axhspan(mean_meanwaters[0] - std_meanwaters[0], mean_meanwaters[0] + std_meanwaters[0], alpha=0.5,
                    color="green")
     elif not plot_fwd and plot_rev:
-        ax.axhline(mean_meanwaters_rev[0], color="green", linestyle=":", label="Folded state")
+        ax.axhline(mean_meanwaters_rev[0], color="green", linestyle=":", label="Native state")
         ax.axhspan(mean_meanwaters_rev[0] - std_meanwaters_rev[0], mean_meanwaters_rev[0] + std_meanwaters_rev[0], alpha=0.5,
                    color="green")
     else:
         pass
 
     ax.set_xlabel(r"$\phi$ (kJ/mol)")
-    ax.set_ylabel(r"$\langle \tilde{N}_v \rangle$")
+    ax.set_ylabel(r"$\langle \tilde{N}_v \rangle_\phi$")
     ax.legend()
 
+    # CEMB grant edits
+    # TODO: Revert
     x_minor_locator = AutoMinorLocator(10)
     y_minor_locator = AutoMinorLocator(10)
-    ax.xaxis.set_minor_locator(x_minor_locator)
-    ax.yaxis.set_minor_locator(y_minor_locator)
-    ax.grid(which='major', linestyle='-')
-    ax.grid(which='minor', linestyle=':')
+    #ax.xaxis.set_minor_locator(x_minor_locator)
+    #ax.yaxis.set_minor_locator(y_minor_locator)
+    #ax.grid(which='major', linestyle='-')
+    #ax.grid(which='minor', linestyle=':')
 
-    print(P0)
-    phi_to_P_custom = partial(phi_to_P, P0=float(P0))
-    P_to_phi_custom = partial(P_to_phi, P0=float(P0))
+    if not no_pressure:
+        phi_to_P_custom = partial(phi_to_P, P0=float(P0))
+        P_to_phi_custom = partial(P_to_phi, P0=float(P0))
 
-    secax = ax.secondary_xaxis('top', functions=(phi_to_P_custom, P_to_phi_custom))
-    secax.set_xlabel(r"Effective hydration shell pressure, $P$ (kbar)")
+        secax = ax.secondary_xaxis('top', functions=(phi_to_P_custom, P_to_phi_custom))
+        secax.set_xlabel(r"Effective hydration shell pressure, $P$ (kbar)")
 
-    plt.savefig(imgfile, format="png")
+    plt.savefig(imgfile, format="png", bbox_inches="tight")
 
 
 if __name__ == "__main__":
@@ -133,7 +143,9 @@ if __name__ == "__main__":
     parser.add_argument("-rev_Ntw_format", help="format of .pkl file containing rev Ntw, with {phi} placeholders for phi value and {run} placeholders for run value")
     parser.add_argument("-imgfile", help="output image (default=phi_ensemble.png)")
     parser.add_argument("-P0", default=1, help="simulation pressure, in bar (default=1)")
+    parser.add_argument("--no_pressure", action="store_true", default=False)
+    parser.add_argument("--invert_signs", action="store_true", default=False)
 
     a = parser.parse_args()
 
-    phi_ensemble(a.phi, a.runs, a.start, a.calc_dir, a.plot_fwd, a.fwd_Ntw_format, a.plot_rev, a.rev_Ntw_format, a.imgfile, a.P0)
+    phi_ensemble(a.phi, a.runs, a.start, a.calc_dir, a.plot_fwd, a.fwd_Ntw_format, a.plot_rev, a.rev_Ntw_format, a.imgfile, a.P0, a.no_pressure, a.invert_signs)

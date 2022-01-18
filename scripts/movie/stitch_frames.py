@@ -29,6 +29,7 @@ parser.add_argument("-framelabels_size", type=int, default=48, help="font size o
 ffmpegargs = parser.add_argument_group('Arguments for movie generation with ffmpeg')
 ffmpegargs.add_argument("-rate", type=int, help="frame rate for movie")
 ffmpegargs.add_argument("-o", help="output movie")
+ffmpegargs.add_argument("-vcodec", default="libx264", help="codec")
 
 a = parser.parse_args()
 
@@ -95,6 +96,7 @@ for i, label in enumerate(tqdm(framelabels)):
 # Make movie
 ################################################################################
 
-os.system("ffmpeg -r {rate} -i {informat} -vcodec mpeg4 -y -q:v 1 -vb 40M {out}".format(rate=a.rate,
-                                                                                        informat=a.compositeformat.format(r"%05d"),
-                                                                                        out=a.o))
+os.system("ffmpeg -r {rate} -i {informat} -vcodec {vcodec} -y -q:v 1 -pix_fmt yuv420p -vb 40M {out}".format(rate=a.rate,
+                                                                                                            vcodec=a.vcodec,
+                                                                                                            informat=a.compositeformat.format(r"%05d"),
+                                                                                                            out=a.o))
