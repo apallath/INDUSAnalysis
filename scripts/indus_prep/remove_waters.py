@@ -13,8 +13,8 @@ if __name__ == '__main__':
                         help='GRO structure file')
     parser.add_argument('-o', '--out', type=str, default='prot_removed.gro',
                         help='Output GRO structure file (default: %(default)s)')
-    parser.add_argument('-b', '--bak', type=str, default='prot_to_remove.gro',
-                        help='GRO structure file with waters within convex hull marked in the tempfactor column (default: %(default)s)')
+    parser.add_argument('-b', '--bak', type=str, default='prot_to_remove.pdb',
+                        help='PDB file with waters within the convex hull annotated in the tempfactor/betafactor column (default: %(default)s)')
     parser.add_argument('--sel-spec', type=str, default='protein',
                         help='Selection spec for selecting all protein atoms (including hydrogens) \
                               default: %(default)s')
