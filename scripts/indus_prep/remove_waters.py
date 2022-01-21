@@ -52,5 +52,5 @@ if __name__ == '__main__':
 
     # Write stats/report
     with open(args.report, 'w') as f:
-        f.write('Removed n waters: {}'.format(inside_mask.sum()))
+        f.write('Removed n waters: {}\n'.format(inside_mask.sum()))
         f.write('New n waters: {}'.format(n_waters))
