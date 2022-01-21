@@ -39,7 +39,7 @@ if __name__ == '__main__':
     for water in waters_to_remove:
         water.residue.atoms.tempfactors = -1
 
-    univ.write(args.bak)
+    univ.atoms.write(args.bak)
 
     atoms = univ.atoms[univ.atoms.tempfactors > -1]
     atoms.write(args.out)
