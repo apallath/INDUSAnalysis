@@ -18,6 +18,8 @@ if __name__ == '__main__':
     parser.add_argument('--sel-spec', type=str, default='protein',
                         help='Selection spec for selecting all protein atoms (including hydrogens) \
                               default: %(default)s')
+    parser.add_argument('--report', type=str, default='removal_stats.txt',
+                        help='Filename to write report of original # of waters removed and new # of waters to (default: %(default)s)')
 
     args = parser.parse_args()
 
@@ -39,11 +41,16 @@ if __name__ == '__main__':
     for water in waters_to_remove:
         water.residue.atoms.tempfactors = -1
 
+    # Write bak file
     univ.atoms.write(args.bak)
 
     atoms = univ.atoms[univ.atoms.tempfactors > -1]
+    # Write removed waters file
     atoms.write(args.out)
 
     n_waters = atoms.select_atoms('name OW and not ({})'.format(args.sel_spec)).n_atoms
 
-    print('New n waters: {}'.format(n_waters))
+    # Write stats/report
+    with open(args.report, 'w') as f:
+        f.write('Removed n waters: {}'.format(inside_mask.sum()))
+        f.write('New n waters: {}'.format(n_waters))
