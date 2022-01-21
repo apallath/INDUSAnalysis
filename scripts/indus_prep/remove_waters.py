@@ -54,3 +54,5 @@ if __name__ == '__main__':
     with open(args.report, 'w') as f:
         f.write('Removed n waters: {}\n'.format(inside_mask.sum()))
         f.write('New n waters: {}'.format(n_waters))
+
+    print("IMPORTANT: Change # of waters in topology file!!!!")
