@@ -1,6 +1,6 @@
 1d_binning:
-  NBINS: null
-  NMAX: null
+  NBINS: 291
+  NMAX: 290
   NMIN: 0
 1d_bootstrap:
   NBOOT: 10
@@ -8,61 +8,61 @@
 1d_phi_ensemble:
   PEAK_CUT: 100
   PHI_BINS: 991
-  PHI_BIN_MAX: 7.43
-  PHI_BIN_MIN: -2.47
+  PHI_BIN_MAX: -2.47
+  PHI_BIN_MIN: 7.43
 1d_phi_star:
-  PHI_STAR: null
-  PHI_STAR_COEX: null
-  PHI_STAR_EQ: null
-1d_plot_phi_star:
-  PLOT_PHI_STAR_BETAF_MAX: null
-  PLOT_PHI_STAR_N_MAX: null
-  PLOT_PHI_STAR_N_MIN: null
+  PHI_STAR: -0.11
+  PHI_STAR_COEX: -0.11199
+  PHI_STAR_EQ: -0.09579
+  PLOT_PHI_STAR_BETAF_MAX: 6
+  PLOT_PHI_STAR_N_MAX: 225
+  PLOT_PHI_STAR_N_MIN: 105
 2d_binning:
-  NBINS2: null
-  NMAX2: null
+  NBINS2: 283
+  NMAX2: 282
   NMIN2: 0
-  RGBINS2: null
-  RGMAX2: null
-  RGMIN2: 0
+  RGBINS2: 61
+  RGMAX2: 16.565656565656568
+  RGMIN2: 4.444444444444445
 2d_phi_star:
-  PHI_STAR2: null
-  PHI_STAR_COEX2: null
-  PHI_STAR_EQ2: null
+  PHI_STAR2: -0.11
+  PHI_STAR_COEX2: -0.11199
+  PHI_STAR_EQ2: -0.09579
 2d_plot:
-  PLOT_BETAF_LEVELS2: null
-  PLOT_BETAF_MAX2: null
-  PLOT_N_MAX2: null
-  PLOT_N_MIN2: null
-  PLOT_PV_LEVELS2: null
+  PLOT_BETAF_LEVELS2: 22
+  PLOT_BETAF_MAX2: 168
+  PLOT_N_MAX2: 282
+  PLOT_N_MIN2: 0
+  PLOT_PV_LEVELS2: 22
 2d_plot_phi_star:
-  PLOT_PHI_STAR_BETAF_LEVELS2: null
-  PLOT_PHI_STAR_BETAF_MAX2: null
-  PLOT_PHI_STAR_N_MAX2: null
-  PLOT_PHI_STAR_N_MIN2: null
-  PLOT_PHI_STAR_PV_LEVELS2: null
-  PLOT_PHI_STAR_RG_MAX2: null
-  PLOT_PHI_STAR_RG_MIN2: null
+  PLOT_PHI_STAR_BETAF_LEVELS2: 11
+  PLOT_PHI_STAR_BETAF_MAX2: 6
+  PLOT_PHI_STAR_N_MAX2: 225
+  PLOT_PHI_STAR_N_MIN2: 105
+  PLOT_PHI_STAR_PV_LEVELS2: 11
+  PLOT_PHI_STAR_RG_MAX2: 14.6
+  PLOT_PHI_STAR_RG_MIN2: 4.6
 basins:
-  NC: null
-  NE: null
+  NC: 131
+  NE: 203
 coex:
-  NT_SPLIT: null
+  NT_SPLIT: 175
 coex2:
-  NTRG_SPLIT_c: null
-  NTRG_SPLIT_m: null
-  NTRG_SPLIT_x0: null
-  RG_SPLIT: null
+  NTRG_SPLIT_c: 9
+  NTRG_SPLIT_m: -0.069
+  NTRG_SPLIT_x0: 177
+coexRg:
+  RG_SPLIT: 9
 data_collection:
   BASE_SAMP_FREQ: 1
   BASE_SAMP_FREQ2: 1
   TEND: null
   TSTART: 2000
 find_basins:
-  NC_MAX: null
-  NC_MIN: null
-  NE_MAX: null
-  NE_MIN: null
+  NC_MAX: 140
+  NC_MIN: 120
+  NE_MAX: 210
+  NE_MIN: 190
 func_params:
   calc_deltaGu_diff_method:
     boot_errors: false
@@ -71,39 +71,6 @@ func_params:
     deltaGu_datfile: deltaGu_int.dat
   plot_hist:
     hist_imgfile: hist.png
-  run_2D_bin_Rg:
-    betaF_datfile: betaF_Rg.dat
-    betaF_imgfile: betaF_Rg.png
-    in_calcfile: calc.pkl
-    prob_datfile: prob_Rg.dat
-    prob_imgfile: prob_Rg.png
-    saved: true
-  run_2D_binless_log_likelihood:
-    betaF_imgfile: betaF_2D.png
-    betaF_npyfile: betaF_2D.npy
-    calcfile: calc_2D.pkl
-    in_calcfile: calc.pkl
-    prob_imgfile: prob_2D.png
-    prob_npyfile: prob_2D.npy
-    saved: true
-    x_bins_npyfile: x_bins_2D.npy
-    y_bins_npyfile: y_bins_2D.npy
-  run_2D_reweight_phi_star:
-    betaF_imgformat: betaF_2D_{}.png
-    betaF_npyformat: betaF_2D_{}.npy
-    in_calcfile: calc.pkl
-    prob_imgformat: prob_2D_{}.png
-    prob_npyformat: prob_2D_{}.npy
-    saved: true
-    x_bins_npyformat: x_bins_2D_{}.npy
-    y_bins_npyformat: y_bins_2D_{}.npy
-  run_2D_reweight_phi_star_bin_Rg:
-    betaF_datformat: betaF_Rg_{}.dat
-    betaF_imgformat: betaF_Rg_{}.png
-    in_calcfile: calc.pkl
-    prob_datformat: prob_Rg_{}.dat
-    prob_imgformat: prob_Rg_{}.png
-    saved: true
   run_binless_log_likelihood:
     betaF_datfile: betaF.dat
     betaF_imgfile: betaF.png
@@ -116,18 +83,6 @@ func_params:
     phi_ens_boot_datfile: phi_ens_boot.dat
     phi_ens_boot_imgfile: phi_ens_boot.png
     phi_ens_peaks_boot_datfile: phi_ens_peaks_boot.dat
-  run_coex_integration_2D:
-    betaF_coex_imgfile: betaF_coex_2D.png
-    in_betaF_npyformat: betaF_2D_{}.npy
-    in_prob_npyformat: prob_2D_{}.npy
-    in_x_bins_npyformat: x_bins_2D_{}.npy
-    in_y_bins_npyformat: y_bins_2D_{}.npy
-    prob_coex_imgfile: prob_coex_2D.png
-  run_coex_integration_Rg:
-    betaF_coex_imgfile: betaF_coex_Rg.png
-    in_betaF_datformat: betaF_Rg_{}.dat
-    in_prob_datformat: prob_Rg_{}.dat
-    prob_coex_imgfile: prob_coex_rg.png
   run_kappa_checks:
     imgfile: curvature_kappa.png
     in_calcfile: calc.pkl
@@ -168,9 +123,54 @@ func_params:
     saved: true
     win_dir: windows
     win_format: betaF_biased_win_{}.png
+  run_2D_binless_log_likelihood:
+    saved: True
+    in_calcfile: calc.pkl
+    calcfile: calc_2D.pkl
+    betaF_imgfile: betaF_2D.png
+    x_bins_npyfile: x_bins_2D.npy
+    y_bins_npyfile: y_bins_2D.npy
+    betaF_npyfile: betaF_2D.npy
+    prob_imgfile: prob_2D.png
+    prob_npyfile: prob_2D.npy
+  run_2D_bin_Rg:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_datfile: betaF_Rg.dat
+    betaF_imgfile: betaF_Rg.png
+    prob_datfile: prob_Rg.dat
+    prob_imgfile: prob_Rg.png
+  run_2D_reweight_phi_star:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_imgformat: betaF_2D_{}.png
+    x_bins_npyformat: x_bins_2D_{}.npy
+    y_bins_npyformat: y_bins_2D_{}.npy
+    betaF_npyformat: betaF_2D_{}.npy
+    prob_imgformat: prob_2D_{}.png
+    prob_npyformat: prob_2D_{}.npy
+  run_2D_reweight_phi_star_bin_Rg:
+    saved: True
+    in_calcfile: calc.pkl
+    betaF_datformat: betaF_Rg_{}.dat
+    betaF_imgformat: betaF_Rg_{}.png
+    prob_datformat: prob_Rg_{}.dat
+    prob_imgformat: prob_Rg_{}.png
+  run_coex_integration_2D:
+    in_x_bins_npyformat: x_bins_2D_{}.npy
+    in_y_bins_npyformat: y_bins_2D_{}.npy
+    in_betaF_npyformat: betaF_2D_{}.npy
+    in_prob_npyformat: prob_2D_{}.npy
+    betaF_coex_imgfile: betaF_coex_2D.png
+    prob_coex_imgfile: prob_coex_2D.png
+  run_coex_integration_Rg:
+    in_betaF_datformat: betaF_Rg_{}.dat
+    in_prob_datformat: prob_Rg_{}.dat
+    betaF_coex_imgfile: betaF_coex_Rg.png
+    prob_coex_imgfile: prob_coex_rg.png
 io_global:
-  calcoutdir: calc
-  plotoutdir: plots
+  calcoutdir: wham_nt_ntrg_test_data/calc
+  plotoutdir: wham_nt_ntrg_test_data/plot
 system:
   NBEAD: 45
   TEMP: 298
@@ -181,7 +181,7 @@ windows:
     Nt_file: inputs_wham_nt_ntrg/C45_T298/unbiased/nt_ntw_k0_N0.dat
     Rg_file: inputs_wham_nt_ntrg/C45_T298_OP/unbiased/C45_Rg.pkl
     TSTEP: 0.002
-    UMBDT: 50
+    UMBDT: 100
     XTCDT: 100
   -240:
     Nt_file: inputs_wham_nt_ntrg/C45_T298/K0.0243/K0.0243N-240/ntw_k0.0243_N-240.dat

@@ -7,6 +7,9 @@ pillow
 pymbar
 pytest
 scipy
+sphinx
+sphinx-rtd-theme
 sphinxcontrib-napoleon
 statsmodels
 tqdm
+pyyaml
