@@ -89,7 +89,7 @@ python /path/to/INDUSAnalysis/ensemble/.../script.py
 
 ## Scripts
 
-`scripts/` contains executable Python and VMD scripts
+`scripts/` contains executable Python and VMD scripts.
 
 Run
 ```sh
@@ -97,10 +97,3 @@ python /path/to/INDUSAnalysis/scripts/run_$analysis_name.py
 ```
 with the required and optional arguments to run analysis on data generated
 from a single run [use the -h or --help flags for help with arguments].
-
-Run
-```sh
-python /path/to/INDUSAnalysis/scripts/run_agg_$analysis_name.py
-```
-with the required and optional arguments to run aggregate analyses on data [
-use the -h or --help flags for help with arguments].
