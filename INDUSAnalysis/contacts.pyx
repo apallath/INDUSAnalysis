@@ -23,7 +23,7 @@ cimport numpy as np
 class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
     def __init__(self):
         super().__init__()
-        self.req_file_args.add_argument("structf", help="Topology or structure file (.tpr, .gro; .tpr required for bond calculation)")
+        self.req_file_args.add_argument("structf", help="Structure file (.gro, .tpr); .tpr required for bond calculations)")
         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
 
         self.calc_args.add_argument("-method", help="Method for calculating contacts (alk-ua, atomic-h, atomic-sh; default=atomic-h)")
@@ -34,6 +34,16 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         self.calc_args.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
         self.calc_args.add_argument("-alk_resname", type=str, default="ALK", help="Residue name of alkane atoms (default = ALK)")
 
+        # Modification useful for polymer simulations.
+        #
+        # If the tpr file and xtc file do not have the same number of atoms
+        # e.g., due to omission of waters in the xtc file
+        # you can pass a gro file which has the exact number of atoms to the structf parameter
+        # and a tpr file with bond information for computing all-pairs-shortest-paths
+        self.calc_args.add_argument("-apsp_structf", help="""Portable binary run (.tpr) input file for bond calculations (default = same as structf).
+                                                          You can use this to pass information on bonds to INDUSAnalysis when the xtc file contains
+                                                          a different number of atoms from the tpr file.""")
+
         self.misc_args.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
 
     def read_args(self):
@@ -43,8 +53,6 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         super().read_args()
         self.structf = self.args.structf
         self.trajf = self.args.trajf
-
-        self.u = mda.Universe(self.structf, self.trajf)
 
         self.method = self.args.method
         if self.method is None:
@@ -71,6 +79,10 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
 
         self.alk_resname = self.args.alk_resname
 
+        self.apsp_structf = self.args.apsp_structf
+        if self.apsp_structf is None:
+            self.apsp_structf = self.structf
+
         self.skip = self.args.skip
         if self.skip is not None:
             self.skip = int(self.skip)
@@ -84,6 +96,10 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
             self.bins = 20
 
         self.verbose = self.args.verbose
+
+        # Initialize universes
+        self.u = mda.Universe(self.structf, self.trajf)
+        self.u_apsp = mda.Universe(self.apsp_structf)
 
     def calc_trajcontacts(self, u, method, distcutoff, connthreshold, start_time, end_time, skip):
         """
@@ -152,7 +168,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         utraj = u.trajectory[start_index:stop_index:skip]
 
         # Determine indices to exclude based on connectivity
-        apsp, all_to_alk = self.alk_ua_APSP(u)
+        apsp, all_to_alk = self.alk_ua_APSP()
 
         if connthreshold < 0:
             raise ValueError("Connectivity threshold must be an integer value 0 or greater.")
@@ -229,7 +245,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         utraj = u.trajectory[start_index:stop_index:skip]
 
         # Determine indices to exclude based on connectivity
-        apsp, all_to_heavy = self.protein_heavy_APSP(u)
+        apsp, all_to_heavy = self.protein_heavy_APSP()
 
         if connthreshold < 0:
             raise ValueError("Connectivity threshold must be an integer value 0 or greater.")
@@ -306,7 +322,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         utraj = u.trajectory[start_index:stop_index:skip]
 
         # Determine indices to exclude based on connectivity
-        apsp, all_to_heavy = self.protein_heavy_APSP(u)
+        apsp, all_to_heavy = self.protein_heavy_APSP()
 
         if connthreshold < 0:
             raise ValueError("Connectivity threshold must be an integer value 0 or greater.")
@@ -363,14 +379,11 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
 
         return ts_contacts, mean_contactmatrix
 
-    def alk_ua_APSP(self, u):
+    def alk_ua_APSP(self):
         """
         Constructs graph of alkane united atoms and calculates all-pairs-shortest-path
         distances using the Floyd-Warshall algorithm, assigning each bond an
         equal weight (of 1).
-
-        Args:
-            u (mda.Universe): Universe object containing all atoms with bond definitions.
 
         Returns:
             {
@@ -382,7 +395,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
             }
         """
         # Connectivity graph
-        alk = u.select_atoms("resname %s" % self.alk_resname)
+        alk = self.u_apsp.select_atoms("resname %s" % self.alk_resname)
         nalk = len(alk)
 
         alk_indices = alk.atoms.indices
@@ -408,14 +421,11 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
 
         return apsp_matrix, all_to_alk
 
-    def protein_heavy_APSP(self, u):
+    def protein_heavy_APSP(self):
         """
         Constructs graph of protein-heavy atoms and calculates all-pairs-shortest-path
         distances using the Floyd-Warshall algorithm, assigning each bond an
         equal weight (of 1).
-
-        Args:
-            u (mda.Universe): Universe object containing all atoms with bond definitions.
 
         Returns:
             {
@@ -427,7 +437,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
             }
         """
         # Connectivity graph
-        protein_heavy = u.select_atoms("protein and not name H*")
+        protein_heavy = self.u.select_atoms("protein and not name H*")
         nheavy = len(protein_heavy)
 
         heavy_indices = protein_heavy.atoms.indices
