@@ -22,7 +22,26 @@ def test_contacts_alk_ua_r4_5_n0():
         os.makedirs('contacts_test_data')
 
     cts = contacts.ContactsAnalysis()
-    args = ['c30.tpr', 'c30_mol_skip.xtc',
+    args = ['c30.tpr', 'c30.xtc',
+            '-method', 'alk-ua', '-distcutoff', '4.5', '-connthreshold', '0', '-skip', '1', '-bins', '10',
+            '-obsstart', '0',
+            '-opref', 'contacts_test_data/poly_r4.5_n0', '-oformat', 'png', '-dpi', '300',
+            '--remote']
+    if __name__ == "__main__":
+        args.append("--verbose")
+    cts.parse_args(args)
+    cts.read_args()
+    cts()
+
+
+@profiling.timefuncfile("test_exec_times.txt")
+def test_contacts_alk_ua_r4_5_n0_poly():
+    if not os.path.exists('contacts_test_data'):
+        os.makedirs('contacts_test_data')
+
+    cts = contacts.ContactsAnalysis()
+    args = ['c30_poly.gro', 'c30_poly.xtc',
+            '-apsp_structf', 'c30.tpr',
             '-method', 'alk-ua', '-distcutoff', '4.5', '-connthreshold', '0', '-skip', '1', '-bins', '10',
             '-obsstart', '0',
             '-opref', 'contacts_test_data/poly_r4.5_n0', '-oformat', 'png', '-dpi', '300',
