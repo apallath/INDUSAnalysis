@@ -137,8 +137,8 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         alk_sel = "resname %s" % self.alk_resname
 
         # Select alkane united atoms only
-        alkane = u.select_atoms(alk_sel)
-        nalk = len(alkane.atoms)
+        alk = u.select_atoms(alk_sel)
+        nalk = len(alk.atoms)
 
         start_index = None
         stop_index = None
@@ -160,14 +160,14 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         # Variables to store computed contacts to
         times = np.zeros(len(utraj))
         total_contacts = np.zeros(len(utraj))
-        mean_contactmatrix = np.zeros((nheavy, nheavy))
+        mean_contactmatrix = np.zeros((nalk, nalk))
 
         if self.verbose:
             pbar = tqdm(desc="Calculating contacts", total=len(utraj))
 
         for tidx, ts in enumerate(utraj):
             # Fast MDAnalysis distance matrix computation
-            dmatrix = mda.lib.distances.distance_array(protein_heavy.positions, protein_heavy.positions)
+            dmatrix = mda.lib.distances.distance_array(alk.positions, alk.positions)
 
             # Exclude i-j interactions below connectivity threshold from distance matrix
             for i in range(apsp.shape[0]):

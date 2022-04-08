@@ -17,15 +17,15 @@ from INDUSAnalysis.lib import profiling
 
 
 @profiling.timefuncfile("test_exec_times.txt")
-def test_contacts_alk_ua_r7_n0():
+def test_contacts_alk_ua_r4_5_n0():
     if not os.path.exists('contacts_test_data'):
         os.makedirs('contacts_test_data')
 
     cts = contacts.ContactsAnalysis()
-    args = ['indus.tpr', 'indus_mol_skip.xtc',
-            '-method', 'atomic-h', '-distcutoff', '7.0', '-connthreshold', '0', '-skip', '50', '-bins', '10',
-            '-obsstart', '500',
-            '-opref', 'contacts_test_data/indus_r7_n0', '-oformat', 'png', '-dpi', '300',
+    args = ['c30.tpr', 'c30_mol_skip.xtc',
+            '-method', 'alk-ua', '-distcutoff', '4.5', '-connthreshold', '0', '-skip', '1', '-bins', '10',
+            '-obsstart', '0',
+            '-opref', 'contacts_test_data/poly_r4.5_n0', '-oformat', 'png', '-dpi', '300',
             '--remote']
     if __name__ == "__main__":
         args.append("--verbose")
