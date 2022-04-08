@@ -1,7 +1,5 @@
 """
-Defines class for analysing contacts along GROMACS simulation trajectory.
-
-Extendable to add new types of contacts analyses.
+Class for analysing contacts along GROMACS simulation trajectory.
 """
 
 import copy
@@ -25,15 +23,16 @@ cimport numpy as np
 class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
     def __init__(self):
         super().__init__()
-        self.req_file_args.add_argument("structf", help="Topology or structure file (.tpr, .gro; .tpr required for atomic-sh)")
+        self.req_file_args.add_argument("structf", help="Topology or structure file (.tpr, .gro; .tpr required for bond calculation)")
         self.req_file_args.add_argument("trajf", help="Compressed trajectory file (.xtc)")
 
-        self.calc_args.add_argument("-method", help="Method for calculating contacts (atomic-h, atomic-sh; default=atomic-h)")
-        self.calc_args.add_argument("-distcutoff", help="Distance cutoff for contacts, in A")
-        self.calc_args.add_argument("-connthreshold", help="Connectivity threshold for contacts (definition varies by method)")
+        self.calc_args.add_argument("-method", help="Method for calculating contacts (alk-ua, atomic-h, atomic-sh; default=atomic-h)")
+        self.calc_args.add_argument("-distcutoff", help="Distance cutoff for contacts, in A (default = 6 A)")
+        self.calc_args.add_argument("-connthreshold", help="Connectivity threshold for contacts (definition varies by method; default = 0)")
         self.calc_args.add_argument("-skip", help="Number of frames to skip between analyses (default = 1)")
         self.calc_args.add_argument("-bins", help="Number of bins for histogram (default = 20)")
         self.calc_args.add_argument("-refcontacts", help="Reference number of contacts for fraction (default = mean)")
+        self.calc_args.add_argument("-alk_resname", type=str, default="ALK", help="Residue name of alkane atoms (default = ALK)")
 
         self.misc_args.add_argument("--verbose", action='store_true', help="Output progress of contacts calculation")
 
@@ -58,19 +57,19 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         if self.distcutoff is not None:
             self.distcutoff = float(self.distcutoff)
         else:
-            if self.method == "atomic-sh":
-                self.distcutoff = 6.0
+            self.distcutoff = 6.0
 
         self.connthreshold = self.args.connthreshold
         if self.connthreshold is not None:
             self.connthreshold = int(self.connthreshold)
         else:
-            if self.method == "atomic-sh":
-                self.connthreshold = 0  # TODO: Update
+            self.connthreshold = 0
 
         self.refcontacts = self.args.refcontacts
         if self.refcontacts is not None:
             self.refcontacts = float(self.refcontacts)
+
+        self.alk_resname = self.args.alk_resname
 
         self.skip = self.args.skip
         if self.skip is not None:
@@ -97,7 +96,7 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
             connthreshold (int): Connectivity threshold.
             start_time (float): Time to start averaging at.
             end_time (float): Time to end averaging at.
-            skip (int): Resampling interval.
+            skip (int): Frequency.
 
         Returns:
             {
@@ -112,7 +111,9 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         Raises:
             ValueError if calculation method is not recognized.
         """
-        if method == "atomic-h":
+        if method == "alk-ua":
+            return self.calc_trajcontacts_alk_ua(u, distcutoff, connthreshold, start_time, end_time, skip)
+        elif method == "atomic-h":
             return self.calc_trajcontacts_atomic_h(u, distcutoff, connthreshold, start_time, end_time, skip)
         elif method == "atomic-sh":
             return self.calc_trajcontacts_atomic_sh(u, distcutoff, connthreshold, start_time, end_time, skip)
@@ -120,17 +121,92 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
             raise ValueError("Method not recognized")
 
     @profiling.timefunc
+    def calc_trajcontacts_alk_ua(self, u, distcutoff, connthreshold, start_time, end_time, skip):
+        """
+        Calculates contacts between alkane united atoms along trajectory.
+
+        The connectivity threshold is the number of bonds any pair of alkane united atoms
+        have to be separated by for it to be a candidate for contact formation. The distance cutoff
+        is the maximum interatomic distance required for such a candidate pair
+        to be a valid contact.
+
+        Side chain heavy atoms i and j form a contact if
+        N(i,j) > connthreshold and r(i,j) < distcutoff.
+        """
+        # MDAnalysis selection strings
+        alk_sel = "resname %s" % self.alk_resname
+
+        # Select alkane united atoms only
+        alkane = u.select_atoms(alk_sel)
+        nalk = len(alkane.atoms)
+
+        start_index = None
+        stop_index = None
+        for tidx, ts in enumerate(u.trajectory):
+            if start_index is None and ts.time >= start_time:
+                start_index = tidx
+            if ts.time == end_time:
+                stop_index = tidx + 1
+
+        # Select trajectory to average over
+        utraj = u.trajectory[start_index:stop_index:skip]
+
+        # Determine indices to exclude based on connectivity
+        apsp, all_to_alk = self.alk_ua_APSP(u)
+
+        if connthreshold < 0:
+            raise ValueError("Connectivity threshold must be an integer value 0 or greater.")
+
+        # Variables to store computed contacts to
+        times = np.zeros(len(utraj))
+        total_contacts = np.zeros(len(utraj))
+        mean_contactmatrix = np.zeros((nheavy, nheavy))
+
+        if self.verbose:
+            pbar = tqdm(desc="Calculating contacts", total=len(utraj))
+
+        for tidx, ts in enumerate(utraj):
+            # Fast MDAnalysis distance matrix computation
+            dmatrix = mda.lib.distances.distance_array(protein_heavy.positions, protein_heavy.positions)
+
+            # Exclude i-j interactions below connectivity threshold from distance matrix
+            for i in range(apsp.shape[0]):
+                for j in range(apsp.shape[1]):
+                    if i == j and apsp[i, j] > 0:
+                        raise ValueError("Distance matrix is inconsistent: shortest path between same atom should be 0.")
+                    if apsp[i, j] <= connthreshold:
+                        dmatrix[i, j] = np.Inf
+
+            # Impose distance cutoff
+            contactmatrix = np.array(dmatrix < distcutoff)
+
+            # Store timeseries
+            times[tidx] = ts.time
+            total_contacts[tidx] = np.sum(contactmatrix)
+
+            # Add to mean
+            mean_contactmatrix += contactmatrix
+
+            if self.verbose:
+                pbar.update(1)
+
+        ts_contacts = timeseries.TimeSeries(times, total_contacts, labels=['Number of contacts'])
+        mean_contactmatrix = mean_contactmatrix / len(utraj)
+
+        return ts_contacts, mean_contactmatrix
+
+    @profiling.timefunc
     def calc_trajcontacts_atomic_h(self, u, distcutoff, connthreshold, start_time, end_time, skip):
         """
         Calculates contacts between heavy atoms along trajectory.
 
-        The connectivity threshold is the number of bonds heavy atoms
+        The connectivity threshold is the number of bonds any pair of heavy atoms
         have to be separated by on the shortest bond network path between them
-        for the pair to be a candidate for contact formation. The distance cutoff
-        is the distance between a candidate atomic pair within which it is
-        considered to be a valid contact.
+        for it to be a candidate for contact formation. The distance cutoff
+        is the maximum interatomic distance for such a candidate pair
+        to be a valid contact.
 
-        Side chain heavy atoms i and j form a contact if
+        Heavy atoms i and j form a contact if
         N(i,j) > connthreshold and r(i,j) < distcutoff.
         """
         # MDAnalysis selection strings
@@ -201,11 +277,11 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         """
         Calculates contacts between side-chain heavy atoms along trajectory.
 
-        The connectivity threshold is the number of bonds side chain heavy atoms
+        The connectivity threshold is the number of bonds any pair of heavy atoms
         have to be separated by on the shortest bond network path between them
-        for the pair to be a candidate for contact formation. The distance cutoff
-        is the distance between a candidate atomic pair within which it is
-        considered to be a valid contact.
+        for it to be a candidate for contact formation. The distance cutoff
+        is the minimum interatomic distance required for such a candidate pair to
+        be a valid contact.
 
         Side chain heavy atoms i and j form a contact if
         N(i,j) > connthreshold and r(i,j) < distcutoff.
@@ -286,6 +362,51 @@ class ContactsAnalysis(timeseries.TimeSeriesAnalysis):
         mean_contactmatrix = mean_contactmatrix / len(utraj)
 
         return ts_contacts, mean_contactmatrix
+
+    def alk_ua_APSP(self, u):
+        """
+        Constructs graph of alkane united atoms and calculates all-pairs-shortest-path
+        distances using the Floyd-Warshall algorithm, assigning each bond an
+        equal weight (of 1).
+
+        Args:
+            u (mda.Universe): Universe object containing all atoms with bond definitions.
+
+        Returns:
+            {
+                D (np.array): Array of shape (nalk, nalk), where D[i,j] is the shortest
+                    path distance between alkane united atom i and alkane united atom j.
+
+                all_to_alk (dict): Dictionary mapping atom i in the Universe to its united atom
+                    index.
+            }
+        """
+        # Connectivity graph
+        alk = u.select_atoms("resname %s" % self.alk_resname)
+        nalk = len(alk)
+
+        alk_indices = alk.atoms.indices
+
+        all_to_alk = {}
+        for alkidx, allidx in enumerate(alk.atoms.indices):
+            all_to_alk[allidx] = alkidx
+
+        adj_matrix = np.zeros((nalk, nalk))
+
+        for bond in alk.bonds:
+            ati = bond.indices[0]
+            atj = bond.indices[1]
+            if ati in alk_indices and atj in alk_indices:
+                alki = all_to_alk[ati]
+                alkj = all_to_alk[atj]
+                adj_matrix[alki, alkj] = 1
+                adj_matrix[alkj, alki] = 1
+
+        # All pairs shortest paths between protein-heavy atoms
+        csr_graph = csr_matrix(adj_matrix)  # Store data in compressed sparse matrix form
+        apsp_matrix = floyd_warshall(csgraph=csr_graph, directed=False)  # Floyd-Warshall
+
+        return apsp_matrix, all_to_alk
 
     def protein_heavy_APSP(self, u):
         """
