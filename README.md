@@ -60,6 +60,14 @@ pytest
 ```
 inside the folder `tests_integration/`.
 
+### Ensemble tests:
+
+Run
+```sh
+pytest
+```
+inside the folder `tests_ensemble/`.
+
 ## Usage
 
 The package can be imported in any Python script using
