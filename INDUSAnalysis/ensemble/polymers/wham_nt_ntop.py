@@ -1,5 +1,5 @@
 """
-Calculates 1D and 2D free energy profiles (in Nt and Rg) for solvated polymer INDUS calculations
+Calculates 1D and 2D free energy profiles (in Nt and a second order parameter) for solvated polymer INDUS calculations
 (biasing the solvation order parameter) using WHAM.
 """
 import argparse
@@ -70,11 +70,11 @@ class WHAM_analysis_biasN:
             ("deltaG_diff", self.calc_deltaGu_diff_method),
             ("deltaG_int", self.calc_deltaGu_int_method_1D),
             ("2D", self.run_2D_binless_log_likelihood),
-            ("Rg", self.run_2D_bin_Rg),
+            ("sec_OP", self.run_2D_bin_sec_OP),
             ("2D_phi_stars", self.run_2D_reweight_phi_star),
-            ("Rg_phi_stars", self.run_2D_reweight_phi_star_bin_Rg),
+            ("sec_OP_phi_stars", self.run_2D_reweight_phi_star_bin_sec_OP),
             ("2D_coex", self.run_coex_integration_2D),
-            ("Rg_coex", self.run_coex_integration_Rg)
+            ("sec_OP_coex", self.run_coex_integration_sec_OP)
         ])
         return self.func_registry
 
@@ -102,7 +102,7 @@ class WHAM_analysis_biasN:
                       "2d_phi_star",
                       "2d_plot_phi_star",
                       "coex2",
-                      "coexRg"]
+                      "coexsec_OP"]
         for category in categories:
             for k, v in self.config[category].items():
                 setattr(self, k, v)
@@ -180,10 +180,10 @@ class WHAM_analysis_biasN:
 
             - n_star_win: list of all simulation Nstar values for each umbrella window
             - Ntw_win: list containing an array of N~ values for each umbrella window
-            - Rg_win: list containing an array of Rg values for each umbrella window
+            - sec_OP_win: list containing an array of sec_OP values for each umbrella window
             - x_bin_points: list containing the points defining N~ bins (centers)
                 for constructing final free energy profiles
-            - y_bin_points: list containing the points defining Rg bins (centers)
+            - y_bin_points: list containing the points defining sec_OP bins (centers)
                 for constructing final free energy profiles
             - umbrella_win: list containing bias potential functions on N~ for each umbrella window.
             - beta: 1/kbT for the simulation, in units of mol/kJ.
@@ -213,7 +213,7 @@ class WHAM_analysis_biasN:
 
         # List of bins to perform binning into
         x_bin_points = np.linspace(self.NMIN2, self.NMAX2, self.NBINS2)
-        y_bin_points = np.linspace(self.RGMIN2, self.RGMAX2, self.RGBINS2)
+        y_bin_points = np.linspace(self.SECOPMIN2, self.SECOPMAX2, self.SECOPBINS2)
 
         # Raw, correlated timeseries CV data from each window
         Ntw_win = []
@@ -228,12 +228,12 @@ class WHAM_analysis_biasN:
 
         tsa = TimeSeriesAnalysis()
 
-        Rg_win = []
+        sec_OP_win = []
 
         for n_star in n_star_win:
-            ts = tsa.load_TimeSeries(self.config["windows"][n_star]["Rg_file"])
-            Rg_win.append(ts[self.TSTART:self.TEND:self.BASE_SAMP_FREQ2].data_array)
-            logger.debug("(Rg) N*={}: {} to end, skipping {}. {} entries.".format(n_star, self.TSTART, self.BASE_SAMP_FREQ2,
+            ts = tsa.load_TimeSeries(self.config["windows"][n_star]["sec_OP_file"])
+            sec_OP_win.append(ts[self.TSTART:self.TEND:self.BASE_SAMP_FREQ2].data_array)
+            logger.debug("(sec_OP) N*={}: {} to end, skipping {}. {} entries.".format(n_star, self.TSTART, self.BASE_SAMP_FREQ2,
                          len(ts[self.TSTART:self.TEND:self.BASE_SAMP_FREQ2].data_array)))
 
         beta = 1000 / (8.314 * int(self.TEMP))  # at T K, in kJ/mol units
@@ -247,16 +247,16 @@ class WHAM_analysis_biasN:
             max_Ntws.append(Ntwwin.max())
         logger.info("MIN Ntw = {:.2f}, MAX Ntw = {:.2f}".format(np.min(np.array(min_Ntws)), np.max(np.array(max_Ntws))))
 
-        # Show min and max Rg across dataset
-        min_Rgs = []
-        for Rgwin in Rg_win:
-            min_Rgs.append(Rgwin.min())
-        max_Rgs = []
-        for Rgwin in Rg_win:
-            max_Rgs.append(Rgwin.max())
-        logger.info("MIN Rg = {:.2f}, MAX Rg = {:.2f}".format(np.min(np.array(min_Rgs)), np.max(np.array(max_Rgs))))
+        # Show min and max sec_OP across dataset
+        min_sec_OPs = []
+        for sec_OPwin in sec_OP_win:
+            min_sec_OPs.append(sec_OPwin.min())
+        max_sec_OPs = []
+        for sec_OPwin in sec_OP_win:
+            max_sec_OPs.append(sec_OPwin.max())
+        logger.info("MIN sec_OP = {:.2f}, MAX sec_OP = {:.2f}".format(np.min(np.array(min_sec_OPs)), np.max(np.array(max_sec_OPs))))
 
-        return n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta
+        return n_star_win, Ntw_win, sec_OP_win, x_bin_points, y_bin_points, umbrella_win, beta
 
     ############################################################################
     # Histogram
@@ -1279,7 +1279,7 @@ class WHAM_analysis_biasN:
     ############################################################################
 
     ############################################################################
-    # 2D WHAM plot and Rg plot
+    # 2D WHAM plot and sec_OP plot
     ############################################################################
 
     def run_2D_binless_log_likelihood(self):
@@ -1304,20 +1304,20 @@ class WHAM_analysis_biasN:
 
         savedloc = self.calcoutdir + "/" + params["in_calcfile"]
 
-        n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
+        n_star_win, Ntw_win, sec_OP_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
 
-        assert(len(Ntw_win[0]) == len(Rg_win[0]))
-        assert(len(Ntw_win[1]) == len(Rg_win[1]))
+        assert(len(Ntw_win[0]) == len(sec_OP_win[0]))
+        assert(len(Ntw_win[1]) == len(sec_OP_win[1]))
 
         # Unroll Ntw_win into a single array
         x_l = Ntw_win[0]
         for i in range(1, len(Ntw_win)):
             x_l = np.hstack((x_l, Ntw_win[i]))
 
-        # Unroll Rg_win into a single array
-        y_l = Rg_win[0]
-        for i in range(1, len(Rg_win)):
-            y_l = np.hstack((y_l, Rg_win[i]))
+        # Unroll sec_OP_win into a single array
+        y_l = sec_OP_win[0]
+        for i in range(1, len(sec_OP_win)):
+            y_l = np.hstack((y_l, sec_OP_win[i]))
 
         N_i = np.array([len(arr) for arr in Ntw_win])
 
@@ -1355,9 +1355,9 @@ class WHAM_analysis_biasN:
         fig.colorbar(contour_filled, cax=cax, orientation='vertical')
 
         ax.set_xlabel(r"$\tilde{N}$")
-        ax.set_ylabel(r"$R_g$ ($\AA$)")
+        ax.set_ylabel(r"$OP_2$")
 
-        cax.set_title(r"$\beta G_v(\tilde{N}, R_g)$")
+        cax.set_title(r"$\beta G_v(\tilde{N}, OP_2)$")
 
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
@@ -1395,9 +1395,9 @@ class WHAM_analysis_biasN:
         fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
 
         ax.set_xlabel(r"$\tilde{N}$")
-        ax.set_ylabel(r"$R_g$ ($\AA$)")
+        ax.set_ylabel(r"$OP_2$")
 
-        cax.set_title(r"$P_v(\tilde{N}, R_g)$")
+        cax.set_title(r"$P_v(\tilde{N}, OP_2)$")
 
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
@@ -1412,7 +1412,7 @@ class WHAM_analysis_biasN:
         # Write to npy file
         np.save(self.calcoutdir + "/" + params["prob_npyfile"], p_bin)
 
-    def run_2D_bin_Rg(self):
+    def run_2D_bin_sec_OP(self):
         """
         Loads the following params from the config file:
             saved:
@@ -1425,24 +1425,24 @@ class WHAM_analysis_biasN:
         # Load config
         self.load_config()
         # Load params
-        params = self.config["func_params"]["run_2D_bin_Rg"]
+        params = self.config["func_params"]["run_2D_bin_sec_OP"]
 
         savedloc = self.calcoutdir + "/" + params["in_calcfile"]
 
-        n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
+        n_star_win, Ntw_win, sec_OP_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
 
-        assert(len(Ntw_win[0]) == len(Rg_win[0]))
-        assert(len(Ntw_win[1]) == len(Rg_win[1]))
+        assert(len(Ntw_win[0]) == len(sec_OP_win[0]))
+        assert(len(Ntw_win[1]) == len(sec_OP_win[1]))
 
         # Unroll Ntw_win into a single array
         x_l = Ntw_win[0]
         for i in range(1, len(Ntw_win)):
             x_l = np.hstack((x_l, Ntw_win[i]))
 
-        # Unroll Rg_win into a single array
-        y_l = Rg_win[0]
-        for i in range(1, len(Rg_win)):
-            y_l = np.hstack((y_l, Rg_win[i]))
+        # Unroll sec_OP_win into a single array
+        y_l = sec_OP_win[0]
+        for i in range(1, len(sec_OP_win)):
+            y_l = np.hstack((y_l, sec_OP_win[i]))
 
         if params["saved"]:
             calc = pickle.load(open(savedloc, "rb"))
@@ -1454,21 +1454,21 @@ class WHAM_analysis_biasN:
         # Useful for debugging:
         logger.debug("Window free energies: ", g_i)
 
-        betaF_Rg = calc.bin_second_betaF_profile(y_l, x_bin_points, y_bin_points,
+        betaF_sec_OP = calc.bin_second_betaF_profile(y_l, x_bin_points, y_bin_points,
                                                  x_bin_style='center', y_bin_style='center')
-        betaF_Rg = betaF_Rg - np.min(betaF_Rg)
+        betaF_sec_OP = betaF_sec_OP - np.min(betaF_sec_OP)
 
         # Write to text file
         of = open(self.calcoutdir + "/" + params["betaF_datfile"], "w")
         of.write("# Nt    betaF\n")
         for i in range(len(y_bin_points)):
-            of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], betaF_Rg[i]))
+            of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], betaF_sec_OP[i]))
         of.close()
 
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-        ax.plot(y_bin_points, betaF_Rg, label="Log-likelihood binless Rg profile")
-        ax.set_xlabel(r"$R_g$")
+        ax.plot(y_bin_points, betaF_sec_OP, label="Log-likelihood binless sec_OP profile")
+        ax.set_xlabel(r"$OP_2$")
         ax.set_ylabel(r"$\beta F$")
         ax.margins(x=0, y=0)
 
@@ -1477,13 +1477,13 @@ class WHAM_analysis_biasN:
 
         """Probabilities"""
         delta_y_bin = y_bin_points[1] - y_bin_points[0]
-        p_bin = delta_y_bin * np.exp(-betaF_Rg)
+        p_bin = delta_y_bin * np.exp(-betaF_sec_OP)
 
         p_bin = p_bin / (delta_y_bin * np.sum(p_bin))  # normalize
 
         # Write to text file
         of = open(self.calcoutdir + "/" + params["prob_datfile"], "w")
-        of.write("# Nt    Pv(Rg)\n")
+        of.write("# Nt    Pv(sec_OP)\n")
         for i in range(len(y_bin_points)):
             of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], p_bin[i]))
         of.close()
@@ -1491,8 +1491,8 @@ class WHAM_analysis_biasN:
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
         ax.plot(y_bin_points, p_bin, label="Log-likelihood probability density")
-        ax.set_xlabel(r"$R_g$")
-        ax.set_ylabel(r"$P_v(R_g)$")
+        ax.set_xlabel(r"$OP_2$")
+        ax.set_ylabel(r"$P_v(OP_2)$")
         ax.margins(x=0, y=0)
 
         plt.savefig(self.plotoutdir + "/" + params["prob_imgfile"], bbox_inches='tight')
@@ -1526,20 +1526,20 @@ class WHAM_analysis_biasN:
 
             savedloc = self.calcoutdir + "/" + params["in_calcfile"]
 
-            n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
+            n_star_win, Ntw_win, sec_OP_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
 
-            assert(len(Ntw_win[0]) == len(Rg_win[0]))
-            assert(len(Ntw_win[1]) == len(Rg_win[1]))
+            assert(len(Ntw_win[0]) == len(sec_OP_win[0]))
+            assert(len(Ntw_win[1]) == len(sec_OP_win[1]))
 
             # Unroll Ntw_win into a single array
             x_l = Ntw_win[0]
             for i in range(1, len(Ntw_win)):
                 x_l = np.hstack((x_l, Ntw_win[i]))
 
-            # Unroll Rg_win into a single array
-            y_l = Rg_win[0]
-            for i in range(1, len(Rg_win)):
-                y_l = np.hstack((y_l, Rg_win[i]))
+            # Unroll sec_OP_win into a single array
+            y_l = sec_OP_win[0]
+            for i in range(1, len(sec_OP_win)):
+                y_l = np.hstack((y_l, sec_OP_win[i]))
 
             if params["saved"]:
                 calc = pickle.load(open(savedloc, "rb"))
@@ -1571,7 +1571,7 @@ class WHAM_analysis_biasN:
             x_min = np.min(x_indices)
             x_max = np.max(x_indices)
 
-            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
+            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_SECOP_MIN2, y_bin_points <= self.PLOT_PHI_STAR_SECOP_MAX2))[0]
             y_min = np.min(y_indices)
             y_max = np.max(y_indices)
 
@@ -1584,9 +1584,9 @@ class WHAM_analysis_biasN:
             fig.colorbar(contour_filled, cax=cax, orientation='vertical')
 
             ax.set_xlabel(r"$\tilde{N}$")
-            ax.set_ylabel(r"$R_g$ ($\AA$)")
+            ax.set_ylabel(r"$OP_2$")
 
-            cax.set_title(r"$\beta G_v^{\phi_1^*}(\tilde{N}, R_g)$")
+            cax.set_title(r"$\beta G_v^{\phi_1^*}(\tilde{N}, OP_2)$")
 
             ax.xaxis.set_minor_locator(AutoMinorLocator())
             ax.yaxis.set_minor_locator(AutoMinorLocator())
@@ -1624,7 +1624,7 @@ class WHAM_analysis_biasN:
             x_min = np.min(x_indices)
             x_max = np.max(x_indices)
 
-            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
+            y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_SECOP_MIN2, y_bin_points <= self.PLOT_PHI_STAR_SECOP_MAX2))[0]
             y_min = np.min(y_indices)
             y_max = np.max(y_indices)
 
@@ -1637,9 +1637,9 @@ class WHAM_analysis_biasN:
             fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
 
             ax.set_xlabel(r"$\tilde{N}$")
-            ax.set_ylabel(r"$R_g$ ($\AA$)")
+            ax.set_ylabel(r"$OP_2$")
 
-            cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, R_g)$")
+            cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, OP_2)$")
 
             ax.xaxis.set_minor_locator(AutoMinorLocator())
             ax.yaxis.set_minor_locator(AutoMinorLocator())
@@ -1656,9 +1656,9 @@ class WHAM_analysis_biasN:
             # Write probabilities to npy file
             np.save(self.calcoutdir + "/" + params["prob_npyformat"].format(phi_star_key), p_bin)
 
-    def run_2D_reweight_phi_star_bin_Rg(self):
+    def run_2D_reweight_phi_star_bin_sec_OP(self):
         """
-        Calculates 1D profile in Rg at different phi_star values by integrating out
+        Calculates 1D profile in sec_OP at different phi_star values by integrating out
         N coordinate from 2D reweighted profile.
 
         Loads the following params from the config file:
@@ -1672,27 +1672,27 @@ class WHAM_analysis_biasN:
         # Load config
         self.load_config()
         # Load params
-        params = self.config["func_params"]["run_2D_reweight_phi_star_bin_Rg"]
+        params = self.config["func_params"]["run_2D_reweight_phi_star_bin_sec_OP"]
 
         # Loop over params
         for phi_star_key in ["PHI_STAR2", "PHI_STAR_EQ2", "PHI_STAR_COEX2"]:
 
             savedloc = self.calcoutdir + "/" + params["in_calcfile"]
 
-            n_star_win, Ntw_win, Rg_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
+            n_star_win, Ntw_win, sec_OP_win, x_bin_points, y_bin_points, umbrella_win, beta = self.get_test_data2()
 
-            assert(len(Ntw_win[0]) == len(Rg_win[0]))
-            assert(len(Ntw_win[1]) == len(Rg_win[1]))
+            assert(len(Ntw_win[0]) == len(sec_OP_win[0]))
+            assert(len(Ntw_win[1]) == len(sec_OP_win[1]))
 
             # Unroll Ntw_win into a single array
             x_l = Ntw_win[0]
             for i in range(1, len(Ntw_win)):
                 x_l = np.hstack((x_l, Ntw_win[i]))
 
-            # Unroll Rg_win into a single array
-            y_l = Rg_win[0]
-            for i in range(1, len(Rg_win)):
-                y_l = np.hstack((y_l, Rg_win[i]))
+            # Unroll sec_OP_win into a single array
+            y_l = sec_OP_win[0]
+            for i in range(1, len(sec_OP_win)):
+                y_l = np.hstack((y_l, sec_OP_win[i]))
 
             if params["saved"]:
                 calc = pickle.load(open(savedloc, "rb"))
@@ -1710,16 +1710,16 @@ class WHAM_analysis_biasN:
 
             G_l_rew = calc.reweight(beta, u_bias=potentials.linear(phi_star))
 
-            betaF_Rg_rew = calc.bin_second_betaF_profile(y_l, x_bin_points, y_bin_points,
+            betaF_sec_OP_rew = calc.bin_second_betaF_profile(y_l, x_bin_points, y_bin_points,
                                                          G_l=G_l_rew, x_bin_style='center', y_bin_style='center')
-            betaF_Rg_rew = betaF_Rg_rew - np.min(betaF_Rg_rew)
+            betaF_sec_OP_rew = betaF_sec_OP_rew - np.min(betaF_sec_OP_rew)
 
             # Plot
             fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-            indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2,
-                                              y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
-            ax.plot(y_bin_points[indices], betaF_Rg_rew[indices], label=r"Biased free energy profile in $\phi_1^*$ ensemble.")
-            ax.set_xlabel(r"$R_g$")
+            indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_SECOP_MIN2,
+                                              y_bin_points <= self.PLOT_PHI_STAR_SECOP_MAX2))[0]
+            ax.plot(y_bin_points[indices], betaF_sec_OP_rew[indices], label=r"Biased free energy profile in $\phi_1^*$ ensemble.")
+            ax.set_xlabel(r"$OP_2$")
             ax.set_ylabel(r"$\beta F$")
             ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX2])
 
@@ -1732,18 +1732,18 @@ class WHAM_analysis_biasN:
             of = open(self.calcoutdir + "/" + params["betaF_datformat"].format(phi_star_key), "w")
             of.write("# N    betaF\n")
             for i in range(len(y_bin_points)):
-                of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], betaF_Rg_rew[i]))
+                of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], betaF_sec_OP_rew[i]))
             of.close()
 
             """Probabilities"""
             delta_y_bin = y_bin_points[1] - y_bin_points[0]
-            p_bin = delta_y_bin * np.exp(-betaF_Rg_rew)
+            p_bin = delta_y_bin * np.exp(-betaF_sec_OP_rew)
 
             p_bin = p_bin / (delta_y_bin * np.sum(p_bin))  # normalize
 
             # Write to text file
             of = open(self.calcoutdir + "/" + params["prob_datformat"].format(phi_star_key), "w")
-            of.write("# Nt    Pv(Rg)\n")
+            of.write("# Nt    Pv(sec_OP)\n")
             for i in range(len(y_bin_points)):
                 of.write("{:.5f} {:.5f}\n".format(y_bin_points[i], p_bin[i]))
             of.close()
@@ -1751,8 +1751,8 @@ class WHAM_analysis_biasN:
             # Plot
             fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
             ax.plot(y_bin_points, p_bin, label="Log-likelihood probability density")
-            ax.set_xlabel(r"$R_g$")
-            ax.set_ylabel(r"$P_v(R_g)$")
+            ax.set_xlabel(r"$OP_2$")
+            ax.set_ylabel(r"$P_v(OP_2)$")
 
             ax.margins(x=0, y=0)
 
@@ -1782,39 +1782,39 @@ class WHAM_analysis_biasN:
         # Load params
         params = self.config["func_params"]["run_coex_integration_2D"]
 
-        pvntrg = np.load(self.calcoutdir + "/" + params["in_prob_npyformat"].format("PHI_STAR_COEX2"))
+        pvntsecop = np.load(self.calcoutdir + "/" + params["in_prob_npyformat"].format("PHI_STAR_COEX2"))
         x_bin_points = np.load(self.calcoutdir + "/" + params["in_x_bins_npyformat"].format("PHI_STAR_COEX2"))
         y_bin_points = np.load(self.calcoutdir + "/" + params["in_y_bins_npyformat"].format("PHI_STAR_COEX2"))
 
         xv, yv = np.meshgrid(x_bin_points, y_bin_points, indexing='ij')
         logger.debug(xv.shape)
-        mask1 = yv < self.NTRG_SPLIT_m * (xv - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c
-        mask2 = yv >= self.NTRG_SPLIT_m * (xv - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c
+        mask1 = yv < self.NTSECOP_SPLIT_m * (xv - self.NTSECOP_SPLIT_x0) + self.NTSECOP_SPLIT_c
+        mask2 = yv >= self.NTSECOP_SPLIT_m * (xv - self.NTSECOP_SPLIT_x0) + self.NTSECOP_SPLIT_c
 
         dx = x_bin_points[1] - x_bin_points[0]
         dy = y_bin_points[1] - y_bin_points[0]
 
-        p1 = dx * dy * np.sum(mask1 * pvntrg)
-        p2 = dx * dy * np.sum(mask2 * pvntrg)
+        p1 = dx * dy * np.sum(mask1 * pvntsecop)
+        p2 = dx * dy * np.sum(mask2 * pvntsecop)
 
-        logger.info("Probabilities in N, Rg: {:.5f} {:.5f}".format(p1, p2))
+        logger.info("Probabilities in N, sec_OP: {:.5f} {:.5f}".format(p1, p2))
 
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
 
-        levels = np.linspace(0, np.max(pvntrg), self.PLOT_PHI_STAR_PV_LEVELS2)
+        levels = np.linspace(0, np.max(pvntsecop), self.PLOT_PHI_STAR_PV_LEVELS2)
         cmap = cm.YlGnBu
 
         x_indices = np.where(np.logical_and(x_bin_points >= self.PLOT_PHI_STAR_N_MIN2, x_bin_points <= self.PLOT_PHI_STAR_N_MAX2))[0]
         x_min = np.min(x_indices)
         x_max = np.max(x_indices)
 
-        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
+        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_SECOP_MIN2, y_bin_points <= self.PLOT_PHI_STAR_SECOP_MAX2))[0]
         y_min = np.min(y_indices)
         y_max = np.max(y_indices)
 
         contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                     pvntrg[x_min:x_max, y_min:y_max].T,
+                                     pvntsecop[x_min:x_max, y_min:y_max].T,
                                      levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
         ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
         divider = make_axes_locatable(ax)
@@ -1823,25 +1823,25 @@ class WHAM_analysis_biasN:
         fig.colorbar(contour_filled, cax=cax, orientation='vertical', format='%.1e')
 
         # Plot dividing line
-        ax.plot(x_bin_points[x_indices], self.NTRG_SPLIT_m * (x_bin_points[x_indices] - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c)
+        ax.plot(x_bin_points[x_indices], self.NTSECOP_SPLIT_m * (x_bin_points[x_indices] - self.NTSECOP_SPLIT_x0) + self.NTSECOP_SPLIT_c)
 
-        # Plot Nt, Rg dividing lines
-        ax.plot(self.NT_SPLIT, self.RG_SPLIT, 'x')
-        ax.text(self.NT_SPLIT + 5, self.RG_SPLIT + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.RG_SPLIT))
+        # Plot Nt, sec_OP dividing lines
+        ax.plot(self.NT_SPLIT, self.SECOP_SPLIT, 'x')
+        ax.text(self.NT_SPLIT + 5, self.SECOP_SPLIT + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.SECOP_SPLIT))
 
         ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
 
         ax.set_xlabel(r"$\tilde{N}$")
-        ax.set_ylabel(r"$R_g$ ($\AA$)")
+        ax.set_ylabel(r"$OP_2$")
 
-        cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, R_g)$")
+        cax.set_title(r"$P_v^{\phi_1^*}(\tilde{N}, OP_2)$")
 
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
 
         ax.set_xlim([self.PLOT_PHI_STAR_N_MIN2, self.PLOT_PHI_STAR_N_MAX2])
-        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
+        ax.set_ylim([self.PLOT_PHI_STAR_SECOP_MIN2, self.PLOT_PHI_STAR_SECOP_MAX2])
 
         ax.tick_params(axis='both', which='both', direction='in', pad=10)
 
@@ -1849,7 +1849,7 @@ class WHAM_analysis_biasN:
         plt.close()
 
         # Plot free energies
-        fntrg = np.load(self.calcoutdir + "/" + params["in_betaF_npyformat"].format("PHI_STAR_COEX2"))
+        fntsecop = np.load(self.calcoutdir + "/" + params["in_betaF_npyformat"].format("PHI_STAR_COEX2"))
 
         fig, ax = plt.subplots(figsize=(4, 4), dpi=600)
 
@@ -1860,12 +1860,12 @@ class WHAM_analysis_biasN:
         x_min = np.min(x_indices)
         x_max = np.max(x_indices)
 
-        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_RG_MIN2, y_bin_points <= self.PLOT_PHI_STAR_RG_MAX2))[0]
+        y_indices = np.where(np.logical_and(y_bin_points >= self.PLOT_PHI_STAR_SECOP_MIN2, y_bin_points <= self.PLOT_PHI_STAR_SECOP_MAX2))[0]
         y_min = np.min(y_indices)
         y_max = np.max(y_indices)
 
         contour_filled = ax.contourf(x_bin_points[x_min:x_max], y_bin_points[y_min:y_max],
-                                     fntrg[x_min:x_max, y_min:y_max].T,
+                                     fntsecop[x_min:x_max, y_min:y_max].T,
                                      levels, cmap=cm.get_cmap(cmap, len(levels) - 1))
         ax.contour(contour_filled, colors='k', alpha=0.5, linewidths=0.5)
         divider = make_axes_locatable(ax)
@@ -1874,34 +1874,34 @@ class WHAM_analysis_biasN:
         fig.colorbar(contour_filled, cax=cax, orientation='vertical')
 
         # Plot dividing line
-        ax.plot(x_bin_points[x_indices], self.NTRG_SPLIT_m * (x_bin_points[x_indices] - self.NTRG_SPLIT_x0) + self.NTRG_SPLIT_c)
+        ax.plot(x_bin_points[x_indices], self.NTSECOP_SPLIT_m * (x_bin_points[x_indices] - self.NTSECOP_SPLIT_x0) + self.NTSECOP_SPLIT_c)
 
-        # Plot Nt, Rg dividing lines
-        ax.plot(self.NT_SPLIT, self.RG_SPLIT, 'x')
-        ax.text(self.NT_SPLIT + 5, self.RG_SPLIT + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.RG_SPLIT))
+        # Plot Nt, sec_OP dividing lines
+        ax.plot(self.NT_SPLIT, self.SECOP_SPLIT, 'x')
+        ax.text(self.NT_SPLIT + 5, self.SECOP_SPLIT + .5, "({:.2f}, {:.2f})".format(self.NT_SPLIT, self.SECOP_SPLIT))
 
         ax.text(0.2, 0.2, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.8, "P = {:.2f}".format(p2), transform=ax.transAxes)
 
         ax.set_xlabel(r"$\tilde{N}$")
-        ax.set_ylabel(r"$R_g$ ($\AA$)")
+        ax.set_ylabel(r"$OP_2$")
 
-        cax.set_title(r"$\beta G_v^{\phi_1^*}(\tilde{N}, R_g)$")
+        cax.set_title(r"$\beta G_v^{\phi_1^*}(\tilde{N}, OP_2)$")
 
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
 
         ax.set_xlim([self.PLOT_PHI_STAR_N_MIN2, self.PLOT_PHI_STAR_N_MAX2])
-        ax.set_ylim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
+        ax.set_ylim([self.PLOT_PHI_STAR_SECOP_MIN2, self.PLOT_PHI_STAR_SECOP_MAX2])
 
         ax.tick_params(axis='both', which='both', direction='in', pad=10)
 
         plt.savefig(self.plotoutdir + "/" + params["betaF_coex_imgfile"], bbox_inches='tight')
         plt.close()
 
-    def run_coex_integration_Rg(self):
+    def run_coex_integration_sec_OP(self):
         """
-        Integrates reweighted Rg profile, at phi_star_coex, to determine coexistence.
+        Integrates reweighted sec_OP profile, at phi_star_coex, to determine coexistence.
 
         Loads the following params from config file:
             in_betaF_datformat:
@@ -1912,45 +1912,45 @@ class WHAM_analysis_biasN:
         # Load config
         self.load_config()
         # Load params
-        params = self.config["func_params"]["run_coex_integration_Rg"]
+        params = self.config["func_params"]["run_coex_integration_sec_OP"]
 
         f = open(self.calcoutdir + "/" + params["in_prob_datformat"].format("PHI_STAR_COEX2"))
 
-        rg = []
-        pvrg = []
+        secop = []
+        pvsecop = []
 
         for line in f:
             if line.strip().split()[0] != '#':
-                rg.append(float(line.strip().split()[0]))
-                pvrg.append(float(line.strip().split()[1]))
+                secop.append(float(line.strip().split()[0]))
+                pvsecop.append(float(line.strip().split()[1]))
 
         f.close()
 
-        rg = np.array(rg)
-        pvrg = np.array(pvrg)
+        secop = np.array(secop)
+        pvsecop = np.array(pvsecop)
 
-        idx1 = np.argwhere(rg < self.RG_SPLIT)
-        idx2 = np.argwhere(rg >= self.RG_SPLIT)
+        idx1 = np.argwhere(secop < self.SECOP_SPLIT)
+        idx2 = np.argwhere(secop >= self.SECOP_SPLIT)
 
-        dx = rg[1] - rg[0]
+        dx = secop[1] - secop[0]
 
-        p1 = dx * np.sum(pvrg[idx1].flatten())
-        p2 = dx * np.sum(pvrg[idx2].flatten())
+        p1 = dx * np.sum(pvsecop[idx1].flatten())
+        p2 = dx * np.sum(pvsecop[idx2].flatten())
 
-        logger.info("Probabilities in Rg: {:.5f} {:.5f}".format(p1, p2))
+        logger.info("Probabilities in sec_OP: {:.5f} {:.5f}".format(p1, p2))
 
         # Plot
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-        ax.plot(rg, pvrg, label="Probability density")
-        ax.axvline(x=self.RG_SPLIT, label=r"$R_g ={:.2f}$".format(self.RG_SPLIT))
+        ax.plot(secop, pvsecop, label="Probability density")
+        ax.axvline(x=self.SECOP_SPLIT, label=r"$OP_2 ={:.2f}$".format(self.SECOP_SPLIT))
         ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
-        ax.set_xlabel(r"$R_g$")
-        ax.set_ylabel(r"$P_v(R_g)$")
+        ax.set_xlabel(r"$OP_2$")
+        ax.set_ylabel(r"$P_v(OP_2)$")
         ax.legend()
         ax.margins(x=0, y=0)
 
-        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
+        ax.set_xlim([self.PLOT_PHI_STAR_SECOP_MIN2, self.PLOT_PHI_STAR_SECOP_MAX2])
 
         plt.savefig(self.plotoutdir + "/" + params["prob_coex_imgfile"], bbox_inches='tight')
         plt.close()
@@ -1958,26 +1958,26 @@ class WHAM_analysis_biasN:
         # Plot free energies
         f = open(self.calcoutdir + "/" + params["in_betaF_datformat"].format("PHI_STAR_COEX2"))
 
-        frg = []
+        fsecop = []
 
         for line in f:
             if line.strip().split()[0] != '#':
-                frg.append(float(line.strip().split()[1]))
+                fsecop.append(float(line.strip().split()[1]))
 
         f.close()
 
-        frg = np.array(frg)
+        fsecop = np.array(fsecop)
 
         fig, ax = plt.subplots(figsize=(4, 4), dpi=300)
-        ax.plot(rg, frg, label="Free energy")
-        ax.axvline(x=self.RG_SPLIT, label=r"$R_g ={:.2f}$".format(self.RG_SPLIT))
+        ax.plot(secop, fsecop, label="Free energy")
+        ax.axvline(x=self.SECOP_SPLIT, label=r"$OP_2 ={:.2f}$".format(self.SECOP_SPLIT))
         ax.text(0.2, 0.5, "P = {:.2f}".format(p1), transform=ax.transAxes)
         ax.text(0.8, 0.5, "P = {:.2f}".format(p2), transform=ax.transAxes)
-        ax.set_xlabel(r"$R_g$")
-        ax.set_ylabel(r"$F(R_g)$")
+        ax.set_xlabel(r"$OP_2$")
+        ax.set_ylabel(r"$F(OP_2)$")
         ax.legend()
         ax.margins(x=0, y=0)
-        ax.set_xlim([self.PLOT_PHI_STAR_RG_MIN2, self.PLOT_PHI_STAR_RG_MAX2])
+        ax.set_xlim([self.PLOT_PHI_STAR_SECOP_MIN2, self.PLOT_PHI_STAR_SECOP_MAX2])
         ax.set_ylim([0, self.PLOT_PHI_STAR_BETAF_MAX2])
 
         plt.savefig(self.plotoutdir + "/" + params["betaF_coex_imgfile"], bbox_inches='tight')
