@@ -71,10 +71,7 @@ def phi_ensemble(phivals: list,
         std_meanwaters_rev = np.std(meanwaters_rev, axis=1)
 
     """Plot waters"""
-    # CEMB grant figure edits
-    # TODO: Revert
-    fig, ax = plt.subplots(figsize=(4, 3), dpi=300)
-    # fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
 
     if invert_signs:
         phivals = -np.array([float(phi) for phi in phivals])
@@ -112,14 +109,12 @@ def phi_ensemble(phivals: list,
     ax.set_ylabel(r"$\langle \tilde{N}_v \rangle_\phi$")
     ax.legend()
 
-    # CEMB grant edits
-    # TODO: Revert
     x_minor_locator = AutoMinorLocator(10)
     y_minor_locator = AutoMinorLocator(10)
-    #ax.xaxis.set_minor_locator(x_minor_locator)
-    #ax.yaxis.set_minor_locator(y_minor_locator)
-    #ax.grid(which='major', linestyle='-')
-    #ax.grid(which='minor', linestyle=':')
+    ax.xaxis.set_minor_locator(x_minor_locator)
+    ax.yaxis.set_minor_locator(y_minor_locator)
+    ax.grid(which='major', linestyle='-')
+    ax.grid(which='minor', linestyle=':')
 
     if not no_pressure:
         phi_to_P_custom = partial(phi_to_P, P0=float(P0))
