@@ -22,7 +22,7 @@ def estimate_kappa(datf: str, temp: float, start_time: float = 0, end_time: floa
 
     beta * kappa = alpha / var(Nt), alpha = 2 to 5
 
-    beta * kappa = 4 * sqrt(1 + alpha) / alpha * sqrt(var(Nt))
+    deltan = 4 * sqrt(1 + alpha) / alpha * sqrt(var(Nt))
 
     Args:
         datf (str): Path to INDUS waters data file.
