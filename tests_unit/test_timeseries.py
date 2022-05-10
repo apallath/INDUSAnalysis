@@ -212,6 +212,12 @@ def test_TimeSeries_bootstrap_correlated():
     assert(timeseries.create1DTimeSeries(x).standard_error(use_pymbar=False) == 0)
 
 
+def test_loadTimeSeriesFromDAT():
+    # Check that loading does not fail
+    ts = timeseries.loadTimeSeriesFromDAT("plumed.dat", datacols=[1, 2], labels=["N", "N~"])
+    print(ts)
+
+
 def test_TimeSeriesAnalysis_save_load_TimeSeries():
     t = np.linspace(0, 10000, 41)
     x = np.random.random((41, 100, 100))

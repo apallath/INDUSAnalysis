@@ -344,6 +344,70 @@ def create1DTimeSeries(x):
 
 
 ################################################################################
+# Convenience function to load TimeSeries objects from .dat files
+################################################################################
+
+
+def loadTimeSeriesFromDAT(filename, tcol=0, datacols=[1], labels=None, commentchar="#"):
+    """Creates a 1-dimensional TimeSeries object from a .dat file (for example,
+       a PLUMED or OrderParameters output) with data_array loaded from
+       column indices `datacols`, time_array loaded from column index `tcol`,
+       and user-defined labels.
+
+    Args:
+        filename (str): Name of DAT file.
+        tcol (int): Column containing time values (default=0). If set to None,
+            then time_array is set to [0, 1, 2, ...]
+        datacols (list): List of column indices in DAT file (int, default=[1]).
+        labels (list): List of column labels corresponding to column indices (default=["x(col1)", "x(col2)", ...]
+            where col1, col2, ... are the datacols values).
+        commentchar (str): Character defining comment lines (lines beginning with this
+            character will be ignored when reading the DAT file, default='#')
+
+    Returns:
+        TimeSeries.
+
+    Note:
+        All column values will be converted to float.
+    """
+    t = []
+    data = []
+
+    with open(filename) as f:
+        # Read data file
+        for l in f:
+            lstrip = l.strip()
+
+            # Skip zero-length lines
+            if len(lstrip) == 0:
+                warnings.warn("Skipped blank line in %s" % filename)
+
+            # Parse data
+            elif lstrip[0] != '#' and '#' not in lstrip:
+                lsplit = lstrip.split()
+                # Skip incomplete lines
+                if len(lsplit) <= max(datacols) or len(lsplit) <= tcol:
+                    warnings.warn("Incomplete data (%s) encountered in %s (or requested column index > actual # of columns). Line skipped." % (lstrip, filename))
+                else:
+                    tcur = float(lsplit[tcol])
+                    datacur = [float(lsplit[col]) for col in datacols]
+                    t.append(tcur)
+                    data.append(datacur)
+
+    t = np.array(t)
+    data = np.array(data)
+
+    if labels is None:
+        labels = []
+        for col in datacols:
+            labels.append("x%d" % col)
+
+    ts = TimeSeries(t, data, labels=labels)
+
+    return ts
+
+
+################################################################################
 # Convenience functions for bootstrapping
 ################################################################################
 
