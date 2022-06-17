@@ -32,7 +32,7 @@ def estimate_kappa(datf: str, temp: float, start_time: float = 0, end_time: floa
     """
     ts_N, ts_Ntw, _ = WatersAnalysis.read_waters(datf)
     var_Ntw = ts_Ntw[start_time:end_time].std() ** 2
-    alphas = np.array([2, 3, 4, 5])
+    alphas = np.array(range(1, 101))
     kappas = 8.314 / 1000 * temp / var_Ntw * alphas
     deltas = 4 * np.sqrt((1 + alphas)) / alphas * np.sqrt(var_Ntw)
 
@@ -58,7 +58,7 @@ def estimate_min_max_Nstar(datf: str, start_time: float = 0, end_time: float = N
     """
     ts_N, ts_Ntw, _ = WatersAnalysis.read_waters(datf)
     mean_Ntw = ts_Ntw[start_time:end_time].mean()
-    alphas = np.array([2, 3, 4, 5])
+    alphas = np.array(range(1, 101))
     nstar_min = (true_Nmin * (1 + alphas) - mean_Ntw) / alphas
     nstar_max = (true_Nmax * (1 + alphas) - mean_Ntw) / alphas
 
