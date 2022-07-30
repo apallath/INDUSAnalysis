@@ -2,8 +2,6 @@
 
 Package to analyze simulation data generated using INDUS.
 
-[Documentation](https://apallath.github.io/INDUSAnalysis) hosted on GitHub pages.
-
 [![build Actions Status](https://github.com/apallath/analysis_scripts/workflows/build-test/badge.svg)](https://github.com/apallath/analysis_scripts/actions)
 [![Website](https://img.shields.io/website?label=docs&url=https%3A%2F%2Fimg.shields.io%2Fwebsite%2Fhttps%2Fapallath.github.io%2FINDUSAnalysis)](https://apallath.github.io/INDUSAnalysis)
 [![GitHub license](https://badgen.net/github/license/apallath/INDUSAnalysis)](https://github.com/apallath/INDUSAnalysis/blob/master/LICENSE)
