@@ -1,20 +1,12 @@
 # INDUSAnalysis
 
-Package to analyze simulation data generated using
-[INDUS](https://link.springer.com/article/10.1007/s10955-011-0269-9). 
+Package to analyze simulation data generated using INDUS.
 
 [Documentation](https://apallath.github.io/INDUSAnalysis) hosted on GitHub pages.
 
-## Status
-
-[![Actions Status](https://img.shields.io/github/workflow/status/apallath/analysis_scripts/Analysis)](https://github.com/apallath/analysis_scripts/actions)
-[![Open Issues](https://img.shields.io/github/issues-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
-[![Closed Issues](https://img.shields.io/github/issues-closed-raw/apallath/analysis_scripts)](https://github.com/apallath/analysis_scripts/issues)
-
-## Code
-
-[![Python](https://img.shields.io/github/languages/top/apallath/analysis_scripts)](https://www.python.org/downloads/release/python-370/)
-[![Google Python Style](https://img.shields.io/badge/Code%20Style-Google%20Python%20Style-brightgreen)](https://google.github.io/styleguide/pyguide.html)
+[![build Actions Status](https://github.com/apallath/analysis_scripts/workflows/Analysis/badge.svg)](https://github.com/apallath/analysis_scripts/actions)
+[![Website](https://img.shields.io/website?label=docs&url=https%3A%2F%2Fimg.shields.io%2Fwebsite%2Fhttps%2Fapallath.github.io%2FINDUSAnalysis)](https://apallath.github.io/INDUSAnalysis)
+[![GitHub license](https://badgen.net/github/license/apallath/INDUSAnalysis)](https://github.com/apallath/INDUSAnalysis/blob/master/LICENSE)
 
 ## Installation
 
