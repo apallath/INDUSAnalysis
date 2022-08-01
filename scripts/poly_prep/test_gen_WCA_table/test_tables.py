@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 
+
 def read_table(table_file):
     x = []
     f = []

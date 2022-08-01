@@ -61,7 +61,7 @@ def phi_i_star(phivals: list,
             ts = ts[start_time:]
             run_waters = ts.data_array[:, protein_heavy_indices]
 
-            # Calcuate per-atom mean waters and var waters for each run
+            # Calculate per-atom mean waters and var waters for each run
             mean_run_waters = np.mean(run_waters, axis=0)
             var_run_waters = np.var(run_waters, axis=0)
 

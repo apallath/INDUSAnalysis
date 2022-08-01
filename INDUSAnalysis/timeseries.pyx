@@ -397,6 +397,9 @@ def loadTimeSeriesFromDAT(filename, tcol=0, datacols=[1], labels=None, commentch
     t = np.array(t)
     data = np.array(data)
 
+    print(t.shape)
+    print(data.shape)
+
     if labels is None:
         labels = []
         for col in datacols:
