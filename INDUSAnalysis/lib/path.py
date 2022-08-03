@@ -105,12 +105,12 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap, dpi):
 
     z = path_z(x, y, x_i, y_i, lam)
 
-    # Plot s
+    # Plot z
     fig, ax = plt.subplots(dpi=dpi)
     if contourvals is not None:
-        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)).clip(min=0, max=1), contourvals, cmap=cmap)
+        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)), contourvals, cmap=cmap)
     else:
-        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)).clip(min=0, max=1), cmap=cmap)
+        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)), cmap=cmap)
     cbar = fig.colorbar(cs)
 
     return fig, ax, cbar
