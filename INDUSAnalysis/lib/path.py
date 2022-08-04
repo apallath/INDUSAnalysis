@@ -29,6 +29,49 @@ def path_s(x, y, x_i, y_i, lam):
     return s
 
 
+def path_s_scaled(x, y, x_i, y_i, lam):
+    r"""
+    Computes progress (tangential) path collective variable using a scaled distance function.
+
+    $$s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}$$
+
+    where
+
+    $$x' = (x - x_{min}) / (x_{max} - x_{min})$$
+    $$x_i' = (x_i - x_{min}) / (x_{max} - x_{min})$$
+    $$y' = (y - y_{min}) / (y_{max} - y_{min})$$
+    $$y_i' = (y - y_{min}) / (y_{max} - y_{min})$$
+
+    The max and min values are calculated from the max and min values of the path points.
+    
+    Args:
+        x: x-values to compute path CV at.
+        y: y-values to compute path CV at.
+        x_i: x-coordinates of images defining path.
+        y_i: y-coordinates of images defining path.
+        lam: Value of $\lambda$ for constructing path CV.
+    """
+    assert(len(x_i) == len(y_i))
+    ivals = np.arange(len(x_i))
+    npath = len(ivals)
+
+    x_min = x_i.min()
+    x_max = x_i.max()
+    y_min = y_i.min()
+    y_max = y_i.max()
+
+    x_s = (x - x_min) / (x_max - x_min)
+    x_i_s = (x_i - x_min) / (x_max - x_min)
+
+    y_s = (y - y_min) / (y_max - y_min)
+    y_i_s = (y_i - y_min) / (y_max - y_min)
+
+    s = 1 / (npath - 1) * np.exp(logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2) + np.log(ivals)[:, np.newaxis], axis=0) 
+                               - logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2), axis=0))
+
+    return s
+
+
 def path_z(x, y, x_i, y_i, lam):
     r"""
     Computes distance (parallel) path collective variable.
@@ -47,7 +90,47 @@ def path_z(x, y, x_i, y_i, lam):
     return z
 
 
-def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap='jet', dpi=150):
+def path_z_scaled(x, y, x_i, y_i, lam):
+    """
+    Computes distance (parallel) path collective variable using a scaled distance function.
+
+    $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
+
+    where
+
+    $$x' = (x - x_{min}) / (x_{max} - x_{min})$$
+    $$x_i' = (x_i - x_{min}) / (x_{max} - x_{min})$$
+    $$y' = (y - y_{min}) / (y_{max} - y_{min})$$
+    $$y_i' = (y - y_{min}) / (y_{max} - y_{min})$$
+
+    The max and min values are calculated from the max and min values of the path points.
+
+    Args:
+        x: x-values to compute path CV at.
+        y: y-values to compute path CV at.
+        x_i: x-coordinates of images defining path.
+        y_i: y-coordinates of images defining path.
+        lam: Value of $\lambda$ for constructing path CV.
+    """
+    assert(len(x_i) == len(y_i))
+
+    x_min = x_i.min()
+    x_max = x_i.max()
+    y_min = y_i.min()
+    y_max = y_i.max()
+
+    x_s = (x - x_min) / (x_max - x_min)
+    x_i_s = (x_i - x_min) / (x_max - x_min)
+
+    y_s = (y - y_min) / (y_max - y_min)
+    y_i_s = (y_i - y_min) / (y_max - y_min)
+    
+    z = -1 / lam * logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2), axis=0)
+
+    return z
+
+
+def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='jet', dpi=150):
     r"""
     Plots progress (tangential) path collective variable on a 2-dimensional grid.
 
@@ -60,6 +143,7 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap='jet', dpi=150)
         y_i: y-coordinates of images defining a path.
         lam: Value of $\lambda$ for constructing path CV.
         contourvals (int or array-like): Determines the number and positions of the contour lines / regions. Refer to the `matplotlib documentation`_ for details.
+        scaled: If true, uses scaled distance functions for computing s.
         cmap: Matplotlib colormap (default=jet).
         dpi: Output DPI (default=150).
 
@@ -70,7 +154,10 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap='jet', dpi=150)
     x = xx.ravel()
     y = yy.ravel()
 
-    s = path_s(x, y, x_i, y_i, lam)
+    if scaled:
+        s = path_s_scaled(x, y, x_i, y_i, lam)
+    else:
+        s = path_s(x, y, x_i, y_i, lam)
 
     # Plot s
     fig, ax = plt.subplots(dpi=dpi)
@@ -83,7 +170,7 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap='jet', dpi=150)
     return fig, ax, cbar
 
 
-def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap, dpi):
+def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='jet', dpi=150):
     r"""
     Plots distance (parallel) path collective variable on a 2-dimensional grid.
 
@@ -96,6 +183,7 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap, dpi):
         y_i: y-coordinates of images defining a path.
         lam: Value of $\lambda$ for constructing path CVs.
         contourvals (int or array-like): Determines the number and positions of the contour lines / regions. Refer to the `matplotlib documentation`_ for details.
+        scaled: If true, uses scaled distance functions for computing z.
         cmap: Matplotlib colormap (default=jet).
         dpi: Output DPI (default=150).
     """
@@ -103,14 +191,17 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, cmap, dpi):
     x = xx.ravel()
     y = yy.ravel()
 
-    z = path_z(x, y, x_i, y_i, lam)
+    if scaled:
+        z = path_z_scaled(x, y, x_i, y_i, lam)
+    else:
+        z = path_z(x, y, x_i, y_i, lam)
 
     # Plot s
     fig, ax = plt.subplots(dpi=dpi)
     if contourvals is not None:
-        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)).clip(min=0, max=1), contourvals, cmap=cmap)
+        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)), contourvals, cmap=cmap)
     else:
-        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)).clip(min=0, max=1), cmap=cmap)
+        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)), cmap=cmap)
     cbar = fig.colorbar(cs)
 
     return fig, ax, cbar
