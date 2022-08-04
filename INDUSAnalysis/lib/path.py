@@ -196,7 +196,7 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
     else:
         z = path_z(x, y, x_i, y_i, lam)
 
-    # Plot s
+    # Plot z
     fig, ax = plt.subplots(dpi=dpi)
     if contourvals is not None:
         cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)), contourvals, cmap=cmap)
