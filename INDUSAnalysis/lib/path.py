@@ -29,7 +29,7 @@ def path_s(x, y, x_i, y_i, lam):
     return s
 
 
-def path_s_scaled(x, y, x_i, y_i, lam):
+def path_s_scaled(x, y, x_i, y_i, lam, x_min=None, x_max=None, y_min=None, y_max=None):
     r"""
     Computes progress (tangential) path collective variable using a scaled distance function.
 
@@ -41,8 +41,6 @@ def path_s_scaled(x, y, x_i, y_i, lam):
     $$x_i' = (x_i - x_{min}) / (x_{max} - x_{min})$$
     $$y' = (y - y_{min}) / (y_{max} - y_{min})$$
     $$y_i' = (y - y_{min}) / (y_{max} - y_{min})$$
-
-    The max and min values are calculated from the max and min values of the path points.
     
     Args:
         x: x-values to compute path CV at.
@@ -50,15 +48,21 @@ def path_s_scaled(x, y, x_i, y_i, lam):
         x_i: x-coordinates of images defining path.
         y_i: y-coordinates of images defining path.
         lam: Value of $\lambda$ for constructing path CV.
+        x_min, x_max, y_min, y_max: Scaling parameters (optional. 
+            If None, the values are calculated from the max and min values of the path points.)
     """
     assert(len(x_i) == len(y_i))
     ivals = np.arange(len(x_i))
     npath = len(ivals)
 
-    x_min = x_i.min()
-    x_max = x_i.max()
-    y_min = y_i.min()
-    y_max = y_i.max()
+    if x_min is None:
+        x_min = x_i.min()
+    if x_max is None:
+        x_max = x_i.max()
+    if y_min is None:
+        y_min = y_i.min()
+    if y_max is None:
+        y_max = y_i.max()
 
     x_s = (x - x_min) / (x_max - x_min)
     x_i_s = (x_i - x_min) / (x_max - x_min)
@@ -90,7 +94,7 @@ def path_z(x, y, x_i, y_i, lam):
     return z
 
 
-def path_z_scaled(x, y, x_i, y_i, lam):
+def path_z_scaled(x, y, x_i, y_i, lam, x_min=None, x_max=None, y_min=None, y_max=None):
     """
     Computes distance (parallel) path collective variable using a scaled distance function.
 
@@ -103,21 +107,25 @@ def path_z_scaled(x, y, x_i, y_i, lam):
     $$y' = (y - y_{min}) / (y_{max} - y_{min})$$
     $$y_i' = (y - y_{min}) / (y_{max} - y_{min})$$
 
-    The max and min values are calculated from the max and min values of the path points.
-
     Args:
         x: x-values to compute path CV at.
         y: y-values to compute path CV at.
         x_i: x-coordinates of images defining path.
         y_i: y-coordinates of images defining path.
         lam: Value of $\lambda$ for constructing path CV.
+        x_min, x_max, y_min, y_max: Scaling parameters (optional. 
+            If None, the values are calculated from the max and min values of the path points.)
     """
     assert(len(x_i) == len(y_i))
 
-    x_min = x_i.min()
-    x_max = x_i.max()
-    y_min = y_i.min()
-    y_max = y_i.max()
+    if x_min is None:
+        x_min = x_i.min()
+    if x_max is None:
+        x_max = x_i.max()
+    if y_min is None:
+        y_min = y_i.min()
+    if y_max is None:
+        y_max = y_i.max()
 
     x_s = (x - x_min) / (x_max - x_min)
     x_i_s = (x_i - x_min) / (x_max - x_min)
@@ -130,7 +138,8 @@ def path_z_scaled(x, y, x_i, y_i, lam):
     return z
 
 
-def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='jet', dpi=150):
+def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False,  x_min=None, x_max=None, y_min=None, y_max=None, 
+    cmap='jet', dpi=150):
     r"""
     Plots progress (tangential) path collective variable on a 2-dimensional grid.
 
@@ -144,6 +153,8 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
         lam: Value of $\lambda$ for constructing path CV.
         contourvals (int or array-like): Determines the number and positions of the contour lines / regions. Refer to the `matplotlib documentation`_ for details.
         scaled: If true, uses scaled distance functions for computing s.
+        x_min, x_max, y_min, y_max: Scaling parameters (optional. 
+            If None, the values are calculated from the max and min values of the path points.)
         cmap: Matplotlib colormap (default=jet).
         dpi: Output DPI (default=150).
 
@@ -155,7 +166,7 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
     y = yy.ravel()
 
     if scaled:
-        s = path_s_scaled(x, y, x_i, y_i, lam)
+        s = path_s_scaled(x, y, x_i, y_i, lam, x_min, x_max, y_min, y_max)
     else:
         s = path_s(x, y, x_i, y_i, lam)
 
@@ -170,7 +181,8 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
     return fig, ax, cbar
 
 
-def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='jet', dpi=150):
+def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, x_min=None, x_max=None, y_min=None, y_max=None,
+    cmap='jet', dpi=150):
     r"""
     Plots distance (parallel) path collective variable on a 2-dimensional grid.
 
@@ -184,6 +196,8 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
         lam: Value of $\lambda$ for constructing path CVs.
         contourvals (int or array-like): Determines the number and positions of the contour lines / regions. Refer to the `matplotlib documentation`_ for details.
         scaled: If true, uses scaled distance functions for computing z.
+        x_min, x_max, y_min, y_max: Scaling parameters (optional. 
+            If None, the values are calculated from the max and min values of the path points.)
         cmap: Matplotlib colormap (default=jet).
         dpi: Output DPI (default=150).
     """
@@ -192,7 +206,7 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
     y = yy.ravel()
 
     if scaled:
-        z = path_z_scaled(x, y, x_i, y_i, lam)
+        z = path_z_scaled(x, y, x_i, y_i, lam, x_min, x_max, y_min, y_max)
     else:
         z = path_z(x, y, x_i, y_i, lam)
 
