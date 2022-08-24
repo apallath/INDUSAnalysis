@@ -1,10 +1,11 @@
+# pypi
 biopython==1.76
 Cython
-matplotlib==3.2.2
-MDAnalysis==0.20.1
+matplotlib==3.*
+MDAnalysis==0.20.*
 numpy
 pillow
-pymbar
+pymbar==3.*
 pytest
 scipy
 sphinx
@@ -13,3 +14,6 @@ sphinxcontrib-napoleon
 statsmodels
 tqdm
 pyyaml
+
+# github
+git+https://github.com/apallath/WHAM@master#egg=WHAM
