@@ -1,12 +1,12 @@
 """
 Functions to compute and plot path collective variables
 """
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.special import logsumexp
 
 
-def path_s(x, y, x_i, y_i, lam):
+def path_s(x, y, x_i, y_i, lam, sqrt=False):
     r"""
     Computes progress (tangential) path collective variable.
 
@@ -18,18 +18,23 @@ def path_s(x, y, x_i, y_i, lam):
         x_i: x-coordinates of images defining path.
         y_i: y-coordinates of images defining path.
         lam: Value of $\lambda$ for constructing path CV.
+        sqrt: If True, computes distance instead of squared distance (default=False).
     """
     assert(len(x_i) == len(y_i))
     ivals = np.arange(len(x_i))
     npath = len(ivals)
 
-    s = 1 / (npath - 1) * np.exp(logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2) + np.log(ivals)[:, np.newaxis], axis=0) 
-                               - logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0))
+    if sqrt:
+        s = 1 / (npath - 1) * np.exp(logsumexp(-lam * (((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2) ** 0.5) + np.log(ivals)[:, np.newaxis], axis=0) 
+                                - logsumexp(-lam * (((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2) ** 0.5), axis=0))
+    else:
+        s = 1 / (npath - 1) * np.exp(logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2) + np.log(ivals)[:, np.newaxis], axis=0) 
+                                - logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0))
 
     return s
 
 
-def path_s_scaled(x, y, x_i, y_i, lam):
+def path_s_scaled(x, y, x_i, y_i, lam, sqrt=False):
     r"""
     Computes progress (tangential) path collective variable using a scaled distance function.
 
@@ -50,6 +55,7 @@ def path_s_scaled(x, y, x_i, y_i, lam):
         x_i: x-coordinates of images defining path.
         y_i: y-coordinates of images defining path.
         lam: Value of $\lambda$ for constructing path CV.
+        sqrt: If True, computes distance instead of squared distance (default=False).
     """
     assert(len(x_i) == len(y_i))
     ivals = np.arange(len(x_i))
@@ -66,13 +72,17 @@ def path_s_scaled(x, y, x_i, y_i, lam):
     y_s = (y - y_min) / (y_max - y_min)
     y_i_s = (y_i - y_min) / (y_max - y_min)
 
-    s = 1 / (npath - 1) * np.exp(logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2) + np.log(ivals)[:, np.newaxis], axis=0) 
-                               - logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2), axis=0))
+    if sqrt:
+        s = 1 / (npath - 1) * np.exp(logsumexp(-lam * (((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2) ** 0.5) + np.log(ivals)[:, np.newaxis], axis=0) 
+                                - logsumexp(-lam * (((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2) ** 0.5), axis=0))
+    else:
+        s = 1 / (npath - 1) * np.exp(logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2) + np.log(ivals)[:, np.newaxis], axis=0) 
+                                - logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2), axis=0))
 
     return s
 
 
-def path_z(x, y, x_i, y_i, lam):
+def path_z(x, y, x_i, y_i, lam, sqrt=False):
     r"""
     Computes distance (parallel) path collective variable.
 
@@ -82,15 +92,19 @@ def path_z(x, y, x_i, y_i, lam):
         x_i: x-coordinates of images defining path.
         y_i: y-coordinates of images defining path.
         lam: Value of $\lambda$ for constructing path CV.
+        sqrt: If True, computes distance instead of squared distance (default=False).
     """
     assert(len(x_i) == len(y_i))
     
-    z = -1 / lam * logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0)
+    if sqrt:
+        z = -1 / lam * logsumexp(-lam * (((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2) ** 0.5), axis=0)
+    else:
+        z = -1 / lam * logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0)
 
     return z
 
 
-def path_z_scaled(x, y, x_i, y_i, lam):
+def path_z_scaled(x, y, x_i, y_i, lam, sqrt=False):
     """
     Computes distance (parallel) path collective variable using a scaled distance function.
 
@@ -111,6 +125,7 @@ def path_z_scaled(x, y, x_i, y_i, lam):
         x_i: x-coordinates of images defining path.
         y_i: y-coordinates of images defining path.
         lam: Value of $\lambda$ for constructing path CV.
+        sqrt: If True, computes distance instead of squared distance (default=False).
     """
     assert(len(x_i) == len(y_i))
 
@@ -125,12 +140,12 @@ def path_z_scaled(x, y, x_i, y_i, lam):
     y_s = (y - y_min) / (y_max - y_min)
     y_i_s = (y_i - y_min) / (y_max - y_min)
     
-    z = -1 / lam * logsumexp(-lam * ((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2), axis=0)
+    z = -1 / lam * logsumexp(-lam * (((x_s[np.newaxis, :] - x_i_s[:, np.newaxis]) ** 2 + (y_s[np.newaxis, :] - y_i_s[:, np.newaxis]) ** 2) ** 0.5), axis=0)
 
     return z
 
 
-def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='jet', dpi=150):
+def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=False, cmap='jet', dpi=150):
     r"""
     Plots progress (tangential) path collective variable on a 2-dimensional grid.
 
@@ -155,22 +170,22 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
     y = yy.ravel()
 
     if scaled:
-        s = path_s_scaled(x, y, x_i, y_i, lam)
+        s = path_s_scaled(x, y, x_i, y_i, lam, sqrt)
     else:
-        s = path_s(x, y, x_i, y_i, lam)
+        s = path_s(x, y, x_i, y_i, lam, sqrt)
 
     # Plot s
     fig, ax = plt.subplots(dpi=dpi)
     if contourvals is not None:
-        cs = ax.contourf(xx, yy, s.reshape(len(xcoord), len(ycoord)).clip(min=0, max=1), contourvals, cmap=cmap)
+        cs = ax.contourf(xx, yy, s.reshape(len(ycoord), len(xcoord)).clip(min=0, max=1), contourvals, cmap=cmap)
     else:
-        cs = ax.contourf(xx, yy, s.reshape(len(xcoord), len(ycoord)).clip(min=0, max=1), cmap=cmap)
+        cs = ax.contourf(xx, yy, s.reshape(len(ycoord), len(xcoord)).clip(min=0, max=1), cmap=cmap)
     cbar = fig.colorbar(cs)
 
     return fig, ax, cbar
 
 
-def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='jet', dpi=150):
+def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=False, cmap='jet', dpi=150):
     r"""
     Plots distance (parallel) path collective variable on a 2-dimensional grid.
 
@@ -192,16 +207,16 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, scaled=False, cmap='
     y = yy.ravel()
 
     if scaled:
-        z = path_z_scaled(x, y, x_i, y_i, lam)
+        z = path_z_scaled(x, y, x_i, y_i, lam, sqrt)
     else:
-        z = path_z(x, y, x_i, y_i, lam)
+        z = path_z(x, y, x_i, y_i, lam, sqrt)
 
     # Plot z
     fig, ax = plt.subplots(dpi=dpi)
     if contourvals is not None:
-        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)), contourvals, cmap=cmap)
+        cs = ax.contourf(xx, yy, z.reshape(len(ycoord), len(xcoord)), contourvals, cmap=cmap)
     else:
-        cs = ax.contourf(xx, yy, z.reshape(len(xcoord), len(ycoord)), cmap=cmap)
+        cs = ax.contourf(xx, yy, z.reshape(len(ycoord), len(xcoord)), cmap=cmap)
     cbar = fig.colorbar(cs)
 
     return fig, ax, cbar
