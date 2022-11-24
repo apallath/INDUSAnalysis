@@ -12,6 +12,14 @@ INDUSAnalysis.lib.collective module
    :undoc-members:
    :show-inheritance:
 
+INDUSAnalysis.lib.path module
+-----------------------------
+
+.. automodule:: INDUSAnalysis.lib.path
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 INDUSAnalysis.lib.profiling module
 ----------------------------------
 

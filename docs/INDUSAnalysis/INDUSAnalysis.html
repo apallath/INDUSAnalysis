@@ -1,72 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>INDUSAnalysis package &mdash; INDUSAnalysis 0.1.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}})</script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="INDUSAnalysis.lib package" href="INDUSAnalysis.lib.html" />
+    <link rel="next" title="INDUSAnalysis.ensemble package" href="INDUSAnalysis.ensemble.html" />
     <link rel="prev" title="INDUSAnalysis" href="../index.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> INDUSAnalysis
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,22 +39,12 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">INDUSAnalysis package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="INDUSAnalysis.ensemble.html">INDUSAnalysis.ensemble package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="INDUSAnalysis.lib.html">INDUSAnalysis.lib package</a></li>
 </ul>
 </li>
@@ -104,101 +59,103 @@
 <li class="toctree-l1"><a class="reference internal" href="INDUSAnalysis.lib.html">INDUSAnalysis.lib package</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">INDUSAnalysis</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>INDUSAnalysis package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/INDUSAnalysis/INDUSAnalysis.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="indusanalysis-package">
-<h1>INDUSAnalysis package<a class="headerlink" href="#indusanalysis-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="indusanalysis-package">
+<h1>INDUSAnalysis package<a class="headerlink" href="#indusanalysis-package" title="Permalink to this headline"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="INDUSAnalysis.ensemble.html">INDUSAnalysis.ensemble package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.ensemble.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="INDUSAnalysis.ensemble.polymers.html">INDUSAnalysis.ensemble.polymers package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="INDUSAnalysis.ensemble.polymers.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="INDUSAnalysis.ensemble.polymers.html#module-INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils">INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="INDUSAnalysis.ensemble.polymers.html#indusanalysis-ensemble-polymers-wham-nt-ntop-module">INDUSAnalysis.ensemble.polymers.wham_nt_ntop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="INDUSAnalysis.ensemble.polymers.html#indusanalysis-ensemble-polymers-wham-nt-ntrg-module">INDUSAnalysis.ensemble.polymers.wham_nt_ntrg module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="INDUSAnalysis.ensemble.polymers.html#module-INDUSAnalysis.ensemble.polymers">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="INDUSAnalysis.ensemble.proteins.html">INDUSAnalysis.ensemble.proteins package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="INDUSAnalysis.ensemble.proteins.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="INDUSAnalysis.ensemble.proteins.html#module-INDUSAnalysis.ensemble.proteins">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.ensemble.html#module-INDUSAnalysis.ensemble">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="INDUSAnalysis.lib.html">INDUSAnalysis.lib package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#module-INDUSAnalysis.lib.collective">INDUSAnalysis.lib.collective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#module-INDUSAnalysis.lib.path">INDUSAnalysis.lib.path module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#module-INDUSAnalysis.lib.profiling">INDUSAnalysis.lib.profiling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="INDUSAnalysis.lib.html#module-INDUSAnalysis.lib">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-INDUSAnalysis.contacts">
-<span id="indusanalysis-contacts-module"></span><h2>INDUSAnalysis.contacts module<a class="headerlink" href="#module-INDUSAnalysis.contacts" title="Permalink to this headline">¶</a></h2>
-<p>Defines class for analysing contacts along GROMACS simulation trajectory.</p>
-<p>Extendable to add new types of contacts analysis.</p>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-INDUSAnalysis.contacts">
+<span id="indusanalysis-contacts-module"></span><h2>INDUSAnalysis.contacts module<a class="headerlink" href="#module-INDUSAnalysis.contacts" title="Permalink to this headline"></a></h2>
+<p>Class for analysing contacts along GROMACS simulation trajectory.</p>
 <dl class="py class">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis">
-<em class="property">class </em><code class="sig-prename descclassname">INDUSAnalysis.contacts.</code><code class="sig-name descname">ContactsAnalysis</code><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.contacts.</span></span><span class="sig-name descname"><span class="pre">ContactsAnalysis</span></span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis" title="INDUSAnalysis.timeseries.TimeSeriesAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">INDUSAnalysis.timeseries.TimeSeriesAnalysis</span></code></a></p>
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.calc_plot_histogram_contacts">
-<code class="sig-name descname">calc_plot_histogram_contacts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_contacts</span></em>, <em class="sig-param"><span class="n">bins</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_plot_histogram_contacts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.alk_ua_APSP">
+<span class="sig-name descname"><span class="pre">alk_ua_APSP</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.alk_ua_APSP" title="Permalink to this definition"></a></dt>
+<dd><p>Constructs graph of alkane united atoms and calculates all-pairs-shortest-path
+distances using the Floyd-Warshall algorithm, assigning each bond an
+equal weight (of 1).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>{</dt><dd><dl class="simple">
+<dt>D (np.array): Array of shape (nalk, nalk), where D[i,j] is the shortest</dt><dd><p>path distance between alkane united atom i and alkane united atom j.</p>
+</dd>
+<dt>all_to_alk (dict): Dictionary mapping atom i in the Universe to its united atom</dt><dd><p>index.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>}</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.calc_plot_histogram_contacts">
+<span class="sig-name descname"><span class="pre">calc_plot_histogram_contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_contacts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_plot_histogram_contacts" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates and plots histogram of contacts, and saves histogram of
 contacts to file.</p>
 <dl class="field-list simple">
@@ -212,8 +169,8 @@ contacts to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts">
-<code class="sig-name descname">calc_trajcontacts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">distcutoff</span></em>, <em class="sig-param"><span class="n">connthreshold</span></em>, <em class="sig-param"><span class="n">start_time</span></em>, <em class="sig-param"><span class="n">end_time</span></em>, <em class="sig-param"><span class="n">skip</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts">
+<span class="sig-name descname"><span class="pre">calc_trajcontacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distcutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connthreshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates contacts between heavy atoms along a trajectory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -224,7 +181,7 @@ contacts to file.</p>
 <li><p><strong>connthreshold</strong> (<em>int</em>) – Connectivity threshold.</p></li>
 <li><p><strong>start_time</strong> (<em>float</em>) – Time to start averaging at.</p></li>
 <li><p><strong>end_time</strong> (<em>float</em>) – Time to end averaging at.</p></li>
-<li><p><strong>skip</strong> (<em>int</em>) – Resampling interval.</p></li>
+<li><p><strong>skip</strong> (<em>int</em>) – Frequency.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -248,34 +205,46 @@ contacts to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_h">
-<code class="sig-name descname">calc_trajcontacts_atomic_h</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">distcutoff</span></em>, <em class="sig-param"><span class="n">connthreshold</span></em>, <em class="sig-param"><span class="n">start_time</span></em>, <em class="sig-param"><span class="n">end_time</span></em>, <em class="sig-param"><span class="n">skip</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_h" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_alk_ua">
+<span class="sig-name descname"><span class="pre">calc_trajcontacts_alk_ua</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distcutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connthreshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_alk_ua" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates contacts between alkane united atoms along trajectory.</p>
+<p>The connectivity threshold is the number of bonds any pair of alkane united atoms
+have to be separated by for it to be a candidate for contact formation. The distance cutoff
+is the maximum interatomic distance required for such a candidate pair
+to be a valid contact.</p>
+<p>Side chain heavy atoms i and j form a contact if
+N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_h">
+<span class="sig-name descname"><span class="pre">calc_trajcontacts_atomic_h</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distcutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connthreshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_h" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates contacts between heavy atoms along trajectory.</p>
-<p>The connectivity threshold is the number of bonds heavy atoms
+<p>The connectivity threshold is the number of bonds any pair of heavy atoms
 have to be separated by on the shortest bond network path between them
-for the pair to be a candidate for contact formation. The distance cutoff
-is the distance between a candidate atomic pair within which it is
-considered to be a valid contact.</p>
-<p>Side chain heavy atoms i and j form a contact if
+for it to be a candidate for contact formation. The distance cutoff
+is the maximum interatomic distance for such a candidate pair
+to be a valid contact.</p>
+<p>Heavy atoms i and j form a contact if
 N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_sh">
-<code class="sig-name descname">calc_trajcontacts_atomic_sh</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">distcutoff</span></em>, <em class="sig-param"><span class="n">connthreshold</span></em>, <em class="sig-param"><span class="n">start_time</span></em>, <em class="sig-param"><span class="n">end_time</span></em>, <em class="sig-param"><span class="n">skip</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_sh" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_sh">
+<span class="sig-name descname"><span class="pre">calc_trajcontacts_atomic_sh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distcutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connthreshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.calc_trajcontacts_atomic_sh" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates contacts between side-chain heavy atoms along trajectory.</p>
-<p>The connectivity threshold is the number of bonds side chain heavy atoms
+<p>The connectivity threshold is the number of bonds any pair of heavy atoms
 have to be separated by on the shortest bond network path between them
-for the pair to be a candidate for contact formation. The distance cutoff
-is the distance between a candidate atomic pair within which it is
-considered to be a valid contact.</p>
+for it to be a candidate for contact formation. The distance cutoff
+is the minimum interatomic distance required for such a candidate pair to
+be a valid contact.</p>
 <p>Side chain heavy atoms i and j form a contact if
 N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.plot_mean_contactmatrix">
-<code class="sig-name descname">plot_mean_contactmatrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mean_contactmatrix</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.plot_mean_contactmatrix" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.plot_mean_contactmatrix">
+<span class="sig-name descname"><span class="pre">plot_mean_contactmatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean_contactmatrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.plot_mean_contactmatrix" title="Permalink to this definition"></a></dt>
 <dd><p>Plots mean contact matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -285,8 +254,8 @@ N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.plot_total_fraction_contacts">
-<code class="sig-name descname">plot_total_fraction_contacts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_contacts</span></em>, <em class="sig-param"><span class="n">refcontacts</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.plot_total_fraction_contacts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.plot_total_fraction_contacts">
+<span class="sig-name descname"><span class="pre">plot_total_fraction_contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_contacts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refcontacts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.plot_total_fraction_contacts" title="Permalink to this definition"></a></dt>
 <dd><p>Plots timeseries number of contacts and fraction of contacts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -299,17 +268,14 @@ N(i,j) &gt; connthreshold and r(i,j) &lt; distcutoff.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.protein_heavy_APSP">
-<code class="sig-name descname">protein_heavy_APSP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.protein_heavy_APSP" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.protein_heavy_APSP">
+<span class="sig-name descname"><span class="pre">protein_heavy_APSP</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.protein_heavy_APSP" title="Permalink to this definition"></a></dt>
 <dd><p>Constructs graph of protein-heavy atoms and calculates all-pairs-shortest-path
 distances using the Floyd-Warshall algorithm, assigning each bond an
 equal weight (of 1).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>u</strong> (<em>mda.Universe</em>) – Universe object containing all atoms with bond definitions.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
 <dt>{</dt><dd><dl class="simple">
 <dt>D (np.array): Array of shape (nheavy, nheavy), where D[i,j] is the shortest</dt><dd><p>path distance between heavy atom i and heavy atom j.</p>
 </dd>
@@ -325,26 +291,26 @@ equal weight (of 1).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.contacts.ContactsAnalysis.read_args">
-<code class="sig-name descname">read_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.read_args" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.contacts.ContactsAnalysis.read_args">
+<span class="sig-name descname"><span class="pre">read_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.contacts.ContactsAnalysis.read_args" title="Permalink to this definition"></a></dt>
 <dd><p>Stores arguments from TimeSeries <cite>args</cite> parameter in class variables.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-INDUSAnalysis.indus_waters">
-<span id="indusanalysis-indus-waters-module"></span><h2>INDUSAnalysis.indus_waters module<a class="headerlink" href="#module-INDUSAnalysis.indus_waters" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-INDUSAnalysis.indus_waters">
+<span id="indusanalysis-indus-waters-module"></span><h2>INDUSAnalysis.indus_waters module<a class="headerlink" href="#module-INDUSAnalysis.indus_waters" title="Permalink to this headline"></a></h2>
 <p>Defines class for analysing waters in INDUS probe volumes.</p>
 <dl class="py class">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis">
-<em class="property">class </em><code class="sig-prename descclassname">INDUSAnalysis.indus_waters.</code><code class="sig-name descname">WatersAnalysis</code><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.indus_waters.</span></span><span class="sig-name descname"><span class="pre">WatersAnalysis</span></span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis" title="INDUSAnalysis.timeseries.TimeSeriesAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">INDUSAnalysis.timeseries.TimeSeriesAnalysis</span></code></a></p>
 <p>Calculates number of waters in individual and union probe volumes. Generates
 plots and PDB files.</p>
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.calc_probe_waters">
-<code class="sig-name descname">calc_probe_waters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">skip</span></em>, <em class="sig-param"><span class="n">radius</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.calc_probe_waters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.calc_probe_waters">
+<span class="sig-name descname"><span class="pre">calc_probe_waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.calc_probe_waters" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates waters in individual probe volumes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -361,39 +327,42 @@ plots and PDB files.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_cma_waters">
-<code class="sig-name descname">plot_cma_waters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_Ntw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_cma_waters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_cma_waters">
+<span class="sig-name descname"><span class="pre">plot_cma_waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_Ntw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_cma_waters" title="Permalink to this definition"></a></dt>
 <dd><p>Plots cumulative moving average waters and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_ma_waters">
-<code class="sig-name descname">plot_ma_waters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_Ntw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_ma_waters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_ma_waters">
+<span class="sig-name descname"><span class="pre">plot_ma_waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_Ntw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_ma_waters" title="Permalink to this definition"></a></dt>
 <dd><p>Plots moving average waters and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_probe_waters">
-<code class="sig-name descname">plot_probe_waters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_probe_waters</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_probe_waters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_probe_waters">
+<span class="sig-name descname"><span class="pre">plot_probe_waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_probe_waters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_probe_waters" title="Permalink to this definition"></a></dt>
 <dd><p>Plots waters in each individual probe as a 2D heatmap.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_waters">
-<code class="sig-name descname">plot_waters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_Ntw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_waters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.plot_waters">
+<span class="sig-name descname"><span class="pre">plot_waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_Ntw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.plot_waters" title="Permalink to this definition"></a></dt>
 <dd><p>Plots waters and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.read_args">
-<code class="sig-name descname">read_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.read_args" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.read_args">
+<span class="sig-name descname"><span class="pre">read_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.read_args" title="Permalink to this definition"></a></dt>
 <dd><p>Stores arguments from TimeSeries <cite>args</cite> parameter in class variables.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.read_waters">
-<code class="sig-name descname">read_waters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.read_waters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.read_waters">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.read_waters" title="Permalink to this definition"></a></dt>
 <dd><p>Reads data from GROMACS-INDUS phi/probe waters output file.</p>
+<p>This reader function is a classmethod, and can be called as a stand-alone
+function for reading INDUS waters output files without making a WatersAnalysis
+object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of GROMACS-INDUS waters output file.</p>
@@ -412,8 +381,8 @@ mu (np.float): Value of mu.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb">
-<code class="sig-name descname">write_probe_waters_pdb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">skip</span></em>, <em class="sig-param"><span class="n">ts_probe_waters</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb">
+<span class="sig-name descname"><span class="pre">write_probe_waters_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_probe_waters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.indus_waters.WatersAnalysis.write_probe_waters_pdb" title="Permalink to this definition"></a></dt>
 <dd><p>Writes instantaneous probe waters to PDB file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -434,14 +403,14 @@ mu (np.float): Value of mu.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-INDUSAnalysis.protein_order_params">
-<span id="indusanalysis-protein-order-params-module"></span><h2>INDUSAnalysis.protein_order_params module<a class="headerlink" href="#module-INDUSAnalysis.protein_order_params" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-INDUSAnalysis.protein_order_params">
+<span id="indusanalysis-protein-order-params-module"></span><h2>INDUSAnalysis.protein_order_params module<a class="headerlink" href="#module-INDUSAnalysis.protein_order_params" title="Permalink to this headline"></a></h2>
 <p>Module containing a class for analysing protein (or polymer) order parameters along a GROMACS
 simulation trajectory.</p>
 <dl class="py class">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis">
-<em class="property">class </em><code class="sig-prename descclassname">INDUSAnalysis.protein_order_params.</code><code class="sig-name descname">OrderParamsAnalysis</code><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.protein_order_params.</span></span><span class="sig-name descname"><span class="pre">OrderParamsAnalysis</span></span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis" title="INDUSAnalysis.timeseries.TimeSeriesAnalysis"><code class="xref py py-class docutils literal notranslate"><span class="pre">INDUSAnalysis.timeseries.TimeSeriesAnalysis</span></code></a></p>
 <p>Calculates order parameters along a GROMACS simulation trajectory.</p>
 <div class="admonition note">
@@ -460,8 +429,8 @@ simulation trajectory.</p>
 </dl>
 </div>
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD">
-<code class="sig-name descname">calc_RMSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">refu</span></em>, <em class="sig-param"><span class="n">reftstep</span></em>, <em class="sig-param"><span class="n">skip</span></em>, <em class="sig-param"><span class="n">selection</span></em>, <em class="sig-param"><span class="n">alignment</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD">
+<span class="sig-name descname"><span class="pre">calc_RMSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reftstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the (unweighted) RMSD of <cite>selection</cite> atom group in <cite>u</cite> from <cite>selection</cite> atom group
 in <cite>refu</cite> at <cite>reftstep</cite>, using <cite>alignment</cite> for alignment.</p>
 <dl class="field-list simple">
@@ -484,8 +453,8 @@ to use for alignment before calculating RMSD.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD_worker">
-<code class="sig-name descname">calc_RMSD_worker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initcoords</span></em>, <em class="sig-param"><span class="n">coords</span></em>, <em class="sig-param"><span class="n">aligninitcoords</span></em>, <em class="sig-param"><span class="n">aligncoords</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD_worker" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD_worker">
+<span class="sig-name descname"><span class="pre">calc_RMSD_worker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initcoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligninitcoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligncoords</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_RMSD_worker" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the (unweighted) root mean square displacement of coordinates from reference
 after aligning them using a subset of coordinates.</p>
 <p>Aligns coords and initcoords by searching for the optimal translation and rotation
@@ -520,8 +489,8 @@ minimize the RMSD between them.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg">
-<code class="sig-name descname">calc_Rg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">skip</span></em>, <em class="sig-param"><span class="n">selection</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg">
+<span class="sig-name descname"><span class="pre">calc_Rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates radius of gyration of selection along trajectory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -538,12 +507,14 @@ minimize the RMSD between them.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg_worker">
-<code class="sig-name descname">calc_Rg_worker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coords</span></em>, <em class="sig-param"><span class="n">masses</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg_worker" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg_worker">
+<span class="sig-name descname"><span class="pre">calc_Rg_worker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masses</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_Rg_worker" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the radius of gyration of atoms with given coordinates and
 masses.</p>
-<p>If $r_i(t)$ is the selection of coordinates.
-$$R_g = $$</p>
+<p>If <span class="math notranslate nohighlight">\(r_i(t)\)</span> is the selection of coordinates.
+<div class="math notranslate nohighlight">
+\[R_g = \]</div>
+</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -564,8 +535,8 @@ $$R_g = $$</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviation_worker">
-<code class="sig-name descname">calc_deviation_worker</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initcoords</span></em>, <em class="sig-param"><span class="n">coords</span></em>, <em class="sig-param"><span class="n">aligninitcoords</span></em>, <em class="sig-param"><span class="n">aligncoords</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviation_worker" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviation_worker">
+<span class="sig-name descname"><span class="pre">calc_deviation_worker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initcoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligninitcoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligncoords</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviation_worker" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates deviations of coordinates from reference after aligning them using
 a subset of coordinates.</p>
 <p>Aligns coords and initcoords by searching for the optimal translation and rotation
@@ -603,8 +574,8 @@ minimize the RMSD between them.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviations">
-<code class="sig-name descname">calc_deviations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">refu</span></em>, <em class="sig-param"><span class="n">reftstep</span></em>, <em class="sig-param"><span class="n">skip</span></em>, <em class="sig-param"><span class="n">selection</span></em>, <em class="sig-param"><span class="n">alignment</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviations" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviations">
+<span class="sig-name descname"><span class="pre">calc_deviations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reftstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.calc_deviations" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates deviations of <cite>selection</cite> AtomGroup atoms in <cite>u</cite> from <cite>selection</cite> AtomGroup atoms
 in <cite>refu</cite> at <cite>reftstep</cite>, using <cite>alignment</cite> for alignment.</p>
 <dl class="field-list simple">
@@ -627,56 +598,56 @@ to use for alignment before calculating RMSD.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_RMSD">
-<code class="sig-name descname">plot_RMSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_RMSD</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_RMSD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_RMSD">
+<span class="sig-name descname"><span class="pre">plot_RMSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_RMSD</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_RMSD" title="Permalink to this definition"></a></dt>
 <dd><p>Plots RMSD and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_Rg">
-<code class="sig-name descname">plot_Rg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_Rg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_Rg" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_Rg">
+<span class="sig-name descname"><span class="pre">plot_Rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_Rg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_Rg" title="Permalink to this definition"></a></dt>
 <dd><p>Plots Rg and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_RMSD">
-<code class="sig-name descname">plot_cma_RMSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_RMSD</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_RMSD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_RMSD">
+<span class="sig-name descname"><span class="pre">plot_cma_RMSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_RMSD</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_RMSD" title="Permalink to this definition"></a></dt>
 <dd><p>Plots cumulative moving average RMSD and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_Rg">
-<code class="sig-name descname">plot_cma_Rg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_Rg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_Rg" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_Rg">
+<span class="sig-name descname"><span class="pre">plot_cma_Rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_Rg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_cma_Rg" title="Permalink to this definition"></a></dt>
 <dd><p>Plots cumulative moving average Rg and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_deviations">
-<code class="sig-name descname">plot_deviations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_deviations</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_deviations" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_deviations">
+<span class="sig-name descname"><span class="pre">plot_deviations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_deviations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_deviations" title="Permalink to this definition"></a></dt>
 <dd><p>Plots deviations as a 2D heatmap.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_RMSD">
-<code class="sig-name descname">plot_ma_RMSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_RMSD</span></em>, <em class="sig-param"><span class="n">window</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_RMSD" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_RMSD">
+<span class="sig-name descname"><span class="pre">plot_ma_RMSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_RMSD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_RMSD" title="Permalink to this definition"></a></dt>
 <dd><p>Plots moving average RMSD and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_Rg">
-<code class="sig-name descname">plot_ma_Rg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ts_Rg</span></em>, <em class="sig-param"><span class="n">window</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_Rg" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_Rg">
+<span class="sig-name descname"><span class="pre">plot_ma_Rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts_Rg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.plot_ma_Rg" title="Permalink to this definition"></a></dt>
 <dd><p>Plots moving average Rg and saves figure to file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.read_args">
-<code class="sig-name descname">read_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.read_args" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.read_args">
+<span class="sig-name descname"><span class="pre">read_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.read_args" title="Permalink to this definition"></a></dt>
 <dd><p>Stores arguments from TimeSeries <cite>args</cite> parameter in class variables.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.write_deviations_pdb">
-<code class="sig-name descname">write_deviations_pdb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">select</span></em>, <em class="sig-param"><span class="n">skip</span></em>, <em class="sig-param"><span class="n">ts_deviations</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.write_deviations_pdb" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.protein_order_params.OrderParamsAnalysis.write_deviations_pdb">
+<span class="sig-name descname"><span class="pre">write_deviations_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_deviations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.protein_order_params.OrderParamsAnalysis.write_deviations_pdb" title="Permalink to this definition"></a></dt>
 <dd><p>Writes per-atom-deviations to PDB file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -698,18 +669,18 @@ to use for alignment before calculating RMSD.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-INDUSAnalysis.timeseries">
-<span id="indusanalysis-timeseries-module"></span><h2>INDUSAnalysis.timeseries module<a class="headerlink" href="#module-INDUSAnalysis.timeseries" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-INDUSAnalysis.timeseries">
+<span id="indusanalysis-timeseries-module"></span><h2>INDUSAnalysis.timeseries module<a class="headerlink" href="#module-INDUSAnalysis.timeseries" title="Permalink to this headline"></a></h2>
 <p>Defines classes for storing and analysing timeseries data.</p>
 <dl class="py class">
-<dt id="INDUSAnalysis.timeseries.TimeSeries">
-<em class="property">class </em><code class="sig-prename descclassname">INDUSAnalysis.timeseries.</code><code class="sig-name descname">TimeSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.timeseries.</span></span><span class="sig-name descname"><span class="pre">TimeSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_contiguous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Stores N-dimensional time series data, accessible and sliceable by time.</p>
 <dl class="py attribute">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.times">
-<code class="sig-name descname">times</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.times" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.times">
+<span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.times" title="Permalink to this definition"></a></dt>
 <dd><p>1-dimensional array of length N.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -719,8 +690,8 @@ to use for alignment before calculating RMSD.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.data">
-<code class="sig-name descname">data</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.data" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.data" title="Permalink to this definition"></a></dt>
 <dd><p>D-dimensional array of shape (N, …).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -730,12 +701,25 @@ to use for alignment before calculating RMSD.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.labels">
-<code class="sig-name descname">labels</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.labels" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.labels">
+<span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.labels" title="Permalink to this definition"></a></dt>
 <dd><p>List of strings describing what each dimension represents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.correct_contiguous">
+<span class="sig-name descname"><span class="pre">correct_contiguous</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.correct_contiguous" title="Permalink to this definition"></a></dt>
+<dd><p>Ensure that for elements (i, i+1), the time at i+1 &gt; time at i.
+If a pair is found such that the time at i+1 &lt;= time at i, delete the preceding timeseries’
+data which is repeated. Useful for correcting INDUS outputs on restart from checkpoint. (Default=True)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>boolean</p>
 </dd>
 </dl>
 </dd></dl>
@@ -771,8 +755,8 @@ to use for alignment before calculating RMSD.</p></li>
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.cumulative_moving_average">
-<code class="sig-name descname">cumulative_moving_average</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.cumulative_moving_average" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.cumulative_moving_average">
+<span class="sig-name descname"><span class="pre">cumulative_moving_average</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.cumulative_moving_average" title="Permalink to this definition"></a></dt>
 <dd><p>Computes cumulative moving average of 1-d data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -781,19 +765,19 @@ to use for alignment before calculating RMSD.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.data_array">
-<em class="property">property </em><code class="sig-name descname">data_array</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.data_array" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.data_array">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_array</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.data_array" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="id0">
-<em class="property">property </em><code class="sig-name descname">labels</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.mean">
-<code class="sig-name descname">mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.mean" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.mean">
+<span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.mean" title="Permalink to this definition"></a></dt>
 <dd><p>Computes mean of timeseries data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -808,8 +792,8 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.moving_average">
-<code class="sig-name descname">moving_average</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">window</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.moving_average" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.moving_average">
+<span class="sig-name descname"><span class="pre">moving_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.moving_average" title="Permalink to this definition"></a></dt>
 <dd><p>Computes moving (rolling) average of 1-d data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -822,8 +806,8 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.plot">
-<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">plotargs</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">plotkwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.plot" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">plotargs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">plotkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.plot" title="Permalink to this definition"></a></dt>
 <dd><p>Plots 1-d timeseries data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -842,8 +826,8 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.plot_2d_heatmap">
-<code class="sig-name descname">plot_2d_heatmap</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">imshowkwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.plot_2d_heatmap" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.plot_2d_heatmap">
+<span class="sig-name descname"><span class="pre">plot_2d_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">imshowkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.plot_2d_heatmap" title="Permalink to this definition"></a></dt>
 <dd><p>Plots 2-d timeseries data as a heatmap.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -859,20 +843,27 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.sem">
-<code class="sig-name descname">sem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.sem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes standard error of mean (estimate of the standard deviation
-of the distribution of the mean) using block bootstrapping.</p>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.standard_error">
+<span class="sig-name descname"><span class="pre">standard_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator=&lt;function</span> <span class="pre">mean&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nboot=100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_pymbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.standard_error" title="Permalink to this definition"></a></dt>
+<dd><p>Computes standard error of estimator function using bootstrapping. If no estimator
+is specified, computes standard error of the mean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>axis</strong> (<em>int</em>) – Optional</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<em>function</em>) – Function that computes estimator of data.</p></li>
+<li><p><strong>nboot</strong> (<em>int</em>) – Number of bootstrap samples to use (default=100).</p></li>
+<li><p><strong>use_pymbar</strong> (<em>bool</em>) – Use pymbar to calculate statistical inefficiency (default=True).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError if data is not 1-dimensional.</strong> – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.std">
-<code class="sig-name descname">std</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.std" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.std">
+<span class="sig-name descname"><span class="pre">std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.std" title="Permalink to this definition"></a></dt>
 <dd><p>Computes std of timeseries data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -886,27 +877,27 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeries.time_array">
-<em class="property">property </em><code class="sig-name descname">time_array</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.time_array" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeries.time_array">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_array</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeries.time_array" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="INDUSAnalysis.timeseries.TimeSeriesAnalysis">
-<em class="property">class </em><code class="sig-prename descclassname">INDUSAnalysis.timeseries.</code><code class="sig-name descname">TimeSeriesAnalysis</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeriesAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.timeseries.</span></span><span class="sig-name descname"><span class="pre">TimeSeriesAnalysis</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Template class for timeseries analysis of simulation data.</p>
 <dl class="py attribute">
-<dt id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.args">
-<code class="sig-name descname">args</code><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.args" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.args" title="Permalink to this definition"></a></dt>
 <dd><p>Command line argument parser.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.load_TimeSeries">
-<code class="sig-name descname">load_TimeSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.load_TimeSeries" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.load_TimeSeries">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_TimeSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.load_TimeSeries" title="Permalink to this definition"></a></dt>
 <dd><p>Loads pickled TimeSeries object from file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -919,8 +910,8 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.parse_args">
-<code class="sig-name descname">parse_args</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.parse_args" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.parse_args">
+<span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.parse_args" title="Permalink to this definition"></a></dt>
 <dd><p>Parses arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -930,14 +921,14 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.read_args">
-<code class="sig-name descname">read_args</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.read_args" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.read_args">
+<span class="sig-name descname"><span class="pre">read_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.read_args" title="Permalink to this definition"></a></dt>
 <dd><p>Stores arguments from TimeSeries <cite>args</cite> parameter in class variables.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_TimeSeries">
-<code class="sig-name descname">save_TimeSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tso</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_TimeSeries" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_TimeSeries">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_TimeSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tso</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_TimeSeries" title="Permalink to this definition"></a></dt>
 <dd><p>Saves TimeSeries object to file using pickle dump.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -947,8 +938,8 @@ TimeSeries object if mean is computed along axis &gt; 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_figure">
-<code class="sig-name descname">save_figure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span></em>, <em class="sig-param"><span class="n">suffix</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_figure" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_figure">
+<span class="sig-name descname"><span class="pre">save_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.TimeSeriesAnalysis.save_figure" title="Permalink to this definition"></a></dt>
 <dd><p>Exports figure to image file.</p>
 <p>The figure is exported to an image file OPREF_SUFFIX.OFORMAT,
 where OPREF is the class attribute containing the output prefix and
@@ -965,58 +956,134 @@ OFORMAT is the class attribute storing the output image extension.</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.bootstrap_independent_sample">
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.timeseries.</span></span><span class="sig-name descname"><span class="pre">bootstrap_independent_sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.bootstrap_independent_sample" title="Permalink to this definition"></a></dt>
+<dd><p>Draws an independent sample of size N_ind = N/g from
+x. If the statistical inefficiency g is not passed as a parameter,
+it will be calculated first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – 1-dimensional array of length N containing correlated data to draw (uncorrelated) sample from.</p></li>
+<li><p><strong>g</strong> (<em>float</em>) – Statistical inefficiency (default=None).</p></li>
+<li><p><strong>use_pymbar</strong> (<em>bool</em>) – Use pymbar to calculate statistical inefficiency (default=True).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1-dimensional array of length N/g containing random samples drawn from x (with replacement).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>y (ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.create1DTimeSeries">
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.timeseries.</span></span><span class="sig-name descname"><span class="pre">create1DTimeSeries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.create1DTimeSeries" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Creates a 1-dimensional TimeSeries object with data_array = x,</dt><dd><p>time_array = [0, 1, …, N], and labels = [‘x0’, ‘x1’, …, ‘xD-1’] where
+N is the shape of axis 0 of x, and D is the number of dimensions of x.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>ndarray</em>) – 1-dimensional array containing correlated data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TimeSeries.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.loadTimeSeriesFromDAT">
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.timeseries.</span></span><span class="sig-name descname"><span class="pre">loadTimeSeriesFromDAT</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.loadTimeSeriesFromDAT" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Creates a 1-dimensional TimeSeries object from a .dat file (for example,</dt><dd><p>a PLUMED or OrderParameters output) with data_array loaded from
+column indices <cite>datacols</cite>, time_array loaded from column index <cite>tcol</cite>,
+and user-defined labels.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Name of DAT file.</p></li>
+<li><p><strong>tcol</strong> (<em>int</em>) – Column containing time values (default=0). If set to None,
+then time_array is set to [0, 1, 2, …]</p></li>
+<li><p><strong>datacols</strong> (<em>list</em>) – List of column indices in DAT file (int, default=[1]).</p></li>
+<li><p><strong>labels</strong> (<em>list</em>) – List of column labels corresponding to column indices (default=[“x(col1)”, “x(col2)”, …]
+where col1, col2, … are the datacols values).</p></li>
+<li><p><strong>commentchar</strong> (<em>str</em>) – Character defining comment lines (lines beginning with this
+character will be ignored when reading the DAT file, default=’#’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TimeSeries.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All column values will be converted to float.</p>
 </div>
-<div class="section" id="module-INDUSAnalysis">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="INDUSAnalysis.timeseries.statisticalInefficiency">
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.timeseries.</span></span><span class="sig-name descname"><span class="pre">statisticalInefficiency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.timeseries.statisticalInefficiency" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the statistical inefficiency of x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>ndarray</em>) – 1-dimensional array containing correlated data.</p></li>
+<li><p><strong>fft</strong> (<em>bool</em>) – Use fft when computing autocorrelation function (default=True).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Statistical inefficiency of x.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>g (float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-INDUSAnalysis">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis" title="Permalink to this headline"></a></h2>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="INDUSAnalysis.lib.html" class="btn btn-neutral float-right" title="INDUSAnalysis.lib package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../index.html" class="btn btn-neutral float-left" title="INDUSAnalysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="INDUSAnalysis.ensemble.html" class="btn btn-neutral float-right" title="INDUSAnalysis.ensemble package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2020, Akash Pallath.
-
-    </p>
+    <p>&#169; Copyright 2020, Akash Pallath.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -42,10 +42,10 @@ def path_s_scaled(x, y, x_i, y_i, lam, sqrt=False, x_min=None, x_max=None, y_min
 
     where
 
-    $$x' = (x - x_{min}) / (x_{max} - x_{min})$$
-    $$x_i' = (x_i - x_{min}) / (x_{max} - x_{min})$$
-    $$y' = (y - y_{min}) / (y_{max} - y_{min})$$
-    $$y_i' = (y - y_{min}) / (y_{max} - y_{min})$$
+    $$x' = \frac{(x - x_{min})}{(x_{max} - x_{min})}$$
+    $$x_i' = \frac{(x_i - x_{min})}{(x_{max} - x_{min})}$$
+    $$y' = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
+    $$y_i' = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
     
     Args:
         x: x-values to compute path CV at.
@@ -109,17 +109,17 @@ def path_z(x, y, x_i, y_i, lam, sqrt=False):
 
 
 def path_z_scaled(x, y, x_i, y_i, lam, sqrt=False, x_min=None, x_max=None, y_min=None, y_max=None):
-    """
+    r"""
     Computes distance (parallel) path collective variable using a scaled distance function.
 
     $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
 
     where
 
-    $$x' = (x - x_{min}) / (x_{max} - x_{min})$$
-    $$x_i' = (x_i - x_{min}) / (x_{max} - x_{min})$$
-    $$y' = (y - y_{min}) / (y_{max} - y_{min})$$
-    $$y_i' = (y - y_{min}) / (y_{max} - y_{min})$$
+    $$x' = \frac{(x - x_{min})}{(x_{max} - x_{min})}$$
+    $$x_i' = \frac{(x_i - x_{min})}{(x_{max} - x_{min})}$$
+    $$y' = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
+    $$y_i' = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
 
     Args:
         x: x-values to compute path CV at.

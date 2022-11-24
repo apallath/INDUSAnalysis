@@ -5,7 +5,9 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
+   INDUSAnalysis.ensemble
    INDUSAnalysis.lib
 
 Submodules
