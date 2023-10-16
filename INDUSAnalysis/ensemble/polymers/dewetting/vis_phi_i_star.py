@@ -10,7 +10,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-def vis_phi_i_star(pklfile, structfile, trajfile, poly_selection, probe_selection, phi, pdb):
+def vis_phi_i_star(pklfile, structfile, trajfile, poly_selection, probe_selection, phi, pdb, spdb):
     ############################################################################
     # Load data
     ############################################################################
@@ -21,6 +21,25 @@ def vis_phi_i_star(pklfile, structfile, trajfile, poly_selection, probe_selectio
 
     ############################################################################
     # Static PDB generation
+    ############################################################################
+
+    # Print color scale data range
+    print(phi_i_stars.min(), phi_i_stars.max(), phi_i_stars.mean())
+
+    # Load equilibrium simulation universe (to manipulate and write)
+    u = mda.Universe(structfile, trajfile)
+    u.add_TopologyAttr('tempfactors')
+
+    with mda.Writer(spdb, multiframe=True, bonds=None, n_atoms=u.atoms.n_atoms) as PDB:
+        u_poly = u.select_atoms(poly_selection)
+        u_poly_probe = u.select_atoms(probe_selection)
+
+        u_poly_probe.atoms.tempfactors = phi_i_stars
+
+        PDB.write(u_poly.atoms)
+
+    ############################################################################
+    # Dynamic PDB generation
     ############################################################################
 
     dewetted_at_or_before = []
@@ -66,7 +85,8 @@ if __name__ == "__main__":
     parser.add_argument("-poly_selection", help="selection string for polymer atoms")
     parser.add_argument("-probe_selection", help="selection string for probe atoms")
     parser.add_argument("-phi", nargs=3, type=float, help="parameters to choose phi values for static PDB (start end num)")
-    parser.add_argument("-pdb", default="vis.pdb", help="static output PDB file (default='vis.pdb')")
+    parser.add_argument("-pdb", default="vis.pdb", help="dynamic output PDB file (default='vis.pdb')")
+    parser.add_argument("-spdb", default="vis_static.pdb", help="static output PDB file (default='vis_static.pdb')")
     a = parser.parse_args()
 
-    vis_phi_i_star(a.pklfile, a.structfile, a.trajfile, a.poly_selection, a.probe_selection, a.phi, a.pdb)
+    vis_phi_i_star(a.pklfile, a.structfile, a.trajfile, a.poly_selection, a.probe_selection, a.phi, a.pdb, a.spdb)
