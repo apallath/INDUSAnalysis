@@ -151,7 +151,7 @@ def phi_i_star(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot Nv v/s phi and phi* for simulation.")
+    parser = argparse.ArgumentParser(description="Plot ni v/s phi and phi_i* for simulation.")
     parser.add_argument("-phi", type=str, nargs="+", help="phi values to read (phi=0 must be first)")
     parser.add_argument("-start", type=int, help="time (ps) to start computing averages")
     parser.add_argument("-structfile", help="path to structure file (.pdb, .gro, .tpr)")

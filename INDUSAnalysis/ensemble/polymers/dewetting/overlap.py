@@ -1,7 +1,5 @@
 """
-Plots ni v/s phi and phi_i* for each atom i.
-
-Stores calculated phi_i* values.
+Calculates overlap between windows
 """
 
 import argparse
@@ -11,6 +9,8 @@ import pickle
 import warnings
 
 import matplotlib
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 import MDAnalysis as mda
@@ -18,67 +18,15 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 from tqdm import tqdm
 
-from INDUSAnalysis.timeseries import TimeSeries, TimeSeriesAnalysis
+from INDUSAnalysis import timeseries
 
 
-def phi_i_star(
-    phivals: list,
-    start_time: int,
-    structfile: str,
-    trajformat: str,
-    skip: int,
-    probe_selection: str,
-    probe_radius: float,
-    solvent_selection: str,
-    all_imgformat: str,
-    all_watersformat: str,
-    pklfile: str,
-    reload: bool,
-):
-    ############################################################################
-    # Load data
-    ############################################################################
-
-    u = mda.Universe(structfile)
-    probe_atoms = u.select_atoms(probe_selection)
-    probe_indices = probe_atoms.atoms.indices
-
-    meanwaters = np.zeros((len(phivals), len(probe_indices)))
-
-    for phiidx, phi in enumerate(tqdm(phivals, desc="Looping over phis")):
-        if reload:
-            ts_waters = TimeSeriesAnalysis.load_TimeSeries(all_watersformat.format(phi=phi))
-
-            print(ts_waters[start_time:].data_array)
-
-        else:
-            utraj = mda.Universe(structfile, trajformat.format(phi=phi))
-
-            times = np.zeros(len(utraj.trajectory[::skip]))
-            waters = np.zeros((len(utraj.trajectory[::skip]), len(probe_indices)))
-
-            for tidx, ts in enumerate(tqdm(utraj.trajectory[::skip], desc="Processing trajectory")):
-                times[tidx] = ts.time
-                for pidx, pat in enumerate(probe_atoms):
-                    wat = utraj.select_atoms(
-                        "{} and (around {} (index {}))".format(solvent_selection, probe_radius, pat.index)
-                    )
-                    waters[tidx, pidx] = len(wat)
-
-            ts_waters = TimeSeries(times, waters, labels=["ni", "at_idx"])
-
-            TimeSeriesAnalysis.save_TimeSeries(ts_waters, all_watersformat.format(phi=phi))
-
-        # Calculate mean
-        meanwaters[phiidx, :] = ts_waters[start_time:].data_array.mean(axis=0)
-
-    print(meanwaters)
-
-    phivals = np.array([float(phi) for phi in phivals])
-    order = np.argsort(phivals)
+def overlap(phivals: list, start_time: int, datformat: str, skip: int, imgfile: str, Nmin=0, Nmax=3000, Nbins=200):
+    Ntw_range = [Nmin, Nmax]
+    Ntw_bins = Nbins
 
     ############################################################################
-    # Actual fits
+    # Plot histogram
     ############################################################################
 
     # Use text-only Matplotlib backend
@@ -87,117 +35,70 @@ def phi_i_star(
     # Ignore warnings
     warnings.filterwarnings("ignore")
 
-    # Debug
-    probes = range(len(probe_indices))
+    fig, ax = plt.subplots(figsize=(8, 6), dpi=150)
 
-    phi_i_stars = np.infty * np.ones(len(probe_indices))
+    # Set up normalization and colormap
+    normalize = mcolors.Normalize(vmin=min(phivals), vmax=max(phivals))
+    colormap = cm.rainbow
 
-    for probe in tqdm(probes):
-        fig, ax = plt.subplots(figsize=(8, 6), dpi=150)
-
-        order = np.argsort(phivals)
-        xdata = np.array(phivals)[order]
-        ydata = meanwaters[:, probe][order]
-
-        # Plot original data
-        ax.plot(
-            xdata,
-            ydata,
-            linestyle=":",
-            marker="s",
-            markersize=3,
-            fillstyle="none",
+    for phi_idx, phi in enumerate(tqdm(phivals, desc="Looping over phis")):
+        ts_waters = timeseries.loadTimeSeriesFromDAT(
+            datformat.format(phi=phi), tcol=0, datacols=[2], labels=["c1", "c2"]
         )
+        ts_waters = ts_waters[start_time:]
 
-        # Fit univariate spline
-        spline = UnivariateSpline(xdata, ydata, k=3, s=0.5 * len(ydata))  # Cubic spline
+        hist, edges = np.histogram(ts_waters.data_array, bins=Ntw_bins, range=Ntw_range, density=True)
+        x = 0.5 * (edges[1:] + edges[:-1])
+        y = hist
+        ax.plot(x, y, color=colormap(normalize(float(phi))))
+        ax.fill_between(x, 0, y, color=colormap(normalize(float(phi))), alpha=0.4)
 
-        x_spline_data = np.linspace(min(phivals), max(phivals), 100)
-        y_spline_data = spline(x_spline_data)
+    ax.set_xlabel(r"$\tilde{N}$")
 
-        # Find phi_i_star
-        phi_i_star_yval = ydata[0] / 2
+    minor_locator = AutoMinorLocator(2)
+    ax.xaxis.set_minor_locator(minor_locator)
+    ax.grid(which="major", linestyle="-")
+    ax.grid(which="minor", linestyle=":")
 
-        phi_i_star_spline_idx = np.abs(y_spline_data - phi_i_star_yval).argmin()
-        phi_i_star = x_spline_data[phi_i_star_spline_idx]
+    # Display colorbar
+    phivals = np.array([float(phi) for phi in phivals])
+    scalarmappable = cm.ScalarMappable(norm=normalize, cmap=colormap)
+    scalarmappable.set_array(np.array(phivals))
+    fig.colorbar(scalarmappable, label=r"$\phi$ (kJ/mol)")
 
-        # Plot spline and phi_i_star
-        ax.plot(x_spline_data, y_spline_data)
-        ax.plot(x_spline_data[phi_i_star_spline_idx], y_spline_data[phi_i_star_spline_idx], "x")
-
-        ax.grid()
-
-        ax.set_xlabel(r"$\phi$ (kJ/mol)")
-        ax.set_ylabel(r"$\langle n_i \rangle$")
-
-        atom = probe_atoms.atoms[probe]
-        atom_name = "{}{}:{}".format(atom.resname, atom.resid, atom.name)
-        title = r"P. atom {} ({})".format(probe, atom_name) + r", $\phi_i^*$ = {:.2f}".format(phi_i_star)
-
-        ax.set_title(title)
-
-        plt.savefig(all_imgformat.format(probe))
-        plt.close()
-
-        # Store data
-        phi_i_stars[probe] = phi_i_star
-
-    # Save phi_i_star data and errors to file
-    phi_i_star_data = dict()
-    phi_i_star_data["phi_i_stars"] = phi_i_stars
-
-    with open(pklfile, "wb") as outfile:
-        pickle.dump(phi_i_star_data, outfile)
+    plt.savefig(imgfile, format="png")
+    plt.close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot Nv v/s phi and phi* for simulation.")
     parser.add_argument("-phi", type=str, nargs="+", help="phi values to read (phi=0 must be first)")
     parser.add_argument("-start", type=int, help="time (ps) to start computing averages")
-    parser.add_argument("-structfile", help="path to structure file (.pdb, .gro, .tpr)")
     parser.add_argument(
-        "-trajformat",
-        help="format of trajectory (.xtc, .pdb) file, with {phi} placeholders for phi value. Missing placeholders are ignored.",
+        "-datformat",
+        help="format of INDUS waters (.dat) file, with {phi} placeholders for phi value. Missing placeholders are ignored.",
     )
     parser.add_argument(
         "-skip", type=int, default=1, help="Interval between frames when reading trajectory (default=1)"
     )
-    parser.add_argument("-probe_selection", help="MDAnalysis selection string for probe volume atoms")
-    parser.add_argument("-probe_radius", type=float, default=6, help="Probe volume radius (in A, default=6)")
     parser.add_argument(
-        "-solvent_selection",
-        type=str,
-        default="name OW",
-        help="MDAnalysis selection string for solvent atoms (default='name OW')",
+        "-imgfile",
+        default="overlap.png",
+        help="filename of overlap output image (default=phi_star.png)",
     )
-    parser.add_argument(
-        "-all_imgformat",
-        default="phi_i_star_h{}.png",
-        help="format of phi_i* output images for all probe atoms, with {} placeholder for probe atom index (default=phi_i_star_h{}.png)",
-    )
-    parser.add_argument(
-        "-all_watersformat",
-        default="ni_phi{phi}.pkl",
-        help="format of pkl files containing TimeSeries probe waters, with {phi} placeholder for phi value (default=ni_phi{phi}.pkl).",
-    )
-    parser.add_argument(
-        "-pklfile", default="phi_i_stars.pkl", help="output file to dump phi_i* data to (.pkl, default=phi_i_stars.pkl)"
-    )
-    parser.add_argument("--reload", action="store_true", default=False)
+    parser.add_argument("-Nmin", type=int, default=0, help="min value of N~ (default=0)")
+    parser.add_argument("-Nmax", type=int, default=150, help="max value of N~ (default=3000)")
+    parser.add_argument("-Nbins", type=int, default=200, help="number of N~ bins for histogram (default=200)")
 
     a = parser.parse_args()
 
-    phi_i_star(
+    overlap(
         phivals=a.phi,
         start_time=a.start,
-        structfile=a.structfile,
-        trajformat=a.trajformat,
+        datformat=a.datformat,
         skip=a.skip,
-        probe_selection=a.probe_selection,
-        probe_radius=a.probe_radius,
-        solvent_selection=a.solvent_selection,
-        all_imgformat=a.all_imgformat,
-        all_watersformat=a.all_watersformat,
-        pklfile=a.pklfile,
-        reload=a.reload,
+        imgfile=a.imgfile,
+        Nmin=a.Nmin,
+        Nmax=a.Nmax,
+        Nbins=a.Nbins,
     )
