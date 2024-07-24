@@ -6,12 +6,16 @@ import numpy as np
 from scipy.special import logsumexp
 
 
-def path_s(x, y, x_i, y_i, lam, sqrt=False):
+def path_s(x, y, x_i, y_i, lam, sqrt=False, one_based=False):
     r"""
     Computes progress (tangential) path collective variable.
 
-    $$s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
-    
+    $$s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} i \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
+
+    If 1-based indexing:
+
+    $$s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} (i + 1) \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
+
     Args:
         x: x-values to compute path CV at.
         y: y-values to compute path CV at.
@@ -19,9 +23,13 @@ def path_s(x, y, x_i, y_i, lam, sqrt=False):
         y_i: y-coordinates of images defining path.
         lam: Value of $\lambda$ for constructing path CV.
         sqrt: If True, computes distance instead of squared distance (default=False).
+        one_based: If True, uses 1-based indexing instead of 0-based (default=False).
     """
     assert(len(x_i) == len(y_i))
-    ivals = np.arange(len(x_i))
+    if one_based:
+        ivals = np.arange(1, len(x_i) + 1)
+    else:
+        ivals = np.arange(len(x_i))
     npath = len(ivals)
 
     if sqrt:
@@ -34,11 +42,15 @@ def path_s(x, y, x_i, y_i, lam, sqrt=False):
     return s
 
 
-def path_s_scaled(x, y, x_i, y_i, lam, sqrt=False, x_min=None, x_max=None, y_min=None, y_max=None):
+def path_s_scaled(x, y, x_i, y_i, lam, sqrt=False, x_min=None, x_max=None, y_min=None, y_max=None, one_based=False):
     r"""
     Computes progress (tangential) path collective variable using a scaled distance function.
 
-    $$s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}$$
+    $$s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} i \ e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}$$
+
+    If 1-based:
+
+    $$s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} (i + 1) \ e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}$$
 
     where
 
@@ -58,7 +70,10 @@ def path_s_scaled(x, y, x_i, y_i, lam, sqrt=False, x_min=None, x_max=None, y_min
             If None, the values are calculated from the max and min values of the path points.)
     """
     assert(len(x_i) == len(y_i))
-    ivals = np.arange(len(x_i))
+    if one_based:
+        ivals = np.arange(1, len(x_i) + 1)
+    else:
+        ivals = np.arange(len(x_i))
     npath = len(ivals)
 
     if x_min is None:
@@ -90,6 +105,9 @@ def path_z(x, y, x_i, y_i, lam, sqrt=False):
     r"""
     Computes distance (parallel) path collective variable.
 
+    $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
+
+
     Args:
         x: x-values to compute path CV at.
         y: y-values to compute path CV at.
@@ -112,7 +130,7 @@ def path_z_scaled(x, y, x_i, y_i, lam, sqrt=False, x_min=None, x_max=None, y_min
     r"""
     Computes distance (parallel) path collective variable using a scaled distance function.
 
-    $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
+    $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]})$$
 
     where
 
@@ -153,12 +171,23 @@ def path_z_scaled(x, y, x_i, y_i, lam, sqrt=False, x_min=None, x_max=None, y_min
     return z
 
 
-def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=False, x_min=None, x_max=None, y_min=None, y_max=None, 
+def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=False, x_min=None, x_max=None, y_min=None, y_max=None, one_based=False, 
     cmap='jet', dpi=150):
     r"""
     Plots progress (tangential) path collective variable on a 2-dimensional grid.
 
-    $$s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
+    $$s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} i \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
+
+    If 1-based indexing:
+
+    $$s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} (i + 1) \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
+
+    If scaled:
+
+    $$x = \frac{(x - x_{min})}{(x_{max} - x_{min})}$$
+    $$x_i = \frac{(x_i - x_{min})}{(x_{max} - x_{min})}$$
+    $$y = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
+    $$y_i = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
 
     Args:
         xcoord: Array specifying x-axis coordinates of grid.
@@ -167,6 +196,7 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=F
         y_i: y-coordinates of images defining a path.
         lam: Value of $\lambda$ for constructing path CV.
         contourvals (int or array-like): Determines the number and positions of the contour lines / regions. Refer to the `matplotlib documentation`_ for details.
+        sqrt: If True, computes distance instead of squared distance (default=False).
         scaled: If true, uses scaled distance functions for computing s.
         x_min, x_max, y_min, y_max: Scaling parameters (optional. 
             If None, the values are calculated from the max and min values of the path points.)
@@ -181,9 +211,9 @@ def plot_path_s(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=F
     y = yy.ravel()
 
     if scaled:
-        s = path_s_scaled(x, y, x_i, y_i, lam, sqrt, x_min, x_max, y_min, y_max)
+        s = path_s_scaled(x, y, x_i, y_i, lam, sqrt, x_min, x_max, y_min, y_max, one_based=one_based)
     else:
-        s = path_s(x, y, x_i, y_i, lam, sqrt)
+        s = path_s(x, y, x_i, y_i, lam, sqrt, one_based=one_based)
 
     # Plot s
     fig, ax = plt.subplots(dpi=dpi)
@@ -203,6 +233,13 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=F
 
     $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
 
+    If scaled:
+
+    $$x = \frac{(x - x_{min})}{(x_{max} - x_{min})}$$
+    $$x_i = \frac{(x_i - x_{min})}{(x_{max} - x_{min})}$$
+    $$y = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
+    $$y_i = \frac{(y - y_{min})}{(y_{max} - y_{min})}$$
+
     Args:
         xcoord: Array specifying x-axis coordinates of grid.
         ycoord: Array specifying y-axis coordinates of grid.
@@ -210,6 +247,7 @@ def plot_path_z(xcoord, ycoord, x_i, y_i, lam, contourvals, sqrt=False, scaled=F
         y_i: y-coordinates of images defining a path.
         lam: Value of $\lambda$ for constructing path CVs.
         contourvals (int or array-like): Determines the number and positions of the contour lines / regions. Refer to the `matplotlib documentation`_ for details.
+        sqrt: If True, computes distance instead of squared distance (default=False).
         scaled: If true, uses scaled distance functions for computing z.
         x_min, x_max, y_min, y_max: Scaling parameters (optional. 
             If None, the values are calculated from the max and min values of the path points.)

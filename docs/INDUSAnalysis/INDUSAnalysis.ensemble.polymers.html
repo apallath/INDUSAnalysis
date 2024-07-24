@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INDUSAnalysis.ensemble.polymers package &mdash; INDUSAnalysis 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=01f34227"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -27,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> INDUSAnalysis
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            INDUSAnalysis
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -73,10 +80,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="INDUSAnalysis.html">INDUSAnalysis package</a> &raquo;</li>
-          <li><a href="INDUSAnalysis.ensemble.html">INDUSAnalysis.ensemble package</a> &raquo;</li>
-      <li>INDUSAnalysis.ensemble.polymers package</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="INDUSAnalysis.html">INDUSAnalysis package</a></li>
+          <li class="breadcrumb-item"><a href="INDUSAnalysis.ensemble.html">INDUSAnalysis.ensemble package</a></li>
+      <li class="breadcrumb-item active">INDUSAnalysis.ensemble.polymers package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/INDUSAnalysis/INDUSAnalysis.ensemble.polymers.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -87,20 +94,20 @@
            <div itemprop="articleBody">
              
   <section id="indusanalysis-ensemble-polymers-package">
-<h1>INDUSAnalysis.ensemble.polymers package<a class="headerlink" href="#indusanalysis-ensemble-polymers-package" title="Permalink to this headline"></a></h1>
+<h1>INDUSAnalysis.ensemble.polymers package<a class="headerlink" href="#indusanalysis-ensemble-polymers-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils">
-<span id="indusanalysis-ensemble-polymers-umbrella-sampling-utils-module"></span><h2>INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils module<a class="headerlink" href="#module-INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils" title="Permalink to this headline"></a></h2>
+<span id="indusanalysis-ensemble-polymers-umbrella-sampling-utils-module"></span><h2>INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils module<a class="headerlink" href="#module-INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils" title="Link to this heading"></a></h2>
 <p>Functions to help perform umbrella sampling calculations.</p>
 <p>This module can also be called as a stand-alone script, given command line options.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.energy_overlap">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.</span></span><span class="sig-name descname"><span class="pre">energy_overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xvgfs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_bin_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_bin_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_imgfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hist.png'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.energy_overlap" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.</span></span><span class="sig-name descname"><span class="pre">energy_overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xvgfs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_bin_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_bin_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_imgfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hist.png'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.energy_overlap" title="Link to this definition"></a></dt>
 <dd><p>Plots histogram of energies, to check if overlap exists between them.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>temps</strong> – List of temperatures.</p></li>
 <li><p><strong>xvgfs</strong> – List of paths to .xvg files containing simulation energies.</p></li>
@@ -117,12 +124,12 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.estimate_kappa">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.</span></span><span class="sig-name descname"><span class="pre">estimate_kappa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.estimate_kappa" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.</span></span><span class="sig-name descname"><span class="pre">estimate_kappa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.estimate_kappa" title="Link to this definition"></a></dt>
 <dd><p>Estimates kappa and corresponding deltan based on var(N~) from an unbiased INDUS simulation.</p>
 <p>beta * kappa = alpha / var(Nt), alpha = 2 to 5</p>
 <p>deltan = 4 * sqrt(1 + alpha) / alpha * sqrt(var(Nt))</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>datf</strong> (<em>str</em>) – Path to INDUS waters data file.</p></li>
 <li><p><strong>temp</strong> (<em>float</em>) – Simulation temperature (in K).</p></li>
@@ -135,11 +142,11 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.estimate_min_max_Nstar">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.</span></span><span class="sig-name descname"><span class="pre">estimate_min_max_Nstar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_Nmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_Nmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.estimate_min_max_Nstar" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.</span></span><span class="sig-name descname"><span class="pre">estimate_min_max_Nstar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_Nmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_Nmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.ensemble.polymers.umbrella_sampling_utils.estimate_min_max_Nstar" title="Link to this definition"></a></dt>
 <dd><p>Estimates the minimum and maximum values of N* to set to get sampling in the desired range (true_Nmin, true_Nmax)</p>
 <p>True biased distribution is centered around a value of N that is in-between the unbiased average &lt;N&gt;0 and chosen N* (Rego 2020, ProQuest).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>datf</strong> (<em>str</em>) – Path to INDUS waters data file.</p></li>
 <li><p><strong>start_time</strong> (<em>float</em>) – Time to begin computation of variance at.</p></li>
@@ -151,13 +158,13 @@
 
 </section>
 <section id="indusanalysis-ensemble-polymers-wham-nt-ntop-module">
-<h2>INDUSAnalysis.ensemble.polymers.wham_nt_ntop module<a class="headerlink" href="#indusanalysis-ensemble-polymers-wham-nt-ntop-module" title="Permalink to this headline"></a></h2>
+<h2>INDUSAnalysis.ensemble.polymers.wham_nt_ntop module<a class="headerlink" href="#indusanalysis-ensemble-polymers-wham-nt-ntop-module" title="Link to this heading"></a></h2>
 </section>
 <section id="indusanalysis-ensemble-polymers-wham-nt-ntrg-module">
-<h2>INDUSAnalysis.ensemble.polymers.wham_nt_ntrg module<a class="headerlink" href="#indusanalysis-ensemble-polymers-wham-nt-ntrg-module" title="Permalink to this headline"></a></h2>
+<h2>INDUSAnalysis.ensemble.polymers.wham_nt_ntrg module<a class="headerlink" href="#indusanalysis-ensemble-polymers-wham-nt-ntrg-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-INDUSAnalysis.ensemble.polymers">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis.ensemble.polymers" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis.ensemble.polymers" title="Link to this heading"></a></h2>
 </section>
 </section>
 

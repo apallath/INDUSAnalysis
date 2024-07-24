@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INDUSAnalysis &mdash; INDUSAnalysis 0.1.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=01f34227"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -26,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> INDUSAnalysis
+
+          
+          
+          <a href="#" class="icon icon-home">
+            INDUSAnalysis
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -55,8 +62,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>INDUSAnalysis</li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">INDUSAnalysis</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -67,9 +74,9 @@
            <div itemprop="articleBody">
              
   <section id="indusanalysis">
-<h1>INDUSAnalysis<a class="headerlink" href="#indusanalysis" title="Permalink to this headline"></a></h1>
+<h1>INDUSAnalysis<a class="headerlink" href="#indusanalysis" title="Link to this heading"></a></h1>
 <dl class="field-list simple">
-<dt class="field-odd">Release</dt>
+<dt class="field-odd">Release<span class="colon">:</span></dt>
 <dd class="field-odd"><p>0.1.0</p>
 </dd>
 </dl>
@@ -77,51 +84,51 @@
 for solvated protein systems generated using the GROMACS implementation of
 <a class="reference external" href="https://link.springer.com/article/10.1007/s10955-011-0269-9">INDUS</a>.</p>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p><strong>Source code</strong> is available from
 <a class="reference external" href="https://github.com/apallath/INDUSAnalysis">https://github.com/apallath/INDUSAnalysis</a></p>
 <p>Obtain the sources with <a class="reference external" href="https://git-scm.com/">git</a></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/apallath/INDUSAnalysis.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/apallath/INDUSAnalysis.git
 </pre></div>
 </div>
 <ol class="arabic simple">
 <li><p>Install requirements</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r requirements.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
 <li><p>Build C extensions</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python setup.py build_ext --inplace
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>build_ext<span class="w"> </span>--inplace
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
 <li><p>Install package [in editable state]</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="o">[</span>-e<span class="o">]</span> .
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="o">[</span>-e<span class="o">]</span><span class="w"> </span>.
 </pre></div>
 </div>
 </section>
 <section id="running-tests">
-<h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this headline"></a></h2>
+<h2>Running tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
 <li><p>For unit tests</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> tests_unit
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>tests_unit
 pytest
 </pre></div>
 </div>
 <ol class="arabic simple">
 <li><p>For integration tests</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> tests_integration
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>tests_integration
 pytest
 </pre></div>
 </div>
 </section>
 <section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline"></a></h2>
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>

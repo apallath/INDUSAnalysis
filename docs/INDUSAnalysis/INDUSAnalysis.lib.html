@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INDUSAnalysis.lib package &mdash; INDUSAnalysis 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=01f34227"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}})</script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -29,11 +32,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> INDUSAnalysis
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            INDUSAnalysis
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -44,9 +51,32 @@
 <li class="toctree-l1"><a class="reference internal" href="INDUSAnalysis.html">INDUSAnalysis package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">INDUSAnalysis.lib package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.collective">INDUSAnalysis.lib.collective module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.path">INDUSAnalysis.lib.path module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.profiling">INDUSAnalysis.lib.profiling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.collective">INDUSAnalysis.lib.collective module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.P_to_phi"><code class="docutils literal notranslate"><span class="pre">P_to_phi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian"><code class="docutils literal notranslate"><span class="pre">derivative_integrated_step_gaussian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.fit_integrated_step_gaussian"><code class="docutils literal notranslate"><span class="pre">fit_integrated_step_gaussian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.fit_linear_model"><code class="docutils literal notranslate"><span class="pre">fit_linear_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.integrated_step_gaussian"><code class="docutils literal notranslate"><span class="pre">integrated_step_gaussian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.linear_model"><code class="docutils literal notranslate"><span class="pre">linear_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian"><code class="docutils literal notranslate"><span class="pre">penalized_integrated_step_gaussian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.collective.phi_to_P"><code class="docutils literal notranslate"><span class="pre">phi_to_P()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.path">INDUSAnalysis.lib.path module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.path.path_s"><code class="docutils literal notranslate"><span class="pre">path_s()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.path.path_s_scaled"><code class="docutils literal notranslate"><span class="pre">path_s_scaled()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.path.path_z"><code class="docutils literal notranslate"><span class="pre">path_z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.path.path_z_scaled"><code class="docutils literal notranslate"><span class="pre">path_z_scaled()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.path.plot_path_s"><code class="docutils literal notranslate"><span class="pre">plot_path_s()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.path.plot_path_z"><code class="docutils literal notranslate"><span class="pre">plot_path_z()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib.profiling">INDUSAnalysis.lib.profiling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.profiling.skipfunc"><code class="docutils literal notranslate"><span class="pre">skipfunc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.profiling.timefunc"><code class="docutils literal notranslate"><span class="pre">timefunc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#INDUSAnalysis.lib.profiling.timefuncfile"><code class="docutils literal notranslate"><span class="pre">timefuncfile()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-INDUSAnalysis.lib">Module contents</a></li>
 </ul>
 </li>
@@ -65,9 +95,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="INDUSAnalysis.html">INDUSAnalysis package</a> &raquo;</li>
-      <li>INDUSAnalysis.lib package</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="INDUSAnalysis.html">INDUSAnalysis package</a></li>
+      <li class="breadcrumb-item active">INDUSAnalysis.lib package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/INDUSAnalysis/INDUSAnalysis.lib.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -78,30 +108,30 @@
            <div itemprop="articleBody">
              
   <section id="indusanalysis-lib-package">
-<h1>INDUSAnalysis.lib package<a class="headerlink" href="#indusanalysis-lib-package" title="Permalink to this headline"></a></h1>
+<h1>INDUSAnalysis.lib package<a class="headerlink" href="#indusanalysis-lib-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
 <section id="module-INDUSAnalysis.lib.collective">
-<span id="indusanalysis-lib-collective-module"></span><h2>INDUSAnalysis.lib.collective module<a class="headerlink" href="#module-INDUSAnalysis.lib.collective" title="Permalink to this headline"></a></h2>
+<span id="indusanalysis-lib-collective-module"></span><h2>INDUSAnalysis.lib.collective module<a class="headerlink" href="#module-INDUSAnalysis.lib.collective" title="Link to this heading"></a></h2>
 <p>Function definitions for:
 - Effective hydration shell pressure calculation
 - Curve fitting</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.P_to_phi">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">P_to_phi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.P_to_phi" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">P_to_phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.P_to_phi" title="Link to this definition"></a></dt>
 <dd><p>Converts effective hydration shell P (kbar) to phi (kJ/mol) given P0 (bar)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>P</strong> (<em>np.float</em>) – Value of effective hydration shell pressure in kbar</p></li>
 <li><p><strong>P0</strong> (<em>np.float</em>) – Value of system (simulation) pressure in bar (optional, default = 1 bar)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>phi potential in kJ/mol</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>phi (np.float)</p>
 </dd>
 </dl>
@@ -109,20 +139,20 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">derivative_integrated_step_gaussian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">derivative_integrated_step_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.derivative_integrated_step_gaussian" title="Link to this definition"></a></dt>
 <dd><p>Function defining the derivative of the integrated step gaussian model (aka step + gaussian)</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.fit_integrated_step_gaussian">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">fit_integrated_step_gaussian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_integrated_step_gaussian" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">fit_integrated_step_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ydata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yerr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_guess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_integrated_step_gaussian" title="Link to this definition"></a></dt>
 <dd><p>Fits the integrated step gaussian model to data with error bars using
 weighted least squares regression.</p>
 <p>The integrated step gaussian model is defined as:</p>
 <div class="math notranslate nohighlight">
 \[y = A \cdot x + \frac{B - A}{S} \log(S \cdot x + \exp(S \cdot C)) - \frac{\sqrt{\pi}}{2} \cdot D \cdot E \cdot erf(\frac{C - x}{E})\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xdata</strong> (<em>ndarray</em>) – 1-dimensional array containing x values</p></li>
 <li><p><strong>ydata</strong> (<em>ndarray</em>) – 1-dimensional array containing y values</p></li>
@@ -131,7 +161,7 @@ weighted least squares regression.</p>
 for curve fitting</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>2-d tuple (popt, perr, chi_sq), where
 popt = array containing the fitted parameters for the integrated step gaussian model.
 perr = array containing errors corresponding to fitted parameters
@@ -142,11 +172,11 @@ chi_sq = chi squared statistic (weighted sum of squared residuals)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.fit_linear_model">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">fit_linear_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_linear_model" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">fit_linear_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ydata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yerr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_guess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.fit_linear_model" title="Link to this definition"></a></dt>
 <dd><p>Fits linear model to data with error bars using
 weighted least squares regression.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xdata</strong> (<em>ndarray</em>) – 1-dimensional array containing x values</p></li>
 <li><p><strong>ydata</strong> (<em>ndarray</em>) – 1-dimensional array containing y values</p></li>
@@ -155,7 +185,7 @@ weighted least squares regression.</p>
 for curve fitting</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>2-d tuple (popt, perr, chi_sq), where
 popt = array containing the fitted parameters for the linear model.
 perr = array containing errors corresponding to fitted parameters
@@ -166,19 +196,19 @@ chi_sq = chi squared statistic (weighted sum of squared residuals)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.integrated_step_gaussian">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">integrated_step_gaussian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.integrated_step_gaussian" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">integrated_step_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.integrated_step_gaussian" title="Link to this definition"></a></dt>
 <dd><p>Function defining the integrated step gaussian model.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.linear_model">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">linear_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.linear_model" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">linear_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.linear_model" title="Link to this definition"></a></dt>
 <dd><p>Function defining linear model</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">penalized_integrated_step_gaussian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">penalized_integrated_step_gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.penalized_integrated_step_gaussian" title="Link to this definition"></a></dt>
 <dd><p>Integrated step gaussian model with a penalty for positive slopes (which
 gets added to the residual during curve fitting).</p>
 <div class="admonition warning">
@@ -190,19 +220,19 @@ Use curve fitting with upper and lower bounds instead (implemented in <cite>fit_
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.collective.phi_to_P">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">phi_to_P</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.phi_to_P" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.collective.</span></span><span class="sig-name descname"><span class="pre">phi_to_P</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.collective.phi_to_P" title="Link to this definition"></a></dt>
 <dd><p>Converts phi (kJ/mol) to effective hydration shell P (kbar) given P0 (bar)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>phi</strong> (<em>np.float</em>) – Value of phi in kJ/mol</p></li>
 <li><p><strong>P0</strong> (<em>np.float</em>) – Value of system (simulation) pressure in bar (optional, default = 1 bar)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Effective hydration shell pressure in kbar.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>P (np.float)</p>
 </dd>
 </dl>
@@ -210,17 +240,21 @@ Use curve fitting with upper and lower bounds instead (implemented in <cite>fit_
 
 </section>
 <section id="module-INDUSAnalysis.lib.path">
-<span id="indusanalysis-lib-path-module"></span><h2>INDUSAnalysis.lib.path module<a class="headerlink" href="#module-INDUSAnalysis.lib.path" title="Permalink to this headline"></a></h2>
+<span id="indusanalysis-lib-path-module"></span><h2>INDUSAnalysis.lib.path module<a class="headerlink" href="#module-INDUSAnalysis.lib.path" title="Link to this heading"></a></h2>
 <p>Functions to compute and plot path collective variables</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.path.path_s">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_s" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_based</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_s" title="Link to this definition"></a></dt>
 <dd><p>Computes progress (tangential) path collective variable.</p>
 <p><div class="math notranslate nohighlight">
-\[s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}\]</div>
+\[s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} i \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}\]</div>
+</p>
+<p>If 1-based indexing:</p>
+<p><div class="math notranslate nohighlight">
+\[s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} (i + 1) \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}\]</div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – x-values to compute path CV at.</p></li>
 <li><p><strong>y</strong> – y-values to compute path CV at.</p></li>
@@ -228,6 +262,7 @@ Use curve fitting with upper and lower bounds instead (implemented in <cite>fit_
 <li><p><strong>y_i</strong> – y-coordinates of images defining path.</p></li>
 <li><p><strong>lam</strong> – Value of <span class="math notranslate nohighlight">\(\lambda\)</span> for constructing path CV.</p></li>
 <li><p><strong>sqrt</strong> – If True, computes distance instead of squared distance (default=False).</p></li>
+<li><p><strong>one_based</strong> – If True, uses 1-based indexing instead of 0-based (default=False).</p></li>
 </ul>
 </dd>
 </dl>
@@ -235,10 +270,14 @@ Use curve fitting with upper and lower bounds instead (implemented in <cite>fit_
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.path.path_s_scaled">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_s_scaled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_s_scaled" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_s_scaled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_based</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_s_scaled" title="Link to this definition"></a></dt>
 <dd><p>Computes progress (tangential) path collective variable using a scaled distance function.</p>
 <p><div class="math notranslate nohighlight">
-\[s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}\]</div>
+\[s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} i \ e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}\]</div>
+</p>
+<p>If 1-based:</p>
+<p><div class="math notranslate nohighlight">
+\[s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} (i + 1) \ e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]}}\]</div>
 </p>
 <p>where</p>
 <p><div class="math notranslate nohighlight">
@@ -254,7 +293,7 @@ Use curve fitting with upper and lower bounds instead (implemented in <cite>fit_
 \[y_i' = \frac{(y - y_{min})}{(y_{max} - y_{min})}\]</div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – x-values to compute path CV at.</p></li>
 <li><p><strong>y</strong> – y-values to compute path CV at.</p></li>
@@ -262,7 +301,13 @@ Use curve fitting with upper and lower bounds instead (implemented in <cite>fit_
 <li><p><strong>y_i</strong> – y-coordinates of images defining path.</p></li>
 <li><p><strong>lam</strong> – Value of <span class="math notranslate nohighlight">\(\lambda\)</span> for constructing path CV.</p></li>
 <li><p><strong>sqrt</strong> – If True, computes distance instead of squared distance (default=False).</p></li>
-<li><p><strong>y_max</strong> (<em>x_min</em><em>, </em><em>x_max</em><em>, </em><em>y_min</em><em>,</em>) – Scaling parameters (optional.
+<li><p><strong>x_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>x_max</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_max</strong> – Scaling parameters (optional.
 If None, the values are calculated from the max and min values of the path points.)</p></li>
 </ul>
 </dd>
@@ -271,10 +316,13 @@ If None, the values are calculated from the max and min values of the path point
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.path.path_z">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_z" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_z" title="Link to this definition"></a></dt>
 <dd><p>Computes distance (parallel) path collective variable.</p>
+<p><div class="math notranslate nohighlight">
+\[z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})\]</div>
+</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – x-values to compute path CV at.</p></li>
 <li><p><strong>y</strong> – y-values to compute path CV at.</p></li>
@@ -289,26 +337,26 @@ If None, the values are calculated from the max and min values of the path point
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.path.path_z_scaled">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_z_scaled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_z_scaled" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">path_z_scaled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.path_z_scaled" title="Link to this definition"></a></dt>
 <dd><p>Computes distance (parallel) path collective variable using a scaled distance function.</p>
 <p><div class="math notranslate nohighlight">
-\[z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})\]</div>
+\[z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x' - x_i') ^ 2 + (y' - y_i') ^ 2]})\]</div>
 </p>
 <p>where</p>
 <p><div class="math notranslate nohighlight">
-\[x' = (x - x_{min}) / (x_{max} - x_{min})\]</div>
+\[x' = \frac{(x - x_{min})}{(x_{max} - x_{min})}\]</div>
 
 <div class="math notranslate nohighlight">
-\[x_i' = (x_i - x_{min}) / (x_{max} - x_{min})\]</div>
+\[x_i' = \frac{(x_i - x_{min})}{(x_{max} - x_{min})}\]</div>
 
 <div class="math notranslate nohighlight">
-\[y' = (y - y_{min}) / (y_{max} - y_{min})\]</div>
+\[y' = \frac{(y - y_{min})}{(y_{max} - y_{min})}\]</div>
 
 <div class="math notranslate nohighlight">
-\[y_i' = (y - y_{min}) / (y_{max} - y_{min})\]</div>
+\[y_i' = \frac{(y - y_{min})}{(y_{max} - y_{min})}\]</div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – x-values to compute path CV at.</p></li>
 <li><p><strong>y</strong> – y-values to compute path CV at.</p></li>
@@ -316,7 +364,13 @@ If None, the values are calculated from the max and min values of the path point
 <li><p><strong>y_i</strong> – y-coordinates of images defining path.</p></li>
 <li><p><strong>lam</strong> – Value of <span class="math notranslate nohighlight">\(\lambda\)</span> for constructing path CV.</p></li>
 <li><p><strong>sqrt</strong> – If True, computes distance instead of squared distance (default=False).</p></li>
-<li><p><strong>y_max</strong> (<em>x_min</em><em>, </em><em>x_max</em><em>, </em><em>y_min</em><em>,</em>) – Scaling parameters (optional.
+<li><p><strong>x_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>x_max</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_max</strong> – Scaling parameters (optional.
 If None, the values are calculated from the max and min values of the path points.)</p></li>
 </ul>
 </dd>
@@ -325,13 +379,30 @@ If None, the values are calculated from the max and min values of the path point
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.path.plot_path_s">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">plot_path_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xcoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.plot_path_s" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">plot_path_s</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xcoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_based</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.plot_path_s" title="Link to this definition"></a></dt>
 <dd><p>Plots progress (tangential) path collective variable on a 2-dimensional grid.</p>
 <p><div class="math notranslate nohighlight">
-\[s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}\]</div>
+\[s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} i \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}\]</div>
+</p>
+<p>If 1-based indexing:</p>
+<p><div class="math notranslate nohighlight">
+\[s = \frac{1}{N-1} \frac{\sum_{i=0}^{N-1} (i + 1) \ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}\]</div>
+</p>
+<p>If scaled:</p>
+<p><div class="math notranslate nohighlight">
+\[x = \frac{(x - x_{min})}{(x_{max} - x_{min})}\]</div>
+
+<div class="math notranslate nohighlight">
+\[x_i = \frac{(x_i - x_{min})}{(x_{max} - x_{min})}\]</div>
+
+<div class="math notranslate nohighlight">
+\[y = \frac{(y - y_{min})}{(y_{max} - y_{min})}\]</div>
+
+<div class="math notranslate nohighlight">
+\[y_i = \frac{(y - y_{min})}{(y_{max} - y_{min})}\]</div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xcoord</strong> – Array specifying x-axis coordinates of grid.</p></li>
 <li><p><strong>ycoord</strong> – Array specifying y-axis coordinates of grid.</p></li>
@@ -339,17 +410,24 @@ If None, the values are calculated from the max and min values of the path point
 <li><p><strong>y_i</strong> – y-coordinates of images defining a path.</p></li>
 <li><p><strong>lam</strong> – Value of <span class="math notranslate nohighlight">\(\lambda\)</span> for constructing path CV.</p></li>
 <li><p><strong>contourvals</strong> (<em>int</em><em> or </em><em>array-like</em>) – Determines the number and positions of the contour lines / regions. Refer to the <a href="#id1"><span class="problematic" id="id2">`matplotlib documentation`_</span></a> for details.</p></li>
+<li><p><strong>sqrt</strong> – If True, computes distance instead of squared distance (default=False).</p></li>
 <li><p><strong>scaled</strong> – If true, uses scaled distance functions for computing s.</p></li>
-<li><p><strong>y_max</strong> (<em>x_min</em><em>, </em><em>x_max</em><em>, </em><em>y_min</em><em>,</em>) – Scaling parameters (optional.
+<li><p><strong>x_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>x_max</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_max</strong> – Scaling parameters (optional.
 If None, the values are calculated from the max and min values of the path points.)</p></li>
 <li><p><strong>cmap</strong> – Matplotlib colormap (default=jet).</p></li>
 <li><p><strong>dpi</strong> – Output DPI (default=150).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Matplotlib figure, axis, and colorbar</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tuple(fig, ax, cbar)</p>
 </dd>
 </dl>
@@ -357,13 +435,26 @@ If None, the values are calculated from the max and min values of the path point
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.path.plot_path_z">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">plot_path_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xcoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.plot_path_z" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.path.</span></span><span class="sig-name descname"><span class="pre">plot_path_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xcoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycoord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.path.plot_path_z" title="Link to this definition"></a></dt>
 <dd><p>Plots distance (parallel) path collective variable on a 2-dimensional grid.</p>
 <p><div class="math notranslate nohighlight">
 \[z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})\]</div>
 </p>
+<p>If scaled:</p>
+<p><div class="math notranslate nohighlight">
+\[x = \frac{(x - x_{min})}{(x_{max} - x_{min})}\]</div>
+
+<div class="math notranslate nohighlight">
+\[x_i = \frac{(x_i - x_{min})}{(x_{max} - x_{min})}\]</div>
+
+<div class="math notranslate nohighlight">
+\[y = \frac{(y - y_{min})}{(y_{max} - y_{min})}\]</div>
+
+<div class="math notranslate nohighlight">
+\[y_i = \frac{(y - y_{min})}{(y_{max} - y_{min})}\]</div>
+</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xcoord</strong> – Array specifying x-axis coordinates of grid.</p></li>
 <li><p><strong>ycoord</strong> – Array specifying y-axis coordinates of grid.</p></li>
@@ -371,8 +462,15 @@ If None, the values are calculated from the max and min values of the path point
 <li><p><strong>y_i</strong> – y-coordinates of images defining a path.</p></li>
 <li><p><strong>lam</strong> – Value of <span class="math notranslate nohighlight">\(\lambda\)</span> for constructing path CVs.</p></li>
 <li><p><strong>contourvals</strong> (<em>int</em><em> or </em><em>array-like</em>) – Determines the number and positions of the contour lines / regions. Refer to the <a href="#id3"><span class="problematic" id="id4">`matplotlib documentation`_</span></a> for details.</p></li>
+<li><p><strong>sqrt</strong> – If True, computes distance instead of squared distance (default=False).</p></li>
 <li><p><strong>scaled</strong> – If true, uses scaled distance functions for computing z.</p></li>
-<li><p><strong>y_max</strong> (<em>x_min</em><em>, </em><em>x_max</em><em>, </em><em>y_min</em><em>,</em>) – Scaling parameters (optional.
+<li><p><strong>x_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>x_max</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_min</strong> – Scaling parameters (optional.
+If None, the values are calculated from the max and min values of the path points.)</p></li>
+<li><p><strong>y_max</strong> – Scaling parameters (optional.
 If None, the values are calculated from the max and min values of the path points.)</p></li>
 <li><p><strong>cmap</strong> – Matplotlib colormap (default=jet).</p></li>
 <li><p><strong>dpi</strong> – Output DPI (default=150).</p></li>
@@ -383,29 +481,29 @@ If None, the values are calculated from the max and min values of the path point
 
 </section>
 <section id="module-INDUSAnalysis.lib.profiling">
-<span id="indusanalysis-lib-profiling-module"></span><h2>INDUSAnalysis.lib.profiling module<a class="headerlink" href="#module-INDUSAnalysis.lib.profiling" title="Permalink to this headline"></a></h2>
+<span id="indusanalysis-lib-profiling-module"></span><h2>INDUSAnalysis.lib.profiling module<a class="headerlink" href="#module-INDUSAnalysis.lib.profiling" title="Link to this heading"></a></h2>
 <p>Helper function definitions for code profiling</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.profiling.skipfunc">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.profiling.</span></span><span class="sig-name descname"><span class="pre">skipfunc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.skipfunc" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.profiling.</span></span><span class="sig-name descname"><span class="pre">skipfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.skipfunc" title="Link to this definition"></a></dt>
 <dd><p>Bypasses function execution [decorator]</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.profiling.timefunc">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.profiling.</span></span><span class="sig-name descname"><span class="pre">timefunc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.timefunc" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.profiling.</span></span><span class="sig-name descname"><span class="pre">timefunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.timefunc" title="Link to this definition"></a></dt>
 <dd><p>Reports function execution time to stdout [decorator]</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="INDUSAnalysis.lib.profiling.timefuncfile">
-<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.profiling.</span></span><span class="sig-name descname"><span class="pre">timefuncfile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.timefuncfile" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">INDUSAnalysis.lib.profiling.</span></span><span class="sig-name descname"><span class="pre">timefuncfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#INDUSAnalysis.lib.profiling.timefuncfile" title="Link to this definition"></a></dt>
 <dd><p>Reports function execution time to file [decorator]</p>
 </dd></dl>
 
 </section>
 <section id="module-INDUSAnalysis.lib">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis.lib" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-INDUSAnalysis.lib" title="Link to this heading"></a></h2>
 </section>
 </section>
 

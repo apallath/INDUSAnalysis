@@ -1,8 +1,8 @@
 # pypi
-biopython==1.76
+biopython
 Cython
 matplotlib==3.*
-MDAnalysis==0.20.*
+MDAnalysis
 numpy
 pillow
 pymbar==3.*
